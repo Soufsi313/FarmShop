@@ -18,6 +18,20 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Routes API pour la gestion des cookies RGPD
+/*
+TODO: Réactiver quand la bannière cookies sera fonctionnelle
+Route::prefix('cookies')->group(function () {
+    Route::post('/consent', [App\Http\Controllers\CookieConsentController::class, 'store']);
+    Route::get('/consent', [App\Http\Controllers\CookieConsentController::class, 'show']);
+    Route::delete('/consent', [App\Http\Controllers\CookieConsentController::class, 'destroy']);
+    
+    // Route pour les statistiques (admin uniquement)
+    Route::get('/statistics', [App\Http\Controllers\CookieConsentController::class, 'statistics'])
+        ->middleware('auth:sanctum');
+});
+*/
+
 // Routes API publiques pour les produits
 Route::prefix('products')->group(function () {
     Route::get('/', [App\Http\Controllers\ProductController::class, 'index']);
@@ -325,7 +339,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/blog-comments/{comment}/restore', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'restore']); // Restaurer
         Route::delete('/blog-comments/{comment}', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'destroy']); // Supprimer
         Route::post('/blog-comments/bulk-action', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'bulkAction']); // Actions en lot
-        Route::get('/blog-comments/statistics', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'statistics']); // Statistiques
+        Route::get('/blog-comments/statistics', [AppHttp\Controllers\Admin\BlogCommentAdminController::class, 'statistics']); // Statistiques
         
         // API d'administration pour les signalements de commentaires
         Route::get('/blog-reports', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'index']); // Liste signalements
