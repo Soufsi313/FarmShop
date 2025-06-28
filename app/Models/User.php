@@ -12,6 +12,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Carbon\Carbon;
 
 class User extends Authenticatable
 {
@@ -117,29 +118,6 @@ class User extends Authenticatable
 
         // Seuls les admins et superusers peuvent supprimer
         return $this->canManageCrud();
-    }
-
-    /**
-     * S'abonner à la newsletter
-     */
-    public function subscribeToNewsletter(): void
-    {
-        $this->update([
-            'is_newsletter_subscribed' => true,
-            'newsletter_subscribed_at' => now(),
-            'newsletter_unsubscribed_at' => null,
-        ]);
-    }
-
-    /**
-     * Se désabonner de la newsletter
-     */
-    public function unsubscribeFromNewsletter(): void
-    {
-        $this->update([
-            'is_newsletter_subscribed' => false,
-            'newsletter_unsubscribed_at' => now(),
-        ]);
     }
 
     /**
@@ -266,6 +244,79 @@ class User extends Authenticatable
     public function wishlistProducts()
     {
         return $this->belongsToMany(Product::class, 'wishlists')->withTimestamps();
+    }
+
+    /**
+     * Relation avec l'abonnement newsletter
+     */
+    public function newsletterSubscription()
+    {
+        return $this->hasOne(NewsletterSubscription::class);
+    }
+
+    /**
+     * Relation avec les newsletters créées
+     */
+    public function createdNewsletters()
+    {
+        return $this->hasMany(Newsletter::class, 'created_by');
+    }
+
+    /**
+     * Vérifier si l'utilisateur est abonné à la newsletter
+     */
+    public function isNewsletterSubscribed(): bool
+    {
+        return $this->is_newsletter_subscribed || 
+               NewsletterSubscription::isSubscribed($this->email);
+    }
+
+    /**
+     * S'abonner à la newsletter
+     */
+    public function subscribeToNewsletter(array $preferences = []): bool
+    {
+        // Mettre à jour le champ utilisateur
+        $this->is_newsletter_subscribed = true;
+        $this->newsletter_subscribed_at = Carbon::now();
+        $this->newsletter_unsubscribed_at = null;
+        $this->save();
+
+        // Créer ou mettre à jour l'abonnement
+        NewsletterSubscription::subscribe($this->email, $this->id, $preferences);
+
+        return true;
+    }
+
+    /**
+     * Se désabonner de la newsletter
+     */
+    public function unsubscribeFromNewsletter(): bool
+    {
+        // Mettre à jour le champ utilisateur
+        $this->is_newsletter_subscribed = false;
+        $this->newsletter_unsubscribed_at = Carbon::now();
+        $this->save();
+
+        // Désactiver l'abonnement
+        $subscription = NewsletterSubscription::byEmail($this->email)->first();
+        if ($subscription) {
+            $subscription->deactivate();
+        }
+
+        return true;
+    }
+
+    /**
+     * Basculer l'abonnement newsletter
+     */
+    public function toggleNewsletterSubscription(array $preferences = []): bool
+    {
+        if ($this->isNewsletterSubscribed()) {
+            return $this->unsubscribeFromNewsletter();
+        } else {
+            return $this->subscribeToNewsletter($preferences);
+        }
     }
 
     /**

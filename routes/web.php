@@ -54,11 +54,13 @@ Route::prefix('contact')->name('contact.')->group(function () {
     Route::post('/', [App\Http\Controllers\ContactController::class, 'store'])->name('store');
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified'
-])->group(function () {
+// Routes publiques pour les newsletters
+Route::prefix('newsletter')->name('newsletter.')->group(function () {
+    Route::post('/subscribe', [App\Http\Controllers\NewsletterController::class, 'subscribe'])->name('subscribe'); // S'abonner (public)
+    Route::get('/unsubscribe/{token}', [App\Http\Controllers\NewsletterController::class, 'unsubscribeByToken'])->name('unsubscribe'); // Désabonnement par token
+});
+
+Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
@@ -287,5 +289,24 @@ Route::middleware([
                 'output' => \Artisan::output()
             ]);
         })->name('rentals.automation.run'); // Déclencher l'automatisation
+    });
+
+    // Routes d'administration pour les newsletters
+    Route::middleware(['permission:manage newsletters'])->prefix('admin')->name('admin.')->group(function () {
+        // CRUD pour les newsletters
+        Route::get('/newsletters', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'index'])->name('newsletters.index'); // Liste
+        Route::get('/newsletters/create', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'create'])->name('newsletters.create'); // Créer
+        Route::post('/newsletters', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'store'])->name('newsletters.store'); // Stocker
+        Route::get('/newsletters/{newsletter}', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'show'])->name('newsletters.show'); // Détail
+        Route::get('/newsletters/{newsletter}/edit', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'edit'])->name('newsletters.edit'); // Éditer
+        Route::put('/newsletters/{newsletter}', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'update'])->name('newsletters.update'); // Mettre à jour
+        Route::delete('/newsletters/{newsletter}', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'destroy'])->name('newsletters.destroy'); // Supprimer
+        
+        // Actions spéciales pour les newsletters
+        Route::put('/newsletters/{newsletter}/publish', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'publish'])->name('newsletters.publish'); // Publier
+        Route::post('/newsletters/{newsletter}/send', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'send'])->name('newsletters.send'); // Envoyer
+        
+        // Gestion des abonnés
+        Route::get('/newsletters/subscribers/list', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'subscribers'])->name('newsletters.subscribers'); // Liste des abonnés
     });
 });

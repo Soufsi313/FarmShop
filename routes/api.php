@@ -36,6 +36,11 @@ Route::prefix('contact')->group(function () {
     Route::post('/', [App\Http\Controllers\ContactController::class, 'store']);
 });
 
+// Routes API publiques pour la newsletter
+Route::prefix('newsletter')->group(function () {
+    Route::post('/subscribe', [App\Http\Controllers\NewsletterController::class, 'subscribe']); // S'abonner (public)
+});
+
 // Routes API publiques pour les likes
 Route::prefix('likes')->group(function () {
     Route::get('/most-liked', [App\Http\Controllers\ProductLikeController::class, 'mostLiked']); // Produits les plus likés
@@ -134,6 +139,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/newsletter/subscribe', [App\Http\Controllers\UserController::class, 'subscribeNewsletter']);
         Route::post('/newsletter/unsubscribe', [App\Http\Controllers\UserController::class, 'unsubscribeNewsletter']);
         Route::get('/export-data', [App\Http\Controllers\UserController::class, 'exportData']);
+    });
+
+    // API pour la newsletter - Utilisateurs connectés
+    Route::prefix('newsletter')->group(function () {
+        Route::post('/toggle', [App\Http\Controllers\NewsletterController::class, 'toggle']); // Basculer abonnement
+        Route::delete('/unsubscribe', [App\Http\Controllers\NewsletterController::class, 'unsubscribe']); // Se désabonner
+        Route::get('/status', [App\Http\Controllers\NewsletterController::class, 'status']); // Statut abonnement
     });
 
     // Actions sur les produits pour utilisateurs connectés
