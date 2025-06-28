@@ -275,4 +275,40 @@ Route::middleware('auth:sanctum')->group(function () {
             ]);
         }); // Déclencher l'automatisation
     });
+
+    // API d'administration pour les newsletters
+    Route::middleware(['permission:manage newsletters'])->prefix('admin')->group(function () {
+        // API CRUD pour les newsletters (NewsletterAdminController)
+        Route::get('/newsletters', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'index']); // Liste
+        Route::post('/newsletters', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'store']); // Créer
+        Route::get('/newsletters/{newsletter}', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'show']); // Détail
+        Route::put('/newsletters/{newsletter}', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'update']); // Mettre à jour
+        Route::delete('/newsletters/{newsletter}', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'destroy']); // Supprimer
+        
+        // Actions spéciales pour les newsletters
+        Route::put('/newsletters/{newsletter}/publish', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'publish']); // Publier
+        Route::post('/newsletters/{newsletter}/send', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'send']); // Envoyer
+        Route::get('/newsletters/statistics', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'statistics']); // Statistiques
+        Route::get('/newsletters/export', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'export']); // Export
+        
+        // Gestion des abonnés
+        Route::get('/newsletters/subscribers/list', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'subscribers']); // Liste des abonnés
+        
+        // API CRUD pour les abonnements newsletter (NewsletterSubscriptionController)
+        Route::get('/newsletter-subscriptions', [App\Http\Controllers\NewsletterSubscriptionController::class, 'index']); // Liste des abonnements
+        Route::post('/newsletter-subscriptions', [App\Http\Controllers\NewsletterSubscriptionController::class, 'store']); // Créer un abonnement
+        Route::get('/newsletter-subscriptions/{subscription}', [App\Http\Controllers\NewsletterSubscriptionController::class, 'show']); // Détail abonnement
+        Route::put('/newsletter-subscriptions/{subscription}', [App\Http\Controllers\NewsletterSubscriptionController::class, 'update']); // Mettre à jour
+        Route::delete('/newsletter-subscriptions/{subscription}', [App\Http\Controllers\NewsletterSubscriptionController::class, 'destroy']); // Supprimer
+        
+        // Actions en lot et export pour les abonnements
+        Route::post('/newsletter-subscriptions/bulk-action', [App\Http\Controllers\NewsletterSubscriptionController::class, 'bulkAction']); // Actions en lot
+        Route::get('/newsletter-subscriptions/export', [App\Http\Controllers\NewsletterSubscriptionController::class, 'export']); // Export CSV
+    });
+});
+
+// Routes API publiques pour la newsletter (pas d'authentification requise)
+Route::prefix('newsletter')->group(function () {
+    Route::get('/unsubscribe/{token}', [App\Http\Controllers\NewsletterSubscriptionController::class, 'unsubscribeByToken']); // Désabonnement par token
+    Route::get('/status/{token}', [App\Http\Controllers\NewsletterSubscriptionController::class, 'checkStatus']); // Vérifier statut par token
 });

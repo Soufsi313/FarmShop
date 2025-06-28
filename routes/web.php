@@ -308,5 +308,22 @@ Route::middleware('auth')->group(function () {
         
         // Gestion des abonnés
         Route::get('/newsletters/subscribers/list', [App\Http\Controllers\Admin\NewsletterAdminController::class, 'subscribers'])->name('newsletters.subscribers'); // Liste des abonnés
+        
+        // CRUD pour les abonnements newsletter (NewsletterSubscriptionController)
+        Route::get('/newsletter-subscriptions', [App\Http\Controllers\NewsletterSubscriptionController::class, 'index'])->name('newsletter-subscriptions.index'); // Liste des abonnements
+        Route::post('/newsletter-subscriptions', [App\Http\Controllers\NewsletterSubscriptionController::class, 'store'])->name('newsletter-subscriptions.store'); // Créer un abonnement
+        Route::get('/newsletter-subscriptions/{subscription}', [App\Http\Controllers\NewsletterSubscriptionController::class, 'show'])->name('newsletter-subscriptions.show'); // Détail abonnement
+        Route::put('/newsletter-subscriptions/{subscription}', [App\Http\Controllers\NewsletterSubscriptionController::class, 'update'])->name('newsletter-subscriptions.update'); // Mettre à jour
+        Route::delete('/newsletter-subscriptions/{subscription}', [App\Http\Controllers\NewsletterSubscriptionController::class, 'destroy'])->name('newsletter-subscriptions.destroy'); // Supprimer
+        
+        // Actions en lot pour les abonnements
+        Route::post('/newsletter-subscriptions/bulk-action', [App\Http\Controllers\NewsletterSubscriptionController::class, 'bulkAction'])->name('newsletter-subscriptions.bulk-action'); // Actions en lot
+        Route::get('/newsletter-subscriptions/export', [App\Http\Controllers\NewsletterSubscriptionController::class, 'export'])->name('newsletter-subscriptions.export'); // Export CSV
+    });
+
+    // Routes publiques pour la newsletter (désabonnement par token)
+    Route::prefix('newsletter')->name('newsletter.')->group(function () {
+        Route::get('/unsubscribe/{token}', [App\Http\Controllers\NewsletterSubscriptionController::class, 'unsubscribeByToken'])->name('unsubscribe.token'); // Désabonnement par token
+        Route::get('/status/{token}', [App\Http\Controllers\NewsletterSubscriptionController::class, 'checkStatus'])->name('status.token'); // Vérifier statut par token
     });
 });
