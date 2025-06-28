@@ -96,6 +96,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/count', [App\Http\Controllers\ProductLikeController::class, 'getUserLikeCount']); // Nombre de mes likes
     });
 
+    // API pour les commandes - Utilisateurs connectés uniquement
+    Route::prefix('orders')->group(function () {
+        Route::get('/', [App\Http\Controllers\OrderController::class, 'index']); // Obtenir la liste des commandes
+        Route::post('/', [App\Http\Controllers\OrderController::class, 'store']); // Créer une nouvelle commande
+        Route::get('/{order}', [App\Http\Controllers\OrderController::class, 'show']); // Obtenir les détails d'une commande
+        Route::put('/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel']); // Annuler une commande
+        Route::get('/{order}/returns', [App\Http\Controllers\OrderController::class, 'returns']); // Obtenir les retours d'une commande
+        Route::post('/{order}/returns', [App\Http\Controllers\OrderController::class, 'createReturn']); // Créer une demande de retour
+    });
+
     // Actions personnelles de l'utilisateur
     Route::prefix('user')->group(function () {
         Route::post('/newsletter/subscribe', [App\Http\Controllers\UserController::class, 'subscribeNewsletter']);
@@ -185,5 +195,21 @@ Route::middleware('auth:sanctum')->group(function () {
         // Interface d'administration pour les likes
         Route::get('/likes', [App\Http\Controllers\ProductLikeController::class, 'adminIndex']); // Liste des likes pour l'admin
         Route::get('/likes/statistics', [App\Http\Controllers\ProductLikeController::class, 'statistics']); // Statistiques détaillées des likes
+    });
+
+    // API d'administration pour les commandes
+    Route::middleware(['permission:manage orders'])->prefix('admin')->group(function () {
+        // Interface d'administration pour les commandes
+        Route::get('/orders', [App\Http\Controllers\OrderController::class, 'adminIndex']); // Liste des commandes pour l'admin
+        Route::get('/orders/{order}', [App\Http\Controllers\OrderController::class, 'adminShow']); // Détail d'une commande pour l'admin
+        Route::put('/orders/{order}/status', [App\Http\Controllers\OrderController::class, 'updateStatus']); // Mettre à jour le statut
+        Route::get('/orders/automation/status-updates', [App\Http\Controllers\OrderController::class, 'automateStatusUpdates']); // Automatisation des statuts
+        Route::get('/orders/statistics', [App\Http\Controllers\OrderController::class, 'statistics']); // Statistiques des commandes
+        
+        // Gestion des retours
+        Route::get('/orders/{order}/returns', [App\Http\Controllers\OrderReturnController::class, 'index']); // Liste des retours
+        Route::put('/orders/returns/{return}/approve', [App\Http\Controllers\OrderReturnController::class, 'approve']); // Approuver un retour
+        Route::put('/orders/returns/{return}/reject', [App\Http\Controllers\OrderReturnController::class, 'reject']); // Rejeter un retour
+        Route::put('/orders/returns/{return}/process', [App\Http\Controllers\OrderReturnController::class, 'process']); // Traiter un retour
     });
 });

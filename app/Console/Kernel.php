@@ -15,7 +15,21 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // Automatiser les changements de statuts des commandes toutes les heures
+        $schedule->command('orders:automate-statuses')
+            ->hourly()
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/order-automation.log'));
+
+        // Nettoyer les paniers abandonnés plus de 7 jours
+        $schedule->command('cart:cleanup')
+            ->daily()
+            ->at('02:00');
+
+        // Envoyer les notifications de stock faible tous les matins à 8h
+        $schedule->command('products:check-low-stock')
+            ->dailyAt('08:00');
     }
 
     /**

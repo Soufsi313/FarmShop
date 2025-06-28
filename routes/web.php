@@ -115,6 +115,18 @@ Route::middleware([
         Route::get('/count', [App\Http\Controllers\ProductLikeController::class, 'getUserLikeCount'])->name('count'); // Nombre de mes likes
     });
 
+    // Routes pour les commandes - Utilisateurs connectés uniquement
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [App\Http\Controllers\OrderController::class, 'index'])->name('index'); // Liste des commandes
+        Route::get('/create', [App\Http\Controllers\OrderController::class, 'create'])->name('create'); // Formulaire de commande
+        Route::post('/', [App\Http\Controllers\OrderController::class, 'store'])->name('store'); // Créer une commande
+        Route::get('/{order}', [App\Http\Controllers\OrderController::class, 'show'])->name('show'); // Détail d'une commande
+        Route::put('/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel'])->name('cancel'); // Annuler une commande
+        Route::get('/{order}/invoice', [App\Http\Controllers\OrderController::class, 'downloadInvoice'])->name('invoice'); // Télécharger la facture
+        Route::get('/{order}/returns', [App\Http\Controllers\OrderController::class, 'returns'])->name('returns'); // Afficher les retours
+        Route::post('/{order}/returns', [App\Http\Controllers\OrderController::class, 'createReturn'])->name('returns.store'); // Créer un retour
+    });
+
     // Routes pour les utilisateurs (actions personnelles)
     Route::prefix('user')->name('user.')->group(function () {
         Route::post('/newsletter/subscribe', [App\Http\Controllers\UserController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
@@ -197,5 +209,21 @@ Route::middleware([
         // Interface d'administration pour les likes
         Route::get('/likes', [App\Http\Controllers\ProductLikeController::class, 'adminIndex'])->name('likes.index'); // Liste des likes
         Route::get('/likes/statistics', [App\Http\Controllers\ProductLikeController::class, 'statistics'])->name('likes.statistics'); // Statistiques des likes
+    });
+
+    // Routes d'administration pour les commandes
+    Route::middleware(['permission:manage orders'])->prefix('admin')->name('admin.')->group(function () {
+        // Interface d'administration pour les commandes
+        Route::get('/orders', [App\Http\Controllers\OrderController::class, 'adminIndex'])->name('orders.index'); // Liste des commandes
+        Route::get('/orders/{order}', [App\Http\Controllers\OrderController::class, 'adminShow'])->name('orders.show'); // Détail d'une commande
+        Route::put('/orders/{order}/status', [App\Http\Controllers\OrderController::class, 'updateStatus'])->name('orders.update-status'); // Mettre à jour le statut
+        Route::get('/orders/automation/status-updates', [App\Http\Controllers\OrderController::class, 'automateStatusUpdates'])->name('orders.automation'); // Automatisation des statuts
+        Route::get('/orders-statistics', [App\Http\Controllers\OrderController::class, 'statistics'])->name('orders.statistics'); // Statistiques des commandes
+        
+        // Gestion des retours
+        Route::get('/orders/{order}/returns', [App\Http\Controllers\OrderReturnController::class, 'index'])->name('orders.returns.index'); // Liste des retours
+        Route::put('/orders/returns/{return}/approve', [App\Http\Controllers\OrderReturnController::class, 'approve'])->name('orders.returns.approve'); // Approuver un retour
+        Route::put('/orders/returns/{return}/reject', [App\Http\Controllers\OrderReturnController::class, 'reject'])->name('orders.returns.reject'); // Rejeter un retour
+        Route::put('/orders/returns/{return}/process', [App\Http\Controllers\OrderReturnController::class, 'process'])->name('orders.returns.process'); // Traiter un retour
     });
 });
