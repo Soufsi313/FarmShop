@@ -221,6 +221,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Relation avec les locations de l'utilisateur
+     */
+    public function rentals()
+    {
+        return $this->hasMany(\App\Models\Rental::class);
+    }
+
+    /**
      * Relation avec les commentaires de blog de l'utilisateur
      */
     public function blogComments()

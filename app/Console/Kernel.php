@@ -30,6 +30,25 @@ class Kernel extends ConsoleKernel
         // Envoyer les notifications de stock faible tous les matins à 8h
         $schedule->command('products:check-low-stock')
             ->dailyAt('08:00');
+
+        // Automatisation des statuts de location (3 fois par jour)
+        $schedule->command('rentals:automate')
+            ->dailyAt('09:00')
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/rental-automation.log'));
+            
+        $schedule->command('rentals:automate')
+            ->dailyAt('15:00')
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/rental-automation.log'));
+            
+        $schedule->command('rentals:automate')
+            ->dailyAt('21:00')
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/rental-automation.log'));
     }
 
     /**

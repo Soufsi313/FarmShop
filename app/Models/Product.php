@@ -118,6 +118,14 @@ class Product extends Model
     }
 
     /**
+     * Relation avec les articles de location
+     */
+    public function rentalItems()
+    {
+        return $this->hasMany(\App\Models\RentalItem::class);
+    }
+
+    /**
      * Scopes
      */
     public function scopeActive($query)
