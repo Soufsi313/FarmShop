@@ -145,4 +145,16 @@ Route::middleware([
         Route::post('/categories/reorder', [App\Http\Controllers\CategoryController::class, 'reorder'])->name('categories.reorder');
         Route::get('/categories-statistics', [App\Http\Controllers\CategoryController::class, 'statistics'])->name('categories.statistics');
     });
+
+    // Routes d'administration pour les images de produits
+    Route::middleware(['permission:manage products'])->prefix('admin')->name('admin.')->group(function () {
+        // CRUD complet pour les images de produits
+        Route::resource('product-images', App\Http\Controllers\ProductImageController::class);
+        
+        // Routes supplémentaires pour la gestion des images
+        Route::post('/product-images/bulk-destroy', [App\Http\Controllers\ProductImageController::class, 'bulkDestroy'])->name('product-images.bulk-destroy');
+        Route::post('/product-images/reorder', [App\Http\Controllers\ProductImageController::class, 'reorder'])->name('product-images.reorder');
+        Route::post('/product-images/{productImage}/set-main', [App\Http\Controllers\ProductImageController::class, 'setMain'])->name('product-images.set-main');
+        Route::get('/product-images-statistics', [App\Http\Controllers\ProductImageController::class, 'statistics'])->name('product-images.statistics');
+    });
 });

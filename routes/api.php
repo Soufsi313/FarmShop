@@ -133,4 +133,16 @@ Route::middleware('auth:sanctum')->group(function () {
         // API CRUD pour les catégories
         Route::apiResource('categories', App\Http\Controllers\CategoryController::class);
     });
+
+    // API d'administration pour les images de produits
+    Route::middleware(['permission:manage products'])->prefix('admin')->group(function () {
+        // Statistiques et actions spécialisées
+        Route::get('/product-images/statistics', [App\Http\Controllers\ProductImageController::class, 'statistics']);
+        Route::post('/product-images/bulk-destroy', [App\Http\Controllers\ProductImageController::class, 'bulkDestroy']);
+        Route::post('/product-images/reorder', [App\Http\Controllers\ProductImageController::class, 'reorder']);
+        Route::post('/product-images/{productImage}/set-main', [App\Http\Controllers\ProductImageController::class, 'setMain']);
+        
+        // API CRUD pour les images de produits
+        Route::apiResource('product-images', App\Http\Controllers\ProductImageController::class);
+    });
 });

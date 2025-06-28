@@ -68,7 +68,6 @@ class RolePermissionSeeder extends Seeder
         // Créer les rôles
         $userRole = Role::firstOrCreate(['name' => User::ROLE_USER]);
         $adminRole = Role::firstOrCreate(['name' => User::ROLE_ADMIN]);
-        $superuserRole = Role::firstOrCreate(['name' => User::ROLE_SUPERUSER]);
 
         // Assigner les permissions au rôle USER
         $userRole->givePermissionTo([
@@ -114,7 +113,7 @@ class RolePermissionSeeder extends Seeder
             'reply_messages',
         ]);
 
-        // Assigner les permissions au rôle SUPERUSER (toutes les permissions)
-        $superuserRole->givePermissionTo(Permission::all());
+        // Assigner toutes les permissions au rôle ADMIN
+        $adminRole->givePermissionTo(Permission::all());
     }
 }

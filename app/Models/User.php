@@ -3,13 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Da    /**
-     * Vérifie si l'utilisateur peut gérer le CRUD (admin uniquement)
-     */
-    public function canManage(): bool
-    {
-        return $this->isAdmin();
-    }\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
