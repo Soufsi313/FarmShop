@@ -651,4 +651,123 @@ class OrderController extends Controller
             return redirect()->back()->with('error', $errorMessage);
         }
     }
+
+    /**
+     * Annuler une commande par l'utilisateur (avec remboursement automatique si non expédiée)
+     */
+    public function userCancel(Request $request, Order $order)
+    {
+        // Vérifier que l'utilisateur est propriétaire de la commande
+        if ($order->user_id !== auth()->id()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vous n\'avez pas l\'autorisation d\'accéder à cette commande.'
+                ], 403);
+            }
+            return redirect()->back()->with('error', 'Vous n\'avez pas l\'autorisation d\'accéder à cette commande.');
+        }
+
+        // Vérifier si la commande peut être annulée avec remboursement
+        if (!$order->canBeCancelledWithRefund()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cette commande ne peut plus être annulée. Elle a déjà été expédiée ou livrée.'
+                ], 400);
+            }
+            return redirect()->back()->with('error', 'Cette commande ne peut plus être annulée. Elle a déjà été expédiée ou livrée.');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        if ($validator->fails()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            return redirect()->back()->withErrors($validator);
+        }
+
+        DB::beginTransaction();
+        try {
+            $reason = $request->reason ?? 'Annulation par le client';
+            
+            if ($order->cancelWithRefund($reason)) {
+                // Envoyer notification d'annulation
+                if (class_exists(\App\Notifications\OrderCancellation::class)) {
+                    $order->user->notify(new \App\Notifications\OrderCancellation($order));
+                }
+
+                DB::commit();
+
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Commande annulée avec succès. Le remboursement sera traité automatiquement.',
+                        'data' => $order->fresh()
+                    ]);
+                }
+
+                return redirect()->route('orders.show', $order)->with('success', 'Commande annulée avec succès. Le remboursement sera traité automatiquement.');
+            } else {
+                throw new \Exception('Impossible d\'annuler la commande.');
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreur lors de l\'annulation : ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Erreur lors de l\'annulation : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Vérifier si une commande peut être annulée par l'utilisateur
+     */
+    public function checkCancellationEligibility(Request $request, Order $order)
+    {
+        // Vérifier que l'utilisateur est propriétaire de la commande
+        if ($order->user_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous n\'avez pas l\'autorisation d\'accéder à cette commande.'
+            ], 403);
+        }
+
+        $canCancel = $order->canBeCancelledWithRefund();
+        $reasons = [];
+
+        if (!$canCancel) {
+            if ($order->isShipped()) {
+                $reasons[] = 'La commande a déjà été expédiée.';
+            }
+            if ($order->isDelivered()) {
+                $reasons[] = 'La commande a déjà été livrée.';
+            }
+            if ($order->isCancelled()) {
+                $reasons[] = 'La commande a déjà été annulée.';
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'can_cancel' => $canCancel,
+                'reasons' => $reasons,
+                'will_refund' => $canCancel && $order->isPaid(),
+                'refund_amount' => $canCancel && $order->isPaid() ? $order->total_amount : 0,
+            ]
+        ]);
+    }
 }

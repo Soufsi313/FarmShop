@@ -35,6 +35,10 @@ class Product extends Model
         'min_rental_days',
         'max_rental_days',
         'rental_conditions',
+        'is_perishable',
+        'is_returnable',
+        'return_period_days',
+        'return_conditions',
         'bulk_pricing',
         'views_count',
         'likes_count',
@@ -47,8 +51,11 @@ class Product extends Model
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
         'is_rentable' => 'boolean',
+        'is_perishable' => 'boolean',
+        'is_returnable' => 'boolean',
         'min_rental_days' => 'integer',
         'max_rental_days' => 'integer',
+        'return_period_days' => 'integer',
         'bulk_pricing' => 'array',
         'views_count' => 'integer',
         'likes_count' => 'integer',
@@ -508,5 +515,70 @@ class Product extends Model
         $availableStock = $this->quantity - $conflictingRentals;
         
         return $availableStock >= $requestedQuantity;
+    }
+
+    /**
+     * Vérifier si le produit peut être retourné
+     */
+    public function isReturnableProduct(): bool
+    {
+        return $this->is_returnable && !$this->is_perishable;
+    }
+
+    /**
+     * Vérifier si le produit est dans sa période de retour
+     */
+    public function isWithinReturnPeriod(\DateTime $orderDate): bool
+    {
+        if (!$this->isReturnableProduct()) {
+            return false;
+        }
+
+        $currentDate = new \DateTime();
+        $maxReturnDate = clone $orderDate;
+        $maxReturnDate->add(new \DateInterval('P' . $this->return_period_days . 'D'));
+
+        return $currentDate <= $maxReturnDate;
+    }
+
+    /**
+     * Obtenir le nombre de jours restants pour retourner le produit
+     */
+    public function getDaysLeftForReturn(\DateTime $orderDate): int
+    {
+        if (!$this->isReturnableProduct()) {
+            return 0;
+        }
+
+        $currentDate = new \DateTime();
+        $maxReturnDate = clone $orderDate;
+        $maxReturnDate->add(new \DateInterval('P' . $this->return_period_days . 'D'));
+
+        $interval = $currentDate->diff($maxReturnDate);
+        return $interval->invert ? 0 : $interval->days;
+    }
+
+    /**
+     * Vérifier si le produit est périssable ou alimentaire
+     */
+    public function isPerishable(): bool
+    {
+        return $this->is_perishable || $this->category->food_type === 'perishable';
+    }
+
+    /**
+     * Obtenir les conditions de retour formatées
+     */
+    public function getReturnConditionsAttribute($value): ?string
+    {
+        if ($value) {
+            return $value;
+        }
+
+        if ($this->isPerishable()) {
+            return 'Les produits périssables ne peuvent pas être retournés pour des raisons d\'hygiène et de sécurité alimentaire.';
+        }
+
+        return 'Retour possible dans les ' . $this->return_period_days . ' jours suivant la livraison, produit en état neuf dans son emballage d\'origine.';
     }
 }

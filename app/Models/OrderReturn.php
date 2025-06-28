@@ -20,15 +20,23 @@ class OrderReturn extends Model
         'order_id',
         'order_item_id',
         'user_id',
+        'return_number',
         'quantity_returned',
-        'reason',
-        'description',
-        'status',
         'refund_amount',
-        'refund_status',
-        'approved_at',
-        'processed_at',
+        'return_reason',
+        'return_notes',
         'admin_notes',
+        'status',
+        'refund_status',
+        'requested_at',
+        'approved_at',
+        'received_at',
+        'refunded_at',
+        'rejected_at',
+        'refund_method',
+        'refund_transaction_id',
+        'is_within_return_period',
+        'return_deadline',
         'images',
     ];
 
@@ -38,19 +46,25 @@ class OrderReturn extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'requested_at' => 'datetime',
         'approved_at' => 'datetime',
-        'processed_at' => 'datetime',
+        'received_at' => 'datetime',
+        'refunded_at' => 'datetime',
+        'rejected_at' => 'datetime',
+        'return_deadline' => 'date',
         'refund_amount' => 'decimal:2',
+        'is_within_return_period' => 'boolean',
         'images' => 'array',
     ];
 
     /**
      * Les statuts possibles pour un retour
      */
-    const STATUS_PENDING = 'pending';
+    const STATUS_REQUESTED = 'requested';
     const STATUS_APPROVED = 'approved';
+    const STATUS_RECEIVED = 'received';
+    const STATUS_REFUNDED = 'refunded';
     const STATUS_REJECTED = 'rejected';
-    const STATUS_PROCESSED = 'processed';
 
     /**
      * Les statuts de remboursement possibles
@@ -76,10 +90,11 @@ class OrderReturn extends Model
     public static function getAllStatuses(): array
     {
         return [
-            self::STATUS_PENDING,
+            self::STATUS_REQUESTED,
             self::STATUS_APPROVED,
+            self::STATUS_RECEIVED,
+            self::STATUS_REFUNDED,
             self::STATUS_REJECTED,
-            self::STATUS_PROCESSED,
         ];
     }
 
@@ -397,5 +412,65 @@ class OrderReturn extends Model
         $this->images = array_merge($currentImages, $imagePaths);
 
         return $this->save();
+    }
+
+    /**
+     * Vérifier si un retour peut être créé pour un article de commande
+     */
+    public static function canCreateReturn(OrderItem $orderItem): bool
+    {
+        // Vérifier si le produit est retournable
+        if (!$orderItem->product->isReturnableProduct()) {
+            return false;
+        }
+
+        // Vérifier si la commande est éligible au retour
+        if (!$orderItem->order->isEligibleForReturn()) {
+            return false;
+        }
+
+        // Vérifier la période de retour
+        if (!$orderItem->product->isWithinReturnPeriod($orderItem->order->created_at)) {
+            return false;
+        }
+
+        // Vérifier qu'il n'y a pas déjà un retour en cours pour cet article
+        $existingReturn = self::where('order_item_id', $orderItem->id)
+            ->whereIn('status', [self::STATUS_PENDING, self::STATUS_APPROVED])
+            ->exists();
+
+        return !$existingReturn;
+    }
+
+    /**
+     * Obtenir les raisons de retour pour un produit périssable (vide car non retournable)
+     */
+    public static function getPerishableReturnMessage(): string
+    {
+        return 'Les produits périssables ne peuvent pas être retournés pour des raisons d\'hygiène et de sécurité alimentaire.';
+    }
+
+    /**
+     * Créer un retour avec validation des règles métier
+     */
+    public static function createReturn(OrderItem $orderItem, array $data): ?self
+    {
+        if (!self::canCreateReturn($orderItem)) {
+            return null;
+        }
+
+        $return = new self([
+            'order_id' => $orderItem->order_id,
+            'order_item_id' => $orderItem->id,
+            'user_id' => $orderItem->order->user_id,
+            'quantity_returned' => min($data['quantity_returned'], $orderItem->quantity),
+            'reason' => $data['reason'],
+            'description' => $data['description'] ?? null,
+            'status' => self::STATUS_PENDING,
+            'refund_status' => self::REFUND_STATUS_PENDING,
+        ]);
+
+        $return->save();
+        return $return;
     }
 }

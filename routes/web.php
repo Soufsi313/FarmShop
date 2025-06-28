@@ -121,7 +121,9 @@ Route::middleware([
         Route::get('/create', [App\Http\Controllers\OrderController::class, 'create'])->name('create'); // Formulaire de commande
         Route::post('/', [App\Http\Controllers\OrderController::class, 'store'])->name('store'); // Créer une commande
         Route::get('/{order}', [App\Http\Controllers\OrderController::class, 'show'])->name('show'); // Détail d'une commande
-        Route::put('/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel'])->name('cancel'); // Annuler une commande
+        Route::put('/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel'])->name('cancel'); // Annuler une commande (admin)
+        Route::put('/{order}/user-cancel', [App\Http\Controllers\OrderController::class, 'userCancel'])->name('user-cancel'); // Annuler par l'utilisateur
+        Route::get('/{order}/cancellation-eligibility', [App\Http\Controllers\OrderController::class, 'checkCancellationEligibility'])->name('cancellation-eligibility'); // Vérifier éligibilité annulation
         Route::get('/{order}/invoice', [App\Http\Controllers\OrderController::class, 'downloadInvoice'])->name('invoice'); // Télécharger la facture
         Route::get('/{order}/returns', [App\Http\Controllers\OrderController::class, 'returns'])->name('returns'); // Afficher les retours
         Route::post('/{order}/returns', [App\Http\Controllers\OrderController::class, 'createReturn'])->name('returns.store'); // Créer un retour
@@ -147,6 +149,13 @@ Route::middleware([
         Route::get('/', [App\Http\Controllers\OrderItemController::class, 'index'])->name('index'); // Liste des articles
         Route::get('/{orderItem}', [App\Http\Controllers\OrderItemController::class, 'show'])->name('show'); // Détail d'un article
         Route::post('/{orderItem}/returns', [App\Http\Controllers\OrderItemController::class, 'createReturn'])->name('returns.store'); // Créer un retour pour l'article
+    });
+
+    // Routes pour les retours - Utilisateurs connectés uniquement
+    Route::prefix('returns')->name('returns.')->group(function () {
+        Route::post('/', [App\Http\Controllers\OrderReturnController::class, 'store'])->name('store'); // Créer une demande de retour
+        Route::get('/check-eligibility', [App\Http\Controllers\OrderReturnController::class, 'checkEligibility'])->name('check-eligibility'); // Vérifier éligibilité
+        Route::get('/{return}', [App\Http\Controllers\OrderReturnController::class, 'show'])->name('show'); // Détail d'un retour
     });
 
     // Routes pour les utilisateurs (actions personnelles)

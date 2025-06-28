@@ -101,7 +101,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [App\Http\Controllers\OrderController::class, 'index']); // Obtenir la liste des commandes
         Route::post('/', [App\Http\Controllers\OrderController::class, 'store']); // Créer une nouvelle commande
         Route::get('/{order}', [App\Http\Controllers\OrderController::class, 'show']); // Obtenir les détails d'une commande
-        Route::put('/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel']); // Annuler une commande
+        Route::put('/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel']); // Annuler une commande (admin)
+        Route::put('/{order}/user-cancel', [App\Http\Controllers\OrderController::class, 'userCancel']); // Annuler par l'utilisateur
+        Route::get('/{order}/cancellation-eligibility', [App\Http\Controllers\OrderController::class, 'checkCancellationEligibility']); // Vérifier éligibilité annulation
         Route::get('/{order}/returns', [App\Http\Controllers\OrderController::class, 'returns']); // Obtenir les retours d'une commande
         Route::post('/{order}/returns', [App\Http\Controllers\OrderController::class, 'createReturn']); // Créer une demande de retour
     });
@@ -118,6 +120,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{rental}/cancel', [App\Http\Controllers\RentalController::class, 'cancel']); // Annuler une location
         Route::post('/{rental}/return', [App\Http\Controllers\RentalController::class, 'processReturn']); // Traiter un retour
         Route::delete('/{rental}', [App\Http\Controllers\RentalController::class, 'destroy']); // Supprimer une location
+    });
+
+    // API pour les retours - Utilisateurs connectés uniquement
+    Route::prefix('returns')->group(function () {
+        Route::post('/', [App\Http\Controllers\OrderReturnController::class, 'store']); // Créer une demande de retour
+        Route::get('/check-eligibility', [App\Http\Controllers\OrderReturnController::class, 'checkEligibility']); // Vérifier éligibilité
+        Route::get('/{return}', [App\Http\Controllers\OrderReturnController::class, 'show']); // Détail d'un retour
     });
 
     // Actions personnelles de l'utilisateur

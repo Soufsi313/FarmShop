@@ -15,11 +15,18 @@ class Category extends Model
     const TYPE_RENTAL = 'rental';
     const TYPE_BOTH = 'both';
 
+    // Constantes pour les types alimentaires
+    const FOOD_TYPE_PERISHABLE = 'perishable';
+    const FOOD_TYPE_NON_PERISHABLE = 'non_perishable';
+    const FOOD_TYPE_NON_FOOD = 'non_food';
+
     protected $fillable = [
         'name',
         'slug',
         'description',
         'type',
+        'food_type',
+        'allows_returns',
         'image',
         'is_active',
         'sort_order',
@@ -27,6 +34,7 @@ class Category extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'allows_returns' => 'boolean',
     ];
 
     /**
@@ -183,6 +191,92 @@ class Category extends Model
             self::TYPE_PURCHASE => 'Achat uniquement',
             self::TYPE_RENTAL => 'Location uniquement',
             self::TYPE_BOTH => 'Achat et Location'
+        ];
+    }
+
+    /**
+     * Vérifier si la catégorie permet les retours
+     */
+    public function allowsReturns(): bool
+    {
+        return $this->allows_returns && $this->food_type !== self::FOOD_TYPE_PERISHABLE;
+    }
+
+    /**
+     * Vérifier si la catégorie est alimentaire périssable
+     */
+    public function isPerishable(): bool
+    {
+        return $this->food_type === self::FOOD_TYPE_PERISHABLE;
+    }
+
+    /**
+     * Vérifier si la catégorie est alimentaire non périssable
+     */
+    public function isNonPerishableFood(): bool
+    {
+        return $this->food_type === self::FOOD_TYPE_NON_PERISHABLE;
+    }
+
+    /**
+     * Vérifier si la catégorie est non alimentaire
+     */
+    public function isNonFood(): bool
+    {
+        return $this->food_type === self::FOOD_TYPE_NON_FOOD;
+    }
+
+    /**
+     * Obtenir le libellé du type alimentaire
+     */
+    public function getFoodTypeLabel(): string
+    {
+        switch($this->food_type) {
+            case self::FOOD_TYPE_PERISHABLE:
+                return 'Alimentaire périssable';
+            case self::FOOD_TYPE_NON_PERISHABLE:
+                return 'Alimentaire non périssable';
+            case self::FOOD_TYPE_NON_FOOD:
+                return 'Non alimentaire';
+            default:
+                return 'Non défini';
+        }
+    }
+
+    /**
+     * Scope pour les catégories retournables
+     */
+    public function scopeReturnable($query)
+    {
+        return $query->where('allows_returns', true)
+                    ->where('food_type', '!=', self::FOOD_TYPE_PERISHABLE);
+    }
+
+    /**
+     * Scope pour les catégories alimentaires
+     */
+    public function scopeFood($query)
+    {
+        return $query->whereIn('food_type', [self::FOOD_TYPE_PERISHABLE, self::FOOD_TYPE_NON_PERISHABLE]);
+    }
+
+    /**
+     * Scope pour les catégories non alimentaires
+     */
+    public function scopeNonFood($query)
+    {
+        return $query->where('food_type', self::FOOD_TYPE_NON_FOOD);
+    }
+
+    /**
+     * Obtenir tous les types alimentaires disponibles
+     */
+    public static function getFoodTypes(): array
+    {
+        return [
+            self::FOOD_TYPE_PERISHABLE => 'Alimentaire périssable',
+            self::FOOD_TYPE_NON_PERISHABLE => 'Alimentaire non périssable',
+            self::FOOD_TYPE_NON_FOOD => 'Non alimentaire',
         ];
     }
 }

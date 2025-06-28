@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
@@ -53,6 +54,10 @@ class Order extends Model
         'paid_at',
         'coupon_code',
         'coupon_discount',
+        'refund_amount',
+        'refund_status',
+        'refund_reason',
+        'refunded_at',
         'is_returnable',
         'return_deadline',
         'notes',
@@ -66,6 +71,7 @@ class Order extends Model
         'delivered_at' => 'datetime',
         'cancelled_at' => 'datetime',
         'paid_at' => 'datetime',
+        'refunded_at' => 'datetime',
         'return_deadline' => 'date',
         'shipping_address' => 'array',
         'billing_address' => 'array',
@@ -75,6 +81,7 @@ class Order extends Model
         'discount_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
         'coupon_discount' => 'decimal:2',
+        'refund_amount' => 'decimal:2',
         'is_returnable' => 'boolean',
     ];
 
@@ -343,17 +350,126 @@ class Order extends Model
         return $this->items()->where('is_perishable', false)->exists();
     }
 
-    public function hasReturnableItems(): bool
+    /**
+     * Vérifier si la commande est éligible au retour
+     */
+    public function isEligibleForReturn(): bool
     {
-        return $this->items()->where('is_returnable', true)->exists();
+        // Les commandes annulées ne sont pas éligibles
+        if ($this->isCancelled()) {
+            return false;
+        }
+
+        // Les commandes livrées sont éligibles selon les règles du produit
+        if ($this->isDelivered()) {
+            return true;
+        }
+
+        // Les commandes non expédiées peuvent être annulées (pas de retour nécessaire)
+        return false;
     }
 
-    public function calculateTotals(): void
+    /**
+     * Vérifier si la commande peut être annulée avec remboursement automatique
+     */
+    public function canBeCancelledWithRefund(): bool
     {
-        $this->subtotal = $this->items()->sum('total_price');
-        $this->tax_amount = $this->subtotal * 0.20; // TVA 20%
-        $this->total_amount = $this->subtotal + $this->tax_amount + $this->shipping_cost - $this->discount_amount - $this->coupon_discount;
-        $this->save();
+        // Peut être annulée tant qu'elle n'est pas expédiée
+        return !$this->isShipped() && !$this->isDelivered() && !$this->isCancelled();
+    }
+
+    /**
+     * Annuler la commande avec remboursement automatique si non expédiée
+     */
+    public function cancelWithRefund(string $reason = null): bool
+    {
+        if (!$this->canBeCancelledWithRefund()) {
+            return false;
+        }
+
+        DB::beginTransaction();
+        try {
+            // Annuler la commande
+            $this->cancel($reason);
+
+            // Remettre les produits en stock
+            foreach ($this->orderItems as $item) {
+                $item->product->increment('quantity', $item->quantity);
+            }
+
+            // Initier le remboursement automatique si payée
+            if ($this->isPaid()) {
+                $this->initiateRefund($this->total_amount, 'Annulation avant expédition');
+            }
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollback();
+            return false;
+        }
+    }
+
+    /**
+     * Initier un remboursement
+     */
+    public function initiateRefund(float $amount, string $reason = null): bool
+    {
+        // Ici, intégrer avec le système de paiement pour le remboursement
+        // Pour l'instant, on simule le processus
+        
+        $this->refund_amount = $amount;
+        $this->refund_status = 'processing';
+        $this->refund_reason = $reason;
+        
+        // TODO: Intégrer avec Stripe/PayPal pour remboursement réel
+        
+        return $this->save();
+    }
+
+    /**
+     * Marquer le remboursement comme terminé
+     */
+    public function completeRefund(): bool
+    {
+        $this->refund_status = 'completed';
+        $this->refunded_at = Carbon::now();
+        
+        return $this->save();
+    }
+
+    /**
+     * Vérifier si tous les articles sont retournables
+     */
+    public function hasReturnableItems(): bool
+    {
+        return $this->orderItems->some(function ($item) {
+            return $item->product->isReturnableProduct();
+        });
+    }
+
+    /**
+     * Obtenir les articles retournables de la commande
+     */
+    public function getReturnableItems()
+    {
+        return $this->orderItems->filter(function ($item) {
+            return $item->product->isReturnableProduct() && 
+                   $item->product->isWithinReturnPeriod($this->created_at);
+        });
+    }
+
+    /**
+     * Vérifier si la commande est dans la période de retour
+     */
+    public function isWithinReturnPeriod(): bool
+    {
+        if (!$this->isDelivered()) {
+            return false;
+        }
+
+        $returnDeadline = $this->return_deadline ?? Carbon::parse($this->delivered_at)->addDays(14);
+        return Carbon::now()->lte($returnDeadline);
     }
 
     /**

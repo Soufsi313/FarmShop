@@ -49,6 +49,19 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->runInBackground()
             ->appendOutputTo(storage_path('logs/rental-automation.log'));
+
+        // Automatisation des processus de retour (2 fois par jour)
+        $schedule->command('returns:automate')
+            ->dailyAt('10:00')
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/return-automation.log'));
+            
+        $schedule->command('returns:automate')
+            ->dailyAt('16:00')
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/return-automation.log'));
     }
 
     /**

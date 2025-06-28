@@ -278,4 +278,213 @@ class OrderReturnController extends Controller
             'data' => $stats
         ]);
     }
+
+    /**
+     * Créer une demande de retour (utilisateur)
+     */
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_item_id' => 'required|exists:order_items,id',
+            'quantity_returned' => 'required|integer|min:1',
+            'reason' => 'required|in:' . implode(',', OrderReturn::getAllReasons()),
+            'description' => 'nullable|string|max:1000',
+            'images.*' => 'nullable|image|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            return redirect()->back()->withErrors($validator);
+        }
+
+        $orderItem = OrderItem::with(['order', 'product.category'])->findOrFail($request->order_item_id);
+
+        // Vérifier que l'utilisateur est propriétaire de la commande
+        if ($orderItem->order->user_id !== auth()->id()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vous n\'avez pas l\'autorisation d\'accéder à cette commande.'
+                ], 403);
+            }
+            return redirect()->back()->with('error', 'Vous n\'avez pas l\'autorisation d\'accéder à cette commande.');
+        }
+
+        // Vérifier si le produit est retournable
+        if (!$orderItem->product->isReturnableProduct()) {
+            $message = $orderItem->product->isPerishable() 
+                ? OrderReturn::getPerishableReturnMessage()
+                : 'Ce produit n\'est pas retournable.';
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 400);
+            }
+            return redirect()->back()->with('error', $message);
+        }
+
+        // Vérifier si la commande est éligible au retour
+        if (!$orderItem->order->isEligibleForReturn()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cette commande n\'est pas éligible au retour.'
+                ], 400);
+            }
+            return redirect()->back()->with('error', 'Cette commande n\'est pas éligible au retour.');
+        }
+
+        // Vérifier la période de retour
+        if (!$orderItem->product->isWithinReturnPeriod($orderItem->order->created_at)) {
+            $daysLeft = $orderItem->product->getDaysLeftForReturn($orderItem->order->created_at);
+            $message = $daysLeft > 0 
+                ? "Il vous reste {$daysLeft} jour(s) pour retourner ce produit."
+                : 'La période de retour de 14 jours est dépassée.';
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 400);
+            }
+            return redirect()->back()->with('error', $message);
+        }
+
+        // Vérifier la quantité
+        if ($request->quantity_returned > $orderItem->quantity) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La quantité à retourner ne peut pas dépasser la quantité commandée.'
+                ], 400);
+            }
+            return redirect()->back()->with('error', 'La quantité à retourner ne peut pas dépasser la quantité commandée.');
+        }
+
+        // Vérifier qu'il n'y a pas déjà un retour en cours
+        if (!OrderReturn::canCreateReturn($orderItem)) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Un retour est déjà en cours pour cet article.'
+                ], 400);
+            }
+            return redirect()->back()->with('error', 'Un retour est déjà en cours pour cet article.');
+        }
+
+        DB::beginTransaction();
+        try {
+            // Créer le retour
+            $return = OrderReturn::createReturn($orderItem, $request->validated());
+
+            if (!$return) {
+                throw new \Exception('Impossible de créer la demande de retour.');
+            }
+
+            // Gérer les images si présentes
+            if ($request->hasFile('images')) {
+                $imagePaths = [];
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('returns', 'public');
+                    $imagePaths[] = $path;
+                }
+                $return->addImages($imagePaths);
+            }
+
+            DB::commit();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Demande de retour créée avec succès.',
+                    'data' => $return->fresh()
+                ], 201);
+            }
+
+            return redirect()->back()->with('success', 'Demande de retour créée avec succès.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreur lors de la création : ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Erreur lors de la création : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Vérifier l'éligibilité d'un produit au retour
+     */
+    public function checkEligibility(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_item_id' => 'required|exists:order_items,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $orderItem = OrderItem::with(['order', 'product.category'])->findOrFail($request->order_item_id);
+
+        // Vérifier que l'utilisateur est propriétaire de la commande
+        if ($orderItem->order->user_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous n\'avez pas l\'autorisation d\'accéder à cette commande.'
+            ], 403);
+        }
+
+        $eligible = OrderReturn::canCreateReturn($orderItem);
+        $reasons = [];
+
+        if (!$eligible) {
+            if (!$orderItem->product->isReturnableProduct()) {
+                $reasons[] = $orderItem->product->isPerishable() 
+                    ? OrderReturn::getPerishableReturnMessage()
+                    : 'Ce produit n\'est pas retournable.';
+            }
+
+            if (!$orderItem->order->isEligibleForReturn()) {
+                $reasons[] = 'Cette commande n\'est pas éligible au retour.';
+            }
+
+            if (!$orderItem->product->isWithinReturnPeriod($orderItem->order->created_at)) {
+                $reasons[] = 'La période de retour de 14 jours est dépassée.';
+            }
+
+            $existingReturn = OrderReturn::where('order_item_id', $orderItem->id)
+                ->whereIn('status', [OrderReturn::STATUS_PENDING, OrderReturn::STATUS_APPROVED])
+                ->exists();
+
+            if ($existingReturn) {
+                $reasons[] = 'Un retour est déjà en cours pour cet article.';
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'eligible' => $eligible,
+                'reasons' => $reasons,
+                'days_left' => $orderItem->product->getDaysLeftForReturn($orderItem->order->created_at),
+                'return_conditions' => $orderItem->product->return_conditions,
+            ]
+        ]);
+    }
 }
