@@ -350,17 +350,21 @@ class Product extends Model
      */
     protected function notifyAdminStockAlert()
     {
-        // Cette méthode sera implémentée pour notifier les admins
-        // via la boîte de réception admin que nous créerons plus tard
+        // Récupérer tous les admins et superusers
+        $admins = User::role(['admin', 'superuser'])->get();
         
-        $message = "Stock critique atteint pour le produit: {$this->name}";
-        $type = $this->isOutOfStock() ? 'stock_out' : 'stock_low';
+        foreach ($admins as $admin) {
+            if ($this->isOutOfStock()) {
+                $admin->notify(new \App\Notifications\ProductOutOfStock($this));
+            } elseif ($this->isLowStock()) {
+                $admin->notify(new \App\Notifications\ProductLowStock($this));
+            }
+        }
         
-        // Notification sera ajoutée dans le système de messagerie admin
+        // Déclencher un événement pour d'autres listeners potentiels
         event('product.stock.alert', [
             'product' => $this,
-            'message' => $message,
-            'type' => $type
+            'type' => $this->isOutOfStock() ? 'stock_out' : 'stock_low'
         ]);
     }
 
