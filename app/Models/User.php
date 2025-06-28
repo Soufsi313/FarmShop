@@ -206,6 +206,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Relation avec le panier de location de l'utilisateur
+     */
+    public function cartLocations()
+    {
+        return $this->hasMany(CartLocation::class);
+    }
+
+    /**
      * Relation avec les produits aimés
      */
     public function likedProducts()

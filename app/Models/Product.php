@@ -23,12 +23,18 @@ class Product extends Model
         'description',
         'category_id',
         'price',
+        'rental_price_per_day',
+        'deposit_amount',
         'quantity',
         'unit_symbol',
         'main_image',
         'critical_stock_threshold',
         'is_active',
         'is_featured',
+        'is_rentable',
+        'min_rental_days',
+        'max_rental_days',
+        'rental_conditions',
         'bulk_pricing',
         'views_count',
         'likes_count',
@@ -36,8 +42,13 @@ class Product extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'rental_price_per_day' => 'decimal:2',
+        'deposit_amount' => 'decimal:2',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
+        'is_rentable' => 'boolean',
+        'min_rental_days' => 'integer',
+        'max_rental_days' => 'integer',
         'bulk_pricing' => 'array',
         'views_count' => 'integer',
         'likes_count' => 'integer',
@@ -101,6 +112,11 @@ class Product extends Model
         return $this->hasMany(Cart::class);
     }
 
+    public function cartLocationItems()
+    {
+        return $this->hasMany(CartLocation::class);
+    }
+
     /**
      * Scopes
      */
@@ -127,6 +143,11 @@ class Product extends Model
     public function scopeOutOfStock($query)
     {
         return $query->where('quantity', 0);
+    }
+
+    public function scopeRentable($query)
+    {
+        return $query->where('is_rentable', true)->where('is_active', true);
     }
 
     public function scopeByCategory($query, $categoryId)
@@ -396,5 +417,88 @@ class Product extends Model
         } else {
             return 'green';
         }
+    }
+
+    /**
+     * Méthodes pour la location
+     */
+
+    /**
+     * Vérifier si le produit est disponible pour la location
+     */
+    public function isAvailableForRental(): bool
+    {
+        return $this->is_rentable && $this->is_active && $this->hasStock(1);
+    }
+
+    /**
+     * Obtenir le prix de location par jour effectif
+     */
+    public function getRentalPricePerDay(): float
+    {
+        return $this->rental_price_per_day ?? ($this->price * 0.1); // 10% du prix de vente par défaut
+    }
+
+    /**
+     * Obtenir le montant de la caution effective
+     */
+    public function getDepositAmount(): float
+    {
+        return $this->deposit_amount ?? ($this->price * 0.2); // 20% du prix de vente par défaut
+    }
+
+    /**
+     * Vérifier si une durée de location est valide
+     */
+    public function isValidRentalDuration(int $days): bool
+    {
+        return $days >= $this->min_rental_days && $days <= $this->max_rental_days;
+    }
+
+    /**
+     * Calculer le prix total de location
+     */
+    public function calculateRentalPrice(int $quantity, int $days): float
+    {
+        if (!$this->isValidRentalDuration($days)) {
+            return 0;
+        }
+
+        return $quantity * $this->getRentalPricePerDay() * $days;
+    }
+
+    /**
+     * Obtenir les locations actives pour ce produit
+     */
+    public function getActiveRentals()
+    {
+        return $this->cartLocationItems()->where('status', CartLocation::STATUS_ACTIVE)->get();
+    }
+
+    /**
+     * Vérifier la disponibilité pour une période donnée
+     */
+    public function isAvailableForPeriod(\Carbon\Carbon $startDate, \Carbon\Carbon $endDate, int $requestedQuantity = 1): bool
+    {
+        if (!$this->isAvailableForRental()) {
+            return false;
+        }
+
+        // Vérifier les conflits de dates avec les locations existantes
+        $conflictingRentals = $this->cartLocationItems()
+            ->whereIn('status', [CartLocation::STATUS_CONFIRMED, CartLocation::STATUS_ACTIVE])
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('rental_start_date', [$startDate, $endDate])
+                      ->orWhereBetween('rental_end_date', [$startDate, $endDate])
+                      ->orWhere(function ($q) use ($startDate, $endDate) {
+                          $q->where('rental_start_date', '<=', $startDate)
+                            ->where('rental_end_date', '>=', $endDate);
+                      });
+            })
+            ->sum('quantity');
+
+        $availableStock = $this->quantity - $conflictingRentals;
+        
+        return $availableStock >= $requestedQuantity;
     }
 }
