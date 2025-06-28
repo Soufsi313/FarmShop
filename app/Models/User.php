@@ -150,6 +150,48 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\Contact::class, 'user_id');
     }
 
+    // ==================== RELATIONS BLOG ====================
+
+    /**
+     * Articles de blog créés par l'utilisateur (admin)
+     */
+    public function blogs()
+    {
+        return $this->hasMany(Blog::class, 'author_id');
+    }
+
+    /**
+     * Commentaires de blog créés par l'utilisateur
+     */
+    public function blogComments()
+    {
+        return $this->hasMany(BlogComment::class, 'user_id');
+    }
+
+    /**
+     * Signalements de commentaires effectués par l'utilisateur
+     */
+    public function blogCommentReports()
+    {
+        return $this->hasMany(BlogCommentReport::class, 'reporter_id');
+    }
+
+    /**
+     * Signalements traités par l'utilisateur (admin)
+     */
+    public function reviewedReports()
+    {
+        return $this->hasMany(BlogCommentReport::class, 'reviewed_by');
+    }
+
+    /**
+     * Commentaires approuvés par l'utilisateur (admin)
+     */
+    public function approvedComments()
+    {
+        return $this->hasMany(BlogComment::class, 'approved_by');
+    }
+
     /**
      * Relation avec les contacts de l'utilisateur
      */
@@ -204,14 +246,6 @@ class User extends Authenticatable
     public function rentals()
     {
         return $this->hasMany(\App\Models\Rental::class);
-    }
-
-    /**
-     * Relation avec les commentaires de blog de l'utilisateur
-     */
-    public function blogComments()
-    {
-        return $this->hasMany(\App\Models\BlogComment::class);
     }
 
     /**
