@@ -74,8 +74,7 @@ class UserController extends Controller
         
         $roles = [
             User::ROLE_USER => 'Utilisateur',
-            User::ROLE_ADMIN => 'Administrateur',
-            User::ROLE_SUPERUSER => 'Super Administrateur'
+            User::ROLE_ADMIN => 'Administrateur'
         ];
 
         return view('admin.users.create', compact('roles'));
@@ -121,8 +120,7 @@ class UserController extends Controller
 
         $roles = [
             User::ROLE_USER => 'Utilisateur',
-            User::ROLE_ADMIN => 'Administrateur',
-            User::ROLE_SUPERUSER => 'Super Administrateur'
+            User::ROLE_ADMIN => 'Administrateur'
         ];
 
         return view('admin.users.edit', compact('user', 'roles'));
@@ -262,7 +260,7 @@ class UserController extends Controller
             'action' => 'required|in:delete,restore,assign_role',
             'user_ids' => 'required|array',
             'user_ids.*' => 'exists:users,id',
-            'role' => 'required_if:action,assign_role|in:' . implode(',', [User::ROLE_USER, User::ROLE_ADMIN, User::ROLE_SUPERUSER])
+            'role' => 'required_if:action,assign_role|in:' . implode(',', [User::ROLE_USER, User::ROLE_ADMIN])
         ]);
 
         if ($validator->fails()) {
@@ -315,7 +313,6 @@ class UserController extends Controller
             'deleted_users' => User::onlyTrashed()->count(),
             'newsletter_subscribers' => User::newsletterSubscribed()->count(),
             'admins' => User::role(User::ROLE_ADMIN)->count(),
-            'superusers' => User::role(User::ROLE_SUPERUSER)->count(),
             'recent_registrations' => User::where('created_at', '>=', now()->subDays(7))->count(),
         ];
 

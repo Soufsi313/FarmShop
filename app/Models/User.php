@@ -3,7 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Da    /**
+     * Vérifie si l'utilisateur peut gérer le CRUD (admin uniquement)
+     */
+    public function canManage(): bool
+    {
+        return $this->isAdmin();
+    }\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -27,7 +33,6 @@ class User extends Authenticatable
     // Constantes pour les rôles
     const ROLE_USER = 'user';
     const ROLE_ADMIN = 'admin';
-    const ROLE_SUPERUSER = 'superuser';
 
     /**
      * The attributes that are mass assignable.
@@ -86,14 +91,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Vérifie si l'utilisateur est un superuser
-     */
-    public function isSuperuser(): bool
-    {
-        return $this->hasRole(self::ROLE_SUPERUSER);
-    }
-
-    /**
      * Vérifie si l'utilisateur est un utilisateur standard
      */
     public function isUser(): bool
@@ -102,11 +99,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Vérifie si l'utilisateur peut gérer le CRUD (admin ou superuser)
+     * Vérifie si l'utilisateur peut gérer le CRUD (admin uniquement)
      */
     public function canManageCrud(): bool
     {
-        return $this->isAdmin() || $this->isSuperuser();
+        return $this->isAdmin();
     }
 
     /**
@@ -370,9 +367,7 @@ class User extends Authenticatable
      */
     public function getPrimaryRole(): string
     {
-        if ($this->isSuperuser()) {
-            return self::ROLE_SUPERUSER;
-        } elseif ($this->isAdmin()) {
+        if ($this->isAdmin()) {
             return self::ROLE_ADMIN;
         } else {
             return self::ROLE_USER;
@@ -388,11 +383,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Forcer la suppression définitive (uniquement pour les superusers)
+     * Forcer la suppression définitive (uniquement pour les admins)
      */
     public function forceDeleteUser(): bool
     {
-        if (!$this->isSuperuser()) {
+        if (!$this->isAdmin()) {
             return false;
         }
         return $this->forceDelete();

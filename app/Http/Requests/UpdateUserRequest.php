@@ -44,7 +44,7 @@ class UpdateUserRequest extends FormRequest
                 Rule::unique('users')->ignore($userId)
             ],
             'password' => 'nullable|string|min:8|confirmed',
-            'role' => ['required', Rule::in([User::ROLE_USER, User::ROLE_ADMIN, User::ROLE_SUPERUSER])],
+            'role' => ['required', Rule::in([User::ROLE_USER, User::ROLE_ADMIN])],
         ];
     }
 

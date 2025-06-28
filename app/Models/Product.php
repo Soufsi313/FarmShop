@@ -376,8 +376,8 @@ class Product extends Model
      */
     protected function notifyAdminStockAlert()
     {
-        // Récupérer tous les admins et superusers
-        $admins = User::role(['admin', 'superuser'])->get();
+        // Récupérer tous les admins
+        $admins = User::role('admin')->get();
         
         foreach ($admins as $admin) {
             if ($this->isOutOfStock()) {

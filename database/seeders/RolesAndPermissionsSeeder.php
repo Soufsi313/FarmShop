@@ -40,6 +40,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete users',
             'view admin messages',
             'manage admin messages',
+            'manage contacts',
         ];
 
         foreach ($permissions as $permission) {
@@ -49,7 +50,6 @@ class RolesAndPermissionsSeeder extends Seeder
         // Création des rôles
         $userRole = Role::create(['name' => User::ROLE_USER]);
         $adminRole = Role::create(['name' => User::ROLE_ADMIN]);
-        $superuserRole = Role::create(['name' => User::ROLE_SUPERUSER]);
 
         // Attribution des permissions aux rôles
         
@@ -66,7 +66,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'export personal data',
         ]);
 
-        // Admin (hérite des permissions user + CRUD)
+        // Admin (hérite des permissions user + toutes les permissions administratives)
         $adminRole->givePermissionTo([
             'view products',
             'buy products',
@@ -84,23 +84,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete users',
             'view admin messages',
             'manage admin messages',
+            'manage contacts',
         ]);
 
-        // Superuser (toutes les permissions)
-        $superuserRole->syncPermissions(Permission::all());
-
-        // Création d'un superuser par défaut
-        $superuser = User::create([
-            'name' => 'Super Administrator',
-            'username' => 'superadmin',
-            'email' => 'superadmin@farmshop.com',
-            'password' => bcrypt('password123'),
-            'email_verified_at' => now(),
-        ]);
-
-        $superuser->assignRole(User::ROLE_SUPERUSER);
-
-        // Création d'un admin par défaut
+        // Création d'un admin par défaut (superuser)
         $admin = User::create([
             'name' => 'Administrator',
             'username' => 'admin',

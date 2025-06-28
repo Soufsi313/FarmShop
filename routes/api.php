@@ -25,6 +25,11 @@ Route::prefix('products')->group(function () {
     Route::get('/search', [App\Http\Controllers\ProductController::class, 'search']);
 });
 
+// Routes API publiques pour le contact
+Route::prefix('contact')->group(function () {
+    Route::post('/', [App\Http\Controllers\ContactController::class, 'store']);
+});
+
 // Routes API pour les utilisateurs authentifiés
 Route::middleware('auth:sanctum')->group(function () {
     // Routes API pour le panier (Cart) - Utilisateurs connectés uniquement
@@ -92,5 +97,23 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // API CRUD pour les produits
         Route::apiResource('products', App\Http\Controllers\ProductController::class);
+    });
+
+    // API d'administration pour les contacts
+    Route::middleware(['permission:manage contacts'])->prefix('admin')->group(function () {
+        Route::get('/contacts', [App\Http\Controllers\ContactController::class, 'index']);
+        Route::get('/contacts/{contact}', [App\Http\Controllers\ContactController::class, 'show']);
+        Route::put('/contacts/{contact}', [App\Http\Controllers\ContactController::class, 'update']);
+        Route::delete('/contacts/{contact}', [App\Http\Controllers\ContactController::class, 'destroy']);
+        
+        // Actions rapides
+        Route::post('/contacts/{contact}/mark-in-progress', [App\Http\Controllers\ContactController::class, 'markInProgress']);
+        Route::post('/contacts/{contact}/mark-resolved', [App\Http\Controllers\ContactController::class, 'markResolved']);
+        Route::post('/contacts/{contact}/close', [App\Http\Controllers\ContactController::class, 'close']);
+        Route::post('/contacts/{contact}/assign', [App\Http\Controllers\ContactController::class, 'assign']);
+        
+        // Statistiques et téléchargements
+        Route::get('/contacts/statistics', [App\Http\Controllers\ContactController::class, 'statistics']);
+        Route::get('/contacts/{contact}/attachment/{attachmentIndex}', [App\Http\Controllers\ContactController::class, 'downloadAttachment']);
     });
 });

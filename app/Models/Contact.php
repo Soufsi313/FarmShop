@@ -32,6 +32,10 @@ class Contact extends Model
         'attachments' => 'array'
     ];
 
+    protected $attributes = [
+        'status' => self::STATUS_NEW,
+    ];
+
     // Statuts possibles
     const STATUS_NEW = 'nouveau';
     const STATUS_IN_PROGRESS = 'en_cours';

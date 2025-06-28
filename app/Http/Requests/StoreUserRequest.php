@@ -30,7 +30,7 @@ class StoreUserRequest extends FormRequest
             'username' => 'required|string|max:255|unique:users|alpha_dash',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role' => ['required', Rule::in([User::ROLE_USER, User::ROLE_ADMIN, User::ROLE_SUPERUSER])],
+            'role' => ['required', Rule::in([User::ROLE_USER, User::ROLE_ADMIN])],
         ];
     }
 

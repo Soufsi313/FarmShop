@@ -36,6 +36,12 @@ Route::prefix('products')->name('products.')->group(function () {
     });
 });
 
+// Routes publiques pour le contact (accessibles à tous)
+Route::prefix('contact')->name('contact.')->group(function () {
+    Route::get('/', [App\Http\Controllers\ContactController::class, 'create'])->name('create');
+    Route::post('/', [App\Http\Controllers\ContactController::class, 'store'])->name('store');
+});
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -102,5 +108,24 @@ Route::middleware([
         // Routes supplémentaires pour la gestion des produits
         Route::post('/products/bulk-action', [App\Http\Controllers\ProductController::class, 'bulkAction'])->name('products.bulk-action');
         Route::get('/products-statistics', [App\Http\Controllers\ProductController::class, 'statistics'])->name('products.statistics');
+    });
+
+    // Routes d'administration pour les contacts
+    Route::middleware(['permission:manage contacts'])->prefix('admin')->name('admin.')->group(function () {
+        // CRUD pour les contacts
+        Route::get('/contacts', [App\Http\Controllers\ContactController::class, 'index'])->name('contacts.index');
+        Route::get('/contacts/{contact}', [App\Http\Controllers\ContactController::class, 'show'])->name('contacts.show');
+        Route::put('/contacts/{contact}', [App\Http\Controllers\ContactController::class, 'update'])->name('contacts.update');
+        Route::delete('/contacts/{contact}', [App\Http\Controllers\ContactController::class, 'destroy'])->name('contacts.destroy');
+        
+        // Actions rapides pour les contacts
+        Route::post('/contacts/{contact}/mark-in-progress', [App\Http\Controllers\ContactController::class, 'markInProgress'])->name('contacts.mark-in-progress');
+        Route::post('/contacts/{contact}/mark-resolved', [App\Http\Controllers\ContactController::class, 'markResolved'])->name('contacts.mark-resolved');
+        Route::post('/contacts/{contact}/close', [App\Http\Controllers\ContactController::class, 'close'])->name('contacts.close');
+        Route::post('/contacts/{contact}/assign', [App\Http\Controllers\ContactController::class, 'assign'])->name('contacts.assign');
+        
+        // Téléchargement des pièces jointes et statistiques
+        Route::get('/contacts/{contact}/attachment/{attachmentIndex}', [App\Http\Controllers\ContactController::class, 'downloadAttachment'])->name('contacts.download-attachment');
+        Route::get('/contacts-statistics', [App\Http\Controllers\ContactController::class, 'statistics'])->name('contacts.statistics');
     });
 });
