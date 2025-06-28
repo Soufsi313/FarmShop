@@ -198,6 +198,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Relation avec le panier de l'utilisateur
+     */
+    public function cart()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    /**
+     * Relation avec les produits aimés
+     */
+    public function likedProducts()
+    {
+        return $this->belongsToMany(Product::class, 'product_likes')->withTimestamps();
+    }
+
+    /**
+     * Relation avec la wishlist
+     */
+    public function wishlistProducts()
+    {
+        return $this->belongsToMany(Product::class, 'wishlists')->withTimestamps();
+    }
+
+    /**
      * Vérifie si l'utilisateur peut accéder à une fonctionnalité
      */
     public function canAccessFeature(string $permission): bool

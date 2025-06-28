@@ -96,6 +96,11 @@ class Product extends Model
         return $this->belongsToMany(User::class, 'wishlists')->withTimestamps();
     }
 
+    public function cartItems()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
     /**
      * Scopes
      */
