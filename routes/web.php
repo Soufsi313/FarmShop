@@ -42,6 +42,12 @@ Route::prefix('categories')->name('categories.')->group(function () {
     Route::get('/{category:slug}', [App\Http\Controllers\CategoryController::class, 'show'])->name('show');
 });
 
+// Routes publiques pour les likes (accessibles à tous)
+Route::prefix('likes')->name('public.likes.')->group(function () {
+    Route::get('/most-liked', [App\Http\Controllers\ProductLikeController::class, 'mostLiked'])->name('most-liked'); // Produits les plus likés
+    Route::get('/statistics', [App\Http\Controllers\ProductLikeController::class, 'statistics'])->name('statistics'); // Statistiques publiques des likes
+});
+
 // Routes publiques pour le contact (accessibles à tous)
 Route::prefix('contact')->name('contact.')->group(function () {
     Route::get('/', [App\Http\Controllers\ContactController::class, 'create'])->name('create');
@@ -97,6 +103,16 @@ Route::middleware([
         Route::get('/check/{product}', [App\Http\Controllers\WishlistController::class, 'check'])->name('check'); // Vérifier si produit en wishlist
         Route::get('/count', [App\Http\Controllers\WishlistController::class, 'getCount'])->name('count'); // Nombre d'articles
         Route::post('/move-to-cart', [App\Http\Controllers\WishlistController::class, 'moveToCart'])->name('move-to-cart'); // Transférer vers le panier
+    });
+
+    // Routes pour les likes de produits - Utilisateurs connectés uniquement
+    Route::prefix('likes')->name('likes.')->group(function () {
+        Route::get('/', [App\Http\Controllers\ProductLikeController::class, 'index'])->name('index'); // Afficher mes likes
+        Route::post('/toggle', [App\Http\Controllers\ProductLikeController::class, 'store'])->name('toggle'); // Liker/unliker un produit
+        Route::delete('/remove/{product}', [App\Http\Controllers\ProductLikeController::class, 'destroy'])->name('remove'); // Retirer un like
+        Route::delete('/clear', [App\Http\Controllers\ProductLikeController::class, 'clearUserLikes'])->name('clear'); // Vider tous mes likes
+        Route::get('/check/{product}', [App\Http\Controllers\ProductLikeController::class, 'check'])->name('check'); // Vérifier si produit liké
+        Route::get('/count', [App\Http\Controllers\ProductLikeController::class, 'getUserLikeCount'])->name('count'); // Nombre de mes likes
     });
 
     // Routes pour les utilisateurs (actions personnelles)
@@ -174,5 +190,12 @@ Route::middleware([
         Route::post('/product-images/reorder', [App\Http\Controllers\ProductImageController::class, 'reorder'])->name('product-images.reorder');
         Route::post('/product-images/{productImage}/set-main', [App\Http\Controllers\ProductImageController::class, 'setMain'])->name('product-images.set-main');
         Route::get('/product-images-statistics', [App\Http\Controllers\ProductImageController::class, 'statistics'])->name('product-images.statistics');
+    });
+
+    // Routes d'administration pour les likes de produits
+    Route::middleware(['permission:manage products'])->prefix('admin')->name('admin.')->group(function () {
+        // Interface d'administration pour les likes
+        Route::get('/likes', [App\Http\Controllers\ProductLikeController::class, 'adminIndex'])->name('likes.index'); // Liste des likes
+        Route::get('/likes/statistics', [App\Http\Controllers\ProductLikeController::class, 'statistics'])->name('likes.statistics'); // Statistiques des likes
     });
 });

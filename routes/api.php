@@ -36,6 +36,12 @@ Route::prefix('contact')->group(function () {
     Route::post('/', [App\Http\Controllers\ContactController::class, 'store']);
 });
 
+// Routes API publiques pour les likes
+Route::prefix('likes')->group(function () {
+    Route::get('/most-liked', [App\Http\Controllers\ProductLikeController::class, 'mostLiked']); // Produits les plus likés
+    Route::get('/statistics', [App\Http\Controllers\ProductLikeController::class, 'statistics']); // Statistiques publiques des likes
+});
+
 // Routes API pour les utilisateurs authentifiés
 Route::middleware('auth:sanctum')->group(function () {
     // Routes API pour le panier (Cart) - Utilisateurs connectés uniquement
@@ -78,6 +84,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/check/{product}', [App\Http\Controllers\WishlistController::class, 'check']); // Vérifier si produit en wishlist
         Route::get('/count', [App\Http\Controllers\WishlistController::class, 'getCount']); // Nombre d'articles
         Route::post('/move-to-cart', [App\Http\Controllers\WishlistController::class, 'moveToCart']); // Transférer vers le panier
+    });
+
+    // API pour les likes de produits - Utilisateurs connectés uniquement
+    Route::prefix('likes')->group(function () {
+        Route::get('/', [App\Http\Controllers\ProductLikeController::class, 'index']); // Obtenir mes likes
+        Route::post('/toggle', [App\Http\Controllers\ProductLikeController::class, 'store']); // Liker/unliker un produit
+        Route::delete('/remove/{product}', [App\Http\Controllers\ProductLikeController::class, 'destroy']); // Retirer un like
+        Route::delete('/clear', [App\Http\Controllers\ProductLikeController::class, 'clearUserLikes']); // Vider tous mes likes
+        Route::get('/check/{product}', [App\Http\Controllers\ProductLikeController::class, 'check']); // Vérifier si produit liké
+        Route::get('/count', [App\Http\Controllers\ProductLikeController::class, 'getUserLikeCount']); // Nombre de mes likes
     });
 
     // Actions personnelles de l'utilisateur
@@ -162,5 +178,12 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // API CRUD pour les images de produits
         Route::apiResource('product-images', App\Http\Controllers\ProductImageController::class, ['as' => 'api.admin']);
+    });
+
+    // API d'administration pour les likes de produits
+    Route::middleware(['permission:manage products'])->prefix('admin')->group(function () {
+        // Interface d'administration pour les likes
+        Route::get('/likes', [App\Http\Controllers\ProductLikeController::class, 'adminIndex']); // Liste des likes pour l'admin
+        Route::get('/likes/statistics', [App\Http\Controllers\ProductLikeController::class, 'statistics']); // Statistiques détaillées des likes
     });
 });
