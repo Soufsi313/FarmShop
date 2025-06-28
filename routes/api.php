@@ -127,8 +127,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(['permission:manage categories'])->prefix('admin')->group(function () {
         // Statistiques et actions en lot
         Route::get('/categories/statistics', [App\Http\Controllers\CategoryController::class, 'statistics']);
+        Route::get('/categories/enhanced-statistics', [App\Http\Controllers\CategoryController::class, 'enhancedStatistics']);
         Route::post('/categories/bulk-action', [App\Http\Controllers\CategoryController::class, 'bulkAction']);
         Route::post('/categories/reorder', [App\Http\Controllers\CategoryController::class, 'reorder']);
+        
+        // Routes spécialisées pour les futures interfaces séparées  
+        Route::get('/categories/purchase', [App\Http\Controllers\CategoryController::class, 'purchaseCategories']);
+        Route::get('/categories/rental', [App\Http\Controllers\CategoryController::class, 'rentalCategories']);
+        Route::get('/categories/types', [App\Http\Controllers\CategoryController::class, 'getAvailableTypes']);
         
         // API CRUD pour les catégories
         Route::apiResource('categories', App\Http\Controllers\CategoryController::class);

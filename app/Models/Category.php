@@ -10,10 +10,16 @@ class Category extends Model
 {
     use HasFactory;
 
+    // Constantes pour les types de catégories
+    const TYPE_PURCHASE = 'purchase';
+    const TYPE_RENTAL = 'rental';
+    const TYPE_BOTH = 'both';
+
     protected $fillable = [
         'name',
         'slug',
         'description',
+        'type',
         'image',
         'is_active',
         'sort_order',
@@ -68,6 +74,30 @@ class Category extends Model
     }
 
     /**
+     * Scope pour les catégories d'achat (purchase ou both)
+     */
+    public function scopeForPurchase($query)
+    {
+        return $query->whereIn('type', [self::TYPE_PURCHASE, self::TYPE_BOTH]);
+    }
+
+    /**
+     * Scope pour les catégories de location (rental ou both)
+     */
+    public function scopeForRental($query)
+    {
+        return $query->whereIn('type', [self::TYPE_RENTAL, self::TYPE_BOTH]);
+    }
+
+    /**
+     * Scope pour filtrer par type exact
+     */
+    public function scopeByType($query, $type)
+    {
+        return $query->where('type', $type);
+    }
+
+    /**
      * Obtenir le nombre de produits actifs dans cette catégorie
      */
     public function getActiveProductsCountAttribute()
@@ -109,5 +139,50 @@ class Category extends Model
     public function getRouteAttribute()
     {
         return route('categories.show', $this->slug);
+    }
+
+    /**
+     * Vérifie si la catégorie est pour les achats
+     */
+    public function isPurchaseCategory()
+    {
+        return in_array($this->type, [self::TYPE_PURCHASE, self::TYPE_BOTH]);
+    }
+
+    /**
+     * Vérifie si la catégorie est pour les locations
+     */
+    public function isRentalCategory()
+    {
+        return in_array($this->type, [self::TYPE_RENTAL, self::TYPE_BOTH]);
+    }
+
+    /**
+     * Obtenir le libellé du type de catégorie
+     */
+    public function getTypeLabel()
+    {
+        switch($this->type) {
+            case self::TYPE_PURCHASE:
+                return 'Achat uniquement';
+            case self::TYPE_RENTAL:
+                return 'Location uniquement';
+            case self::TYPE_BOTH:
+                return 'Achat et Location';
+            default:
+                return 'Non défini';
+        }
+    }
+
+    /**
+     * Obtenir tous les types disponibles avec leurs libellés
+     */
+    public static function getAvailableTypes()
+    {
+        return [
+            self::TYPE_PURCHASE => 'Achat uniquement',
+            self::TYPE_RENTAL => 'Location uniquement',
+            self::TYPE_BOTH => 'Achat et Location'
+        ];
     }
 }

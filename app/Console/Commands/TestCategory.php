@@ -34,6 +34,7 @@ class TestCategory extends Command
             $category = Category::create([
                 'name' => 'Légumes Bio',
                 'description' => 'Catégorie de légumes biologiques frais',
+                'type' => Category::TYPE_BOTH, // Achat et location
                 'is_active' => true,
                 'sort_order' => 1
             ]);
@@ -42,6 +43,7 @@ class TestCategory extends Command
             $this->info("   - Nom: {$category->name}");
             $this->info("   - Slug: {$category->slug}");
             $this->info("   - Description: {$category->description}");
+            $this->info("   - Type: {$category->getTypeLabel()}");
             $this->info("   - Active: " . ($category->is_active ? 'Oui' : 'Non'));
             $this->info("   - Ordre: {$category->sort_order}");
             $this->info("   - URL image: {$category->image_url}");

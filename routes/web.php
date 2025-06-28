@@ -144,6 +144,12 @@ Route::middleware([
         Route::post('/categories/bulk-action', [App\Http\Controllers\CategoryController::class, 'bulkAction'])->name('categories.bulk-action');
         Route::post('/categories/reorder', [App\Http\Controllers\CategoryController::class, 'reorder'])->name('categories.reorder');
         Route::get('/categories-statistics', [App\Http\Controllers\CategoryController::class, 'statistics'])->name('categories.statistics');
+        Route::get('/categories-enhanced-statistics', [App\Http\Controllers\CategoryController::class, 'enhancedStatistics'])->name('categories.enhanced-statistics');
+        
+        // Routes spécialisées pour les futures interfaces séparées
+        Route::get('/categories/purchase', [App\Http\Controllers\CategoryController::class, 'purchaseCategories'])->name('categories.purchase');
+        Route::get('/categories/rental', [App\Http\Controllers\CategoryController::class, 'rentalCategories'])->name('categories.rental');
+        Route::get('/categories/types', [App\Http\Controllers\CategoryController::class, 'getAvailableTypes'])->name('categories.types');
     });
 
     // Routes d'administration pour les images de produits
