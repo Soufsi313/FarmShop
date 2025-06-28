@@ -59,6 +59,22 @@ Route::middleware([
         Route::get('/total', [App\Http\Controllers\CartController::class, 'getCartTotal'])->name('total'); // Total du panier
     });
 
+    // Routes pour le panier de location (CartLocation) - Utilisateurs connectés uniquement
+    Route::prefix('cart-location')->name('cart-location.')->group(function () {
+        Route::get('/', [App\Http\Controllers\CartLocationController::class, 'index'])->name('index'); // Afficher le panier de location
+        Route::post('/add', [App\Http\Controllers\CartLocationController::class, 'store'])->name('add'); // Ajouter un produit en location
+        Route::get('/{cart_location}', [App\Http\Controllers\CartLocationController::class, 'show'])->name('show'); // Afficher un article
+        Route::put('/update/{cart_location}', [App\Http\Controllers\CartLocationController::class, 'update'])->name('update'); // Modifier un article
+        Route::delete('/remove/{cart_location}', [App\Http\Controllers\CartLocationController::class, 'destroy'])->name('remove'); // Supprimer un article
+        Route::delete('/clear', [App\Http\Controllers\CartLocationController::class, 'clear'])->name('clear'); // Vider le panier de location
+        Route::post('/quick-add/{product}', [App\Http\Controllers\CartLocationController::class, 'quickAdd'])->name('quick-add'); // Ajout rapide
+        Route::post('/sync', [App\Http\Controllers\CartLocationController::class, 'sync'])->name('sync'); // Synchroniser le panier
+        Route::post('/validate', [App\Http\Controllers\CartLocationController::class, 'validateCart'])->name('validate'); // Valider le panier
+        Route::get('/count', [App\Http\Controllers\CartLocationController::class, 'getCartCount'])->name('count'); // Nombre d'articles
+        Route::get('/total', [App\Http\Controllers\CartLocationController::class, 'getCartTotal'])->name('total'); // Total du panier
+        Route::post('/{cart_location}/extend', [App\Http\Controllers\CartLocationController::class, 'extend'])->name('extend'); // Prolonger une location
+    });
+
     // Routes pour les utilisateurs (actions personnelles)
     Route::prefix('user')->name('user.')->group(function () {
         Route::post('/newsletter/subscribe', [App\Http\Controllers\UserController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
