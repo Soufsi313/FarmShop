@@ -25,6 +25,12 @@ Route::prefix('products')->group(function () {
     Route::get('/search', [App\Http\Controllers\ProductController::class, 'search']);
 });
 
+// Routes API publiques pour les catégories
+Route::prefix('categories')->group(function () {
+    Route::get('/', [App\Http\Controllers\CategoryController::class, 'index']);
+    Route::get('/{category}', [App\Http\Controllers\CategoryController::class, 'show']);
+});
+
 // Routes API publiques pour le contact
 Route::prefix('contact')->group(function () {
     Route::post('/', [App\Http\Controllers\ContactController::class, 'store']);
@@ -115,5 +121,16 @@ Route::middleware('auth:sanctum')->group(function () {
         // Statistiques et téléchargements
         Route::get('/contacts/statistics', [App\Http\Controllers\ContactController::class, 'statistics']);
         Route::get('/contacts/{contact}/attachment/{attachmentIndex}', [App\Http\Controllers\ContactController::class, 'downloadAttachment']);
+    });
+
+    // API d'administration pour les catégories
+    Route::middleware(['permission:manage categories'])->prefix('admin')->group(function () {
+        // Statistiques et actions en lot
+        Route::get('/categories/statistics', [App\Http\Controllers\CategoryController::class, 'statistics']);
+        Route::post('/categories/bulk-action', [App\Http\Controllers\CategoryController::class, 'bulkAction']);
+        Route::post('/categories/reorder', [App\Http\Controllers\CategoryController::class, 'reorder']);
+        
+        // API CRUD pour les catégories
+        Route::apiResource('categories', App\Http\Controllers\CategoryController::class);
     });
 });

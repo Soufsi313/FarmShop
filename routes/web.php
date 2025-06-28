@@ -36,6 +36,12 @@ Route::prefix('products')->name('products.')->group(function () {
     });
 });
 
+// Routes publiques pour les catégories (accessibles à tous)
+Route::prefix('categories')->name('categories.')->group(function () {
+    Route::get('/', [App\Http\Controllers\CategoryController::class, 'index'])->name('index');
+    Route::get('/{category:slug}', [App\Http\Controllers\CategoryController::class, 'show'])->name('show');
+});
+
 // Routes publiques pour le contact (accessibles à tous)
 Route::prefix('contact')->name('contact.')->group(function () {
     Route::get('/', [App\Http\Controllers\ContactController::class, 'create'])->name('create');
@@ -127,5 +133,16 @@ Route::middleware([
         // Téléchargement des pièces jointes et statistiques
         Route::get('/contacts/{contact}/attachment/{attachmentIndex}', [App\Http\Controllers\ContactController::class, 'downloadAttachment'])->name('contacts.download-attachment');
         Route::get('/contacts-statistics', [App\Http\Controllers\ContactController::class, 'statistics'])->name('contacts.statistics');
+    });
+
+    // Routes d'administration pour les catégories
+    Route::middleware(['permission:manage categories'])->prefix('admin')->name('admin.')->group(function () {
+        // CRUD complet pour les catégories
+        Route::resource('categories', App\Http\Controllers\CategoryController::class);
+        
+        // Routes supplémentaires pour la gestion des catégories
+        Route::post('/categories/bulk-action', [App\Http\Controllers\CategoryController::class, 'bulkAction'])->name('categories.bulk-action');
+        Route::post('/categories/reorder', [App\Http\Controllers\CategoryController::class, 'reorder'])->name('categories.reorder');
+        Route::get('/categories-statistics', [App\Http\Controllers\CategoryController::class, 'statistics'])->name('categories.statistics');
     });
 });
