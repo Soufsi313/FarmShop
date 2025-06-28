@@ -87,6 +87,18 @@ Route::middleware([
         Route::post('/{cart_location}/extend', [App\Http\Controllers\CartLocationController::class, 'extend'])->name('extend'); // Prolonger une location
     });
 
+    // Routes pour la wishlist - Utilisateurs connectés uniquement
+    Route::prefix('wishlist')->name('wishlist.')->group(function () {
+        Route::get('/', [App\Http\Controllers\WishlistController::class, 'index'])->name('index'); // Afficher la wishlist
+        Route::post('/add', [App\Http\Controllers\WishlistController::class, 'store'])->name('add'); // Ajouter un produit à la wishlist
+        Route::delete('/remove/{product}', [App\Http\Controllers\WishlistController::class, 'destroy'])->name('remove'); // Retirer un produit de la wishlist
+        Route::delete('/clear', [App\Http\Controllers\WishlistController::class, 'clear'])->name('clear'); // Vider la wishlist
+        Route::post('/toggle/{product}', [App\Http\Controllers\WishlistController::class, 'toggle'])->name('toggle'); // Toggle produit (ajouter/retirer)
+        Route::get('/check/{product}', [App\Http\Controllers\WishlistController::class, 'check'])->name('check'); // Vérifier si produit en wishlist
+        Route::get('/count', [App\Http\Controllers\WishlistController::class, 'getCount'])->name('count'); // Nombre d'articles
+        Route::post('/move-to-cart', [App\Http\Controllers\WishlistController::class, 'moveToCart'])->name('move-to-cart'); // Transférer vers le panier
+    });
+
     // Routes pour les utilisateurs (actions personnelles)
     Route::prefix('user')->name('user.')->group(function () {
         Route::post('/newsletter/subscribe', [App\Http\Controllers\UserController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');

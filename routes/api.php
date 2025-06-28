@@ -68,6 +68,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{cart_location}/extend', [App\Http\Controllers\CartLocationController::class, 'extend']); // Prolonger une location
     });
 
+    // API pour la wishlist - Utilisateurs connectés uniquement
+    Route::prefix('wishlist')->group(function () {
+        Route::get('/', [App\Http\Controllers\WishlistController::class, 'index']); // Obtenir la wishlist
+        Route::post('/add', [App\Http\Controllers\WishlistController::class, 'store']); // Ajouter un produit à la wishlist
+        Route::delete('/remove/{product}', [App\Http\Controllers\WishlistController::class, 'destroy']); // Retirer un produit de la wishlist
+        Route::delete('/clear', [App\Http\Controllers\WishlistController::class, 'clear']); // Vider la wishlist
+        Route::post('/toggle/{product}', [App\Http\Controllers\WishlistController::class, 'toggle']); // Toggle produit (ajouter/retirer)
+        Route::get('/check/{product}', [App\Http\Controllers\WishlistController::class, 'check']); // Vérifier si produit en wishlist
+        Route::get('/count', [App\Http\Controllers\WishlistController::class, 'getCount']); // Nombre d'articles
+        Route::post('/move-to-cart', [App\Http\Controllers\WishlistController::class, 'moveToCart']); // Transférer vers le panier
+    });
+
     // Actions personnelles de l'utilisateur
     Route::prefix('user')->group(function () {
         Route::post('/newsletter/subscribe', [App\Http\Controllers\UserController::class, 'subscribeNewsletter']);
@@ -89,7 +101,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/users/{id}/force-delete', [App\Http\Controllers\UserController::class, 'forceDelete']);
         
         // API CRUD pour les utilisateurs
-        Route::apiResource('users', App\Http\Controllers\UserController::class);
+        Route::apiResource('users', App\Http\Controllers\UserController::class, ['as' => 'api.admin']);
     });
 
     // API d'administration pour les produits
@@ -102,7 +114,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/products/bulk-action', [App\Http\Controllers\ProductController::class, 'bulkAction']);
         
         // API CRUD pour les produits
-        Route::apiResource('products', App\Http\Controllers\ProductController::class);
+        Route::apiResource('products', App\Http\Controllers\ProductController::class, ['as' => 'api.admin']);
     });
 
     // API d'administration pour les contacts
@@ -137,7 +149,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/categories/types', [App\Http\Controllers\CategoryController::class, 'getAvailableTypes']);
         
         // API CRUD pour les catégories
-        Route::apiResource('categories', App\Http\Controllers\CategoryController::class);
+        Route::apiResource('categories', App\Http\Controllers\CategoryController::class, ['as' => 'api.admin']);
     });
 
     // API d'administration pour les images de produits
@@ -149,6 +161,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/product-images/{productImage}/set-main', [App\Http\Controllers\ProductImageController::class, 'setMain']);
         
         // API CRUD pour les images de produits
-        Route::apiResource('product-images', App\Http\Controllers\ProductImageController::class);
+        Route::apiResource('product-images', App\Http\Controllers\ProductImageController::class, ['as' => 'api.admin']);
     });
 });
