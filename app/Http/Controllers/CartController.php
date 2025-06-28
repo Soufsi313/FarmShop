@@ -220,7 +220,7 @@ class CartController extends Controller
     /**
      * Valider le panier avant commande.
      */
-    public function validate(Request $request)
+    public function validateCart(Request $request)
     {
         $user = auth()->user();
         $issues = Cart::validateCart($user->id);

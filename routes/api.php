@@ -27,6 +27,20 @@ Route::prefix('products')->group(function () {
 
 // Routes API pour les utilisateurs authentifiés
 Route::middleware('auth:sanctum')->group(function () {
+    // Routes API pour le panier (Cart) - Utilisateurs connectés uniquement
+    Route::prefix('cart')->group(function () {
+        Route::get('/', [App\Http\Controllers\CartController::class, 'index']); // Obtenir le contenu du panier
+        Route::post('/add', [App\Http\Controllers\CartController::class, 'store']); // Ajouter un produit au panier
+        Route::put('/update/{cart}', [App\Http\Controllers\CartController::class, 'update']); // Modifier la quantité d'un article
+        Route::delete('/remove/{cart}', [App\Http\Controllers\CartController::class, 'destroy']); // Supprimer un article du panier
+        Route::delete('/clear', [App\Http\Controllers\CartController::class, 'clear']); // Vider complètement le panier
+        Route::post('/quick-add/{product}', [App\Http\Controllers\CartController::class, 'quickAdd']); // Ajout rapide d'un produit (quantité 1)
+        Route::post('/sync', [App\Http\Controllers\CartController::class, 'sync']); // Synchroniser le panier avec les données côté client
+        Route::post('/validate', [App\Http\Controllers\CartController::class, 'validateCart']); // Valider le panier (stock, prix, etc.)
+        Route::get('/count', [App\Http\Controllers\CartController::class, 'getCartCount']); // Obtenir le nombre total d'articles
+        Route::get('/total', [App\Http\Controllers\CartController::class, 'getCartTotal']); // Obtenir le montant total du panier
+    });
+
     // Actions personnelles de l'utilisateur
     Route::prefix('user')->group(function () {
         Route::post('/newsletter/subscribe', [App\Http\Controllers\UserController::class, 'subscribeNewsletter']);
