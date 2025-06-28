@@ -304,7 +304,66 @@ Route::middleware('auth:sanctum')->group(function () {
         // Actions en lot et export pour les abonnements
         Route::post('/newsletter-subscriptions/bulk-action', [App\Http\Controllers\NewsletterSubscriptionController::class, 'bulkAction']); // Actions en lot
         Route::get('/newsletter-subscriptions/export', [App\Http\Controllers\NewsletterSubscriptionController::class, 'export']); // Export CSV
+        
+        // API d'administration pour le blog
+        Route::get('/blogs', [App\Http\Controllers\Admin\BlogAdminController::class, 'index']); // Liste articles
+        Route::post('/blogs', [App\Http\Controllers\Admin\BlogAdminController::class, 'store']); // Créer article
+        Route::get('/blogs/{blog}', [App\Http\Controllers\Admin\BlogAdminController::class, 'show']); // Détail article
+        Route::put('/blogs/{blog}', [App\Http\Controllers\Admin\BlogAdminController::class, 'update']); // Mettre à jour article
+        Route::delete('/blogs/{blog}', [App\Http\Controllers\Admin\BlogAdminController::class, 'destroy']); // Supprimer article
+        Route::put('/blogs/{blog}/publish', [App\Http\Controllers\Admin\BlogAdminController::class, 'publish']); // Publier
+        Route::put('/blogs/{blog}/unpublish', [App\Http\Controllers\Admin\BlogAdminController::class, 'unpublish']); // Dépublier
+        Route::post('/blogs/bulk-action', [App\Http\Controllers\Admin\BlogAdminController::class, 'bulkAction']); // Actions en lot
+        Route::get('/blogs/statistics', [App\Http\Controllers\Admin\BlogAdminController::class, 'statistics']); // Statistiques
+        
+        // API d'administration pour les commentaires de blog
+        Route::get('/blog-comments', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'index']); // Liste commentaires
+        Route::get('/blog-comments/{comment}', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'show']); // Détail commentaire
+        Route::put('/blog-comments/{comment}/approve', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'approve']); // Approuver
+        Route::put('/blog-comments/{comment}/reject', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'reject']); // Rejeter
+        Route::put('/blog-comments/{comment}/hide', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'hide']); // Masquer
+        Route::put('/blog-comments/{comment}/restore', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'restore']); // Restaurer
+        Route::delete('/blog-comments/{comment}', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'destroy']); // Supprimer
+        Route::post('/blog-comments/bulk-action', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'bulkAction']); // Actions en lot
+        Route::get('/blog-comments/statistics', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'statistics']); // Statistiques
+        
+        // API d'administration pour les signalements de commentaires
+        Route::get('/blog-reports', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'index']); // Liste signalements
+        Route::get('/blog-reports/{report}', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'show']); // Détail signalement
+        Route::put('/blog-reports/{report}/approve', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'approve']); // Approuver
+        Route::put('/blog-reports/{report}/reject', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'reject']); // Rejeter
+        Route::post('/blog-reports/bulk-action', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'bulkAction']); // Actions en lot
+        Route::get('/blog-reports/statistics', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'statistics']); // Statistiques
     });
+
+    // API pour les commentaires et signalements (utilisateurs connectés)
+    Route::prefix('blog')->group(function () {
+        Route::get('/{blog}/comments', [App\Http\Controllers\BlogCommentController::class, 'index']); // Liste commentaires
+        Route::post('/{blog}/comments', [App\Http\Controllers\BlogCommentController::class, 'store']); // Ajouter commentaire
+        Route::get('/{blog}/comments/{comment}', [App\Http\Controllers\BlogCommentController::class, 'show']); // Détail commentaire
+        Route::put('/{blog}/comments/{comment}', [App\Http\Controllers\BlogCommentController::class, 'update']); // Modifier commentaire
+        Route::delete('/{blog}/comments/{comment}', [App\Http\Controllers\BlogCommentController::class, 'destroy']); // Supprimer commentaire
+        Route::post('/{blog}/comments/{comment}/like', [App\Http\Controllers\BlogCommentController::class, 'toggleLike']); // Liker commentaire
+        Route::get('/{blog}/comments/{comment}/replies', [App\Http\Controllers\BlogCommentController::class, 'replies']); // Réponses
+        
+        // Signaler un commentaire
+        Route::post('/{blog}/comments/{comment}/report', [App\Http\Controllers\BlogCommentReportController::class, 'store']); // Signaler
+        
+        // Routes pour les utilisateurs connectés
+        Route::get('/user/comments', [App\Http\Controllers\BlogCommentController::class, 'myComments']); // Mes commentaires
+        Route::get('/user/reports', [App\Http\Controllers\BlogCommentReportController::class, 'myReports']); // Mes signalements
+        Route::put('/user/reports/{report}/cancel', [App\Http\Controllers\BlogCommentReportController::class, 'cancel']); // Annuler signalement
+    });
+});
+
+// Routes API publiques pour le blog (pas d'authentification requise)
+Route::prefix('blog')->group(function () {
+    Route::get('/', [App\Http\Controllers\BlogController::class, 'index']); // Liste des articles
+    Route::get('/search', [App\Http\Controllers\BlogController::class, 'search']); // Recherche
+    Route::get('/popular', [App\Http\Controllers\BlogController::class, 'popular']); // Articles populaires
+    Route::get('/recent', [App\Http\Controllers\BlogController::class, 'recent']); // Articles récents
+    Route::get('/author/{authorId}', [App\Http\Controllers\BlogController::class, 'byAuthor']); // Articles par auteur
+    Route::get('/{slug}', [App\Http\Controllers\BlogController::class, 'show']); // Détail article
 });
 
 // Routes API publiques pour la newsletter (pas d'authentification requise)
