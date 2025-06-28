@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom">
     <div class="container">
         <!-- Logo -->
-        <a class="navbar-brand text-success fw-bold" href="{{ route('dashboard') }}">
+        <a class="navbar-brand text-success fw-bold" href="{{ route('welcome') }}">
             <i class="fas fa-seedling me-2"></i>
             FarmShop
         </a>
@@ -16,7 +16,7 @@
             <ul class="navbar-nav me-auto">
                 <!-- Accueil -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('dashboard') }}">
+                    <a class="nav-link" href="{{ route('welcome') }}">
                         <i class="fas fa-home me-1"></i> Accueil
                     </a>
                 </li>
@@ -44,10 +44,10 @@
                             <span class="badge bg-success ms-1">3</span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="{{ route('cart.index') }}">
                                 <i class="fas fa-shopping-cart me-2 text-success"></i> Panier Achat
                             </a></li>
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="{{ route('cart.rental') }}">
                                 <i class="fas fa-calendar-alt me-2 text-primary"></i> Panier Location
                             </a></li>
                         </ul>
@@ -55,21 +55,21 @@
 
                     <!-- Wishlist -->
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="{{ route('wishlist.index') }}">
                             <i class="fas fa-heart me-1"></i> Wishlist
                         </a>
                     </li>
 
                     <!-- Mes commandes -->
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="{{ route('orders.index') }}">
                             <i class="fas fa-box me-1"></i> Mes commandes
                         </a>
                     </li>
 
                     <!-- Mes locations -->
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="{{ route('rentals.index') }}">
                             <i class="fas fa-calendar-check me-1"></i> Mes locations
                         </a>
                     </li>
@@ -77,7 +77,7 @@
                     @if(Auth::user()->hasRole('admin') || Auth::user()->can('access admin panel'))
                         <!-- Panel Admin -->
                         <li class="nav-item">
-                            <a class="nav-link text-danger" href="#">
+                            <a class="nav-link text-danger" href="{{ route('admin.dashboard') }}">
                                 <i class="fas fa-cogs me-1"></i> Panel Admin
                             </a>
                         </li>
@@ -86,14 +86,14 @@
 
                 <!-- Blog -->
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="{{ route('blog.index') }}">
                         <i class="fas fa-blog me-1"></i> Blog
                     </a>
                 </li>
 
                 <!-- Contact -->
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="{{ route('contact.index') }}">
                         <i class="fas fa-envelope me-1"></i> Contact
                     </a>
                 </li>

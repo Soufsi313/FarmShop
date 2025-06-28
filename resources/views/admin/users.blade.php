@@ -75,7 +75,7 @@
                         <i class="fas fa-tachometer-alt"></i>
                         Tableau de bord
                     </a>
-                    <a href="{{ route('admin.users') }}" class="admin-nav-link bg-primary">
+                    <a href="{{ route('admin.users.index') }}" class="admin-nav-link bg-primary">
                         <i class="fas fa-users"></i>
                         Utilisateurs
                     </a>
@@ -98,7 +98,7 @@
                     
                     <hr class="my-4" style="border-color: rgba(255,255,255,0.2);">
                     
-                    <a href="{{ route('dashboard') }}" class="admin-nav-link">
+                    <a href="{{ route('welcome') }}" class="admin-nav-link">
                         <i class="fas fa-arrow-left"></i>
                         Retour au site
                     </a>

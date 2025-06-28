@@ -40,11 +40,11 @@
                                     Votre marketplace agricole de confiance - Achat, location et expertise au service de votre réussite
                                 </p>
                                 <div class="d-flex flex-column flex-md-row gap-3 justify-content-center mt-4">
-                                    <a href="#" class="btn btn-primary-custom btn-custom">
+                                    <a href="{{ route('products.index') }}" class="btn btn-primary-custom btn-custom">
                                         <i class="fas fa-shopping-cart me-2"></i>
                                         Découvrir nos produits
                                     </a>
-                                    <a href="#" class="btn btn-outline-custom btn-custom">
+                                    <a href="{{ route('products.index', ['type' => 'rental']) }}" class="btn btn-outline-custom btn-custom">
                                         <i class="fas fa-calendar-alt me-2"></i>
                                         Explorer les locations
                                     </a>
@@ -127,7 +127,7 @@
                                 <p class="category-description">
                                     Outillage professionnel et machines agricoles pour vos travaux
                                 </p>
-                                <a href="#" class="btn btn-primary-custom btn-sm mt-3">
+                                <a href="{{ route('categories.show', 'outils-machines') }}" class="btn btn-primary-custom btn-sm mt-3">
                                     Voir plus <i class="fas fa-arrow-right ms-1"></i>
                                 </a>
                             </div>
@@ -143,7 +143,7 @@
                                 <p class="category-description">
                                     Graines certifiées et fertilisants bio pour vos cultures
                                 </p>
-                                <a href="#" class="btn btn-primary-custom btn-sm mt-3">
+                                <a href="{{ route('categories.show', 'semences-fertilisants') }}" class="btn btn-primary-custom btn-sm mt-3">
                                     Voir plus <i class="fas fa-arrow-right ms-1"></i>
                                 </a>
                             </div>
@@ -419,11 +419,11 @@
                                 Rejoignez des milliers d'agriculteurs qui font confiance à FarmShop pour leurs besoins en matériel agricole
                             </p>
                             <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
-                                <a href="#" class="btn btn-outline-custom btn-custom">
+                                <a href="{{ route('register') }}" class="btn btn-outline-custom btn-custom">
                                     <i class="fas fa-user-plus me-2"></i>
                                     Créer un compte gratuit
                                 </a>
-                                <a href="#" class="btn btn-primary-custom btn-custom" style="background: white; color: var(--primary-color);">
+                                <a href="{{ route('contact.index') }}" class="btn btn-primary-custom btn-custom" style="background: white; color: var(--primary-color);">
                                     <i class="fas fa-phone me-2"></i>
                                     Nous contacter
                                 </a>

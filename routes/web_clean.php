@@ -18,49 +18,11 @@ Route::prefix('products')->name('products.')->group(function () {
     Route::get('/{product:slug}', [App\Http\Controllers\ProductController::class, 'show'])->name('show');
 });
 
-// Routes publiques pour les catégories (accessibles à tous)
-Route::prefix('categories')->name('categories.')->group(function () {
-    Route::get('/', [App\Http\Controllers\CategoryController::class, 'index'])->name('index');
-    Route::get('/{category:slug}', [App\Http\Controllers\CategoryController::class, 'show'])->name('show');
-});
-
-// Routes pour les pages statiques
-Route::get('/cookies/policy', function () {
-    return view('pages.cookies-policy');
-})->name('cookies.policy');
-
 // Routes d'authentification Fortify (gérées automatiquement)
 // Route::middleware(['guest'])->group(function () {
 //     Route::get('/login', [Laravel\Fortify\Http\Controllers\AuthenticatedSessionController::class, 'create'])->name('login');
 //     Route::get('/register', [Laravel\Fortify\Http\Controllers\RegisteredUserController::class, 'create'])->name('register');
 // });
-
-// Route home (alias pour welcome)
-Route::get('/home', function () {
-    return redirect()->route('welcome');
-})->name('home');
-
-// Routes pour les fonctionnalités utilisateur (nécessitent l'authentification)
-Route::middleware(['auth'])->group(function () {
-    // Panier
-    Route::prefix('cart')->name('cart.')->group(function () {
-        Route::get('/', function () { return view('cart.index'); })->name('index');
-        Route::get('/rental', function () { return view('cart.rental'); })->name('rental');
-    });
-    
-    // Wishlist
-    Route::get('/wishlist', function () { return view('wishlist.index'); })->name('wishlist.index');
-    
-    // Commandes
-    Route::get('/orders', function () { return view('orders.index'); })->name('orders.index');
-    
-    // Locations
-    Route::get('/rentals', function () { return view('rentals.index'); })->name('rentals.index');
-});
-
-// Routes publiques supplémentaires
-Route::get('/blog', function () { return view('blog.index'); })->name('blog.index');
-Route::get('/contact', function () { return view('contact.index'); })->name('contact.index');
 
 // Routes admin (accessibles uniquement aux admins)
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
