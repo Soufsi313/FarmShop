@@ -102,26 +102,28 @@
             <!-- Menu utilisateur -->
             <ul class="navbar-nav">
                 @auth
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                            <img src="{{ Auth::user()->profile_photo_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&color=7F9CF5&background=EBF4FF' }}" 
-                                 alt="{{ Auth::user()->name }}" class="rounded-circle me-2" width="30" height="30">
-                            {{ Auth::user()->name }}
+                    <!-- Informations utilisateur -->
+                    <li class="nav-item d-flex align-items-center me-3">
+                        <img src="{{ Auth::user()->profile_photo_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&color=7F9CF5&background=EBF4FF' }}" 
+                             alt="{{ Auth::user()->name }}" class="rounded-circle me-2" width="30" height="30">
+                        <span class="text-dark">{{ Auth::user()->name }}</span>
+                    </li>
+                    
+                    <!-- Lien Mon profil -->
+                    <li class="nav-item me-2">
+                        <a href="{{ route('profile.show') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-user me-1"></i> Mon profil
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ route('profile.show') }}">
-                                <i class="fas fa-user me-2"></i> Mon profil
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item text-danger">
-                                        <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
+                    </li>
+                    
+                    <!-- Bouton déconnexion direct -->
+                    <li class="nav-item">
+                        <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="fas fa-sign-out-alt me-1"></i> Déconnexion
+                            </button>
+                        </form>
                     </li>
                 @else
                     <li class="nav-item me-2">

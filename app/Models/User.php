@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,7 +15,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Carbon\Carbon;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens;
     use HasFactory;
@@ -289,11 +290,14 @@ class User extends Authenticatable
     }
 
     /**
-     * Relation avec les newsletters créées
+     * Override the teams relation to use memberships table
      */
-    public function createdNewsletters()
+    public function teams()
     {
-        return $this->hasMany(Newsletter::class, 'created_by');
+        return $this->belongsToMany(Team::class, 'memberships')
+                    ->withPivot('role', 'created_at', 'updated_at')
+                    ->withTimestamps()
+                    ->as('membership');
     }
 
     /**

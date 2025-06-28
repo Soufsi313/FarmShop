@@ -33,6 +33,19 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
+        // Personnaliser les vues d'authentification
+        Fortify::loginView(function () {
+            return view('auth.login-modern');
+        });
+
+        Fortify::registerView(function () {
+            return view('auth.register-modern');
+        });
+
+        Fortify::verifyEmailView(function () {
+            return view('auth.verify-email-modern');
+        });
+
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 

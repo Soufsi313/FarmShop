@@ -17,6 +17,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Route de debug pour l'authentification
+Route::get('/debug-auth', function () {
+    return view('debug-auth');
+});
+
 // Route de test pour vérifier les utilisateurs créés
 Route::get('/test-users', function () {
     $users = \App\Models\User::with('roles')->get();
