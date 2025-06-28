@@ -197,6 +197,19 @@ class OrderItem extends Model
     }
 
     /**
+     * Vérifier si l'article peut être supprimé
+     */
+    public function canBeDeleted(): bool
+    {
+        // Un article ne peut être supprimé que si la commande n'est pas encore expédiée
+        return $this->order && in_array($this->order->status, [
+            Order::STATUS_PENDING,
+            Order::STATUS_CONFIRMED,
+            Order::STATUS_PREPARATION
+        ]);
+    }
+
+    /**
      * Méthodes statiques
      */
     public static function getStatuses(): array
@@ -210,5 +223,13 @@ class OrderItem extends Model
             self::STATUS_RETURNED => 'Retourné',
             self::STATUS_CANCELLED => 'Annulé',
         ];
+    }
+
+    /**
+     * Obtenir tous les statuts possibles
+     */
+    public static function getAllStatuses(): array
+    {
+        return array_keys(self::getStatuses());
     }
 }

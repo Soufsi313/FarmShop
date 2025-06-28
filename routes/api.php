@@ -106,6 +106,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{order}/returns', [App\Http\Controllers\OrderController::class, 'createReturn']); // Créer une demande de retour
     });
 
+    // API pour les articles de commande - Utilisateurs connectés uniquement
+    Route::prefix('order-items')->group(function () {
+        Route::get('/', [App\Http\Controllers\OrderItemController::class, 'index']); // Obtenir la liste des articles
+        Route::get('/{orderItem}', [App\Http\Controllers\OrderItemController::class, 'show']); // Obtenir les détails d'un article
+        Route::post('/{orderItem}/returns', [App\Http\Controllers\OrderItemController::class, 'createReturn']); // Créer un retour pour l'article
+    });
+
     // Actions personnelles de l'utilisateur
     Route::prefix('user')->group(function () {
         Route::post('/newsletter/subscribe', [App\Http\Controllers\UserController::class, 'subscribeNewsletter']);
@@ -204,6 +211,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/orders/{order}', [App\Http\Controllers\OrderController::class, 'adminShow']); // Détail d'une commande pour l'admin
         Route::put('/orders/{order}/status', [App\Http\Controllers\OrderController::class, 'updateStatus']); // Mettre à jour le statut
         Route::get('/orders/automation/status-updates', [App\Http\Controllers\OrderController::class, 'automateStatusUpdates']); // Automatisation des statuts
+        Route::post('/orders/automation/run', [App\Http\Controllers\OrderController::class, 'runStatusAutomation']); // Déclencher manuellement l'automatisation
         Route::get('/orders/statistics', [App\Http\Controllers\OrderController::class, 'statistics']); // Statistiques des commandes
         
         // Gestion des retours
@@ -211,5 +219,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/orders/returns/{return}/approve', [App\Http\Controllers\OrderReturnController::class, 'approve']); // Approuver un retour
         Route::put('/orders/returns/{return}/reject', [App\Http\Controllers\OrderReturnController::class, 'reject']); // Rejeter un retour
         Route::put('/orders/returns/{return}/process', [App\Http\Controllers\OrderReturnController::class, 'process']); // Traiter un retour
+
+        // API pour la gestion des articles de commande
+        Route::prefix('order-items')->group(function () {
+            Route::get('/', [App\Http\Controllers\OrderItemController::class, 'index']); // Liste des articles
+            Route::post('/', [App\Http\Controllers\OrderItemController::class, 'store']); // Créer un article
+            Route::get('/{orderItem}', [App\Http\Controllers\OrderItemController::class, 'show']); // Détail d'un article
+            Route::put('/{orderItem}', [App\Http\Controllers\OrderItemController::class, 'update']); // Mettre à jour un article
+            Route::delete('/{orderItem}', [App\Http\Controllers\OrderItemController::class, 'destroy']); // Supprimer un article
+            Route::put('/{orderItem}/status', [App\Http\Controllers\OrderItemController::class, 'updateStatus']); // Mettre à jour le statut
+            Route::post('/bulk-action', [App\Http\Controllers\OrderItemController::class, 'bulkAction']); // Actions en lot
+            Route::get('/statistics', [App\Http\Controllers\OrderItemController::class, 'statistics']); // Statistiques
+        });
     });
 });

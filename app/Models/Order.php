@@ -357,6 +357,14 @@ class Order extends Model
     }
 
     /**
+     * Recalculer les totaux de la commande
+     */
+    public function recalculateTotals(): void
+    {
+        $this->calculateTotals();
+    }
+
+    /**
      * Méthodes pour les statuts disponibles
      */
     public static function getStatuses(): array

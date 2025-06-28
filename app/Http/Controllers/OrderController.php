@@ -526,49 +526,129 @@ class OrderController extends Controller
     }
 
     /**
-     * Simuler l'automatisation des statuts (méthode pour cron/scheduler)
+     * Afficher la page d'automatisation des statuts (Admin uniquement)
+     * Et exécuter l'automatisation si demandé via API
      */
-    public function automateStatusUpdates()
+    public function automateStatusUpdates(Request $request)
     {
-        $updated = 0;
-
-        // Auto-confirmer les commandes payées depuis plus de 1 heure
-        $pendingOrders = Order::where('status', Order::STATUS_PENDING)
-            ->where('payment_status', Order::PAYMENT_STATUS_COMPLETED)
-            ->where('created_at', '<=', Carbon::now()->subHour())
-            ->get();
-
-        foreach ($pendingOrders as $order) {
-            $order->update(['status' => Order::STATUS_CONFIRMED, 'confirmed_at' => Carbon::now()]);
-            $this->sendStatusChangeEmail($order, Order::STATUS_PENDING);
-            $updated++;
+        // Vérifier les permissions
+        if (!Auth::user()->can('manage orders')) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès non autorisé.'
+                ], 403);
+            }
+            
+            return redirect()->back()->with('error', 'Accès non autorisé.');
         }
 
-        // Auto-expédier les commandes confirmées depuis plus de 2 jours
-        $confirmedOrders = Order::where('status', Order::STATUS_CONFIRMED)
-            ->where('confirmed_at', '<=', Carbon::now()->subDays(2))
-            ->get();
+        // Si c'est une requête API, exécuter l'automatisation
+        if ($request->expectsJson()) {
+            $updated = 0;
 
-        foreach ($confirmedOrders as $order) {
-            $order->update(['status' => Order::STATUS_SHIPPED, 'shipped_at' => Carbon::now()]);
-            $this->sendStatusChangeEmail($order, Order::STATUS_CONFIRMED);
-            $updated++;
+            // Auto-confirmer les commandes payées depuis plus de 1 heure
+            $pendingOrders = Order::where('status', Order::STATUS_PENDING)
+                ->where('payment_status', Order::PAYMENT_STATUS_COMPLETED)
+                ->where('created_at', '<=', Carbon::now()->subHour())
+                ->get();
+
+            foreach ($pendingOrders as $order) {
+                $order->update(['status' => Order::STATUS_CONFIRMED, 'confirmed_at' => Carbon::now()]);
+                $this->sendStatusChangeEmail($order, Order::STATUS_PENDING);
+                $updated++;
+            }
+
+            // Auto-expédier les commandes confirmées depuis plus de 2 jours
+            $confirmedOrders = Order::where('status', Order::STATUS_CONFIRMED)
+                ->where('confirmed_at', '<=', Carbon::now()->subDays(2))
+                ->get();
+
+            foreach ($confirmedOrders as $order) {
+                $order->update(['status' => Order::STATUS_SHIPPED, 'shipped_at' => Carbon::now()]);
+                $this->sendStatusChangeEmail($order, Order::STATUS_CONFIRMED);
+                $updated++;
+            }
+
+            // Auto-livrer les commandes expédiées depuis plus de 3 jours
+            $shippedOrders = Order::where('status', Order::STATUS_SHIPPED)
+                ->where('shipped_at', '<=', Carbon::now()->subDays(3))
+                ->get();
+
+            foreach ($shippedOrders as $order) {
+                $order->update(['status' => Order::STATUS_DELIVERED, 'delivered_at' => Carbon::now()]);
+                $this->sendStatusChangeEmail($order, Order::STATUS_SHIPPED);
+                $updated++;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Automatisation terminée. {$updated} commandes mises à jour."
+            ]);
         }
 
-        // Auto-livrer les commandes expédiées depuis plus de 3 jours
-        $shippedOrders = Order::where('status', Order::STATUS_SHIPPED)
-            ->where('shipped_at', '<=', Carbon::now()->subDays(3))
-            ->get();
+        // Pour les requêtes web, afficher la vue d'administration
+        return view('admin.orders.automation');
+    }
 
-        foreach ($shippedOrders as $order) {
-            $order->update(['status' => Order::STATUS_DELIVERED, 'delivered_at' => Carbon::now()]);
-            $this->sendStatusChangeEmail($order, Order::STATUS_SHIPPED);
-            $updated++;
+    /**
+     * Déclencher manuellement l'automatisation des statuts de commandes (Admin uniquement)
+     */
+    public function runStatusAutomation(Request $request)
+    {
+        // Vérifier les permissions
+        if (!Auth::user()->can('manage orders')) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès non autorisé.'
+                ], 403);
+            }
+            
+            return redirect()->back()->with('error', 'Accès non autorisé.');
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => "Automatisation terminée. {$updated} commandes mises à jour."
-        ]);
+        try {
+            // Exécuter la commande d'automatisation
+            $exitCode = \Artisan::call('orders:automate-statuses');
+            $output = \Artisan::output();
+
+            if ($exitCode === 0) {
+                $message = 'Automatisation des statuts de commandes exécutée avec succès.';
+                
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => $message,
+                        'output' => $output
+                    ]);
+                }
+                
+                return redirect()->back()->with('success', $message);
+            } else {
+                $errorMessage = 'Erreur lors de l\'exécution de l\'automatisation.';
+                
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $errorMessage,
+                        'output' => $output
+                    ], 500);
+                }
+                
+                return redirect()->back()->with('error', $errorMessage);
+            }
+        } catch (\Exception $e) {
+            $errorMessage = 'Une erreur est survenue: ' . $e->getMessage();
+            
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage
+                ], 500);
+            }
+            
+            return redirect()->back()->with('error', $errorMessage);
+        }
     }
 }

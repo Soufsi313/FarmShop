@@ -127,6 +127,13 @@ Route::middleware([
         Route::post('/{order}/returns', [App\Http\Controllers\OrderController::class, 'createReturn'])->name('returns.store'); // Créer un retour
     });
 
+    // Routes pour les articles de commande - Utilisateurs connectés uniquement
+    Route::prefix('order-items')->name('order-items.')->group(function () {
+        Route::get('/', [App\Http\Controllers\OrderItemController::class, 'index'])->name('index'); // Liste des articles
+        Route::get('/{orderItem}', [App\Http\Controllers\OrderItemController::class, 'show'])->name('show'); // Détail d'un article
+        Route::post('/{orderItem}/returns', [App\Http\Controllers\OrderItemController::class, 'createReturn'])->name('returns.store'); // Créer un retour pour l'article
+    });
+
     // Routes pour les utilisateurs (actions personnelles)
     Route::prefix('user')->name('user.')->group(function () {
         Route::post('/newsletter/subscribe', [App\Http\Controllers\UserController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
@@ -218,6 +225,7 @@ Route::middleware([
         Route::get('/orders/{order}', [App\Http\Controllers\OrderController::class, 'adminShow'])->name('orders.show'); // Détail d'une commande
         Route::put('/orders/{order}/status', [App\Http\Controllers\OrderController::class, 'updateStatus'])->name('orders.update-status'); // Mettre à jour le statut
         Route::get('/orders/automation/status-updates', [App\Http\Controllers\OrderController::class, 'automateStatusUpdates'])->name('orders.automation'); // Automatisation des statuts
+        Route::post('/orders/automation/run', [App\Http\Controllers\OrderController::class, 'runStatusAutomation'])->name('orders.automation.run'); // Déclencher manuellement l'automatisation
         Route::get('/orders-statistics', [App\Http\Controllers\OrderController::class, 'statistics'])->name('orders.statistics'); // Statistiques des commandes
         
         // Gestion des retours
@@ -225,5 +233,19 @@ Route::middleware([
         Route::put('/orders/returns/{return}/approve', [App\Http\Controllers\OrderReturnController::class, 'approve'])->name('orders.returns.approve'); // Approuver un retour
         Route::put('/orders/returns/{return}/reject', [App\Http\Controllers\OrderReturnController::class, 'reject'])->name('orders.returns.reject'); // Rejeter un retour
         Route::put('/orders/returns/{return}/process', [App\Http\Controllers\OrderReturnController::class, 'process'])->name('orders.returns.process'); // Traiter un retour
+
+        // Gestion des articles de commande
+        Route::prefix('order-items')->name('order-items.')->group(function () {
+            Route::get('/', [App\Http\Controllers\OrderItemController::class, 'index'])->name('index'); // Liste des articles
+            Route::get('/create/{order}', [App\Http\Controllers\OrderItemController::class, 'create'])->name('create'); // Créer un article
+            Route::post('/', [App\Http\Controllers\OrderItemController::class, 'store'])->name('store'); // Sauvegarder un article
+            Route::get('/{orderItem}', [App\Http\Controllers\OrderItemController::class, 'show'])->name('show'); // Détail d'un article
+            Route::get('/{orderItem}/edit', [App\Http\Controllers\OrderItemController::class, 'edit'])->name('edit'); // Éditer un article
+            Route::put('/{orderItem}', [App\Http\Controllers\OrderItemController::class, 'update'])->name('update'); // Mettre à jour un article
+            Route::delete('/{orderItem}', [App\Http\Controllers\OrderItemController::class, 'destroy'])->name('destroy'); // Supprimer un article
+            Route::put('/{orderItem}/status', [App\Http\Controllers\OrderItemController::class, 'updateStatus'])->name('update-status'); // Mettre à jour le statut
+            Route::post('/bulk-action', [App\Http\Controllers\OrderItemController::class, 'bulkAction'])->name('bulk-action'); // Actions en lot
+            Route::get('/statistics', [App\Http\Controllers\OrderItemController::class, 'statistics'])->name('statistics'); // Statistiques
+        });
     });
 });
