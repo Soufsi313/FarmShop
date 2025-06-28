@@ -182,6 +182,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Relation avec les contacts de l'utilisateur
+     */
+    public function contacts()
+    {
+        return $this->hasMany(\App\Models\Contact::class, 'user_id');
+    }
+
+    /**
+     * Relation avec les contacts assignés à cet administrateur
+     */
+    public function assignedContacts()
+    {
+        return $this->hasMany(\App\Models\Contact::class, 'assigned_to');
+    }
+
+    /**
      * Relation avec les commandes de l'utilisateur
      */
     public function orders()
