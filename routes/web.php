@@ -127,6 +127,21 @@ Route::middleware([
         Route::post('/{order}/returns', [App\Http\Controllers\OrderController::class, 'createReturn'])->name('returns.store'); // Créer un retour
     });
 
+    // Routes pour les locations - Utilisateurs connectés uniquement
+    Route::prefix('rentals')->name('rentals.')->group(function () {
+        Route::get('/', [App\Http\Controllers\RentalController::class, 'index'])->name('index'); // Liste des locations
+        Route::get('/create', [App\Http\Controllers\RentalController::class, 'create'])->name('create'); // Formulaire de location
+        Route::post('/', [App\Http\Controllers\RentalController::class, 'store'])->name('store'); // Créer une location
+        Route::get('/statistics', [App\Http\Controllers\RentalController::class, 'statistics'])->name('statistics'); // Statistiques utilisateur
+        Route::post('/check-availability', [App\Http\Controllers\RentalController::class, 'checkAvailability'])->name('check-availability'); // Vérifier disponibilité
+        Route::get('/{rental}', [App\Http\Controllers\RentalController::class, 'show'])->name('show'); // Détail d'une location
+        Route::put('/{rental}', [App\Http\Controllers\RentalController::class, 'update'])->name('update'); // Modifier une location
+        Route::put('/{rental}/cancel', [App\Http\Controllers\RentalController::class, 'cancel'])->name('cancel'); // Annuler une location
+        Route::post('/{rental}/return', [App\Http\Controllers\RentalController::class, 'processReturn'])->name('return'); // Traiter un retour
+        Route::get('/{rental}/invoice', [App\Http\Controllers\RentalController::class, 'generateInvoice'])->name('invoice'); // Générer facture PDF
+        Route::delete('/{rental}', [App\Http\Controllers\RentalController::class, 'destroy'])->name('destroy'); // Supprimer une location
+    });
+
     // Routes pour les articles de commande - Utilisateurs connectés uniquement
     Route::prefix('order-items')->name('order-items.')->group(function () {
         Route::get('/', [App\Http\Controllers\OrderItemController::class, 'index'])->name('index'); // Liste des articles
@@ -233,19 +248,35 @@ Route::middleware([
         Route::put('/orders/returns/{return}/approve', [App\Http\Controllers\OrderReturnController::class, 'approve'])->name('orders.returns.approve'); // Approuver un retour
         Route::put('/orders/returns/{return}/reject', [App\Http\Controllers\OrderReturnController::class, 'reject'])->name('orders.returns.reject'); // Rejeter un retour
         Route::put('/orders/returns/{return}/process', [App\Http\Controllers\OrderReturnController::class, 'process'])->name('orders.returns.process'); // Traiter un retour
+    });
 
-        // Gestion des articles de commande
-        Route::prefix('order-items')->name('order-items.')->group(function () {
-            Route::get('/', [App\Http\Controllers\OrderItemController::class, 'index'])->name('index'); // Liste des articles
-            Route::get('/create/{order}', [App\Http\Controllers\OrderItemController::class, 'create'])->name('create'); // Créer un article
-            Route::post('/', [App\Http\Controllers\OrderItemController::class, 'store'])->name('store'); // Sauvegarder un article
-            Route::get('/{orderItem}', [App\Http\Controllers\OrderItemController::class, 'show'])->name('show'); // Détail d'un article
-            Route::get('/{orderItem}/edit', [App\Http\Controllers\OrderItemController::class, 'edit'])->name('edit'); // Éditer un article
-            Route::put('/{orderItem}', [App\Http\Controllers\OrderItemController::class, 'update'])->name('update'); // Mettre à jour un article
-            Route::delete('/{orderItem}', [App\Http\Controllers\OrderItemController::class, 'destroy'])->name('destroy'); // Supprimer un article
-            Route::put('/{orderItem}/status', [App\Http\Controllers\OrderItemController::class, 'updateStatus'])->name('update-status'); // Mettre à jour le statut
-            Route::post('/bulk-action', [App\Http\Controllers\OrderItemController::class, 'bulkAction'])->name('bulk-action'); // Actions en lot
-            Route::get('/statistics', [App\Http\Controllers\OrderItemController::class, 'statistics'])->name('statistics'); // Statistiques
-        });
+    // Routes d'administration pour les locations
+    Route::middleware(['permission:manage_rentals'])->prefix('admin')->name('admin.')->group(function () {
+        // Interface d'administration pour les locations
+        Route::get('/rentals', [App\Http\Controllers\Admin\RentalAdminController::class, 'index'])->name('rentals.index'); // Liste des locations
+        Route::get('/rentals/dashboard', [App\Http\Controllers\Admin\RentalAdminController::class, 'dashboard'])->name('rentals.dashboard'); // Dashboard locations
+        Route::get('/rentals/export', [App\Http\Controllers\Admin\RentalAdminController::class, 'export'])->name('rentals.export'); // Export CSV
+        Route::get('/rentals/{rental}', [App\Http\Controllers\Admin\RentalAdminController::class, 'show'])->name('rentals.show'); // Détail d'une location
+        Route::put('/rentals/{rental}/status', [App\Http\Controllers\Admin\RentalAdminController::class, 'updateStatus'])->name('rentals.update-status'); // Mettre à jour le statut
+        Route::put('/rentals/{rental}/confirm', [App\Http\Controllers\Admin\RentalAdminController::class, 'confirm'])->name('rentals.confirm'); // Confirmer une location
+        Route::delete('/rentals/{rental}', [App\Http\Controllers\Admin\RentalAdminController::class, 'destroy'])->name('rentals.destroy'); // Supprimer une location
+        
+        // Gestion des amendes
+        Route::get('/rentals/{rental}/penalties', [App\Http\Controllers\Admin\RentalAdminController::class, 'managePenalties'])->name('rentals.penalties.index'); // Liste des amendes
+        Route::post('/rentals/{rental}/penalties', [App\Http\Controllers\Admin\RentalAdminController::class, 'managePenalties'])->name('rentals.penalties.store'); // Ajouter une amende
+        Route::put('/rentals/{rental}/penalties/{penalty}', [App\Http\Controllers\Admin\RentalAdminController::class, 'updatePenalty'])->name('rentals.penalties.update'); // Mettre à jour une amende
+    
+        // Automatisation des locations
+        Route::get('/rentals/automation/status-updates', function() {
+            return view('admin.rentals.automation');
+        })->name('rentals.automation'); // Interface d'automatisation
+        Route::post('/rentals/automation/run', function() {
+            \Artisan::call('rentals:automate');
+            return response()->json([
+                'success' => true,
+                'message' => 'Automatisation exécutée avec succès',
+                'output' => \Artisan::output()
+            ]);
+        })->name('rentals.automation.run'); // Déclencher l'automatisation
     });
 });
