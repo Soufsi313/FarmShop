@@ -189,6 +189,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Relation avec l'adhésion de l'utilisateur
+     */
+    public function membership()
+    {
+        return $this->hasOne(\App\Models\Membership::class);
+    }
+
+    /**
+     * Relation avec les adhésions approuvées par cet administrateur
+     */
+    public function approvedMemberships()
+    {
+        return $this->hasMany(\App\Models\Membership::class, 'approved_by');
+    }
+
+    /**
+     * Relation avec les utilisateurs parrainés par cet utilisateur
+     */
+    public function referredMemberships()
+    {
+        return $this->hasMany(\App\Models\Membership::class, 'referred_by');
+    }
+
+    /**
      * Relation avec les commandes de l'utilisateur
      */
     public function orders()
