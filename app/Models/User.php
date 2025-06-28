@@ -525,4 +525,40 @@ class User extends Authenticatable
             'account_status' => $this->deleted_at ? 'Deleted' : 'Active',
         ];
     }
+
+    // Relations pour les cookies
+    /**
+     * Consentements cookies de l'utilisateur
+     */
+    public function cookieConsents()
+    {
+        return $this->hasMany(CookieConsent::class);
+    }
+
+    /**
+     * Obtenir le consentement cookie actuel
+     */
+    public function getCurrentCookieConsent()
+    {
+        return $this->cookieConsents()
+            ->active()
+            ->latest('consent_date')
+            ->first();
+    }
+
+    /**
+     * Vérifier si l'utilisateur a donné son consentement pour une catégorie de cookie
+     */
+    public function hasConsentForCookie($category)
+    {
+        return CookieConsent::isConsentGiven($category, $this->id);
+    }
+
+    /**
+     * Obtenir toutes les catégories de cookies acceptées par l'utilisateur
+     */
+    public function getAcceptedCookieCategories()
+    {
+        return CookieConsent::getAcceptedCategories($this->id);
+    }
 }
