@@ -353,7 +353,45 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user/comments', [App\Http\Controllers\BlogCommentController::class, 'myComments']); // Mes commentaires
         Route::get('/user/reports', [App\Http\Controllers\BlogCommentReportController::class, 'myReports']); // Mes signalements
         Route::put('/user/reports/{report}/cancel', [App\Http\Controllers\BlogCommentReportController::class, 'cancel']); // Annuler signalement
+        
     });
+
+    // API d'administration pour les cookies
+    Route::middleware(['permission:manage cookies'])->prefix('admin')->group(function () {
+        Route::get('/cookies', [App\Http\Controllers\Admin\CookieAdminController::class, 'index']); // Liste cookies
+        Route::post('/cookies', [App\Http\Controllers\Admin\CookieAdminController::class, 'store']); // Créer cookie
+        Route::get('/cookies/{cookie}', [App\Http\Controllers\Admin\CookieAdminController::class, 'show']); // Détail cookie
+        Route::put('/cookies/{cookie}', [App\Http\Controllers\Admin\CookieAdminController::class, 'update']); // Mettre à jour cookie
+        Route::delete('/cookies/{cookie}', [App\Http\Controllers\Admin\CookieAdminController::class, 'destroy']); // Supprimer cookie
+        Route::post('/cookies/bulk-action', [App\Http\Controllers\Admin\CookieAdminController::class, 'bulkAction']); // Actions en lot
+        Route::get('/cookies/statistics', [App\Http\Controllers\Admin\CookieAdminController::class, 'statistics']); // Statistiques cookies
+        
+        // API d'administration pour les consentements cookies
+        Route::get('/cookie-consents', [App\Http\Controllers\Admin\CookieAdminController::class, 'consents']); // Liste consentements
+        Route::get('/cookie-consents/statistics', [App\Http\Controllers\Admin\CookieAdminController::class, 'consentStatistics']); // Statistiques consentements
+    });
+
+    // API pour les préférences cookies (utilisateurs connectés)
+    Route::prefix('cookies')->group(function () {
+        Route::post('/accept-all', [App\Http\Controllers\CookieController::class, 'acceptAll']); // Accepter tous
+        Route::post('/reject-all', [App\Http\Controllers\CookieController::class, 'rejectAll']); // Refuser tous
+        Route::post('/save-preferences', [App\Http\Controllers\CookieController::class, 'savePreferences']); // Sauvegarder préférences
+        Route::post('/revoke', [App\Http\Controllers\CookieController::class, 'revokeConsent']); // Révoquer consentement
+        Route::get('/history', [App\Http\Controllers\CookieController::class, 'getConsentHistory']); // Historique consentements
+    });
+});
+
+// Routes API publiques pour les cookies (pas d'authentification requise)
+Route::prefix('cookies')->group(function () {
+    Route::get('/preferences', [App\Http\Controllers\CookieController::class, 'preferences']); // Préférences cookies
+    Route::post('/accept-all', [App\Http\Controllers\CookieController::class, 'acceptAll']); // Accepter tous (visiteurs)
+    Route::post('/reject-all', [App\Http\Controllers\CookieController::class, 'rejectAll']); // Refuser tous (visiteurs)
+    Route::post('/save-preferences', [App\Http\Controllers\CookieController::class, 'savePreferences']); // Sauvegarder préférences (visiteurs)
+    Route::get('/policy', [App\Http\Controllers\CookieController::class, 'policy']); // Politique cookies
+    Route::get('/status', [App\Http\Controllers\CookieController::class, 'getConsentStatus']); // Statut consentement
+    Route::get('/check/{category}', [App\Http\Controllers\CookieController::class, 'checkCategory']); // Vérifier catégorie
+    Route::get('/by-category', [App\Http\Controllers\CookieController::class, 'getCookiesByCategory']); // Cookies par catégorie
+    Route::post('/revoke', [App\Http\Controllers\CookieController::class, 'revokeConsent']); // Révoquer consentement (visiteurs)
 });
 
 // Routes API publiques pour le blog (pas d'authentification requise)
