@@ -189,6 +189,16 @@ class Product extends Model
         return $query;
     }
 
+    public function scopeSortByPrice($query, $direction = 'asc')
+    {
+        return $query->orderBy('price', $direction);
+    }
+
+    public function scopePopular($query)
+    {
+        return $query->orderBy('likes_count', 'desc')->orderBy('views_count', 'desc');
+    }
+
     /**
      * Méthodes de gestion du stock
      */

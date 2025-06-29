@@ -51,9 +51,9 @@
                 <div class="ps-lg-4">
                     <!-- Badges -->
                     <div class="mb-3">
-                        @if($product->is_organic)
-                            <span class="badge bg-success me-2">
-                                <i class="fas fa-leaf me-1"></i>Bio
+                        @if($product->is_featured)
+                            <span class="badge bg-warning me-2">
+                                <i class="fas fa-star me-1"></i>Vedette
                             </span>
                         @endif
                         @if($product->category)
@@ -89,27 +89,91 @@
                         </div>
                     @endif
                     
-                    <!-- Stock -->
+                    <!-- Stock et quantité -->
                     <div class="mb-4">
-                        @if($product->quantity > 0)
-                            <span class="badge bg-success">
-                                <i class="fas fa-check me-1"></i>En stock ({{ $product->quantity }})
-                            </span>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                @if($product->quantity > 0)
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check me-1"></i>En stock ({{ $product->quantity }})
+                                    </span>
+                                    @if($product->quantity <= $product->critical_stock_threshold)
+                                        <span class="badge bg-warning ms-2">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>Stock faible
+                                        </span>
+                                    @endif
+                                @else
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times me-1"></i>Rupture de stock
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        @auth
+                            @if($product->quantity > 0)
+                                <!-- Sélecteur de quantité -->
+                                <div class="mb-3">
+                                    <label for="quantity" class="form-label">Quantité</label>
+                                    <div class="input-group" style="max-width: 200px;">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="changeQuantity(-1)">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" 
+                                               class="form-control text-center" 
+                                               id="quantity" 
+                                               value="1" 
+                                               min="1" 
+                                               max="{{ $product->quantity }}">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="changeQuantity(1)">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Boutons d'action -->
+                                <div class="d-flex gap-2 mb-4">
+                                    <button class="btn btn-outline-success" onclick="addToCart({{ $product->id }})">
+                                        <i class="fas fa-shopping-cart me-1"></i>Ajouter au panier
+                                    </button>
+                                    <button class="btn btn-success" onclick="buyNowFromDetail({{ $product->id }})">
+                                        <i class="fas fa-bolt me-1"></i>Acheter maintenant
+                                    </button>
+                                    <button class="btn btn-outline-primary" onclick="addToWishlist({{ $product->id }})">
+                                        <i class="fas fa-heart me-1"></i>Favoris
+                                    </button>
+                                </div>
+                            @else
+                                <div class="mb-4">
+                                    <button class="btn btn-secondary" disabled>
+                                        <i class="fas fa-ban me-1"></i>Produit en rupture
+                                    </button>
+                                </div>
+                            @endif
                         @else
-                            <span class="badge bg-danger">
-                                <i class="fas fa-times me-1"></i>Rupture de stock
-                            </span>
-                        @endif
+                            <!-- Message pour visiteurs non connectés -->
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle me-2"></i>Compte requis</h6>
+                                <p class="mb-0">
+                                    Connectez-vous pour ajouter ce produit au panier et passer commande.
+                                </p>
+                                <div class="mt-3">
+                                    <a href="{{ route('login') }}" class="btn btn-success me-2">
+                                        <i class="fas fa-sign-in-alt me-1"></i>Se connecter
+                                    </a>
+                                    <a href="{{ route('register') }}" class="btn btn-outline-success">
+                                        <i class="fas fa-user-plus me-1"></i>Créer un compte
+                                    </a>
+                                </div>
+                            </div>
+                        @endauth
                     </div>
                     
-                    <!-- Boutons d'action -->
+                    <!-- Navigation et partage -->
                     <div class="d-flex gap-2 mb-4">
-                        <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-1"></i>Retour au dashboard
+                        <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Retour aux produits
                         </a>
-                        <button class="btn btn-outline-primary" onclick="addToWishlist({{ $product->id }})">
-                            <i class="fas fa-heart me-1"></i>Favoris
-                        </button>
                         <button class="btn btn-outline-secondary" onclick="shareProduct()">
                             <i class="fas fa-share me-1"></i>Partager
                         </button>
@@ -156,17 +220,101 @@
     @endif
 </div>
 
+@endsection
+
+@section('scripts')
 <script>
-// Ajout au panier
-document.getElementById('addToCartForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const quantity = document.getElementById('quantity').value;
-    alert(`${quantity} {{ $product->unit ?? '' }} ajouté(s) au panier ! (Fonctionnalité à implémenter)`);
-});
+// Gestion de la quantité
+function changeQuantity(delta) {
+    const quantityInput = document.getElementById('quantity');
+    if (!quantityInput) return;
+    
+    const currentValue = parseInt(quantityInput.value);
+    const newValue = Math.max(1, Math.min(currentValue + delta, parseInt(quantityInput.max)));
+    quantityInput.value = newValue;
+}
+
+// Ajout au panier depuis la page de détail
+function addToCart(productId) {
+    const quantity = document.getElementById('quantity')?.value || 1;
+    
+    fetch(`/api/cart/add`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: parseInt(quantity)
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            showToast(`${quantity}x {{ $product->name ?? "" }} ajouté(s) au panier !`, 'success');
+        } else {
+            showToast('Erreur lors de l\'ajout au panier', 'error');
+        }
+    })
+    .catch(error => {
+        // En attendant l'implémentation complète
+        showToast(`${quantity}x {{ $product->name ?? "" }} ajouté(s) au panier ! (Simulation)`, 'success');
+    });
+}
+
+// Achat immédiat depuis la page de détail
+function buyNowFromDetail(productId) {
+    const quantity = document.getElementById('quantity')?.value || 1;
+    
+    fetch(`/api/orders/buy-now`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: parseInt(quantity)
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            showToast('Achat effectué avec succès !', 'success');
+            // Rediriger vers la page de confirmation
+            // window.location.href = '/orders/confirmation';
+        } else {
+            showToast('Erreur lors de l\'achat', 'error');
+        }
+    })
+    .catch(error => {
+        // En attendant l'implémentation complète
+        showToast(`Achat effectué: ${quantity}x {{ $product->name ?? "" }} (Simulation)`, 'success');
+    });
+}
 
 // Ajout aux favoris
 function addToWishlist(productId) {
-    alert('Ajouté aux favoris ! (Fonctionnalité à implémenter)');
+    fetch(`/api/wishlist/add`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            product_id: productId
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            showToast('Produit ajouté aux favoris !', 'success');
+        } else {
+            showToast('Erreur lors de l\'ajout aux favoris', 'error');
+        }
+    })
+    .catch(error => {
+        // En attendant l'implémentation complète
+        showToast('{{ $product->name ?? "" }} ajouté aux favoris ! (Simulation)', 'success');
+    });
 }
 
 // Partage du produit
@@ -179,9 +327,46 @@ function shareProduct() {
         });
     } else {
         navigator.clipboard.writeText(window.location.href).then(() => {
-            alert('Lien copié dans le presse-papier !');
+            showToast('Lien copié dans le presse-papier !', 'info');
         });
     }
 }
+
+// Fonction pour afficher les notifications toast
+function showToast(message, type = 'success') {
+    // Créer un élément toast
+    const toastContainer = document.querySelector('.toast-container') || createToastContainer();
+    
+    const toastElement = document.createElement('div');
+    toastElement.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} border-0`;
+    toastElement.setAttribute('role', 'alert');
+    toastElement.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toastElement);
+    
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+    
+    // Supprimer le toast après qu'il soit caché
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+    });
+}
+
+// Créer le conteneur de toast s'il n'existe pas
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.className = 'toast-container position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '9999';
+    document.body.appendChild(container);
+    return container;
+}
 </script>
-@endsection

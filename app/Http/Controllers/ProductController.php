@@ -17,7 +17,7 @@ class ProductController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        // Pas de middleware auth pour les méthodes publiques
         $this->middleware('permission:manage products')->except(['index', 'show', 'search', 'like', 'wishlist']);
         $this->middleware('auth')->only(['like', 'wishlist']);
     }
@@ -45,6 +45,18 @@ class ProductController extends Controller
             $query->priceRange($request->price_min, $request->price_max);
         }
 
+        // Filtrage par type de produit
+        if ($request->filled('product_type')) {
+            switch ($request->product_type) {
+                case 'purchase':
+                    $query->where('price', '>', 0);
+                    break;
+                case 'rental':
+                    $query->where('is_rentable', true);
+                    break;
+            }
+        }
+
         // Tri
         $sortBy = $request->get('sort', 'name');
         $sortDirection = $request->get('direction', 'asc');
@@ -66,7 +78,7 @@ class ProductController extends Controller
         }
 
         // Filtres de stock (admin uniquement)
-        if (auth()->user() && auth()->user()->can('manage products')) {
+        if (auth()->check() && auth()->user()->can('manage products')) {
             if ($request->filled('stock_status')) {
                 switch ($request->stock_status) {
                     case 'in_stock':

@@ -22,18 +22,10 @@
                 </li>
 
                 <!-- Produits -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('products.index') }}">
                         <i class="fas fa-shopping-bag me-1"></i> Produits
                     </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ route('products.index') }}">
-                            <i class="fas fa-shopping-cart me-2 text-success"></i> Achat
-                        </a></li>
-                        <li><a class="dropdown-item" href="{{ route('products.index', ['type' => 'rental']) }}">
-                            <i class="fas fa-calendar-alt me-2 text-primary"></i> Locations
-                        </a></li>
-                    </ul>
                 </li>
 
                 @auth
