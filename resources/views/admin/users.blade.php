@@ -98,7 +98,7 @@
                     
                     <hr class="my-4" style="border-color: rgba(255,255,255,0.2);">
                     
-                    <a href="{{ route('welcome') }}" class="admin-nav-link">
+                    <a href="{{ route('dashboard') }}" class="admin-nav-link">
                         <i class="fas fa-arrow-left"></i>
                         Retour au site
                     </a>

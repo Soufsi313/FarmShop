@@ -339,7 +339,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/blog-comments/{comment}/restore', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'restore']); // Restaurer
         Route::delete('/blog-comments/{comment}', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'destroy']); // Supprimer
         Route::post('/blog-comments/bulk-action', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'bulkAction']); // Actions en lot
-        Route::get('/blog-comments/statistics', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'statistics']); // Statistiques
+        Route::get('/blog-comments/statistics', [AppHttp\Controllers\Admin\BlogCommentAdminController::class, 'statistics']); // Statistiques
         
         // API d'administration pour les signalements de commentaires
         Route::get('/blog-reports', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'index']); // Liste signalements

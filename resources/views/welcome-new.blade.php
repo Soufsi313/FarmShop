@@ -11,8 +11,14 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
 
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <!-- Font Awesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -117,15 +123,31 @@
                     </div>
                     
                     <div class="row g-4">
-                        <!-- Catégorie 1 - Outils et Machines -->
+                        <!-- Catégorie 1 -->
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="category-card card-hover">
+                                <div class="category-icon">
+                                    <i class="fas fa-tractor"></i>
+                                </div>
+                                <h5 class="category-title">Tracteurs</h5>
+                                <p class="category-description">
+                                    Tracteurs agricoles neufs et d'occasion de toutes puissances
+                                </p>
+                                <a href="#" class="btn btn-primary-custom btn-sm mt-3">
+                                    Voir plus <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Catégorie 2 -->
                         <div class="col-sm-6 col-lg-3">
                             <div class="category-card card-hover">
                                 <div class="category-icon">
                                     <i class="fas fa-tools"></i>
                                 </div>
-                                <h5 class="category-title">Outils & Machines</h5>
+                                <h5 class="category-title">Outils</h5>
                                 <p class="category-description">
-                                    Outillage professionnel et machines agricoles pour vos travaux
+                                    Outillage et équipements divers pour tous types de travaux
                                 </p>
                                 <a href="#" class="btn btn-primary-custom btn-sm mt-3">
                                     Voir plus <i class="fas fa-arrow-right ms-1"></i>
@@ -133,15 +155,15 @@
                             </div>
                         </div>
 
-                        <!-- Catégorie 2 - Semences et Fertilisants -->
+                        <!-- Catégorie 3 -->
                         <div class="col-sm-6 col-lg-3">
                             <div class="category-card card-hover">
                                 <div class="category-icon">
                                     <i class="fas fa-seedling"></i>
                                 </div>
-                                <h5 class="category-title">Semences & Fertilisants</h5>
+                                <h5 class="category-title">Semences</h5>
                                 <p class="category-description">
-                                    Graines certifiées et fertilisants bio pour vos cultures
+                                    Graines et plants de qualité certifiée pour vos cultures
                                 </p>
                                 <a href="#" class="btn btn-primary-custom btn-sm mt-3">
                                     Voir plus <i class="fas fa-arrow-right ms-1"></i>
@@ -149,31 +171,15 @@
                             </div>
                         </div>
 
-                        <!-- Catégorie 3 - Fruits et Légumes -->
+                        <!-- Catégorie 4 -->
                         <div class="col-sm-6 col-lg-3">
                             <div class="category-card card-hover">
                                 <div class="category-icon">
-                                    <i class="fas fa-apple-alt"></i>
+                                    <i class="fas fa-truck"></i>
                                 </div>
-                                <h5 class="category-title">Fruits & Légumes</h5>
+                                <h5 class="category-title">Transport</h5>
                                 <p class="category-description">
-                                    Produits frais locaux de nos partenaires agriculteurs belges
-                                </p>
-                                <a href="#" class="btn btn-primary-custom btn-sm mt-3">
-                                    Voir plus <i class="fas fa-arrow-right ms-1"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Catégorie 4 - Produits Laitiers -->
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="category-card card-hover">
-                                <div class="category-icon">
-                                    <i class="fas fa-cheese"></i>
-                                </div>
-                                <h5 class="category-title">Produits Laitiers</h5>
-                                <p class="category-description">
-                                    Lait, fromages et produits laitiers artisanaux de qualité
+                                    Véhicules et remorques agricoles pour vos déplacements
                                 </p>
                                 <a href="#" class="btn btn-primary-custom btn-sm mt-3">
                                     Voir plus <i class="fas fa-arrow-right ms-1"></i>
@@ -239,14 +245,14 @@
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                     </div>
-                                    <p class="card-text">"Excellent service ! J'ai trouvé exactement les outils dont j'avais besoin pour ma ferme. Livraison rapide et matériel de qualité."</p>
+                                    <p class="card-text">"Excellent service ! J'ai trouvé exactement le tracteur que je cherchais à un prix très compétitif. Livraison rapide et professionnelle."</p>
                                     <div class="d-flex align-items-center mt-3">
                                         <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                             <i class="fas fa-user text-white"></i>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">Jean Van Der Berg</h6>
-                                            <small class="text-muted">Agriculteur, Bruxelles</small>
+                                            <h6 class="mb-0">Jean Dupont</h6>
+                                            <small class="text-muted">Agriculteur, Normandie</small>
                                         </div>
                                     </div>
                                 </div>
@@ -263,14 +269,14 @@
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                     </div>
-                                    <p class="card-text">"La location de machines est très pratique pour mes besoins saisonniers. Les produits laitiers locaux sont de qualité exceptionnelle !"</p>
+                                    <p class="card-text">"La location de matériel est très pratique pour mes besoins ponctuels. Interface claire et processus simple."</p>
                                     <div class="d-flex align-items-center mt-3">
                                         <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                             <i class="fas fa-user text-white"></i>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">Marie Dubois</h6>
-                                            <small class="text-muted">Maraîchère, Liège</small>
+                                            <h6 class="mb-0">Marie Martin</h6>
+                                            <small class="text-muted">Maraîchère, Provence</small>
                                         </div>
                                     </div>
                                 </div>
@@ -287,124 +293,19 @@
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                     </div>
-                                    <p class="card-text">"Les semences bio sont excellentes et les fruits et légumes frais arrivent directement de producteurs locaux. Support client réactif !"</p>
+                                    <p class="card-text">"Support client réactif et professionnel. Je recommande vivement cette plateforme à tous les agriculteurs."</p>
                                     <div class="d-flex align-items-center mt-3">
                                         <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                             <i class="fas fa-user text-white"></i>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">Pierre Janssens</h6>
-                                            <small class="text-muted">Producteur bio, Namur</small>
+                                            <h6 class="mb-0">Pierre Legrand</h6>
+                                            <small class="text-muted">Éleveur, Bretagne</small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Blog Section -->
-            <section class="py-5 bg-white">
-                <div class="container">
-                    <div class="row text-center mb-5">
-                        <div class="col-lg-8 mx-auto">
-                            <h2 class="display-5 fw-bold mb-4">
-                                <i class="fas fa-blog text-primary me-3"></i>
-                                Actualités & Conseils
-                            </h2>
-                            <p class="lead text-muted">
-                                Restez informé des dernières tendances agricoles et découvrez nos conseils d'experts
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="row g-4">
-                        <!-- Article 1 -->
-                        <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm hover-lift">
-                                <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height: 200px;">
-                                    <i class="fas fa-seedling fa-3x text-white"></i>
-                                </div>
-                                <div class="card-body">
-                                    <span class="badge bg-success mb-2">Agriculture Bio</span>
-                                    <h5 class="card-title">Guide complet des semences biologiques en Belgique</h5>
-                                    <p class="card-text text-muted">Découvrez les meilleures pratiques pour choisir et cultiver des semences biologiques adaptées au climat belge...</p>
-                                    <div class="d-flex align-items-center text-muted small">
-                                        <i class="fas fa-calendar me-2"></i>
-                                        <span>15 juin 2025</span>
-                                        <span class="mx-2">•</span>
-                                        <i class="fas fa-clock me-2"></i>
-                                        <span>5 min</span>
-                                    </div>
-                                </div>
-                                <div class="card-footer bg-transparent border-0 pt-0">
-                                    <a href="#" class="btn btn-outline-primary btn-sm">
-                                        Lire l'article <i class="fas fa-arrow-right ms-1"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Article 2 -->
-                        <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm hover-lift">
-                                <div class="card-img-top bg-success d-flex align-items-center justify-content-center" style="height: 200px;">
-                                    <i class="fas fa-tools fa-3x text-white"></i>
-                                </div>
-                                <div class="card-body">
-                                    <span class="badge bg-warning mb-2">Équipement</span>
-                                    <h5 class="card-title">Comment entretenir vos machines agricoles</h5>
-                                    <p class="card-text text-muted">Nos experts vous partagent leurs conseils pour prolonger la durée de vie de vos équipements et optimiser leur performance...</p>
-                                    <div class="d-flex align-items-center text-muted small">
-                                        <i class="fas fa-calendar me-2"></i>
-                                        <span>12 juin 2025</span>
-                                        <span class="mx-2">•</span>
-                                        <i class="fas fa-clock me-2"></i>
-                                        <span>8 min</span>
-                                    </div>
-                                </div>
-                                <div class="card-footer bg-transparent border-0 pt-0">
-                                    <a href="#" class="btn btn-outline-primary btn-sm">
-                                        Lire l'article <i class="fas fa-arrow-right ms-1"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Article 3 -->
-                        <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm hover-lift">
-                                <div class="card-img-top bg-info d-flex align-items-center justify-content-center" style="height: 200px;">
-                                    <i class="fas fa-chart-line fa-3x text-white"></i>
-                                </div>
-                                <div class="card-body">
-                                    <span class="badge bg-info mb-2">Marché</span>
-                                    <h5 class="card-title">Tendances du marché agricole belge 2025</h5>
-                                    <p class="card-text text-muted">Analyse des opportunités et défis du secteur agricole en Belgique pour cette année. Perspectives d'évolution...</p>
-                                    <div class="d-flex align-items-center text-muted small">
-                                        <i class="fas fa-calendar me-2"></i>
-                                        <span>10 juin 2025</span>
-                                        <span class="mx-2">•</span>
-                                        <i class="fas fa-clock me-2"></i>
-                                        <span>6 min</span>
-                                    </div>
-                                </div>
-                                <div class="card-footer bg-transparent border-0 pt-0">
-                                    <a href="#" class="btn btn-outline-primary btn-sm">
-                                        Lire l'article <i class="fas fa-arrow-right ms-1"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Bouton voir tous les articles -->
-                    <div class="text-center mt-5">
-                        <a href="#" class="btn btn-primary-custom btn-lg">
-                            <i class="fas fa-blog me-2"></i>
-                            Voir tous nos articles
-                        </a>
                     </div>
                 </div>
             </section>
@@ -436,21 +337,10 @@
 
         <!-- Footer -->
         @include('components.footer')
-
-        <!-- Bannière cookies JavaScript pur -->
-        {{-- @include('components.cookie-banner-pure-js') --}}
-        {{-- 
-        TODO: Bannière de consentement cookies RGPD
-        Problème: Modal ne se ferme pas correctement (conflit Alpine.js)
-        À revoir plus tard avec une autre approche
-        --}}
     </div>
 
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    {{-- Script de debug cookies (en développement seulement) --}}
-    {{-- <script src="{{ asset('js/debug-cookies.js') }}"></script> --}}
     
     <!-- Custom JavaScript pour les animations -->
     <script>

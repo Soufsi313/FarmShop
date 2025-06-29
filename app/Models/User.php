@@ -40,6 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'username', 
         'email', 
         'password',
+        'biography',
         'is_newsletter_subscribed',
         'newsletter_subscribed_at',
         'newsletter_unsubscribed_at',
@@ -298,6 +299,22 @@ class User extends Authenticatable implements MustVerifyEmail
                     ->withPivot('role', 'created_at', 'updated_at')
                     ->withTimestamps()
                     ->as('membership');
+    }
+
+    /**
+     * Messages envoyés à l'admin
+     */
+    public function adminMessages()
+    {
+        return $this->hasMany(AdminMessage::class);
+    }
+
+    /**
+     * Réponses aux messages admin
+     */
+    public function adminMessageReplies()
+    {
+        return $this->hasMany(AdminMessageReply::class);
     }
 
     /**
@@ -564,5 +581,21 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getAcceptedCookieCategories()
     {
         return CookieConsent::getAcceptedCategories($this->id);
+    }
+
+    /**
+     * Messages admin envoyés par l'utilisateur
+     */
+    public function adminMessages()
+    {
+        return $this->hasMany(AdminMessage::class);
+    }
+
+    /**
+     * Réponses aux messages admin
+     */
+    public function adminMessageReplies()
+    {
+        return $this->hasMany(AdminMessageReply::class);
     }
 }
