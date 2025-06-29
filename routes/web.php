@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 // Route d'accueil
 Route::get('/', function () {
@@ -17,6 +18,30 @@ Route::prefix('products')->name('products.')->group(function () {
     Route::get('/', [App\Http\Controllers\ProductController::class, 'index'])->name('index');
     Route::get('/{product:slug}', [App\Http\Controllers\ProductController::class, 'show'])->name('show');
 });
+
+// Routes publiques pour les cookies (accessibles à tous)
+Route::prefix('cookies')->name('cookies.')->group(function () {
+    Route::get('/policy', [App\Http\Controllers\CookieController::class, 'policy'])->name('policy');
+    Route::get('/preferences', [App\Http\Controllers\CookieController::class, 'preferences'])->name('preferences');
+    Route::post('/accept-all', [App\Http\Controllers\CookieController::class, 'acceptAll'])->name('accept-all');
+    Route::post('/reject-all', [App\Http\Controllers\CookieController::class, 'rejectAll'])->name('reject-all');
+    Route::post('/save-preferences', [App\Http\Controllers\CookieController::class, 'savePreferences'])->name('save-preferences');
+    Route::get('/status', [App\Http\Controllers\CookieController::class, 'getConsentStatus'])->name('status');
+});
+
+// Route dashboard qui redirige selon le rôle de l'utilisateur
+Route::get('/dashboard', function () {
+    if (!auth()->check()) {
+        return redirect()->route('login');
+    }
+    
+    if (auth()->user()->hasRole('admin')) {
+        return redirect()->route('admin.dashboard');
+    }
+    
+    // Pour les utilisateurs normaux, rediriger vers la liste des produits
+    return redirect()->route('products.index');
+})->name('dashboard');
 
 // Routes d'authentification Fortify (gérées automatiquement)
 // Route::middleware(['guest'])->group(function () {
@@ -38,6 +63,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/products', [App\Http\Controllers\Admin\AdminController::class, 'productsIndex'])->name('products.index');
     Route::post('/products', [App\Http\Controllers\Admin\AdminController::class, 'storeProduct'])->name('products.store');
     Route::delete('/products/{product}', [App\Http\Controllers\Admin\AdminController::class, 'destroyProduct'])->name('products.destroy');
+    
+    // Gestion des catégories
+    Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/categories/create', [App\Http\Controllers\CategoryController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [App\Http\Controllers\CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
+    Route::get('/categories/{category}/edit', [App\Http\Controllers\CategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'destroy'])->name('categories.destroy');
     
     // Gestion des commandes
     Route::get('/orders', [App\Http\Controllers\Admin\AdminController::class, 'ordersIndex'])->name('orders.index');
@@ -62,4 +96,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 // Routes pour envoyer des messages à l'admin (utilisateurs connectés)
 Route::middleware(['auth'])->group(function () {
     Route::post('/contact-admin', [App\Http\Controllers\AdminMessageController::class, 'store'])->name('contact.admin');
+    
+    // Routes profil utilisateur
+    Route::get('/mon-profil', [App\Http\Controllers\UserProfileController::class, 'show'])->name('profile.show');
+    Route::put('/mon-profil', [App\Http\Controllers\UserProfileController::class, 'update'])->name('profile.update');
+    Route::post('/mon-profil/photo', [App\Http\Controllers\UserProfileController::class, 'uploadPhoto'])->name('profile.photo.upload');
+    Route::delete('/mon-profil/photo', [App\Http\Controllers\UserProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
+    Route::post('/mon-profil/newsletter', [App\Http\Controllers\UserProfileController::class, 'toggleNewsletter'])->name('profile.newsletter.toggle');
+    Route::get('/mon-profil/donnees', [App\Http\Controllers\UserProfileController::class, 'downloadUserData'])->name('profile.data.download');
+    Route::delete('/mon-profil/account', [App\Http\Controllers\UserProfileController::class, 'requestAccountDeletion'])->name('profile.account.delete');
+    
+    // Routes messages utilisateur
+    Route::get('/mes-messages', [App\Http\Controllers\UserMessageController::class, 'index'])->name('user.messages.index');
+    Route::get('/mes-messages/{message}', [App\Http\Controllers\UserMessageController::class, 'show'])->name('user.messages.show');
 });

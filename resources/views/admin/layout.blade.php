@@ -143,6 +143,10 @@
                     <i class="fas fa-box me-2"></i>Produits
                 </a>
                 
+                <a class="nav-link {{ request()->routeIs('admin.categories*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
+                    <i class="fas fa-layer-group me-2"></i>Catégories
+                </a>
+                
                 <a class="nav-link {{ request()->routeIs('admin.orders*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
                     <i class="fas fa-shopping-cart me-2"></i>Commandes
                 </a>

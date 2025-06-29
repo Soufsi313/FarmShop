@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom">
     <div class="container">
         <!-- Logo -->
-        <a class="navbar-brand text-success fw-bold" href="{{ route('dashboard') }}">
+        <a class="navbar-brand text-success fw-bold" href="{{ route('welcome') }}">
             <i class="fas fa-seedling me-2"></i>
             FarmShop
         </a>
@@ -16,7 +16,7 @@
             <ul class="navbar-nav me-auto">
                 <!-- Accueil -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('dashboard') }}">
+                    <a class="nav-link" href="{{ route('welcome') }}">
                         <i class="fas fa-home me-1"></i> Accueil
                     </a>
                 </li>
@@ -77,7 +77,7 @@
                     @if(Auth::user()->hasRole('admin') || Auth::user()->can('access admin panel'))
                         <!-- Panel Admin -->
                         <li class="nav-item">
-                            <a class="nav-link text-danger" href="#">
+                            <a class="nav-link text-danger" href="{{ route('admin.dashboard') }}">
                                 <i class="fas fa-cogs me-1"></i> Panel Admin
                             </a>
                         </li>

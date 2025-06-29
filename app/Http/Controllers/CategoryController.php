@@ -40,7 +40,7 @@ class CategoryController extends Controller
             $query->ordered();
         }
 
-        $categories = $query->paginate(20);
+        $categories = $query->paginate(10);
 
         if ($request->expectsJson()) {
             return response()->json([

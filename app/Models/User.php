@@ -41,6 +41,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email', 
         'password',
         'biography',
+        'profile_photo_path',
         'is_newsletter_subscribed',
         'newsletter_subscribed_at',
         'newsletter_unsubscribed_at',

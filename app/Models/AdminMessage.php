@@ -15,7 +15,8 @@ class AdminMessage extends Model
         'message',
         'status',
         'read_at',
-        'resolved_at'
+        'resolved_at',
+        'is_read_by_user'
     ];
 
     protected $casts = [

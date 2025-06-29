@@ -41,11 +41,6 @@
                             Locations
                         </a>
                     </li>
-                    <li>
-                        <a href="{{ route('categories.index') }}" class="text-gray-300 hover:text-green-400 transition-colors duration-200">
-                            Catégories
-                        </a>
-                    </li>
                     @auth
                         <li>
                             <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-200">
