@@ -147,6 +147,16 @@
                     <i class="fas fa-shopping-cart me-2"></i>Commandes
                 </a>
                 
+                <a class="nav-link {{ request()->routeIs('admin.messages*') ? 'active' : '' }}" href="{{ route('admin.messages.index') }}">
+                    <i class="fas fa-envelope me-2"></i>Messages
+                    @php
+                        $unreadCount = \App\Models\AdminMessage::where('status', 'pending')->count();
+                    @endphp
+                    @if($unreadCount > 0)
+                        <span class="badge bg-warning ms-2">{{ $unreadCount }}</span>
+                    @endif
+                </a>
+                
                 <hr class="my-3" style="border-color: rgba(255, 255, 255, 0.2);">
                 
                 <a class="nav-link" href="#">

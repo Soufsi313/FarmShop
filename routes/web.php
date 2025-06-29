@@ -42,4 +42,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Gestion des commandes
     Route::get('/orders', [App\Http\Controllers\Admin\AdminController::class, 'ordersIndex'])->name('orders.index');
     Route::patch('/orders/{order}/status', [App\Http\Controllers\Admin\AdminController::class, 'updateOrderStatus'])->name('orders.status');
+    
+    // Gestion des messages admin
+    Route::get('/messages', [App\Http\Controllers\AdminMessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{adminMessage}', [App\Http\Controllers\AdminMessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages/{adminMessage}/reply', [App\Http\Controllers\AdminMessageController::class, 'reply'])->name('messages.reply');
+    Route::patch('/messages/{adminMessage}/resolve', [App\Http\Controllers\AdminMessageController::class, 'markAsResolved'])->name('messages.resolve');
+    Route::delete('/messages/{adminMessage}', [App\Http\Controllers\AdminMessageController::class, 'destroy'])->name('messages.destroy');
+});
+
+// Routes pour envoyer des messages à l'admin (utilisateurs connectés)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/contact-admin', [App\Http\Controllers\AdminMessageController::class, 'store'])->name('contact.admin');
 });
