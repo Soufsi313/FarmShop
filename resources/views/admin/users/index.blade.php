@@ -81,8 +81,8 @@
                         <td>{{ $user->email }}</td>
                         <td>
                             @php
-                                $membership = $user->memberships->first();
-                                $role = $membership ? $membership->role : 'user';
+                                $firstRole = $user->roles->first();
+                                $role = $firstRole ? $firstRole->name : 'user';
                             @endphp
                             <span class="badge bg-{{ $role === 'admin' ? 'danger' : 'primary' }}">
                                 {{ ucfirst($role) }}
@@ -201,8 +201,8 @@
                         <label class="form-label">Rôle</label>
                         <select class="form-select" name="role" required>
                             @php
-                                $membership = $user->memberships->first();
-                                $currentRole = $membership ? $membership->role : 'user';
+                                $firstRole = $user->roles->first();
+                                $currentRole = $firstRole ? $firstRole->name : 'user';
                             @endphp
                             <option value="user" {{ $currentRole === 'user' ? 'selected' : '' }}>Utilisateur</option>
                             <option value="admin" {{ $currentRole === 'admin' ? 'selected' : '' }}>Administrateur</option>

@@ -212,30 +212,6 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Relation avec l'adhésion de l'utilisateur
-     */
-    public function membership()
-    {
-        return $this->hasOne(\App\Models\Membership::class);
-    }
-
-    /**
-     * Relation avec les adhésions approuvées par cet administrateur
-     */
-    public function approvedMemberships()
-    {
-        return $this->hasMany(\App\Models\Membership::class, 'approved_by');
-    }
-
-    /**
-     * Relation avec les utilisateurs parrainés par cet utilisateur
-     */
-    public function referredMemberships()
-    {
-        return $this->hasMany(\App\Models\Membership::class, 'referred_by');
-    }
-
-    /**
      * Relation avec les commandes de l'utilisateur
      */
     public function orders()
@@ -289,17 +265,6 @@ class User extends Authenticatable implements MustVerifyEmail
     public function newsletterSubscription()
     {
         return $this->hasOne(NewsletterSubscription::class);
-    }
-
-    /**
-     * Override the teams relation to use memberships table
-     */
-    public function teams()
-    {
-        return $this->belongsToMany(Team::class, 'memberships')
-                    ->withPivot('role', 'created_at', 'updated_at')
-                    ->withTimestamps()
-                    ->as('membership');
     }
 
     /**

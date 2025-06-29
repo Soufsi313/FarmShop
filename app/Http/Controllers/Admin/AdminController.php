@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\Category;
-use App\Models\Membership;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -38,7 +37,7 @@ class AdminController extends Controller
     // GESTION UTILISATEURS
     public function usersIndex(Request $request)
     {
-        $query = User::with('memberships');
+        $query = User::with('roles');
 
         // Recherche
         if ($request->search) {
@@ -87,12 +86,8 @@ class AdminController extends Controller
                 'email_verified_at' => now(),
             ]);
 
-            // Créer le membership avec le rôle
-            Membership::create([
-                'user_id' => $user->id,
-                'team_id' => 1, // Default team
-                'role' => $request->role,
-            ]);
+            // Assigner le rôle directement
+            $user->assignRole($request->role);
         });
 
         return redirect()->route('admin.users.index')->with('success', 'Utilisateur créé avec succès.');
