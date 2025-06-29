@@ -172,15 +172,19 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'original_price' => 'nullable|numeric|min:0',
-            'stock_quantity' => 'nullable|integer|min:0',
-            'category_id' => 'nullable|exists:categories,id',
+            'quantity' => 'required|integer|min:0',
+            'critical_stock_threshold' => 'required|integer|min:1',
+            'unit_symbol' => 'required|in:kg,piece,liter',
+            'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean',
         ]);
 
         $data = $request->all();
         $data['is_active'] = $request->has('is_active');
+        $data['is_perishable'] = true; // Produits alimentaires = périssables
+        $data['is_returnable'] = false; // Pas de retour pour l'alimentaire
+        $data['is_rentable'] = false; // Pas de location pour l'alimentaire
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('products', 'public');
@@ -189,6 +193,36 @@ class AdminController extends Controller
         Product::create($data);
 
         return redirect()->route('admin.products.index')->with('success', 'Produit créé avec succès.');
+    }
+
+    public function updateProduct(Request $request, Product $product)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:0',
+            'critical_stock_threshold' => 'required|integer|min:1',
+            'unit_symbol' => 'required|in:kg,piece,liter',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'is_active' => 'boolean',
+        ]);
+
+        $data = $request->all();
+        $data['is_active'] = $request->has('is_active');
+
+        if ($request->hasFile('image')) {
+            // Supprimer l'ancienne image si elle existe
+            if ($product->main_image) {
+                Storage::disk('public')->delete($product->main_image);
+            }
+            $data['main_image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product->update($data);
+
+        return redirect()->route('admin.products.index')->with('success', 'Produit modifié avec succès.');
     }
 
     public function destroyProduct(Product $product)

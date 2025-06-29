@@ -1,4 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.public')
+
+@section('title', $product->name . ' - ' . config('app.name', 'FarmShop'))
 
 @section('content')
 <div class="container py-5">
@@ -8,7 +10,14 @@
                 <!-- Images du produit -->
                 <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
-                        @if($product->images && $product->images->count() > 0)
+                        @if($product->main_image)
+                            <div class="carousel-item active">
+                                <img src="{{ asset('storage/' . $product->main_image) }}" 
+                                     class="d-block w-100 rounded" 
+                                     alt="{{ $product->name }}"
+                                     style="height: 400px; object-fit: cover;">
+                            </div>
+                        @elseif($product->images && $product->images->count() > 0)
                             @foreach($product->images as $index => $image)
                                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                                     <img src="{{ asset('storage/' . $image->image_path) }}" 
@@ -27,7 +36,7 @@
                         @endif
                     </div>
                     
-                    @if($product->images && $product->images->count() > 1)
+                    @if(($product->images && $product->images->count() > 1) || ($product->main_image && $product->images && $product->images->count() > 0))
                         <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
                             <span class="carousel-control-prev-icon"></span>
                         </button>
@@ -60,7 +69,7 @@
                     <!-- Prix -->
                     <div class="mb-4">
                         <span class="h3 text-success">{{ number_format($product->price, 2) }}€</span>
-                        <span class="text-muted">/{{ $product->unit }}</span>
+                        <span class="text-muted">/{{ $product->unit_symbol }}</span>
                     </div>
                     
                     <!-- Description -->
@@ -82,9 +91,9 @@
                     
                     <!-- Stock -->
                     <div class="mb-4">
-                        @if($product->stock_quantity > 0)
+                        @if($product->quantity > 0)
                             <span class="badge bg-success">
-                                <i class="fas fa-check me-1"></i>En stock ({{ $product->stock_quantity }} {{ $product->unit }})
+                                <i class="fas fa-check me-1"></i>En stock ({{ $product->quantity }})
                             </span>
                         @else
                             <span class="badge bg-danger">
@@ -93,32 +102,11 @@
                         @endif
                     </div>
                     
-                    <!-- Formulaire d'ajout au panier -->
-                    @if($product->stock_quantity > 0)
-                        <form id="addToCartForm" class="mb-4">
-                            <div class="row">
-                                <div class="col-4">
-                                    <label for="quantity" class="form-label">Quantité</label>
-                                    <input type="number" 
-                                           class="form-control" 
-                                           id="quantity" 
-                                           name="quantity" 
-                                           value="1" 
-                                           min="1" 
-                                           max="{{ $product->stock_quantity }}">
-                                </div>
-                                <div class="col-8 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-success btn-lg w-100">
-                                        <i class="fas fa-shopping-cart me-2"></i>
-                                        Ajouter au panier
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    @endif
-                    
                     <!-- Boutons d'action -->
                     <div class="d-flex gap-2 mb-4">
+                        <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Retour au dashboard
+                        </a>
                         <button class="btn btn-outline-primary" onclick="addToWishlist({{ $product->id }})">
                             <i class="fas fa-heart me-1"></i>Favoris
                         </button>
@@ -134,7 +122,7 @@
                             Livraison
                         </h6>
                         <small class="text-muted">
-                            Livraison gratuite à partir de 50€ d'achat
+                            Livraison gratuite à partir de 25€ d'achat
                         </small>
                     </div>
                 </div>

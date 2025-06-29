@@ -56,6 +56,7 @@
                         <th>Catégorie</th>
                         <th>Prix</th>
                         <th>Stock</th>
+                        <th>Seuil critique</th>
                         <th>Statut</th>
                         <th>Créé le</th>
                         <th>Actions</th>
@@ -96,13 +97,18 @@
                             @endif
                         </td>
                         <td>
-                            @if($product->stock_quantity !== null)
-                                <span class="badge bg-{{ $product->stock_quantity > 10 ? 'success' : ($product->stock_quantity > 0 ? 'warning' : 'danger') }}">
-                                    {{ $product->stock_quantity }}
+                            @if($product->quantity !== null)
+                                <span class="badge bg-{{ $product->quantity > $product->critical_stock_threshold ? 'success' : ($product->quantity > 0 ? 'warning' : 'danger') }}">
+                                    {{ $product->quantity }}
                                 </span>
                             @else
                                 <span class="text-muted">Illimité</span>
                             @endif
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ $product->quantity <= $product->critical_stock_threshold ? 'danger' : 'secondary' }}">
+                                {{ $product->critical_stock_threshold }}
+                            </span>
                         </td>
                         <td>
                             <span class="badge bg-{{ $product->is_active ? 'success' : 'secondary' }}">
@@ -177,22 +183,32 @@
                     </div>
                     
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label">Prix (€)</label>
                                 <input type="number" class="form-control" name="price" step="0.01" required>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label class="form-label">Prix original (€)</label>
-                                <input type="number" class="form-control" name="original_price" step="0.01">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label">Stock</label>
-                                <input type="number" class="form-control" name="stock_quantity" placeholder="Laisser vide pour illimité">
+                                <input type="number" class="form-control" name="quantity" placeholder="Quantité en stock" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Seuil critique</label>
+                                <input type="number" class="form-control" name="critical_stock_threshold" value="10" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Unité</label>
+                                <select class="form-select" name="unit_symbol" required>
+                                    <option value="kg">Kilogramme (kg)</option>
+                                    <option value="piece">À la pièce</option>
+                                    <option value="liter">Litre</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -217,6 +233,101 @@
         </div>
     </div>
 </div>
+
+<!-- Modals d'édition des produits -->
+@foreach($products as $product)
+<div class="modal fade" id="editProductModal{{ $product->id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="modal-header">
+                    <h5 class="modal-title">Modifier le produit</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Nom du produit</label>
+                                <input type="text" class="form-control" name="name" value="{{ $product->name }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Catégorie</label>
+                                <select class="form-select" name="category_id" required>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ $product->category_id == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3">{{ $product->description }}</textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Prix (€)</label>
+                                <input type="number" class="form-control" name="price" step="0.01" value="{{ $product->price }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Stock</label>
+                                <input type="number" class="form-control" name="quantity" value="{{ $product->quantity }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Seuil critique</label>
+                                <input type="number" class="form-control" name="critical_stock_threshold" value="{{ $product->critical_stock_threshold }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Unité</label>
+                                <select class="form-select" name="unit_symbol" required>
+                                    <option value="kg" {{ $product->unit_symbol == 'kg' ? 'selected' : '' }}>Kilogramme (kg)</option>
+                                    <option value="piece" {{ $product->unit_symbol == 'piece' ? 'selected' : '' }}>À la pièce</option>
+                                    <option value="liter" {{ $product->unit_symbol == 'liter' ? 'selected' : '' }}>Litre</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Image</label>
+                        <input type="file" class="form-control" name="image" accept="image/*">
+                        @if($product->main_image)
+                            <small class="text-muted">Image actuelle : {{ $product->main_image }}</small>
+                        @endif
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="is_active" value="1" {{ $product->is_active ? 'checked' : '' }}>
+                            <label class="form-check-label">Produit actif</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Modifier</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endforeach
 
 <script>
 function deleteProduct(productId) {
