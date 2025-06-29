@@ -49,6 +49,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/messages/{adminMessage}/reply', [App\Http\Controllers\AdminMessageController::class, 'reply'])->name('messages.reply');
     Route::patch('/messages/{adminMessage}/resolve', [App\Http\Controllers\AdminMessageController::class, 'markAsResolved'])->name('messages.resolve');
     Route::delete('/messages/{adminMessage}', [App\Http\Controllers\AdminMessageController::class, 'destroy'])->name('messages.destroy');
+    
+    // Gestion des réponses aux messages
+    Route::get('/messages/{adminMessage}/replies', [App\Http\Controllers\AdminMessageReplyController::class, 'index'])->name('messages.replies.index');
+    Route::post('/messages/{adminMessage}/replies', [App\Http\Controllers\AdminMessageReplyController::class, 'store'])->name('messages.replies.store');
+    Route::get('/messages/{adminMessage}/replies/{reply}', [App\Http\Controllers\AdminMessageReplyController::class, 'show'])->name('messages.replies.show');
+    Route::put('/messages/{adminMessage}/replies/{reply}', [App\Http\Controllers\AdminMessageReplyController::class, 'update'])->name('messages.replies.update');
+    Route::delete('/messages/{adminMessage}/replies/{reply}', [App\Http\Controllers\AdminMessageReplyController::class, 'destroy'])->name('messages.replies.destroy');
+    Route::patch('/messages/{adminMessage}/mark-read', [App\Http\Controllers\AdminMessageReplyController::class, 'markAsRead'])->name('messages.mark_read');
 });
 
 // Routes pour envoyer des messages à l'admin (utilisateurs connectés)

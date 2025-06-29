@@ -583,19 +583,4 @@ class User extends Authenticatable implements MustVerifyEmail
         return CookieConsent::getAcceptedCategories($this->id);
     }
 
-    /**
-     * Messages admin envoyés par l'utilisateur
-     */
-    public function adminMessages()
-    {
-        return $this->hasMany(AdminMessage::class);
-    }
-
-    /**
-     * Réponses aux messages admin
-     */
-    public function adminMessageReplies()
-    {
-        return $this->hasMany(AdminMessageReply::class);
-    }
 }

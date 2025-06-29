@@ -319,35 +319,38 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/newsletter-subscriptions/bulk-action', [App\Http\Controllers\NewsletterSubscriptionController::class, 'bulkAction']); // Actions en lot
         Route::get('/newsletter-subscriptions/export', [App\Http\Controllers\NewsletterSubscriptionController::class, 'export']); // Export CSV
         
-        // API d'administration pour le blog
+        /*
+        TODO: Corriger tous les namespaces App.Http en App\Http dans cette section
+        
         Route::get('/blogs', [App\Http\Controllers\Admin\BlogAdminController::class, 'index']); // Liste articles
         Route::post('/blogs', [App\Http\Controllers\Admin\BlogAdminController::class, 'store']); // Créer article
         Route::get('/blogs/{blog}', [App\Http\Controllers\Admin\BlogAdminController::class, 'show']); // Détail article
-        Route::put('/blogs/{blog}', [App\Http\Controllers\Admin\BlogAdminController::class, 'update']); // Mettre à jour article
-        Route::delete('/blogs/{blog}', [App\Http\Controllers\Admin\BlogAdminController::class, 'destroy']); // Supprimer article
-        Route::put('/blogs/{blog}/publish', [App\Http\Controllers\Admin\BlogAdminController::class, 'publish']); // Publier
-        Route::put('/blogs/{blog}/unpublish', [App\Http\Controllers\Admin\BlogAdminController::class, 'unpublish']); // Dépublier
-        Route::post('/blogs/bulk-action', [App\Http\Controllers\Admin\BlogAdminController::class, 'bulkAction']); // Actions en lot
-        Route::get('/blogs/statistics', [App\Http\Controllers\Admin\BlogAdminController::class, 'statistics']); // Statistiques
+        Route::put('/blogs/{blog}', [App.Http\Controllers\Admin\BlogAdminController::class, 'update']); // Mettre à jour article
+        Route::delete('/blogs/{blog}', [App.Http\Controllers\Admin\BlogAdminController::class, 'destroy']); // Supprimer article
+        Route::put('/blogs/{blog}/publish', [App.Http\Controllers\Admin\BlogAdminController::class, 'publish']); // Publier
+        Route::put('/blogs/{blog}/unpublish', [App.Http\Controllers\Admin\BlogAdminController::class, 'unpublish']); // Dépublier
+        Route::post('/blogs/bulk-action', [App.Http\Controllers\Admin\BlogAdminController::class, 'bulkAction']); // Actions en lot
+        Route::get('/blogs/statistics', [App.Http\Controllers\Admin\BlogAdminController::class, 'statistics']); // Statistiques
         
         // API d'administration pour les commentaires de blog
-        Route::get('/blog-comments', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'index']); // Liste commentaires
-        Route::get('/blog-comments/{comment}', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'show']); // Détail commentaire
-        Route::put('/blog-comments/{comment}/approve', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'approve']); // Approuver
-        Route::put('/blog-comments/{comment}/reject', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'reject']); // Rejeter
-        Route::put('/blog-comments/{comment}/hide', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'hide']); // Masquer
-        Route::put('/blog-comments/{comment}/restore', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'restore']); // Restaurer
-        Route::delete('/blog-comments/{comment}', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'destroy']); // Supprimer
-        Route::post('/blog-comments/bulk-action', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'bulkAction']); // Actions en lot
-        Route::get('/blog-comments/statistics', [App\Http\Controllers\Admin\BlogCommentAdminController::class, 'statistics']); // Statistiques
+        Route::get('/blog-comments', [App.Http\Controllers\Admin\BlogCommentAdminController::class, 'index']); // Liste commentaires
+        Route::get('/blog-comments/{comment}', [App.Http\Controllers\Admin\BlogCommentAdminController::class, 'show']); // Détail commentaire
+        Route::put('/blog-comments/{comment}/approve', [App.Http\Controllers\Admin\BlogCommentAdminController::class, 'approve']); // Approuver
+        Route::put('/blog-comments/{comment}/reject', [App.Http\Controllers\Admin\BlogCommentAdminController::class, 'reject']); // Rejeter
+        Route::put('/blog-comments/{comment}/hide', [App.Http\Controllers\Admin\BlogCommentAdminController::class, 'hide']); // Masquer
+        Route::put('/blog-comments/{comment}/restore', [App.Http\Controllers\Admin\BlogCommentAdminController::class, 'restore']); // Restaurer
+        Route::delete('/blog-comments/{comment}', [App.Http\Controllers\Admin\BlogCommentAdminController::class, 'destroy']); // Supprimer
+        Route::post('/blog-comments/bulk-action', [App.Http\Controllers\Admin\BlogCommentAdminController::class, 'bulkAction']); // Actions en lot
+        Route::get('/blog-comments/statistics', [App.Http\Controllers\Admin\BlogCommentAdminController::class, 'statistics']); // Statistiques
         
         // API d'administration pour les signalements de commentaires
-        Route::get('/blog-reports', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'index']); // Liste signalements
-        Route::get('/blog-reports/{report}', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'show']); // Détail signalement
-        Route::put('/blog-reports/{report}/approve', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'approve']); // Approuver
-        Route::put('/blog-reports/{report}/reject', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'reject']); // Rejeter
-        Route::post('/blog-reports/bulk-action', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'bulkAction']); // Actions en lot
-        Route::get('/blog-reports/statistics', [App\Http\Controllers\Admin\BlogCommentReportAdminController::class, 'statistics']); // Statistiques
+        Route::get('/blog-reports', [App.Http\Controllers\Admin\BlogCommentReportAdminController::class, 'index']); // Liste signalements
+        Route::get('/blog-reports/{report}', [App.Http\Controllers\Admin\BlogCommentReportAdminController::class, 'show']); // Détail signalement
+        Route::put('/blog-reports/{report}/approve', [App.Http\Controllers\Admin\BlogCommentReportAdminController::class, 'approve']); // Approuver
+        Route::put('/blog-reports/{report}/reject', [App.Http\Controllers\Admin\BlogCommentReportAdminController::class, 'reject']); // Rejeter
+        Route::post('/blog-reports/bulk-action', [App.Http\Controllers\Admin\BlogCommentReportAdminController::class, 'bulkAction']); // Actions en lot
+        Route::get('/blog-reports/statistics', [App.Http\Controllers\Admin\BlogCommentReportAdminController::class, 'statistics']); // Statistiques
+        */
     });
 
     // API pour les commentaires et signalements (utilisateurs connectés)
@@ -422,4 +425,19 @@ Route::prefix('blog')->group(function () {
 Route::prefix('newsletter')->group(function () {
     Route::get('/unsubscribe/{token}', [App\Http\Controllers\NewsletterSubscriptionController::class, 'unsubscribeByToken']); // Désabonnement par token
     Route::get('/status/{token}', [App\Http\Controllers\NewsletterSubscriptionController::class, 'checkStatus']); // Vérifier statut par token
+});
+
+// Routes API pour les réponses aux messages admin (accès admin uniquement)
+Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin/messages')->group(function () {
+    Route::get('/{adminMessage}/replies', [App\Http\Controllers\AdminMessageReplyController::class, 'index']);
+    Route::post('/{adminMessage}/replies', [App\Http\Controllers\AdminMessageReplyController::class, 'store']);
+    Route::get('/{adminMessage}/replies/{reply}', [App\Http\Controllers\AdminMessageReplyController::class, 'show']);
+    Route::put('/{adminMessage}/replies/{reply}', [App\Http\Controllers\AdminMessageReplyController::class, 'update']);
+    Route::delete('/{adminMessage}/replies/{reply}', [App\Http\Controllers\AdminMessageReplyController::class, 'destroy']);
+    Route::patch('/{adminMessage}/mark-read', [App\Http\Controllers\AdminMessageReplyController::class, 'markAsRead']);
+});
+
+// Routes API pour les messages admin (utilisateurs connectés)
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/contact-admin', [App\Http\Controllers\AdminMessageController::class, 'store']);
 });
