@@ -50,8 +50,8 @@ class AdminController extends Controller
 
         // Filtre par rôle
         if ($request->role) {
-            $query->whereHas('memberships', function($q) use ($request) {
-                $q->where('role', $request->role);
+            $query->whereHas('roles', function($q) use ($request) {
+                $q->where('name', $request->role);
             });
         }
 
@@ -109,17 +109,8 @@ class AdminController extends Controller
                 'email' => $request->email,
             ]);
 
-            // Mettre à jour le rôle
-            $membership = $user->memberships()->first();
-            if ($membership) {
-                $membership->update(['role' => $request->role]);
-            } else {
-                Membership::create([
-                    'user_id' => $user->id,
-                    'team_id' => 1,
-                    'role' => $request->role,
-                ]);
-            }
+            // Mettre à jour le rôle avec Spatie Permission
+            $user->syncRoles([$request->role]);
         });
 
         return redirect()->route('admin.users.index')->with('success', 'Utilisateur modifié avec succès.');

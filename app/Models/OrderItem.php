@@ -104,8 +104,8 @@ class OrderItem extends Model
      */
     public function getIsReturnableAttribute(): bool
     {
-        return $this->is_returnable && 
-               !$this->is_perishable && 
+        return (bool)$this->attributes['is_returnable'] && 
+               !(bool)$this->attributes['is_perishable'] && 
                $this->status === self::STATUS_DELIVERED &&
                $this->order->is_returnable &&
                $this->order->return_deadline >= now();

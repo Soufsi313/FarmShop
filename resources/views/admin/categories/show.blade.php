@@ -109,12 +109,12 @@
             <div class="card-body">
                 <div class="row text-center">
                     <div class="col-12 mb-3">
-                        <h3 class="text-primary mb-0">{{ $category->products->count() }}</h3>
+                        <h3 class="text-primary mb-0">{{ $category->products_count }}</h3>
                         <small class="text-muted">Produits dans cette catégorie</small>
                     </div>
                 </div>
                 
-                @if($category->products->count() > 0)
+                @if($category->products_count > 0)
                     <div class="row text-center">
                         <div class="col-6">
                             <div class="border-end">
@@ -144,7 +144,7 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0"><i class="fas fa-box me-2"></i>Produits ({{ $category->products->count() }})</h5>
                 @if(Gate::allows('manage products'))
-                    <a href="{{ route('admin.products.create', ['category_id' => $category->id]) }}" class="btn btn-sm btn-primary">
+                    <a href="{{ route('admin.products.index', ['category_id' => $category->id]) }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus me-1"></i>Ajouter un produit
                     </a>
                 @endif
@@ -240,7 +240,7 @@
                         <h5 class="text-muted">Aucun produit dans cette catégorie</h5>
                         <p class="text-muted">Cette catégorie ne contient encore aucun produit.</p>
                         @can('manage products')
-                            <a href="{{ route('admin.products.create', ['category_id' => $category->id]) }}" class="btn btn-primary">
+                            <a href="{{ route('admin.products.index', ['category_id' => $category->id]) }}" class="btn btn-primary">
                                 <i class="fas fa-plus me-2"></i>Ajouter le premier produit
                             </a>
                         @endcan
@@ -269,7 +269,7 @@
                     </div>
                     <div class="col-md-3">
                         @can('manage products')
-                            <a href="{{ route('admin.products.create', ['category_id' => $category->id]) }}" class="btn btn-outline-success w-100 mb-2">
+                            <a href="{{ route('admin.products.index', ['category_id' => $category->id]) }}" class="btn btn-outline-success w-100 mb-2">
                                 <i class="fas fa-plus me-2"></i>Ajouter un produit
                             </a>
                         @endcan

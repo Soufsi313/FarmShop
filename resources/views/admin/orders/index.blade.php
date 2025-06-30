@@ -240,7 +240,21 @@
                     <div class="col-md-6">
                         <h6>Adresse de livraison</h6>
                         @if($order->shipping_address)
-                            <p class="mb-0">{{ $order->shipping_address }}</p>
+                            @php
+                                $address = json_decode($order->shipping_address, true);
+                            @endphp
+                            @if($address)
+                                <p class="mb-0">
+                                    {{ $address['street'] ?? '' }}<br>
+                                    @if(!empty($address['additional_info']))
+                                        {{ $address['additional_info'] }}<br>
+                                    @endif
+                                    {{ $address['postal_code'] ?? '' }} {{ $address['city'] ?? '' }}<br>
+                                    {{ $address['country'] ?? '' }}
+                                </p>
+                            @else
+                                <p class="text-muted mb-0">Format d'adresse invalide</p>
+                            @endif
                         @else
                             <p class="text-muted mb-0">Non renseignée</p>
                         @endif
@@ -261,10 +275,10 @@
                         <tbody>
                             @foreach($order->items as $item)
                             <tr>
-                                <td>{{ $item->product->name ?? 'Produit supprimé' }}</td>
-                                <td>{{ number_format($item->price, 2) }} €</td>
+                                <td>{{ $item->product_name ?? 'Produit supprimé' }}</td>
+                                <td>{{ number_format($item->unit_price, 2) }} €</td>
                                 <td>{{ $item->quantity }}</td>
-                                <td>{{ number_format($item->price * $item->quantity, 2) }} €</td>
+                                <td>{{ number_format($item->total_price, 2) }} €</td>
                             </tr>
                             @endforeach
                         </tbody>

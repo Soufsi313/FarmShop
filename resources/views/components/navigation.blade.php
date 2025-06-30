@@ -46,7 +46,7 @@
 
                     <!-- Mes commandes -->
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="{{ route('orders.user.index') }}">
                             <i class="fas fa-box me-1"></i> Mes commandes
                         </a>
                     </li>

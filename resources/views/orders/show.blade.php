@@ -74,18 +74,18 @@
             <h2 class="text-xl font-semibold text-gray-900 mb-4">Articles commandés</h2>
             
             <div class="divide-y divide-gray-200">
-                @foreach($order->orderItems as $item)
+                @foreach($order->items as $item)
                 <div class="py-4 first:pt-0 last:pb-0">
                     <div class="flex items-start space-x-4">
                         <!-- Image du produit -->
                         <div class="flex-shrink-0">
-                            @if($item->product && $item->product->image_url)
-                                <img src="{{ asset('storage/' . $item->product->image_url) }}" 
+                            @if($item->product && $item->product->main_image)
+                                <img src="{{ $item->product->main_image_url }}" 
                                      alt="{{ $item->product_name }}"
-                                     class="w-16 h-16 object-cover rounded-lg">
+                                     class="w-20 h-20 object-cover rounded-lg border border-gray-200 shadow-sm">
                             @else
-                                <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center border border-gray-200">
+                                    <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
                                 </div>
@@ -303,10 +303,13 @@
                 </p>
             </div>
             <div class="items-center px-4 py-3">
-                <button id="cancelButton"
-                        class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-24 mr-2 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
-                    Annuler
-                </button>
+                <form method="POST" action="{{ route('orders.user.cancel', $order->id) }}" class="inline">
+                    @csrf
+                    <button type="submit"
+                            class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-24 mr-2 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+                        Annuler
+                    </button>
+                </form>
                 <button onclick="closeCancelModal()"
                         class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
                     Retour
@@ -324,29 +327,6 @@ function cancelOrder() {
 function closeCancelModal() {
     document.getElementById('cancelModal').classList.add('hidden');
 }
-
-document.getElementById('cancelButton').addEventListener('click', function() {
-    // Ici on ferait un appel AJAX pour annuler la commande
-    fetch(`/api/orders/{{ $order->id }}/cancel`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert('Erreur lors de l\'annulation de la commande');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Erreur lors de l\'annulation de la commande');
-    });
-});
 </script>
 @endif
 @endsection

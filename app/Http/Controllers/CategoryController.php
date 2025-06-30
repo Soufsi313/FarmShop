@@ -110,9 +110,14 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
+        $this->authorize('manage categories');
+        
         $category->load(['products' => function($query) {
             $query->active()->with(['images', 'category']);
         }]);
+        
+        // Charger le nombre de produits associés
+        $category->loadCount('products');
 
         if (request()->expectsJson()) {
             return response()->json([
@@ -121,7 +126,7 @@ class CategoryController extends Controller
             ]);
         }
 
-        return view('categories.show', compact('category'));
+        return view('admin.categories.show', compact('category'));
     }
 
     /**
@@ -130,6 +135,9 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         $this->authorize('manage categories');
+        
+        // Charger le nombre de produits associés
+        $category->loadCount('products');
         
         return view('admin.categories.edit', compact('category'));
     }

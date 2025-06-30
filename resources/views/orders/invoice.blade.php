@@ -131,15 +131,35 @@
             <p>{{ $order->user->phone ?? 'N/A' }}</p>
             
             <h4 style="margin-top: 20px; color: #2563eb;">Adresse de facturation</h4>
-            <p>{{ $order->billing_address }}</p>
-            <p>{{ $order->billing_postal_code }} {{ $order->billing_city }}</p>
-            <p>{{ $order->billing_country }}</p>
+            @php
+                $billingAddress = json_decode($order->billing_address, true);
+            @endphp
+            @if($billingAddress)
+                <p>{{ $billingAddress['street'] ?? '' }}</p>
+                @if(!empty($billingAddress['additional_info']))
+                    <p>{{ $billingAddress['additional_info'] }}</p>
+                @endif
+                <p>{{ $billingAddress['postal_code'] ?? '' }} {{ $billingAddress['city'] ?? '' }}</p>
+                <p>{{ $billingAddress['country'] ?? '' }}</p>
+            @else
+                <p>{{ $order->billing_address }}</p>
+            @endif
 
             @if($order->shipping_address !== $order->billing_address)
                 <h4 style="margin-top: 20px; color: #2563eb;">Adresse de livraison</h4>
-                <p>{{ $order->shipping_address }}</p>
-                <p>{{ $order->shipping_postal_code }} {{ $order->shipping_city }}</p>
-                <p>{{ $order->shipping_country }}</p>
+                @php
+                    $shippingAddress = json_decode($order->shipping_address, true);
+                @endphp
+                @if($shippingAddress)
+                    <p>{{ $shippingAddress['street'] ?? '' }}</p>
+                    @if(!empty($shippingAddress['additional_info']))
+                        <p>{{ $shippingAddress['additional_info'] }}</p>
+                    @endif
+                    <p>{{ $shippingAddress['postal_code'] ?? '' }} {{ $shippingAddress['city'] ?? '' }}</p>
+                    <p>{{ $shippingAddress['country'] ?? '' }}</p>
+                @else
+                    <p>{{ $order->shipping_address }}</p>
+                @endif
             @endif
         </div>
     </div>
@@ -154,7 +174,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($order->orderItems as $item)
+            @foreach($order->items as $item)
                 <tr>
                     <td>
                         <strong>{{ $item->product_name }}</strong>

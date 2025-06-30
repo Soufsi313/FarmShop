@@ -370,6 +370,20 @@ class Order extends Model
     }
 
     /**
+     * Vérifier si la commande peut être annulée
+     */
+    public function canBeCancelled(): bool
+    {
+        // Peut être annulée tant qu'elle n'est pas expédiée, livrée ou déjà annulée
+        return !in_array($this->status, [
+            self::STATUS_SHIPPED,
+            self::STATUS_DELIVERED,
+            self::STATUS_CANCELLED,
+            self::STATUS_RETURNED
+        ]);
+    }
+
+    /**
      * Vérifier si la commande peut être annulée avec remboursement automatique
      */
     public function canBeCancelledWithRefund(): bool
@@ -393,7 +407,7 @@ class Order extends Model
             $this->cancel($reason);
 
             // Remettre les produits en stock
-            foreach ($this->orderItems as $item) {
+            foreach ($this->items as $item) {
                 $item->product->increment('quantity', $item->quantity);
             }
 
@@ -443,7 +457,7 @@ class Order extends Model
      */
     public function hasReturnableItems(): bool
     {
-        return $this->orderItems->some(function ($item) {
+        return $this->items->some(function ($item) {
             return $item->product->isReturnableProduct();
         });
     }
@@ -453,7 +467,7 @@ class Order extends Model
      */
     public function getReturnableItems()
     {
-        return $this->orderItems->filter(function ($item) {
+        return $this->items->filter(function ($item) {
             return $item->product->isReturnableProduct() && 
                    $item->product->isWithinReturnPeriod($this->created_at);
         });
@@ -504,5 +518,85 @@ class Order extends Model
             self::PAYMENT_FAILED => 'Échec',
             self::PAYMENT_REFUNDED => 'Remboursé',
         ];
+    }
+
+    /**
+     * Vérifier si la commande est en attente
+     */
+    public function isPending(): bool
+    {
+        return $this->status === self::STATUS_PENDING;
+    }
+
+    /**
+     * Vérifier si la commande est confirmée
+     */
+    public function isConfirmed(): bool
+    {
+        return $this->status === self::STATUS_CONFIRMED;
+    }
+
+    /**
+     * Vérifier si la commande est en cours de préparation
+     */
+    public function isProcessing(): bool
+    {
+        return $this->status === self::STATUS_PREPARATION;
+    }
+
+    /**
+     * Vérifier si la commande est expédiée
+     */
+    public function isShipped(): bool
+    {
+        return $this->status === self::STATUS_SHIPPED;
+    }
+
+    /**
+     * Vérifier si la commande est livrée
+     */
+    public function isDelivered(): bool
+    {
+        return $this->status === self::STATUS_DELIVERED;
+    }
+
+    /**
+     * Vérifier si la commande est annulée
+     */
+    public function isCancelled(): bool
+    {
+        return $this->status === self::STATUS_CANCELLED;
+    }
+
+    /**
+     * Vérifier si la commande est retournée
+     */
+    public function isReturned(): bool
+    {
+        return $this->status === self::STATUS_RETURNED;
+    }
+
+    /**
+     * Vérifier si la commande est payée
+     */
+    public function isPaid(): bool
+    {
+        return $this->payment_status === self::PAYMENT_PAID;
+    }
+
+    /**
+     * Vérifier si le remboursement est en cours
+     */
+    public function isRefundInProgress(): bool
+    {
+        return $this->refund_status === 'processing';
+    }
+
+    /**
+     * Vérifier si le remboursement est terminé
+     */
+    public function isRefundCompleted(): bool
+    {
+        return $this->refund_status === 'completed';
     }
 }

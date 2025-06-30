@@ -352,7 +352,7 @@ class Product extends Model
     public function getMainImageUrlAttribute()
     {
         if ($this->main_image) {
-            return asset('storage/products/' . $this->main_image);
+            return asset('storage/' . $this->main_image);
         }
         return asset('images/default-product.png');
     }

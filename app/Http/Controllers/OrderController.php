@@ -38,7 +38,12 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $query = $user->orders()->with(['orderItems.product', 'orderItems.productImage']);
+        
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Vous devez être connecté pour voir vos commandes.');
+        }
+        
+        $query = $user->orders()->with(['items.product']);
 
         // Filtrage par statut
         if ($request->filled('status')) {
@@ -145,7 +150,7 @@ class OrderController extends Controller
             $order = Order::create([
                 'user_id' => $user->id,
                 'order_number' => Order::generateOrderNumber(),
-                'status' => Order::STATUS_PENDING,
+                'status' => Order::STATUS_CONFIRMED, // Changer en confirmé directement
                 'subtotal' => $subtotal,
                 'tax_amount' => $taxAmount,
                 'shipping_cost' => $shippingCost,
@@ -185,7 +190,7 @@ class OrderController extends Controller
             $user->cartItems()->delete();
 
             // Envoyer notification email de confirmation
-            // $this->sendOrderConfirmationEmail($order);
+            $this->sendOrderConfirmationEmail($order);
 
             DB::commit();
 
@@ -193,7 +198,7 @@ class OrderController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Commande créée avec succès.',
-                    'data' => $order->load('orderItems.product')
+                    'data' => $order->load('items.product')
                 ], 201);
             }
 
@@ -226,7 +231,7 @@ class OrderController extends Controller
             abort(403, 'Accès non autorisé à cette commande.');
         }
 
-        $order->load(['orderItems.product', 'orderItems.productImage', 'orderReturns']);
+        $order->load(['items.product', 'returns']);
 
         if (request()->expectsJson()) {
             return response()->json([
@@ -297,17 +302,17 @@ class OrderController extends Controller
      */
     public function downloadInvoice(Order $order)
     {
-        // Vérifier que la commande appartient à l'utilisateur connecté
-        if ($order->user_id !== Auth::id()) {
+        // Vérifier l'autorisation : soit le propriétaire de la commande, soit un admin
+        if ($order->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
             abort(403, 'Accès non autorisé à cette commande.');
         }
 
-        // Vérifier que la commande est confirmée
-        if (!$order->isConfirmed() && !$order->isProcessing() && !$order->isShipped() && !$order->isDelivered()) {
+        // Vérifier que la commande est confirmée (sauf pour les admins qui peuvent accéder aux factures même annulées)
+        if (!Auth::user()->hasRole('admin') && !$order->isConfirmed() && !$order->isProcessing() && !$order->isShipped() && !$order->isDelivered()) {
             abort(400, 'La facture n\'est disponible que pour les commandes confirmées.');
         }
 
-        $order->load(['orderItems.product', 'user']);
+        $order->load(['items.product', 'user']);
 
         $pdf = Pdf::loadView('orders.invoice', compact('order'));
 
@@ -483,7 +488,7 @@ class OrderController extends Controller
             abort(403, 'Accès non autorisé à cette commande.');
         }
 
-        $returns = $order->orderReturns()->with(['orderItem.product'])->get();
+        $returns = $order->returns()->get();
 
         if (request()->expectsJson()) {
             return response()->json([
