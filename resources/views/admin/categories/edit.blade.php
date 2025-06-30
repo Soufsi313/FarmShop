@@ -161,6 +161,8 @@
 
                         <div class="col-md-4">
                             <div class="form-check mt-4">
+                                <!-- Champ caché pour s'assurer que allows_returns est toujours envoyé -->
+                                <input type="hidden" name="allows_returns" value="0">
                                 <input class="form-check-input @error('allows_returns') is-invalid @enderror" 
                                        type="checkbox" 
                                        id="allows_returns" 

@@ -160,6 +160,21 @@ class AdminController extends Controller
             $query->where('is_active', false);
         }
 
+        // Filtre par type de produit
+        if ($request->product_type) {
+            switch ($request->product_type) {
+                case 'purchase':
+                    $query->where('price', '>', 0)->where('is_rentable', false);
+                    break;
+                case 'rental':
+                    $query->where('is_rentable', true);
+                    break;
+                case 'both':
+                    $query->where('price', '>', 0)->where('is_rentable', true);
+                    break;
+            }
+        }
+
         $products = $query->latest()->paginate(15);
         $categories = Category::all();
         

@@ -98,114 +98,37 @@ class Category extends Model
     }
 
     /**
-     * Scope pour filtrer par type exact
+     * Obtenir le taux de TVA pour cette catégorie
+     * 
+     * @return float Le taux de TVA (ex: 0.06 pour 6%, 0.21 pour 21%)
      */
-    public function scopeByType($query, $type)
+    public function getTaxRate()
     {
-        return $query->where('type', $type);
-    }
-
-    /**
-     * Obtenir le nombre de produits actifs dans cette catégorie
-     */
-    public function getActiveProductsCountAttribute()
-    {
-        return $this->products()->active()->count();
-    }
-
-    /**
-     * Générer un slug unique
-     */
-    public static function generateUniqueSlug($name)
-    {
-        $baseSlug = Str::slug($name);
-        $slug = $baseSlug;
-        $counter = 1;
-
-        while (static::where('slug', $slug)->exists()) {
-            $slug = $baseSlug . '-' . $counter;
-            $counter++;
+        // Produits alimentaires (périssables et non-périssables) : 6% TVA
+        if (in_array($this->food_type, [self::FOOD_TYPE_PERISHABLE, self::FOOD_TYPE_NON_PERISHABLE])) {
+            return 0.06;
         }
-
-        return $slug;
+        
+        // Produits non-alimentaires : 21% TVA
+        return 0.21;
     }
 
     /**
-     * Obtenir l'URL de l'image de la catégorie
+     * Vérifier si la catégorie contient des produits alimentaires
+     * 
+     * @return bool
      */
-    public function getImageUrlAttribute()
+    public function isFood()
     {
-        if ($this->image) {
-            return asset('storage/categories/' . $this->image);
-        }
-        return asset('images/default-category.png');
+        return in_array($this->food_type, [self::FOOD_TYPE_PERISHABLE, self::FOOD_TYPE_NON_PERISHABLE]);
     }
 
     /**
-     * Obtenir la route de la catégorie
+     * Vérifier si la catégorie contient des produits périssables
+     * 
+     * @return bool
      */
-    public function getRouteAttribute()
-    {
-        return route('categories.show', $this->slug);
-    }
-
-    /**
-     * Vérifie si la catégorie est pour les achats
-     */
-    public function isPurchaseCategory()
-    {
-        return in_array($this->type, [self::TYPE_PURCHASE, self::TYPE_BOTH]);
-    }
-
-    /**
-     * Vérifie si la catégorie est pour les locations
-     */
-    public function isRentalCategory()
-    {
-        return in_array($this->type, [self::TYPE_RENTAL, self::TYPE_BOTH]);
-    }
-
-    /**
-     * Obtenir le libellé du type de catégorie
-     */
-    public function getTypeLabel()
-    {
-        switch($this->type) {
-            case self::TYPE_PURCHASE:
-                return 'Achat uniquement';
-            case self::TYPE_RENTAL:
-                return 'Location uniquement';
-            case self::TYPE_BOTH:
-                return 'Achat et Location';
-            default:
-                return 'Non défini';
-        }
-    }
-
-    /**
-     * Obtenir tous les types disponibles avec leurs libellés
-     */
-    public static function getAvailableTypes()
-    {
-        return [
-            self::TYPE_PURCHASE => 'Achat uniquement',
-            self::TYPE_RENTAL => 'Location uniquement',
-            self::TYPE_BOTH => 'Achat et Location'
-        ];
-    }
-
-    /**
-     * Vérifier si la catégorie permet les retours
-     */
-    public function allowsReturns(): bool
-    {
-        return $this->allows_returns && $this->food_type !== self::FOOD_TYPE_PERISHABLE;
-    }
-
-    /**
-     * Vérifier si la catégorie est alimentaire périssable
-     */
-    public function isPerishable(): bool
+    public function isPerishable()
     {
         return $this->food_type === self::FOOD_TYPE_PERISHABLE;
     }

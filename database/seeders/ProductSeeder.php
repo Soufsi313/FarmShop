@@ -17,6 +17,7 @@ class ProductSeeder extends Seeder
                 'slug' => 'fruits-et-legumes',
                 'description' => 'Fruits et légumes frais de saison, cultivés localement avec amour.',
                 'type' => 'purchase', // Catégorie uniquement pour achat (pas location)
+                'food_type' => 'perishable', // Produits alimentaires périssables
                 'is_active' => true
             ]
         );

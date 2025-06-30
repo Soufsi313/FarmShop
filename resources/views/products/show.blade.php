@@ -68,8 +68,83 @@
                     
                     <!-- Prix -->
                     <div class="mb-4">
-                        <span class="h3 text-success">{{ number_format($product->price, 2) }}€</span>
-                        <span class="text-muted">/{{ $product->unit_symbol }}</span>
+                        @if($product->is_rentable && $product->rental_price_per_day > 0)
+                            @if($product->price > 0)
+                                <!-- Produit mixte achat + location -->
+                                <div class="d-flex flex-column gap-2">
+                                    <div>
+                                        <span class="badge bg-warning me-2">
+                                            <i class="fas fa-star me-1"></i>Achat + Location
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span class="h4 text-success">{{ number_format($product->price, 2) }}€</span>
+                                        <span class="text-muted">/{{ $product->unit_symbol }}</span>
+                                        <small class="text-muted ms-2">(Achat)</small>
+                                    </div>
+                                    <div>
+                                        <span class="h4 text-info">{{ number_format($product->rental_price_per_day, 2) }}€</span>
+                                        <span class="text-muted">/jour</span>
+                                        <small class="text-muted ms-2">(Location)</small>
+                                    </div>
+                                    @if($product->deposit_amount > 0)
+                                        <div>
+                                            <small class="text-warning">
+                                                <i class="fas fa-shield-alt me-1"></i>
+                                                Caution: {{ number_format($product->deposit_amount, 2) }}€
+                                            </small>
+                                        </div>
+                                    @endif
+                                </div>
+                            @else
+                                <!-- Produit location uniquement -->
+                                <div class="d-flex flex-column gap-2">
+                                    <div>
+                                        <span class="badge bg-info me-2">
+                                            <i class="fas fa-calendar-alt me-1"></i>Location
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span class="h3 text-info">{{ number_format($product->rental_price_per_day, 2) }}€</span>
+                                        <span class="text-muted">/jour</span>
+                                    </div>
+                                    @if($product->deposit_amount > 0)
+                                        <div>
+                                            <small class="text-warning">
+                                                <i class="fas fa-shield-alt me-1"></i>
+                                                Caution: {{ number_format($product->deposit_amount, 2) }}€
+                                            </small>
+                                        </div>
+                                    @endif
+                                    @if($product->min_rental_days > 1 || $product->max_rental_days < 365)
+                                        <div>
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>
+                                                @if($product->min_rental_days > 1)
+                                                    Min: {{ $product->min_rental_days }} jour{{ $product->min_rental_days > 1 ? 's' : '' }}
+                                                @endif
+                                                @if($product->max_rental_days < 365)
+                                                    {{ $product->min_rental_days > 1 ? ' - ' : '' }}Max: {{ $product->max_rental_days }} jours
+                                                @endif
+                                            </small>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
+                        @else
+                            <!-- Produit achat uniquement -->
+                            <div class="d-flex flex-column gap-2">
+                                <div>
+                                    <span class="badge bg-success me-2">
+                                        <i class="fas fa-shopping-cart me-1"></i>Achat
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="h3 text-success">{{ number_format($product->price, 2) }}€</span>
+                                    <span class="text-muted">/{{ $product->unit_symbol }}</span>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                     
                     <!-- Description -->
@@ -112,37 +187,92 @@
 
                         @auth
                             @if($product->quantity > 0)
-                                <!-- Sélecteur de quantité -->
-                                <div class="mb-3">
-                                    <label for="quantity" class="form-label">Quantité</label>
-                                    <div class="input-group" style="max-width: 200px;">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="changeQuantity(-1)">
-                                            <i class="fas fa-minus"></i>
+                                @if($product->is_rentable && $product->rental_price_per_day > 0)
+                                    @if($product->price > 0)
+                                        <!-- Produit mixte achat + location -->
+                                        <!-- Sélecteur de quantité pour achat -->
+                                        <div class="mb-3">
+                                            <label for="quantity" class="form-label">Quantité (pour achat)</label>
+                                            <div class="input-group" style="max-width: 200px;">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="changeQuantity(-1)">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <input type="number" 
+                                                       class="form-control text-center" 
+                                                       id="quantity" 
+                                                       value="1" 
+                                                       min="1" 
+                                                       max="{{ $product->quantity }}">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="changeQuantity(1)">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Boutons pour achat -->
+                                        <div class="d-flex gap-2 mb-3">
+                                            <button class="btn btn-outline-success" onclick="addToCart({{ $product->id }})">
+                                                <i class="fas fa-shopping-cart me-1"></i>Ajouter au panier
+                                            </button>
+                                            <button class="btn btn-success" onclick="buyNowFromDetail({{ $product->id }})">
+                                                <i class="fas fa-bolt me-1"></i>Acheter maintenant
+                                            </button>
+                                        </div>
+
+                                        <!-- Bouton pour location -->
+                                        <div class="d-flex gap-2 mb-4">
+                                            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#rentalModal{{ $product->id }}">
+                                                <i class="fas fa-calendar-alt me-1"></i>Louer ce produit
+                                            </button>
+                                            <button class="btn btn-outline-primary" onclick="addToWishlist({{ $product->id }})">
+                                                <i class="fas fa-heart me-1"></i>Favoris
+                                            </button>
+                                        </div>
+                                    @else
+                                        <!-- Produit location uniquement -->
+                                        <div class="d-flex gap-2 mb-4">
+                                            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#rentalModal{{ $product->id }}">
+                                                <i class="fas fa-calendar-alt me-1"></i>Louer ce produit
+                                            </button>
+                                            <button class="btn btn-outline-primary" onclick="addToWishlist({{ $product->id }})">
+                                                <i class="fas fa-heart me-1"></i>Favoris
+                                            </button>
+                                        </div>
+                                    @endif
+                                @else
+                                    <!-- Produit achat uniquement -->
+                                    <!-- Sélecteur de quantité -->
+                                    <div class="mb-3">
+                                        <label for="quantity" class="form-label">Quantité</label>
+                                        <div class="input-group" style="max-width: 200px;">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="changeQuantity(-1)">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <input type="number" 
+                                                   class="form-control text-center" 
+                                                   id="quantity" 
+                                                   value="1" 
+                                                   min="1" 
+                                                   max="{{ $product->quantity }}">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="changeQuantity(1)">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Boutons d'action pour achat -->
+                                    <div class="d-flex gap-2 mb-4">
+                                        <button class="btn btn-outline-success" onclick="addToCart({{ $product->id }})">
+                                            <i class="fas fa-shopping-cart me-1"></i>Ajouter au panier
                                         </button>
-                                        <input type="number" 
-                                               class="form-control text-center" 
-                                               id="quantity" 
-                                               value="1" 
-                                               min="1" 
-                                               max="{{ $product->quantity }}">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="changeQuantity(1)">
-                                            <i class="fas fa-plus"></i>
+                                        <button class="btn btn-success" onclick="buyNowFromDetail({{ $product->id }})">
+                                            <i class="fas fa-bolt me-1"></i>Acheter maintenant
+                                        </button>
+                                        <button class="btn btn-outline-primary" onclick="addToWishlist({{ $product->id }})">
+                                            <i class="fas fa-heart me-1"></i>Favoris
                                         </button>
                                     </div>
-                                </div>
-
-                                <!-- Boutons d'action -->
-                                <div class="d-flex gap-2 mb-4">
-                                    <button class="btn btn-outline-success" onclick="addToCart({{ $product->id }})">
-                                        <i class="fas fa-shopping-cart me-1"></i>Ajouter au panier
-                                    </button>
-                                    <button class="btn btn-success" onclick="buyNowFromDetail({{ $product->id }})">
-                                        <i class="fas fa-bolt me-1"></i>Acheter maintenant
-                                    </button>
-                                    <button class="btn btn-outline-primary" onclick="addToWishlist({{ $product->id }})">
-                                        <i class="fas fa-heart me-1"></i>Favoris
-                                    </button>
-                                </div>
+                                @endif
                             @else
                                 <div class="mb-4">
                                     <button class="btn btn-secondary" disabled>
@@ -179,16 +309,29 @@
                         </button>
                     </div>
                     
-                    <!-- Informations supplémentaires -->
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="mb-2">
-                            <i class="fas fa-truck text-success me-2"></i>
-                            Livraison
-                        </h6>
-                        <small class="text-muted">
-                            Livraison gratuite à partir de 25€ d'achat
-                        </small>
-                    </div>
+                    <!-- Informations supplémentaires (uniquement pour les produits d'achat) -->
+                    @if($product->price > 0)
+                        <div class="border rounded p-3 bg-light">
+                            <h6 class="mb-2">
+                                <i class="fas fa-truck text-success me-2"></i>
+                                Livraison
+                            </h6>
+                            <small class="text-muted">
+                                Livraison gratuite à partir de 25€ d'achat
+                            </small>
+                        </div>
+                    @else
+                        <!-- Informations pour les produits de location uniquement -->
+                        <div class="border rounded p-3 bg-light">
+                            <h6 class="mb-2">
+                                <i class="fas fa-handshake text-info me-2"></i>
+                                Récupération & Retour
+                            </h6>
+                            <small class="text-muted">
+                                Récupération et retour du matériel directement sur place
+                            </small>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -220,6 +363,102 @@
     @endif
 </div>
 
+<!-- Modal de location pour produits louables -->
+@if($product->is_rentable && $product->rental_price_per_day > 0)
+<div class="modal fade" id="rentalModal{{ $product->id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-alt me-2"></i>Louer : {{ $product->name }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="rentalForm{{ $product->id }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Date de début</label>
+                            <input type="date" class="form-control" name="start_date" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Date de fin</label>
+                            <input type="date" class="form-control" name="end_date" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Prix par jour :</span>
+                                    <strong>{{ number_format($product->rental_price_per_day, 2) }}€</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Nombre de jours :</span>
+                                    <strong id="rentalDays{{ $product->id }}">0</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Sous-total :</span>
+                                    <strong id="rentalSubtotal{{ $product->id }}">0.00€</strong>
+                                </div>
+                                @if($product->deposit_amount > 0)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Caution :</span>
+                                    <strong class="text-warning">{{ number_format($product->deposit_amount, 2) }}€</strong>
+                                </div>
+                                @endif
+                                <hr class="my-2">
+                                <div class="d-flex justify-content-between">
+                                    <span><strong>Total à payer :</strong></span>
+                                    <strong class="text-primary" id="rentalTotal{{ $product->id }}">0.00€</strong>
+                                </div>
+                                <small class="text-muted d-block mt-1">
+                                    @if($product->deposit_amount > 0)
+                                        La caution sera restituée après retour en bon état
+                                    @endif
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    @if($product->rental_conditions)
+                    <div class="mb-3">
+                        <label class="form-label">Conditions de location :</label>
+                        <div class="alert alert-info">
+                            <small>{{ $product->rental_conditions }}</small>
+                        </div>
+                    </div>
+                    @endif
+                    
+                    @if($product->min_rental_days > 1 || $product->max_rental_days < 365)
+                    <div class="mb-3">
+                        <div class="alert alert-warning">
+                            <small>
+                                <i class="fas fa-info-circle me-1"></i>
+                                @if($product->min_rental_days > 1)
+                                    Durée minimum : {{ $product->min_rental_days }} jour{{ $product->min_rental_days > 1 ? 's' : '' }}
+                                @endif
+                                @if($product->max_rental_days < 365)
+                                    {{ $product->min_rental_days > 1 ? ' - ' : '' }}Durée maximum : {{ $product->max_rental_days }} jours
+                                @endif
+                            </small>
+                        </div>
+                    </div>
+                    @endif
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-info" onclick="processRental({{ $product->id }})">
+                    <i class="fas fa-calendar-check me-1"></i>Confirmer la location
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 @endsection
 
 @section('scripts')
@@ -234,9 +473,116 @@ function changeQuantity(delta) {
     quantityInput.value = newValue;
 }
 
+// Gestion des dates de location et calcul automatique
+document.addEventListener('DOMContentLoaded', function() {
+    @if($product->is_rentable && $product->rental_price_per_day > 0)
+    const startDateInput = document.querySelector('#rentalModal{{ $product->id }} input[name="start_date"]');
+    const endDateInput = document.querySelector('#rentalModal{{ $product->id }} input[name="end_date"]');
+    
+    if (startDateInput && endDateInput) {
+        // Date minimum = aujourd'hui
+        const today = new Date().toISOString().split('T')[0];
+        startDateInput.min = today;
+        endDateInput.min = today;
+        
+        function calculateRental() {
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+            
+            if (startDate && endDate && endDate >= startDate) {
+                const diffTime = Math.abs(endDate - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 pour inclure le jour de début
+                
+                const pricePerDay = {{ $product->rental_price_per_day }};
+                const deposit = {{ $product->deposit_amount ?? 0 }};
+                const minDays = {{ $product->min_rental_days ?? 1 }};
+                const maxDays = {{ $product->max_rental_days ?? 365 }};
+                
+                // Vérifier les contraintes de durée
+                if (diffDays < minDays || diffDays > maxDays) {
+                    document.getElementById('rentalDays{{ $product->id }}').textContent = diffDays;
+                    document.getElementById('rentalSubtotal{{ $product->id }}').textContent = 'Durée non valide';
+                    document.getElementById('rentalTotal{{ $product->id }}').textContent = 'Durée non valide';
+                    return;
+                }
+                
+                const subtotal = diffDays * pricePerDay;
+                const total = subtotal + deposit;
+                
+                document.getElementById('rentalDays{{ $product->id }}').textContent = diffDays;
+                document.getElementById('rentalSubtotal{{ $product->id }}').textContent = subtotal.toFixed(2) + '€';
+                document.getElementById('rentalTotal{{ $product->id }}').textContent = total.toFixed(2) + '€';
+            } else {
+                document.getElementById('rentalDays{{ $product->id }}').textContent = '0';
+                document.getElementById('rentalSubtotal{{ $product->id }}').textContent = '0.00€';
+                document.getElementById('rentalTotal{{ $product->id }}').textContent = '{{ number_format($product->deposit_amount ?? 0, 2) }}€';
+            }
+        }
+        
+        startDateInput.addEventListener('change', function() {
+            endDateInput.min = this.value;
+            calculateRental();
+        });
+        
+        endDateInput.addEventListener('change', calculateRental);
+    }
+    @endif
+});
+
+// Traitement de la location
+function processRental(productId) {
+    const form = document.getElementById(`rentalForm${productId}`);
+    const formData = new FormData(form);
+    
+    const startDate = formData.get('start_date');
+    const endDate = formData.get('end_date');
+    
+    if (!startDate || !endDate) {
+        showToast('Veuillez sélectionner les dates de location', 'error');
+        return;
+    }
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    if (end < start) {
+        showToast('La date de fin doit être postérieure à la date de début', 'error');
+        return;
+    }
+    
+    // Simulation de la réservation
+    fetch(`/api/rentals/book`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            start_date: startDate,
+            end_date: endDate
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            showToast('Location réservée avec succès !', 'success');
+            document.querySelector(`#rentalModal${productId} .btn-close`).click();
+        } else {
+            showToast('Erreur lors de la réservation', 'error');
+        }
+    })
+    .catch(error => {
+        // En attendant l'implémentation complète
+        showToast(`Location réservée: {{ $product->name ?? "" }} du ${startDate} au ${endDate} (Simulation)`, 'success');
+        document.querySelector(`#rentalModal${productId} .btn-close`).click();
+    });
+}
+
 // Ajout au panier depuis la page de détail
 function addToCart(productId) {
     const quantity = document.getElementById('quantity')?.value || 1;
+    
+    console.log('Tentative d\'ajout au panier:', { productId, quantity });
     
     fetch(`/api/cart/add`, {
         method: 'POST',
@@ -250,15 +596,41 @@ function addToCart(productId) {
         })
     })
     .then(response => {
-        if (response.ok) {
+        console.log('Réponse API:', response.status, response.statusText);
+        if (!response.ok) {
+            // Essayons de lire le contenu même en cas d'erreur
+            return response.text().then(text => {
+                console.error('Contenu de l\'erreur:', text);
+                throw new Error(`HTTP ${response.status}: ${response.statusText} - ${text.substring(0, 200)}`);
+            });
+        }
+        // Lire le contenu comme texte d'abord pour le débugger
+        return response.text().then(text => {
+            console.log('Contenu brut de la réponse:', text);
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error('Erreur de parsing JSON:', e);
+                console.error('Contenu qui pose problème:', text.substring(0, 500));
+                throw new Error('Réponse non-JSON reçue: ' + text.substring(0, 100));
+            }
+        });
+    })
+    .then(data => {
+        console.log('Données reçues:', data);
+        if (data.success) {
             showToast(`${quantity}x {{ $product->name ?? "" }} ajouté(s) au panier !`, 'success');
+            // Mettre à jour le compteur du panier
+            if (window.updateCartCount) {
+                window.updateCartCount();
+            }
         } else {
-            showToast('Erreur lors de l\'ajout au panier', 'error');
+            showToast(data.message || 'Erreur lors de l\'ajout au panier', 'error');
         }
     })
     .catch(error => {
-        // En attendant l'implémentation complète
-        showToast(`${quantity}x {{ $product->name ?? "" }} ajouté(s) au panier ! (Simulation)`, 'success');
+        console.error('Erreur complète:', error);
+        showToast('Erreur lors de l\'ajout au panier: ' + error.message, 'error');
     });
 }
 

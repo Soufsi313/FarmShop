@@ -62,7 +62,29 @@ Route::prefix('likes')->group(function () {
 });
 
 // Routes API pour les utilisateurs authentifiés
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:web')->group(function () {
+    // Route de test pour vérifier l'authentification
+    Route::get('/test-auth', function () {
+        return response()->json([
+            'success' => true,
+            'message' => 'Utilisateur authentifié avec succès',
+            'user' => auth()->user()->only(['id', 'name', 'email'])
+        ]);
+    });
+
+    // Route de test pour ajouter au panier
+    Route::post('/test-cart-add', function (Request $request) {
+        $user = auth()->user();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Test d\'ajout au panier',
+            'user_id' => $user ? $user->id : null,
+            'data_received' => $request->all(),
+            'headers' => $request->headers->all()
+        ]);
+    });
+
     // Routes API pour le panier (Cart) - Utilisateurs connectés uniquement
     Route::prefix('cart')->group(function () {
         Route::get('/', [App\Http\Controllers\CartController::class, 'index']); // Obtenir le contenu du panier
@@ -322,9 +344,9 @@ Route::middleware('auth:sanctum')->group(function () {
         /*
         TODO: Corriger tous les namespaces App.Http en App\Http dans cette section
         
-        Route::get('/blogs', [App\Http\Controllers\Admin\BlogAdminController::class, 'index']); // Liste articles
-        Route::post('/blogs', [App\Http\Controllers\Admin\BlogAdminController::class, 'store']); // Créer article
-        Route::get('/blogs/{blog}', [App\Http\Controllers\Admin\BlogAdminController::class, 'show']); // Détail article
+        Route::get('/blogs', [App.Http\Controllers\Admin\BlogAdminController::class, 'index']); // Liste articles
+        Route::post('/blogs', [App.Http\Controllers\Admin\BlogAdminController::class, 'store']); // Créer article
+        Route::get('/blogs/{blog}', [App.Http\Controllers\Admin\BlogAdminController::class, 'show']); // Détail article
         Route::put('/blogs/{blog}', [App.Http\Controllers\Admin\BlogAdminController::class, 'update']); // Mettre à jour article
         Route::delete('/blogs/{blog}', [App.Http\Controllers\Admin\BlogAdminController::class, 'destroy']); // Supprimer article
         Route::put('/blogs/{blog}/publish', [App.Http\Controllers\Admin\BlogAdminController::class, 'publish']); // Publier

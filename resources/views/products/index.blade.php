@@ -168,28 +168,31 @@
                                     
                                     <!-- Badges -->
                                     <div class="position-absolute top-0 end-0 m-2">
-                                        @if($product->is_rentable && $product->price <= 0)
-                                            <span class="badge bg-info mb-1 d-block">
-                                                <i class="fas fa-calendar-alt me-1"></i>Location
-                                            </span>
-                                        @elseif($product->price > 0 && !$product->is_rentable)
-                                            <span class="badge bg-success mb-1 d-block">
-                                                <i class="fas fa-shopping-cart me-1"></i>Achat
-                                            </span>
-                                        @elseif($product->price > 0 && $product->is_rentable)
-                                            <span class="badge bg-warning mb-1 d-block">
-                                                <i class="fas fa-star me-1"></i>Achat + Location
+                                        @if($product->category)
+                                            <span class="badge bg-secondary d-block mb-1">
+                                                {{ $product->category->name }}
                                             </span>
                                         @endif
-                                        
                                         @if($product->is_featured)
-                                            <span class="badge bg-warning mb-1 d-block">
+                                            <span class="badge bg-warning d-block">
                                                 <i class="fas fa-star me-1"></i>Vedette
                                             </span>
                                         @endif
-                                        @if($product->category)
-                                            <span class="badge bg-secondary d-block">
-                                                {{ $product->category->name }}
+                                    </div>
+
+                                    <!-- Badge type de produit (en bas à gauche) -->
+                                    <div class="position-absolute bottom-0 start-0 m-2">
+                                        @if($product->is_rentable && $product->price <= 0)
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-calendar-alt me-1"></i>Location
+                                            </span>
+                                        @elseif($product->price > 0 && !$product->is_rentable)
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-shopping-cart me-1"></i>Achat
+                                            </span>
+                                        @elseif($product->price > 0 && $product->is_rentable)
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-star me-1"></i>Achat + Location
                                             </span>
                                         @endif
                                     </div>
@@ -214,7 +217,7 @@
                                 
                                 <div class="card-body d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="card-title mb-0">{{ $product->name }}</h5>
+                                        <h5 class="card-title mb-0 flex-grow-1">{{ $product->name }}</h5>
                                         @auth
                                             <div class="dropdown">
                                                 <button class="btn btn-link p-0 text-muted" 
@@ -238,26 +241,34 @@
                                         @endauth
                                     </div>
                                     
-                                    <p class="card-text text-muted flex-grow-1 small">
+                                    <p class="card-text text-muted flex-grow-1 small mb-3">
                                         {{ Str::limit($product->description, 80) }}
                                     </p>
                                     
-                                    <!-- Prix et stock -->
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <div>
-                                            @if($product->is_rentable && $product->rental_price_per_day > 0)
-                                                <span class="h5 text-info mb-0 fw-bold">{{ number_format($product->rental_price_per_day, 2) }}€</span>
-                                                <small class="text-muted d-block">/jour</small>
-                                                @if($product->price > 0)
-                                                    <small class="text-success">Achat: {{ number_format($product->price, 2) }}€/{{ $product->unit_symbol }}</small>
+                                    <!-- Informations prix et location -->
+                                    <div class="mb-3">
+                                        @if($product->is_rentable && $product->rental_price_per_day > 0)
+                                            <div class="text-center rental-price-box rounded p-2 mb-2">
+                                                <div class="h5 text-info mb-0 fw-bold">{{ number_format($product->rental_price_per_day, 2) }}€<small class="fs-6">/jour</small></div>
+                                                @if($product->deposit_amount > 0)
+                                                    <small class="text-muted">+ {{ number_format($product->deposit_amount, 2) }}€ de caution</small>
                                                 @endif
-                                            @else
+                                                @if($product->price > 0)
+                                                    <div class="mt-1">
+                                                        <small class="text-success">Achat: {{ number_format($product->price, 2) }}€/{{ $product->unit_symbol }}</small>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <div class="text-center">
                                                 <span class="h5 text-success mb-0 fw-bold">{{ number_format($product->price, 2) }}€</span>
-                                                <small class="text-muted d-block">/{{ $product->unit_symbol }}</small>
-                                            @endif
-                                        </div>
-                                        <div class="text-end">
-                                            <small class="text-muted d-block">Stock: {{ $product->quantity }}</small>
+                                                <small class="text-muted">/{{ $product->unit_symbol }}</small>
+                                            </div>
+                                        @endif
+                                        
+                                        <!-- Stock -->
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">Stock: {{ $product->quantity }}</small>
                                             @if($product->quantity <= $product->critical_stock_threshold && $product->quantity > 0)
                                                 <small class="text-warning">
                                                     <i class="fas fa-exclamation-triangle me-1"></i>Dernières pièces !
@@ -267,10 +278,10 @@
                                     </div>
                                     
                                     <!-- Actions -->
-                                    <div class="d-flex gap-2">
-                                        <!-- Bouton Voir (toujours visible) -->
+                                    <div class="d-grid gap-2">
+                                        <!-- Bouton Voir détails (toujours visible) -->
                                         <a href="{{ route('products.show', $product->slug) }}" 
-                                           class="btn btn-outline-primary btn-sm flex-fill">
+                                           class="btn btn-outline-primary btn-sm">
                                             <i class="fas fa-eye me-1"></i>Voir détails
                                         </a>
                                         
@@ -279,7 +290,7 @@
                                             @if($product->quantity > 0)
                                                 @if($product->is_rentable && $product->price <= 0)
                                                     <!-- Produit location uniquement -->
-                                                    <div class="btn-group flex-fill" role="group">
+                                                    <div class="btn-group" role="group">
                                                         <button class="btn btn-outline-info btn-sm" 
                                                                 onclick="addToCart({{ $product->id }}, 'rental')">
                                                             <i class="fas fa-calendar-plus me-1"></i>Réserver
@@ -291,7 +302,7 @@
                                                     </div>
                                                 @elseif($product->price > 0 && !$product->is_rentable)
                                                     <!-- Produit achat uniquement -->
-                                                    <div class="btn-group flex-fill" role="group">
+                                                    <div class="btn-group" role="group">
                                                         <button class="btn btn-outline-success btn-sm" 
                                                                 onclick="addToCart({{ $product->id }}, 'purchase')">
                                                             <i class="fas fa-shopping-cart me-1"></i>Panier
@@ -303,29 +314,31 @@
                                                     </div>
                                                 @else
                                                     <!-- Produit achat + location -->
-                                                    <div class="d-flex flex-column gap-1">
-                                                        <div class="btn-group" role="group">
-                                                            <button class="btn btn-outline-success btn-sm" 
-                                                                    onclick="addToCart({{ $product->id }}, 'purchase')">
+                                                    <div class="row g-1">
+                                                        <div class="col-6">
+                                                            <button class="btn btn-success btn-sm w-100" 
+                                                                    onclick="buyNow({{ $product->id }})">
                                                                 <i class="fas fa-shopping-cart me-1"></i>Acheter
                                                             </button>
-                                                            <button class="btn btn-outline-info btn-sm" 
-                                                                    onclick="addToCart({{ $product->id }}, 'rental')">
-                                                                <i class="fas fa-calendar-plus me-1"></i>Louer
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <button class="btn btn-info btn-sm w-100" 
+                                                                    onclick="rentNow({{ $product->id }})">
+                                                                <i class="fas fa-calendar-check me-1"></i>Louer
                                                             </button>
                                                         </div>
                                                     </div>
                                                 @endif
                                             @else
-                                                <button class="btn btn-secondary btn-sm flex-fill" disabled>
-                                                    <i class="fas fa-ban me-1"></i>Rupture
+                                                <button class="btn btn-secondary btn-sm" disabled>
+                                                    <i class="fas fa-ban me-1"></i>Rupture de stock
                                                 </button>
                                             @endif
                                         @else
                                             <!-- Message pour visiteurs non connectés -->
-                                            <button class="btn btn-outline-success btn-sm flex-fill" 
+                                            <button class="btn btn-outline-success btn-sm" 
                                                     onclick="showLoginPrompt()">
-                                                <i class="fas fa-user-plus me-1"></i>Se connecter
+                                                <i class="fas fa-user-plus me-1"></i>Se connecter pour commander
                                             </button>
                                         @endauth
                                     </div>
@@ -493,6 +506,7 @@
     transition: all 0.3s ease;
     border-radius: 10px;
     overflow: hidden;
+    min-height: 500px; /* Hauteur minimale pour uniformiser */
 }
 
 .product-card:hover {
@@ -502,6 +516,8 @@
 
 .card-img-top {
     transition: transform 0.3s ease;
+    height: 250px;
+    object-fit: cover;
 }
 
 .product-card:hover .card-img-top {
@@ -515,6 +531,27 @@
 
 .badge {
     font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Amélioration de l'affichage des prix pour les locations */
+.rental-price-box {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border: 1px solid #b3e5fc;
+}
+
+/* Meilleur contraste pour les badges en bas */
+.position-absolute.bottom-0 .badge {
+    backdrop-filter: blur(4px);
+    background-color: rgba(var(--bs-info-rgb), 0.9) !important;
+}
+
+.position-absolute.bottom-0 .badge.bg-success {
+    background-color: rgba(var(--bs-success-rgb), 0.9) !important;
+}
+
+.position-absolute.bottom-0 .badge.bg-warning {
+    background-color: rgba(var(--bs-warning-rgb), 0.9) !important;
 }
 </style>
 
@@ -536,16 +573,21 @@ function addToCart(productId, type = 'purchase') {
             type: type
         })
     })
-    .then(response => {
-        if (response.ok) {
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
             showToast(`Produit ${actionText} !`, 'success');
+            // Mettre à jour le compteur du panier
+            if (window.updateCartCount) {
+                window.updateCartCount();
+            }
         } else {
-            showToast(`Erreur lors de l'ajout`, 'error');
+            showToast(data.message || `Erreur lors de l'ajout`, 'error');
         }
     })
     .catch(error => {
-        // En attendant l'implémentation complète
-        showToast(`Produit ${actionText} ! (Simulation)`, 'success');
+        console.error('Erreur:', error);
+        showToast(`Erreur lors de l'ajout au panier`, 'error');
     });
 }
 
@@ -703,7 +745,9 @@ function updateRentalPrice() {
         if (diffDays > 0) {
             const pricePerDay = parseFloat(document.querySelector('#rentNowContent .text-info.h5').textContent.replace('€/jour', ''));
             const totalPrice = pricePerDay * diffDays;
-            const deposit = Math.min(totalPrice * 0.5, 200); // Caution = 50% du prix ou max 200€
+            
+            // Caution réduite : 20% du prix de location ou minimum 25€
+            const deposit = Math.max(totalPrice * 0.2, 25);
             
             document.getElementById('rentalDays').textContent = diffDays;
             document.getElementById('rentalPrice').textContent = totalPrice.toFixed(2) + '€';

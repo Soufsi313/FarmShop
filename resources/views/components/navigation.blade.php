@@ -29,20 +29,12 @@
                 </li>
 
                 @auth
-                    <!-- Panier -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-shopping-cart me-1"></i> Panier
-                            <span class="badge bg-success ms-1">3</span>
+                    <!-- Panier - Lien direct -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('cart.index') }}">
+                            <i class="fas fa-shopping-cart me-1"></i> Mon Panier
+                            <span class="badge bg-success ms-1" id="cart-count">0</span>
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">
-                                <i class="fas fa-shopping-cart me-2 text-success"></i> Panier Achat
-                            </a></li>
-                            <li><a class="dropdown-item" href="#">
-                                <i class="fas fa-calendar-alt me-2 text-primary"></i> Panier Location
-                            </a></li>
-                        </ul>
                     </li>
 
                     <!-- Wishlist -->
@@ -133,3 +125,48 @@
         </div>
     </div>
 </nav>
+
+@auth
+<script>
+// Mettre à jour le compteur du panier au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    // Désactivé temporairement pour debug
+    // updateCartCount();
+});
+
+function updateCartCount() {
+    fetch('/api/cart/count', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const cartCountElement = document.getElementById('cart-count');
+        if (cartCountElement && data.success && data.count !== undefined) {
+            cartCountElement.textContent = data.count;
+            cartCountElement.style.display = data.count > 0 ? 'inline' : 'none';
+        }
+    })
+    .catch(error => {
+        console.error('Erreur lors de la récupération du compteur panier:', error);
+        // Masquer le badge en cas d'erreur
+        const cartCountElement = document.getElementById('cart-count');
+        if (cartCountElement) {
+            cartCountElement.style.display = 'none';
+        }
+    });
+}
+
+// Fonction globale pour mettre à jour le panier depuis d'autres pages
+window.updateCartCount = updateCartCount;
+</script>
+@endauth

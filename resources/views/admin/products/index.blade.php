@@ -27,16 +27,24 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
+                <select class="form-select" name="product_type">
+                    <option value="">Tous les types</option>
+                    <option value="purchase" {{ request('product_type') == 'purchase' ? 'selected' : '' }}>Achat</option>
+                    <option value="rental" {{ request('product_type') == 'rental' ? 'selected' : '' }}>Location</option>
+                    <option value="both" {{ request('product_type') == 'both' ? 'selected' : '' }}>Achat + Location</option>
+                </select>
+            </div>
+            <div class="col-md-2">
                 <select class="form-select" name="status">
                     <option value="">Tous les statuts</option>
                     <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Actif</option>
                     <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactif</option>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-search"></i> Filtrer
+                    <i class="fas fa-search"></i>
                 </button>
             </div>
         </form>
@@ -54,6 +62,7 @@
                         <th>Image</th>
                         <th>Nom</th>
                         <th>Catégorie</th>
+                        <th>Type</th>
                         <th>Prix</th>
                         <th>Stock</th>
                         <th>Seuil critique</th>
@@ -91,9 +100,55 @@
                             @endif
                         </td>
                         <td>
-                            <strong>{{ number_format($product->price, 2) }} €</strong>
-                            @if($product->original_price && $product->original_price > $product->price)
-                                <br><small class="text-decoration-line-through text-muted">{{ number_format($product->original_price, 2) }} €</small>
+                            @if($product->is_rentable && $product->price > 0)
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-star me-1"></i>Achat + Location
+                                </span>
+                            @elseif($product->is_rentable)
+                                <span class="badge bg-info">
+                                    <i class="fas fa-calendar-alt me-1"></i>Location
+                                </span>
+                            @else
+                                <span class="badge bg-success">
+                                    <i class="fas fa-shopping-cart me-1"></i>Achat
+                                </span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($product->is_rentable && $product->rental_price_per_day > 0)
+                                @if($product->price > 0)
+                                    <!-- Produit mixte achat + location -->
+                                    <div>
+                                        <strong class="text-success">{{ number_format($product->price, 2) }} €</strong>
+                                        <small class="text-muted">/{{ $product->unit_symbol }}</small>
+                                    </div>
+                                    <div class="mt-1">
+                                        <strong class="text-info">{{ number_format($product->rental_price_per_day, 2) }} €</strong>
+                                        <small class="text-muted">/jour</small>
+                                    </div>
+                                @else
+                                    <!-- Produit location uniquement -->
+                                    <div>
+                                        <strong class="text-info">{{ number_format($product->rental_price_per_day, 2) }} €</strong>
+                                        <small class="text-muted">/jour</small>
+                                    </div>
+                                    @if($product->deposit_amount > 0)
+                                        <div class="mt-1">
+                                            <small class="text-warning">Caution: {{ number_format($product->deposit_amount, 2) }} €</small>
+                                        </div>
+                                    @endif
+                                @endif
+                            @else
+                                <!-- Produit achat uniquement -->
+                                <div>
+                                    <strong class="text-success">{{ number_format($product->price, 2) }} €</strong>
+                                    <small class="text-muted">/{{ $product->unit_symbol ?? 'unité' }}</small>
+                                </div>
+                                @if($product->original_price && $product->original_price > $product->price)
+                                    <div class="mt-1">
+                                        <small class="text-decoration-line-through text-muted">{{ number_format($product->original_price, 2) }} €</small>
+                                    </div>
+                                @endif
                             @endif
                         </td>
                         <td>
@@ -276,8 +331,8 @@
                     <div class="row">
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label class="form-label">Prix (€)</label>
-                                <input type="number" class="form-control" name="price" step="0.01" value="{{ $product->price }}" required>
+                                <label class="form-label">Prix d'achat (€) <small class="text-muted">(0 si location uniquement)</small></label>
+                                <input type="number" class="form-control" name="price" step="0.01" value="{{ $product->price }}" min="0">
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -300,6 +355,64 @@
                                     <option value="piece" {{ $product->unit_symbol == 'piece' ? 'selected' : '' }}>À la pièce</option>
                                     <option value="liter" {{ $product->unit_symbol == 'liter' ? 'selected' : '' }}>Litre</option>
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section Location -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-calendar-alt me-2"></i>Paramètres de location
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="is_rentable" value="1" 
+                                           {{ $product->is_rentable ? 'checked' : '' }} id="is_rentable_{{ $product->id }}">
+                                    <label class="form-check-label" for="is_rentable_{{ $product->id }}">
+                                        Disponible en location
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="row rental-fields" style="display: {{ $product->is_rentable ? 'block' : 'none' }};">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Prix/jour (€)</label>
+                                        <input type="number" class="form-control" name="rental_price_per_day" 
+                                               step="0.01" value="{{ $product->rental_price_per_day }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Caution (€)</label>
+                                        <input type="number" class="form-control" name="deposit_amount" 
+                                               step="0.01" value="{{ $product->deposit_amount }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="mb-3">
+                                        <label class="form-label">Min jours</label>
+                                        <input type="number" class="form-control" name="min_rental_days" 
+                                               value="{{ $product->min_rental_days ?? 1 }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="mb-3">
+                                        <label class="form-label">Max jours</label>
+                                        <input type="number" class="form-control" name="max_rental_days" 
+                                               value="{{ $product->max_rental_days ?? 30 }}">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Conditions de location</label>
+                                        <textarea class="form-control" name="rental_conditions" rows="2" 
+                                                  placeholder="Ex: Nettoyer après usage, vérifier l'huile...">{{ $product->rental_conditions }}</textarea>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -342,5 +455,23 @@ function deleteProduct(productId) {
         });
     }
 }
+
+// Gestion de l'affichage des champs de location
+document.addEventListener('DOMContentLoaded', function() {
+    // Pour chaque modal
+    document.querySelectorAll('[id^="is_rentable_"]').forEach(checkbox => {
+        const productId = checkbox.id.replace('is_rentable_', '');
+        const rentalFields = checkbox.closest('.modal').querySelector('.rental-fields');
+        
+        // Événement change sur la checkbox
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                rentalFields.style.display = 'block';
+            } else {
+                rentalFields.style.display = 'none';
+            }
+        });
+    });
+});
 </script>
 @endsection

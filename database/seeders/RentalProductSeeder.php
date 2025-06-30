@@ -23,7 +23,8 @@ class RentalProductSeeder extends Seeder
             'slug' => 'outils-jardinage',
             'description' => 'Outils pour l\'entretien du jardin et des espaces verts',
             'is_active' => true,
-            'type' => 'rental'
+            'type' => 'rental',
+            'food_type' => 'non_food' // Produits non-alimentaires
         ]);
 
         $machinesCategory = Category::firstOrCreate([
@@ -32,7 +33,8 @@ class RentalProductSeeder extends Seeder
             'slug' => 'machines-equipements',
             'description' => 'Machines et équipements pour particuliers',
             'is_active' => true,
-            'type' => 'rental'
+            'type' => 'rental',
+            'food_type' => 'non_food' // Produits non-alimentaires
         ]);
 
         // Produits de location - Outils de jardinage

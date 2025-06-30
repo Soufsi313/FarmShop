@@ -28,6 +28,8 @@ class StoreCategoryRequest extends FormRequest
             'slug' => ['nullable', 'string', 'max:255', 'unique:categories,slug'],
             'description' => ['nullable', 'string', 'max:1000'],
             'type' => ['required', 'in:purchase,rental,both'],
+            'food_type' => ['required', 'in:perishable,non_perishable,non_food'],
+            'allows_returns' => ['boolean'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
             'is_active' => ['boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
@@ -47,6 +49,8 @@ class StoreCategoryRequest extends FormRequest
             'slug.unique' => 'Une catégorie avec ce slug existe déjà.',
             'type.required' => 'Le type de catégorie est obligatoire.',
             'type.in' => 'Le type de catégorie doit être : achat, location ou les deux.',
+            'food_type.required' => 'Le type alimentaire est obligatoire.',
+            'food_type.in' => 'Le type alimentaire doit être : périssable, non périssable ou non alimentaire.',
             'image.image' => 'Le fichier doit être une image.',
             'image.mimes' => 'L\'image doit être au format jpeg, png, jpg ou gif.',
             'image.max' => 'L\'image ne doit pas dépasser 2 Mo.',
@@ -68,6 +72,15 @@ class StoreCategoryRequest extends FormRequest
             ]);
         } else {
             $this->merge(['is_active' => true]); // Par défaut actif
+        }
+
+        // Convertir allows_returns en booléen si c'est une chaîne
+        if ($this->has('allows_returns')) {
+            $this->merge([
+                'allows_returns' => filter_var($this->allows_returns, FILTER_VALIDATE_BOOLEAN)
+            ]);
+        } else {
+            $this->merge(['allows_returns' => true]); // Par défaut autoriser les retours
         }
 
         // Définir sort_order par défaut si non fourni

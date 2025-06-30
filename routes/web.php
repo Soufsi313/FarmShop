@@ -98,6 +98,22 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 Route::middleware(['auth'])->group(function () {
     Route::post('/contact-admin', [App\Http\Controllers\AdminMessageController::class, 'store'])->name('contact.admin');
     
+    // Routes panier (utilisateurs connectés)
+    Route::get('/panier', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+    Route::get('/api/cart/count', [App\Http\Controllers\CartController::class, 'getCartCount'])->name('cart.count');
+    Route::post('/api/cart/add', [App\Http\Controllers\CartController::class, 'store'])->name('cart.add');
+    Route::put('/api/cart/items/{cartItem}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+    Route::delete('/api/cart/items/{cartItem}', [App\Http\Controllers\CartController::class, 'destroy'])->name('cart.remove');
+    Route::delete('/api/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
+    
+    // Route de test pour vérifier l'authentification
+    Route::get('/api/test-auth', function () {
+        return response()->json([
+            'authenticated' => auth()->check(),
+            'user' => auth()->user() ? auth()->user()->only(['id', 'name', 'email']) : null
+        ]);
+    });
+
     // Routes profil utilisateur
     Route::get('/mon-profil', [App\Http\Controllers\UserProfileController::class, 'show'])->name('profile.show');
     Route::put('/mon-profil', [App\Http\Controllers\UserProfileController::class, 'update'])->name('profile.update');
@@ -111,3 +127,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/mes-messages', [App\Http\Controllers\UserMessageController::class, 'index'])->name('user.messages.index');
     Route::get('/mes-messages/{message}', [App\Http\Controllers\UserMessageController::class, 'show'])->name('user.messages.show');
 });
+
+
