@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom">
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom" style="display: block !important; position: relative !important; z-index: 1000 !important; background-color: white !important;">
     <div class="container">
         <!-- Logo -->
         <a class="navbar-brand text-success fw-bold" href="{{ route('welcome') }}">
@@ -168,5 +168,10 @@ function updateCartCount() {
 
 // Fonction globale pour mettre à jour le panier depuis d'autres pages
 window.updateCartCount = updateCartCount;
+
+// Mettre à jour le compteur au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    updateCartCount();
+});
 </script>
 @endauth

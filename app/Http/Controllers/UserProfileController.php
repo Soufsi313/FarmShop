@@ -41,13 +41,33 @@ class UserProfileController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'biography' => ['nullable', 'string', 'max:500'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'shipping_street' => ['nullable', 'string', 'max:255'],
+            'shipping_additional' => ['nullable', 'string', 'max:255'],
+            'shipping_city' => ['nullable', 'string', 'max:100'],
+            'shipping_postal_code' => ['nullable', 'string', 'max:10'],
+            'shipping_country' => ['nullable', 'string', 'max:100'],
         ]);
+
+        // Préparer l'adresse de livraison
+        $shippingAddress = null;
+        if ($request->filled('shipping_street') && $request->filled('shipping_city') && $request->filled('shipping_postal_code')) {
+            $shippingAddress = [
+                'street' => $request->shipping_street,
+                'additional_info' => $request->shipping_additional,
+                'city' => $request->shipping_city,
+                'postal_code' => $request->shipping_postal_code,
+                'country' => $request->shipping_country ?: 'France',
+            ];
+        }
 
         // Mise à jour des informations de base
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
             'biography' => $request->biography,
+            'phone' => $request->phone,
+            'default_shipping_address' => $shippingAddress,
         ]);
 
         return redirect()->route('profile.show')->with('success', 'Profil mis à jour avec succès !');

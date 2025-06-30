@@ -1,10 +1,22 @@
-@extends('layouts.app')
+@extends('layouts.public')
 
 @section('title', 'Mon Profil')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-8">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Boutons de navigation -->
+        <div class="mb-4">
+            <div class="d-flex gap-2">
+                <a href="{{ route('welcome') }}" class="btn btn-outline-success">
+                    <i class="fas fa-home me-2"></i>Accueil
+                </a>
+                <a href="{{ route('products.index') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-shopping-bag me-2"></i>Produits
+                </a>
+            </div>
+        </div>
+
         <!-- Header -->
         <div class="bg-white rounded-2xl shadow-sm border border-green-100 mb-8 overflow-hidden">
             <div class="bg-gradient-to-r from-green-600 to-emerald-600 px-8 py-6">
@@ -141,6 +153,114 @@
                                 @error('email')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
+                            </div>
+                        </div>
+                        
+                        <!-- Informations de contact -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                </svg>
+                                Contact
+                            </h3>
+                            
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Téléphone
+                                </label>
+                                <input type="tel" name="phone" id="phone" value="{{ old('phone', $user->phone) }}"
+                                       placeholder="Ex: 06 12 34 56 78"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('phone') border-red-300 @enderror">
+                                @error('phone')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Adresse de livraison par défaut -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                Adresse de livraison par défaut
+                            </h3>
+                            <p class="text-sm text-gray-600 mb-4">
+                                Cette adresse sera utilisée par défaut pour vos commandes. Vous pourrez la modifier lors du checkout si nécessaire.
+                            </p>
+                            
+                            <div class="grid grid-cols-1 gap-6">
+                                <div>
+                                    <label for="shipping_street" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Adresse <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" name="shipping_street" id="shipping_street" 
+                                           value="{{ old('shipping_street', $user->default_shipping_address['street'] ?? '') }}"
+                                           placeholder="Ex: 123 Rue de la Paix"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('shipping_street') border-red-300 @enderror">
+                                    @error('shipping_street')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                
+                                <div>
+                                    <label for="shipping_additional" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Complément d'adresse
+                                    </label>
+                                    <input type="text" name="shipping_additional" id="shipping_additional" 
+                                           value="{{ old('shipping_additional', $user->default_shipping_address['additional_info'] ?? '') }}"
+                                           placeholder="Ex: Appartement 2B, Étage 3, etc."
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('shipping_additional') border-red-300 @enderror">
+                                    @error('shipping_additional')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="shipping_postal_code" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Code postal <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" name="shipping_postal_code" id="shipping_postal_code" 
+                                               value="{{ old('shipping_postal_code', $user->default_shipping_address['postal_code'] ?? '') }}"
+                                               placeholder="Ex: 75001"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('shipping_postal_code') border-red-300 @enderror">
+                                        @error('shipping_postal_code')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="shipping_city" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Ville <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" name="shipping_city" id="shipping_city" 
+                                               value="{{ old('shipping_city', $user->default_shipping_address['city'] ?? '') }}"
+                                               placeholder="Ex: Paris"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('shipping_city') border-red-300 @enderror">
+                                        @error('shipping_city')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label for="shipping_country" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Pays
+                                    </label>
+                                    <select name="shipping_country" id="shipping_country"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('shipping_country') border-red-300 @enderror">
+                                        <option value="France" {{ old('shipping_country', $user->default_shipping_address['country'] ?? 'France') === 'France' ? 'selected' : '' }}>France</option>
+                                        <option value="Belgique" {{ old('shipping_country', $user->default_shipping_address['country'] ?? '') === 'Belgique' ? 'selected' : '' }}>Belgique</option>
+                                        <option value="Suisse" {{ old('shipping_country', $user->default_shipping_address['country'] ?? '') === 'Suisse' ? 'selected' : '' }}>Suisse</option>
+                                        <option value="Luxembourg" {{ old('shipping_country', $user->default_shipping_address['country'] ?? '') === 'Luxembourg' ? 'selected' : '' }}>Luxembourg</option>
+                                    </select>
+                                    @error('shipping_country')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
                         

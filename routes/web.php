@@ -106,6 +106,14 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/api/cart/items/{cartItem}', [App\Http\Controllers\CartController::class, 'destroy'])->name('cart.remove');
     Route::delete('/api/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
     
+    // Routes commandes (utilisateurs connectés)
+    Route::get('/checkout', [App\Http\Controllers\OrderController::class, 'create'])->name('orders.create');
+    Route::post('/checkout', [App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
+    Route::get('/mes-commandes', [App\Http\Controllers\OrderController::class, 'index'])->name('orders.user.index');
+    Route::get('/mes-commandes/{order}', [App\Http\Controllers\OrderController::class, 'show'])->name('orders.user.show');
+    Route::get('/mes-commandes/{order}/facture', [App\Http\Controllers\OrderController::class, 'downloadInvoice'])->name('orders.user.invoice');
+    Route::post('/mes-commandes/{order}/annuler', [App\Http\Controllers\OrderController::class, 'userCancel'])->name('orders.user.cancel');
+    
     // Route de test pour vérifier l'authentification
     Route::get('/api/test-auth', function () {
         return response()->json([

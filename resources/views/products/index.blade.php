@@ -4,6 +4,15 @@
 
 @section('content')
 <div class="container py-5">
+    <!-- Bouton de retour à l'accueil -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="{{ route('welcome') }}" class="btn btn-outline-success">
+                <i class="fas fa-arrow-left me-2"></i>Retour à l'accueil
+            </a>
+        </div>
+    </div>
+
     <!-- Hero Section -->
     <div class="row mb-5">
         <div class="col-12 text-center">
@@ -302,9 +311,30 @@
                                                     </div>
                                                 @elseif($product->price > 0 && !$product->is_rentable)
                                                     <!-- Produit achat uniquement -->
-                                                    <div class="btn-group" role="group">
+                                                    <!-- Sélecteur de quantité -->
+                                                    <div class="mb-2">
+                                                        <label class="form-label small mb-1">Quantité</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <button class="btn btn-outline-secondary" type="button" 
+                                                                    onclick="changeProductQuantity({{ $product->id }}, -1)">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                            <input type="number" 
+                                                                   class="form-control text-center" 
+                                                                   id="quantity-{{ $product->id }}"
+                                                                   value="1" 
+                                                                   min="1" 
+                                                                   max="{{ $product->quantity }}">
+                                                            <button class="btn btn-outline-secondary" type="button" 
+                                                                    onclick="changeProductQuantity({{ $product->id }}, 1)">
+                                                                <i class="fas fa-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Boutons d'action -->
+                                                    <div class="btn-group w-100" role="group">
                                                         <button class="btn btn-outline-success btn-sm" 
-                                                                onclick="addToCart({{ $product->id }}, 'purchase')">
+                                                                onclick="addToCartWithQuantity({{ $product->id }})">
                                                             <i class="fas fa-shopping-cart me-1"></i>Panier
                                                         </button>
                                                         <button class="btn btn-success btn-sm" 
@@ -314,14 +344,41 @@
                                                     </div>
                                                 @else
                                                     <!-- Produit achat + location -->
+                                                    <!-- Sélecteur de quantité -->
+                                                    <div class="mb-2">
+                                                        <label class="form-label small mb-1">Quantité</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <button class="btn btn-outline-secondary" type="button" 
+                                                                    onclick="changeProductQuantity({{ $product->id }}, -1)">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                            <input type="number" 
+                                                                   class="form-control text-center" 
+                                                                   id="quantity-{{ $product->id }}"
+                                                                   value="1" 
+                                                                   min="1" 
+                                                                   max="{{ $product->quantity }}">
+                                                            <button class="btn btn-outline-secondary" type="button" 
+                                                                    onclick="changeProductQuantity({{ $product->id }}, 1)">
+                                                                <i class="fas fa-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Boutons d'action -->
                                                     <div class="row g-1">
                                                         <div class="col-6">
-                                                            <button class="btn btn-success btn-sm w-100" 
-                                                                    onclick="buyNow({{ $product->id }})">
-                                                                <i class="fas fa-shopping-cart me-1"></i>Acheter
+                                                            <button class="btn btn-outline-success btn-sm w-100" 
+                                                                    onclick="addToCartWithQuantity({{ $product->id }})">
+                                                                <i class="fas fa-shopping-cart me-1"></i>Panier
                                                             </button>
                                                         </div>
                                                         <div class="col-6">
+                                                            <button class="btn btn-success btn-sm w-100" 
+                                                                    onclick="buyNow({{ $product->id }})">
+                                                                <i class="fas fa-bolt me-1"></i>Acheter
+                                                            </button>
+                                                        </div>
+                                                        <div class="col-12 mt-1">
                                                             <button class="btn btn-info btn-sm w-100" 
                                                                     onclick="rentNow({{ $product->id }})">
                                                                 <i class="fas fa-calendar-check me-1"></i>Louer
@@ -498,6 +555,34 @@
         </div>
     </div>
 </div>
+
+<!-- Modal d'ajout au panier avec sélection de quantité -->
+<div class="modal fade" id="addToCartModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">
+                    <i class="fas fa-shopping-cart text-success me-2"></i>
+                    Ajouter au panier
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="addToCartContent">
+                    <!-- Le contenu sera injecté dynamiquement -->
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Annuler
+                </button>
+                <button type="button" class="btn btn-success" onclick="processAddToCart()">
+                    <i class="fas fa-shopping-cart me-1"></i>Ajouter au panier
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -558,13 +643,14 @@
 <script>
 // Fonction pour ajouter au panier
 function addToCart(productId, type = 'purchase') {
-    // TODO: Implémenter la logique d'ajout au panier avec type
     const actionText = type === 'rental' ? 'réservé' : 'ajouté au panier';
     
     fetch(`/api/cart/add`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
         body: JSON.stringify({
@@ -573,13 +659,24 @@ function addToCart(productId, type = 'purchase') {
             type: type
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Réponse API:', response.status, response.statusText);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(data => {
+        console.log('Données reçues:', data);
         if (data.success) {
             showToast(`Produit ${actionText} !`, 'success');
             // Mettre à jour le compteur du panier
             if (window.updateCartCount) {
                 window.updateCartCount();
+            }
+            // Rediriger vers le panier si type = 'purchase'
+            if (type === 'purchase') {
+                window.location.href = '/panier';
             }
         } else {
             showToast(data.message || `Erreur lors de l'ajout`, 'error');
@@ -587,7 +684,7 @@ function addToCart(productId, type = 'purchase') {
     })
     .catch(error => {
         console.error('Erreur:', error);
-        showToast(`Erreur lors de l'ajout au panier`, 'error');
+        showToast(`Erreur lors de l'ajout au panier: ${error.message}`, 'error');
     });
 }
 
@@ -599,8 +696,83 @@ function rentNow(productId) {
 
 // Fonction pour acheter maintenant
 function buyNow(productId) {
-    // Afficher une modal de confirmation avec options de quantité
-    showBuyNowModal(productId);
+    // Ajouter au panier puis rediriger
+    fetch(`/api/cart/add`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: 1
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showToast('Produit ajouté au panier !', 'success');
+            // Rediriger immédiatement vers le panier
+            window.location.href = '/panier';
+        } else {
+            showToast(data.message || 'Erreur lors de l\'ajout', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        showToast(`Erreur lors de l'ajout au panier: ${error.message}`, 'error');
+    });
+}
+
+// Fonction pour ajouter au panier et rediriger
+function addToCartAndRedirect(productId) {
+    fetch(`/api/cart/add`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: 1
+        })
+    })
+    .then(response => {
+        console.log('Réponse API:', response.status, response.statusText);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Données reçues:', data);
+        if (data.success) {
+            showToast('Produit ajouté au panier !', 'success');
+            // Mettre à jour le compteur du panier
+            if (window.updateCartCount) {
+                window.updateCartCount();
+            }
+            // Rediriger vers le panier
+            setTimeout(() => {
+                window.location.href = '/panier';
+            }, 500); // Petit délai pour voir le toast
+        } else {
+            showToast(data.message || 'Erreur lors de l\'ajout', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        showToast(`Erreur lors de l'ajout au panier: ${error.message}`, 'error');
+    });
 }
 
 // Fonction pour ajouter aux favoris
@@ -796,6 +968,9 @@ function processRentNow() {
         bootstrap.Modal.getInstance(document.getElementById('rentNowModal')).hide();
     });
 }
+
+// Fonction pour afficher le modal d'achat rapide
+function showBuyNowModal(productId) {
     // Récupérer les informations du produit depuis la page
     const productCard = document.querySelector(`[data-product-id="${productId}"]`);
     if (!productCard) {
@@ -990,5 +1165,198 @@ document.querySelectorAll('#category, #product_type').forEach(select => {
         this.closest('form').submit();
     });
 });
+
+// Fonction pour ajouter au panier avec sélection de quantité
+function addToCartWithQuantity(productId) {
+    // Récupérer les informations du produit depuis la page
+    const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+    if (!productCard) {
+        showToast('Erreur lors du chargement du produit', 'error');
+        return;
+    }
+
+    // Extraire les informations du produit depuis le DOM
+    const productName = productCard.querySelector('.card-title').textContent;
+    const productPriceElement = productCard.querySelector('.h5.text-info');
+    const productPrice = productPriceElement ? productPriceElement.textContent : '0€';
+    const productImage = productCard.querySelector('.card-img-top').src;
+    const productStock = parseInt(productCard.querySelector('[data-stock]').dataset.stock);
+
+    const product = {
+        id: productId,
+        name: productName,
+        price: productPrice,
+        image: productImage,
+        stock: productStock
+    };
+
+    displayAddToCartModal(product);
+}
+
+// Fonction pour afficher le contenu du modal d'ajout au panier
+function displayAddToCartModal(product) {
+    const content = `
+        <div class="row">
+            <div class="col-md-4">
+                <img src="${product.image}" class="img-fluid rounded" alt="${product.name}">
+            </div>
+            <div class="col-md-8">
+                <h6>${product.name}</h6>
+                <p class="text-success h5">${product.price}</p>
+                
+                <div class="mb-3">
+                    <label for="addToCartQuantity" class="form-label">Quantité désirée</label>
+                    <div class="input-group" style="max-width: 200px;">
+                        <button class="btn btn-outline-secondary" type="button" onclick="changeAddToCartQuantity(-1)">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" 
+                               class="form-control text-center" 
+                               id="addToCartQuantity" 
+                               value="1" 
+                               min="1" 
+                               max="${product.stock}">
+                        <button class="btn btn-outline-secondary" type="button" onclick="changeAddToCartQuantity(1)">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted">Stock disponible: ${product.stock}</small>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Total:</span>
+                        <span class="fw-bold text-success" id="addToCartTotalPrice">${product.price}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('addToCartContent').innerHTML = content;
+    
+    // Stocker l'ID du produit pour la finalisation
+    document.getElementById('addToCartModal').dataset.productId = product.id;
+    
+    const modal = new bootstrap.Modal(document.getElementById('addToCartModal'));
+    modal.show();
+
+    // Mettre à jour le prix total quand la quantité change
+    document.getElementById('addToCartQuantity').addEventListener('input', updateAddToCartTotalPrice);
+}
+
+// Fonction pour changer la quantité dans le modal d'ajout au panier
+function changeAddToCartQuantity(delta) {
+    const quantityInput = document.getElementById('addToCartQuantity');
+    const currentValue = parseInt(quantityInput.value);
+    const newValue = Math.max(1, Math.min(currentValue + delta, parseInt(quantityInput.max)));
+    quantityInput.value = newValue;
+    updateAddToCartTotalPrice();
+}
+
+// Fonction pour mettre à jour le prix total dans le modal d'ajout au panier
+function updateAddToCartTotalPrice() {
+    const quantity = parseInt(document.getElementById('addToCartQuantity').value);
+    const priceText = document.querySelector('#addToCartContent .text-success.h5').textContent;
+    const priceValue = parseFloat(priceText.replace('€', '').replace(',', '.'));
+    const total = (priceValue * quantity).toFixed(2);
+    document.getElementById('addToCartTotalPrice').textContent = total + '€';
+}
+
+// Fonction pour traiter l'ajout au panier
+function processAddToCart() {
+    const productId = document.getElementById('addToCartModal').dataset.productId;
+    const quantity = parseInt(document.getElementById('addToCartQuantity').value);
+
+    fetch(`/api/cart/add`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: quantity
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showToast(`${quantity} produit(s) ajouté(s) au panier !`, 'success');
+            // Fermer le modal
+            bootstrap.Modal.getInstance(document.getElementById('addToCartModal')).hide();
+            // Mettre à jour le compteur du panier
+            if (window.updateCartCount) {
+                window.updateCartCount();
+            }
+        } else {
+            showToast(data.message || 'Erreur lors de l\'ajout', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        showToast(`Erreur lors de l'ajout au panier: ${error.message}`, 'error');
+    });
+}
+
+// Fonctions pour le sélecteur de quantité sur les cartes produit
+function changeProductQuantity(productId, delta) {
+    const quantityInput = document.getElementById(`quantity-${productId}`);
+    const currentValue = parseInt(quantityInput.value);
+    const maxValue = parseInt(quantityInput.max);
+    const newValue = Math.max(1, Math.min(currentValue + delta, maxValue));
+    quantityInput.value = newValue;
+}
+
+// Fonction pour ajouter au panier avec la quantité sélectionnée
+function addToCartWithQuantity(productId) {
+    const quantityInput = document.getElementById(`quantity-${productId}`);
+    const quantity = parseInt(quantityInput.value);
+
+    fetch(`/api/cart/add`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: quantity,
+            type: 'purchase'
+        })
+    })
+    .then(response => {
+        console.log('Réponse API:', response.status, response.statusText);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Données reçues:', data);
+        if (data.success) {
+            showToast(`${quantity} produit(s) ajouté(s) au panier !`, 'success');
+            // Mettre à jour le compteur du panier
+            if (window.updateCartCount) {
+                window.updateCartCount();
+            }
+        } else {
+            showToast(data.message || 'Erreur lors de l\'ajout', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        showToast(`Erreur lors de l'ajout au panier: ${error.message}`, 'error');
+    });
+}
 </script>
 @endsection

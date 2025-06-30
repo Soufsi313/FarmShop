@@ -318,27 +318,50 @@ class CartController extends Controller
     public function validateCart(Request $request)
     {
         $user = auth()->user();
-        $issues = Cart::validateCart($user->id);
+        $cartItems = $user->cartItems()->with(['product'])->get();
         
-        if (!empty($issues)) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Des problèmes ont été détectés dans votre panier.',
-                    'issues' => $issues
-                ], 400);
+        $issues = [];
+        $hasIssues = false;
+        
+        foreach ($cartItems as $cartItem) {
+            $product = $cartItem->product;
+            
+            // Vérifier si le produit existe encore
+            if (!$product) {
+                $issues[] = "Le produit dans votre panier n'existe plus.";
+                $hasIssues = true;
+                continue;
             }
-
-            return redirect()->route('cart.index')
-                ->with('error', 'Des problèmes ont été détectés dans votre panier.')
-                ->with('issues', $issues);
+            
+            // Vérifier le stock
+            if ($product->quantity < $cartItem->quantity) {
+                $issues[] = "Stock insuffisant pour {$product->name}. Stock disponible: {$product->quantity}";
+                $hasIssues = true;
+            }
+            
+            // Vérifier si le produit est toujours actif
+            if (!$product->is_active) {
+                $issues[] = "Le produit {$product->name} n'est plus disponible.";
+                $hasIssues = true;
+            }
         }
-
+        
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Panier valide, prêt pour la commande.'
+                'cart' => [
+                    'has_issues' => $hasIssues,
+                    'items_count' => $cartItems->count(),
+                    'total' => $cartItems->sum('total_price')
+                ],
+                'issues' => $issues
             ]);
+        }
+
+        if ($hasIssues) {
+            return redirect()->route('cart.index')
+                ->with('error', 'Des problèmes ont été détectés dans votre panier.')
+                ->with('issues', $issues);
         }
 
         return redirect()->route('checkout.index'); // Redirection vers la page de commande

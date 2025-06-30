@@ -77,7 +77,7 @@ class OrderController extends Controller
     public function create()
     {
         $user = Auth::user();
-        $cartItems = $user->cartItems()->with(['product', 'cartLocation'])->get();
+        $cartItems = $user->cartItems()->with(['product'])->get();
 
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Votre panier est vide.');
@@ -92,15 +92,11 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'billing_address' => 'required|string|max:500',
-            'billing_city' => 'required|string|max:100',
-            'billing_postal_code' => 'required|string|max:20',
-            'billing_country' => 'required|string|max:100',
-            'shipping_address' => 'nullable|string|max:500',
-            'shipping_city' => 'nullable|string|max:100',
-            'shipping_postal_code' => 'nullable|string|max:20',
+            'shipping_address' => 'required|string|max:500',
+            'shipping_additional' => 'nullable|string|max:500',
+            'shipping_city' => 'required|string|max:100',
+            'shipping_postal_code' => 'required|string|max:20',
             'shipping_country' => 'nullable|string|max:100',
-            'payment_method' => 'required|in:card,paypal,bank_transfer,cash_on_delivery',
             'notes' => 'nullable|string|max:1000',
         ]);
 
@@ -115,7 +111,7 @@ class OrderController extends Controller
         }
 
         $user = Auth::user();
-        $cartItems = $user->cartItems()->with(['product', 'cartLocation'])->get();
+        $cartItems = $user->cartItems()->with(['product'])->get();
 
         if ($cartItems->isEmpty()) {
             if ($request->expectsJson()) {
@@ -127,6 +123,21 @@ class OrderController extends Controller
             return redirect()->route('cart.index')->with('error', 'Votre panier est vide.');
         }
 
+        // Calculer les montants
+        $subtotal = $cartItems->sum('total_price');
+        $shippingCost = $subtotal < 25 ? 2.50 : 0; // Frais de livraison si < 25€
+        $taxAmount = 0; // Pas de TVA pour l'instant
+        $totalAmount = $subtotal + $shippingCost + $taxAmount;
+
+        // Préparer l'adresse de livraison
+        $shippingAddress = [
+            'street' => $request->shipping_address,
+            'additional_info' => $request->shipping_additional,
+            'city' => $request->shipping_city,
+            'postal_code' => $request->shipping_postal_code,
+            'country' => $request->shipping_country ?: 'France',
+        ];
+
         DB::beginTransaction();
 
         try {
@@ -135,27 +146,23 @@ class OrderController extends Controller
                 'user_id' => $user->id,
                 'order_number' => Order::generateOrderNumber(),
                 'status' => Order::STATUS_PENDING,
-                'billing_address' => $request->billing_address,
-                'billing_city' => $request->billing_city,
-                'billing_postal_code' => $request->billing_postal_code,
-                'billing_country' => $request->billing_country,
-                'shipping_address' => $request->shipping_address ?: $request->billing_address,
-                'shipping_city' => $request->shipping_city ?: $request->billing_city,
-                'shipping_postal_code' => $request->shipping_postal_code ?: $request->billing_postal_code,
-                'shipping_country' => $request->shipping_country ?: $request->billing_country,
-                'payment_method' => $request->payment_method,
-                'payment_status' => Order::PAYMENT_STATUS_PENDING,
+                'subtotal' => $subtotal,
+                'tax_amount' => $taxAmount,
+                'shipping_cost' => $shippingCost,
+                'total_amount' => $totalAmount,
+                'shipping_address' => json_encode($shippingAddress),
+                'billing_address' => json_encode($shippingAddress), // Utiliser la même adresse pour la facturation
+                'payment_method' => 'stripe', // Méthode par défaut
+                'payment_status' => Order::PAYMENT_PENDING,
                 'notes' => $request->notes,
             ]);
-
-            $totalAmount = 0;
 
             // Créer les articles de commande
             foreach ($cartItems as $cartItem) {
                 $product = $cartItem->product;
 
                 // Vérifier le stock
-                if ($product->stock < $cartItem->quantity) {
+                if ($product->quantity < $cartItem->quantity) {
                     throw new \Exception("Stock insuffisant pour le produit {$product->name}");
                 }
 
@@ -164,34 +171,21 @@ class OrderController extends Controller
                     'product_id' => $product->id,
                     'product_name' => $product->name,
                     'product_description' => $product->description,
-                    'price' => $product->price,
+                    'unit_price' => $cartItem->unit_price,
                     'quantity' => $cartItem->quantity,
+                    'total_price' => $cartItem->total_price,
                     'status' => OrderItem::STATUS_PENDING,
                 ]);
 
                 // Décrémenter le stock
-                $product->decrement('stock', $cartItem->quantity);
-
-                $totalAmount += $orderItem->getSubtotalAttribute();
+                $product->decrement('quantity', $cartItem->quantity);
             }
-
-            // Calculer les frais de livraison (exemple : 5€ si commande < 50€)
-            $shippingCost = $totalAmount < 50 ? 5.00 : 0.00;
-            $taxAmount = $totalAmount * 0.20; // TVA 20%
-
-            // Mettre à jour le total de la commande
-            $order->update([
-                'subtotal' => $totalAmount,
-                'tax_amount' => $taxAmount,
-                'shipping_cost' => $shippingCost,
-                'total_amount' => $totalAmount + $taxAmount + $shippingCost,
-            ]);
 
             // Vider le panier
             $user->cartItems()->delete();
 
             // Envoyer notification email de confirmation
-            $this->sendOrderConfirmationEmail($order);
+            // $this->sendOrderConfirmationEmail($order);
 
             DB::commit();
 
@@ -203,7 +197,7 @@ class OrderController extends Controller
                 ], 201);
             }
 
-            return redirect()->route('orders.show', $order)
+            return redirect()->route('orders.user.show', $order)
                 ->with('success', 'Votre commande a été créée avec succès !');
 
         } catch (\Exception $e) {
@@ -212,12 +206,12 @@ class OrderController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Erreur lors de la création de la commande : ' . $e->getMessage()
+                    'message' => 'Erreur lors de la création de la commande: ' . $e->getMessage()
                 ], 500);
             }
 
             return redirect()->back()
-                ->with('error', 'Erreur lors de la création de la commande : ' . $e->getMessage())
+                ->with('error', 'Erreur lors de la création de la commande: ' . $e->getMessage())
                 ->withInput();
         }
     }

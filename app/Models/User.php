@@ -45,6 +45,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'is_newsletter_subscribed',
         'newsletter_subscribed_at',
         'newsletter_unsubscribed_at',
+        'default_shipping_address',
+        'default_billing_address',
+        'phone',
     ];
 
     /**
@@ -69,6 +72,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'is_newsletter_subscribed' => 'boolean',
         'newsletter_subscribed_at' => 'datetime',
         'newsletter_unsubscribed_at' => 'datetime',
+        'default_shipping_address' => 'array',
+        'default_billing_address' => 'array',
     ];
 
     /**
@@ -233,6 +238,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function cart()
     {
         return $this->hasMany(Cart::class);
+    }
+
+    /**
+     * Relation avec les articles du panier de l'utilisateur
+     */
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
     }
 
     /**
@@ -549,4 +562,77 @@ class User extends Authenticatable implements MustVerifyEmail
         return CookieConsent::getAcceptedCategories($this->id);
     }
 
+    /**
+     * Vérifier si l'utilisateur a une adresse de livraison par défaut
+     */
+    public function hasDefaultShippingAddress()
+    {
+        return !empty($this->default_shipping_address) && 
+               !empty($this->default_shipping_address['street']) &&
+               !empty($this->default_shipping_address['city']) &&
+               !empty($this->default_shipping_address['postal_code']);
+    }
+
+    /**
+     * Obtenir l'adresse de livraison formatée
+     */
+    public function getFormattedShippingAddress()
+    {
+        if (!$this->hasDefaultShippingAddress()) {
+            return null;
+        }
+
+        $address = $this->default_shipping_address;
+        $formatted = $address['street'] . "\n";
+        
+        if (!empty($address['additional_info'])) {
+            $formatted .= $address['additional_info'] . "\n";
+        }
+        
+        $formatted .= $address['postal_code'] . ' ' . $address['city'];
+        
+        if (!empty($address['country'])) {
+            $formatted .= "\n" . $address['country'];
+        }
+
+        return $formatted;
+    }
+
+    /**
+     * Obtenir l'adresse de livraison sur une ligne
+     */
+    public function getShippingAddressOneLine()
+    {
+        if (!$this->hasDefaultShippingAddress()) {
+            return null;
+        }
+
+        $address = $this->default_shipping_address;
+        $parts = [
+            $address['street'],
+            $address['postal_code'] . ' ' . $address['city']
+        ];
+
+        if (!empty($address['country'])) {
+            $parts[] = $address['country'];
+        }
+
+        return implode(', ', $parts);
+    }
+
+    /**
+     * Mettre à jour l'adresse de livraison par défaut
+     */
+    public function updateDefaultShippingAddress($addressData)
+    {
+        $this->update([
+            'default_shipping_address' => [
+                'street' => $addressData['street'] ?? '',
+                'additional_info' => $addressData['additional_info'] ?? '',
+                'city' => $addressData['city'] ?? '',
+                'postal_code' => $addressData['postal_code'] ?? '',
+                'country' => $addressData['country'] ?? 'France',
+            ]
+        ]);
+    }
 }

@@ -4,14 +4,25 @@
 
 @section('content')
 <div class="container py-5">
+    <!-- Boutons de navigation -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex gap-2">
+                <a href="{{ route('welcome') }}" class="btn btn-outline-success">
+                    <i class="fas fa-home me-2"></i>Accueil
+                </a>
+                <a href="{{ route('products.index') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-shopping-bag me-2"></i>Continuer mes achats
+                </a>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-lg-8">
             <!-- En-tête du panier -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2><i class="fas fa-shopping-cart me-2"></i>Mon Panier</h2>
-                <a href="{{ route('products.index') }}" class="btn btn-outline-primary">
-                    <i class="fas fa-arrow-left me-1"></i>Continuer mes achats
-                </a>
             </div>
 
             @if($cartSummary['has_issues'])
@@ -343,28 +354,24 @@ function updateAllCart() {
 
 // Procéder au checkout
 function proceedToCheckout() {
-    // Valider d'abord le panier
-    fetch('/api/cart/validate', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.cart.has_issues === false) {
-            // Rediriger vers la page de checkout
-            showToast('Redirection vers la commande...', 'success');
-            // window.location.href = '/checkout';
-        } else {
-            showToast('Veuillez corriger les erreurs du panier avant de continuer', 'error');
-            location.reload();
-        }
-    })
-    .catch(error => {
-        console.error('Erreur:', error);
-        showToast('Erreur lors de la validation du panier', 'error');
-    });
+    // Vérifier si l'utilisateur est connecté
+    @guest
+        // Si l'utilisateur n'est pas connecté, rediriger vers la connexion
+        showToast('Veuillez vous connecter pour continuer', 'warning');
+        window.location.href = '/login?redirect=' + encodeURIComponent('/checkout');
+        return;
+    @endguest
+    
+    // Si le panier n'est pas vide, rediriger directement vers le checkout
+    const cartItems = document.querySelectorAll('.cart-item');
+    if (cartItems.length === 0) {
+        showToast('Votre panier est vide', 'error');
+        return;
+    }
+    
+    // Rediriger vers la page de checkout
+    showToast('Redirection vers la commande...', 'success');
+    window.location.href = '/checkout';
 }
 
 // Fonction toast réutilisée

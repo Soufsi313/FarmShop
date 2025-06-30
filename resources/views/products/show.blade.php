@@ -4,6 +4,20 @@
 
 @section('content')
 <div class="container py-5">
+    <!-- Boutons de navigation -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex gap-2 align-items-center">
+                <a href="{{ route('products.index') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Retour aux produits
+                </a>
+                <a href="{{ route('welcome') }}" class="btn btn-outline-success">
+                    <i class="fas fa-home me-2"></i>Accueil
+                </a>
+            </div>
+        </div>
+    </div>
+
     @if(isset($product))
         <div class="row">
             <div class="col-lg-6">
@@ -453,6 +467,25 @@
                 <button type="button" class="btn btn-info" onclick="processRental({{ $product->id }})">
                     <i class="fas fa-calendar-check me-1"></i>Confirmer la location
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation en bas de page -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ route('products.index') }}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Retour aux produits
+                </a>
+                <a href="{{ route('welcome') }}" class="btn btn-outline-success">
+                    <i class="fas fa-home me-2"></i>Accueil
+                </a>
+                @auth
+                    <a href="{{ route('cart.index') }}" class="btn btn-outline-warning">
+                        <i class="fas fa-shopping-cart me-2"></i>Mon Panier
+                    </a>
+                @endauth
             </div>
         </div>
     </div>

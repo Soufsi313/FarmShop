@@ -1,55 +1,55 @@
-<footer class="bg-gray-800 text-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+<footer class="bg-dark text-white">
+    <div class="container py-5">
+        <div class="row">
             <!-- Logo et description -->
-            <div class="col-span-1 md:col-span-2">
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-seedling text-2xl text-green-400 mr-2"></i>
-                    <span class="text-2xl font-bold">FarmShop</span>
+            <div class="col-lg-6 col-md-6 mb-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-seedling fs-2 text-success me-3"></i>
+                    <span class="fs-2 fw-bold">FarmShop</span>
                 </div>
-                <p class="text-gray-300 mb-4 max-w-md">
+                <p class="text-light mb-4" style="max-width: 400px;">
                     Votre marketplace agricole de confiance pour acheter et louer du matériel agricole de qualité. 
                     Rejoignez des milliers d'agriculteurs satisfaits.
                 </p>
-                <div class="flex space-x-4">
-                    <a href="#" class="text-gray-400 hover:text-green-400 transition-colors duration-200">
-                        <i class="fab fa-facebook-f text-xl"></i>
+                <div class="d-flex gap-3">
+                    <a href="#" class="text-secondary text-decoration-none fs-4 hover-success">
+                        <i class="fab fa-facebook-f"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-green-400 transition-colors duration-200">
-                        <i class="fab fa-twitter text-xl"></i>
+                    <a href="#" class="text-secondary text-decoration-none fs-4 hover-success">
+                        <i class="fab fa-twitter"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-green-400 transition-colors duration-200">
-                        <i class="fab fa-instagram text-xl"></i>
+                    <a href="#" class="text-secondary text-decoration-none fs-4 hover-success">
+                        <i class="fab fa-instagram"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-green-400 transition-colors duration-200">
-                        <i class="fab fa-linkedin-in text-xl"></i>
+                    <a href="#" class="text-secondary text-decoration-none fs-4 hover-success">
+                        <i class="fab fa-linkedin-in"></i>
                     </a>
                 </div>
             </div>
 
             <!-- Liens rapides -->
-            <div>
-                <h3 class="text-lg font-semibold mb-4">Liens rapides</h3>
-                <ul class="space-y-2">
-                    <li>
-                        <a href="{{ route('products.index') }}" class="text-gray-300 hover:text-green-400 transition-colors duration-200">
-                            Tous les produits
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h5 class="fw-bold mb-3">Liens rapides</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="{{ route('products.index') }}" class="text-light text-decoration-none hover-success">
+                            <i class="fas fa-shopping-bag me-2"></i>Tous les produits
                         </a>
                     </li>
-                    <li>
-                        <a href="{{ route('products.index', ['type' => 'rental']) }}" class="text-gray-300 hover:text-green-400 transition-colors duration-200">
-                            Locations
+                    <li class="mb-2">
+                        <a href="{{ route('products.index', ['product_type' => 'rental']) }}" class="text-light text-decoration-none hover-success">
+                            <i class="fas fa-calendar-alt me-2"></i>Locations
                         </a>
                     </li>
                     @auth
-                        <li>
-                            <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-200">
-                                Mes commandes
+                        <li class="mb-2">
+                            <a href="#" class="text-light text-decoration-none hover-success">
+                                <i class="fas fa-box me-2"></i>Mes commandes
                             </a>
                         </li>
-                        <li>
-                            <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-200">
-                                Mes locations
+                        <li class="mb-2">
+                            <a href="#" class="text-light text-decoration-none hover-success">
+                                <i class="fas fa-calendar-check me-2"></i>Mes locations
                             </a>
                         </li>
                     @endauth
@@ -57,32 +57,32 @@
             </div>
 
             <!-- Support -->
-            <div>
-                <h3 class="text-lg font-semibold mb-4">Support</h3>
-                <ul class="space-y-2">
-                    <li>
-                        <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-200">
-                            Contact
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h5 class="fw-bold mb-3">Support</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="#" class="text-light text-decoration-none hover-success">
+                            <i class="fas fa-envelope me-2"></i>Contact
                         </a>
                     </li>
-                    <li>
-                        <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-200">
-                            FAQ
+                    <li class="mb-2">
+                        <a href="#" class="text-light text-decoration-none hover-success">
+                            <i class="fas fa-question-circle me-2"></i>FAQ
                         </a>
                     </li>
-                    <li>
-                        <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-200">
-                            Livraison
+                    <li class="mb-2">
+                        <a href="#" class="text-light text-decoration-none hover-success">
+                            <i class="fas fa-truck me-2"></i>Livraison
                         </a>
                     </li>
-                    <li>
-                        <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-200">
-                            Retours
+                    <li class="mb-2">
+                        <a href="#" class="text-light text-decoration-none hover-success">
+                            <i class="fas fa-undo me-2"></i>Retours
                         </a>
                     </li>
-                    <li>
-                        <a href="{{ route('cookies.policy') }}" class="text-gray-300 hover:text-green-400 transition-colors duration-200">
-                            Politique cookies
+                    <li class="mb-2">
+                        <a href="{{ route('cookies.policy') }}" class="text-light text-decoration-none hover-success">
+                            <i class="fas fa-cookie-bite me-2"></i>Politique cookies
                         </a>
                     </li>
                 </ul>
@@ -90,22 +90,25 @@
         </div>
 
         <!-- Ligne de séparation -->
-        <div class="border-t border-gray-700 mt-8 pt-8">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="text-gray-400 text-sm">
+        <hr class="border-secondary my-4">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <small class="text-secondary">
                     © {{ date('Y') }} FarmShop. Tous droits réservés.
-                </div>
-                <div class="flex space-x-6 mt-4 md:mt-0">
-                    <a href="#" class="text-gray-400 hover:text-green-400 text-sm transition-colors duration-200">
+                </small>
+            </div>
+            <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                <div class="d-flex justify-content-center justify-content-md-end gap-3">
+                    <a href="#" class="text-secondary text-decoration-none small hover-success">
                         Mentions légales
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-green-400 text-sm transition-colors duration-200">
+                    <a href="#" class="text-secondary text-decoration-none small hover-success">
                         Politique de confidentialité
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-green-400 text-sm transition-colors duration-200">
+                    <a href="#" class="text-secondary text-decoration-none small hover-success">
                         CGV
                     </a>
-                    <a href="#" onclick="window.reopenCookiePreferences?.()" class="text-gray-400 hover:text-green-400 text-sm transition-colors duration-200">
+                    <a href="#" onclick="window.reopenCookiePreferences?.()" class="text-secondary text-decoration-none small hover-success">
                         <i class="fas fa-cookie-bite me-1"></i>
                         Gérer les cookies
                     </a>
@@ -114,3 +117,10 @@
         </div>
     </div>
 </footer>
+
+<style>
+.hover-success:hover {
+    color: var(--bs-success) !important;
+    transition: color 0.3s ease;
+}
+</style>

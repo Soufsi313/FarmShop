@@ -19,21 +19,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     
     @yield('head')
 </head>
-<body>
-    <!-- Navigation -->
-    @include('components.navigation')
+<body class="font-sans antialiased">
+    <div id="app">
+        <!-- Navigation -->
+        @include('components.navigation')
 
-    <!-- Main Content -->
-    <main>
-        @yield('content')
-    </main>
+        <!-- Main Content -->
+        <main>
+            @yield('content')
+        </main>
 
-    <!-- Footer -->
-    @include('components.footer')
+        <!-- Footer -->
+        @include('components.footer')
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
