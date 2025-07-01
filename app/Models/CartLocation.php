@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Carbon\Carbon;
 
 class CartLocation extends Model
@@ -13,37 +14,24 @@ class CartLocation extends Model
 
     protected $fillable = [
         'user_id',
-        'product_id',
-        'product_name',
-        'product_category', 
-        'product_description',
-        'product_unit',
-        'quantity',
-        'rental_duration_days',
-        'rental_start_date',
-        'rental_end_date',
-        'unit_price_per_day',
-        'total_price',
-        'deposit_amount',
-        'status'
+        'status',
+        'total_amount',
+        'total_deposit',
+        'notes'
     ];
 
     protected $casts = [
-        'rental_start_date' => 'date',
-        'rental_end_date' => 'date',
-        'unit_price_per_day' => 'decimal:2',
-        'total_price' => 'decimal:2',
-        'deposit_amount' => 'decimal:2',
-        'quantity' => 'integer',
-        'rental_duration_days' => 'integer'
+        'total_amount' => 'decimal:2',
+        'total_deposit' => 'decimal:2'
     ];
 
-    // Statuts possibles pour une location
-    const STATUS_PENDING = 'pending';
-    const STATUS_CONFIRMED = 'confirmed';
-    const STATUS_ACTIVE = 'active';
-    const STATUS_RETURNED = 'returned';
-    const STATUS_CANCELLED = 'cancelled';
+    // Statuts possibles pour un panier de location
+    const STATUS_DRAFT = 'draft';           // Panier en cours de constitution
+    const STATUS_PENDING = 'pending';       // Panier validé, en attente de confirmation
+    const STATUS_CONFIRMED = 'confirmed';   // Location confirmée
+    const STATUS_ACTIVE = 'active';         // Location en cours
+    const STATUS_COMPLETED = 'completed';   // Location terminée
+    const STATUS_CANCELLED = 'cancelled';   // Location annulée
 
     /**
      * Relations
@@ -53,45 +41,35 @@ class CartLocation extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function product(): BelongsTo
+    public function items(): HasMany
     {
-        return $this->belongsTo(Product::class);
+        return $this->hasMany(CartItemLocation::class);
     }
 
     /**
-     * Accesseurs et Mutateurs
+     * Accesseurs
      */
-    public function getTotalAmountAttribute(): float
+    public function getTotalItemsAttribute(): int
     {
-        return $this->total_price + $this->deposit_amount;
+        return $this->items()->sum('quantity');
     }
 
-    public function getDailyPriceAttribute(): float
+    public function getGrandTotalAttribute(): float
     {
-        return $this->quantity * $this->unit_price_per_day;
-    }
-
-    public function getRemainingDaysAttribute(): int
-    {
-        if ($this->status !== self::STATUS_ACTIVE) {
-            return 0;
-        }
-        
-        return max(0, Carbon::now()->diffInDays($this->rental_end_date, false));
-    }
-
-    public function getIsOverdueAttribute(): bool
-    {
-        return $this->status === self::STATUS_ACTIVE && 
-               Carbon::now()->isAfter($this->rental_end_date);
+        return $this->total_amount + $this->total_deposit;
     }
 
     /**
      * Scopes
      */
-    public function scopeActive($query)
+    public function scopeForUser($query, $userId)
     {
-        return $query->where('status', self::STATUS_ACTIVE);
+        return $query->where('user_id', $userId);
+    }
+
+    public function scopeDraft($query)
+    {
+        return $query->where('status', self::STATUS_DRAFT);
     }
 
     public function scopePending($query)
@@ -99,22 +77,9 @@ class CartLocation extends Model
         return $query->where('status', self::STATUS_PENDING);
     }
 
-    public function scopeForUser($query, $userId)
+    public function scopeActive($query)
     {
-        return $query->where('user_id', $userId);
-    }
-
-    public function scopeOverdue($query)
-    {
-        return $query->where('status', self::STATUS_ACTIVE)
-                    ->where('rental_end_date', '<', Carbon::now());
-    }
-
-    public function scopeExpiringSoon($query, $days = 3)
-    {
-        $endDate = Carbon::now()->addDays($days);
-        return $query->where('status', self::STATUS_ACTIVE)
-                    ->whereBetween('rental_end_date', [Carbon::now(), $endDate]);
+        return $query->where('status', self::STATUS_ACTIVE);
     }
 
     /**
@@ -122,65 +87,155 @@ class CartLocation extends Model
      */
 
     /**
-     * Recalculer le prix total basé sur la quantité et la durée
+     * Recalculer les totaux basés sur les items
      */
-    public function recalculatePrice(): void
+    public function recalculateTotals(): void
     {
-        $this->total_price = $this->quantity * $this->unit_price_per_day * $this->rental_duration_days;
+        $this->total_amount = $this->items()->sum('total_price');
+        $this->total_deposit = $this->items()->sum('deposit_amount');
         $this->save();
     }
 
     /**
-     * Mettre à jour la quantité et recalculer le prix
+     * Obtenir ou créer le panier de location actif d'un utilisateur
      */
-    public function updateQuantity(int $newQuantity): bool
+    public static function getActiveCartForUser(int $userId): self
     {
-        if ($newQuantity <= 0) {
+        return self::firstOrCreate(
+            ['user_id' => $userId, 'status' => self::STATUS_DRAFT],
+            ['total_amount' => 0, 'total_deposit' => 0]
+        );
+    }
+
+    /**
+     * Ajouter un produit au panier
+     */
+    public function addItem(
+        int $productId, 
+        int $quantity, 
+        int $durationDays, 
+        Carbon $startDate,
+        ?float $depositAmount = null
+    ): ?CartItemLocation {
+        $product = Product::find($productId);
+        
+        if (!$product || !$product->hasStock($quantity)) {
+            return null;
+        }
+
+        $endDate = $startDate->copy()->addDays($durationDays);
+        $unitPricePerDay = $product->rental_price_per_day ?? $product->price * 0.1;
+        $totalPrice = $quantity * $unitPricePerDay * $durationDays;
+        $deposit = $depositAmount ?? ($product->deposit_amount ?? $product->price * 0.2);
+
+        // Vérifier si l'item existe déjà
+        $existingItem = $this->items()->where('product_id', $productId)->first();
+        
+        if ($existingItem) {
+            // Mettre à jour l'item existant
+            $existingItem->update([
+                'quantity' => $existingItem->quantity + $quantity,
+                'rental_duration_days' => $durationDays,
+                'rental_start_date' => $startDate,
+                'rental_end_date' => $endDate,
+                'total_price' => $existingItem->total_price + $totalPrice,
+                'deposit_amount' => $existingItem->deposit_amount + ($quantity * $deposit)
+            ]);
+            $item = $existingItem;
+        } else {
+            // Créer un nouvel item
+            $item = $this->items()->create([
+                'product_id' => $productId,
+                'product_name' => $product->name,
+                'product_category' => $product->category->name ?? 'Non catégorisé',
+                'product_description' => $product->description,
+                'product_unit' => $product->unit,
+                'quantity' => $quantity,
+                'rental_duration_days' => $durationDays,
+                'rental_start_date' => $startDate,
+                'rental_end_date' => $endDate,
+                'unit_price_per_day' => $unitPricePerDay,
+                'total_price' => $totalPrice,
+                'deposit_amount' => $quantity * $deposit,
+                'status' => CartItemLocation::STATUS_PENDING
+            ]);
+        }
+
+        $this->recalculateTotals();
+        return $item;
+    }
+
+    /**
+     * Supprimer un item du panier
+     */
+    public function removeItem(int $itemId): bool
+    {
+        $item = $this->items()->find($itemId);
+        if (!$item) {
             return false;
         }
 
-        // Vérifier la disponibilité du produit pour cette quantité
-        if ($this->product && !$this->product->hasStock($newQuantity)) {
-            return false;
+        $item->delete();
+        $this->recalculateTotals();
+        
+        // Si plus d'items, supprimer le panier
+        if ($this->items()->count() === 0) {
+            $this->delete();
         }
-
-        $this->quantity = $newQuantity;
-        $this->recalculatePrice();
         
         return true;
     }
 
     /**
-     * Mettre à jour la durée de location et recalculer le prix
+     * Vider le panier
      */
-    public function updateDuration(int $newDurationDays, ?Carbon $newStartDate = null): bool
+    public function clear(): bool
     {
-        if ($newDurationDays <= 0) {
-            return false;
-        }
-
-        $startDate = $newStartDate ?? $this->rental_start_date;
-        $endDate = $startDate->copy()->addDays($newDurationDays);
-
-        $this->rental_duration_days = $newDurationDays;
-        $this->rental_start_date = $startDate;
-        $this->rental_end_date = $endDate;
-        $this->recalculatePrice();
-
+        $this->items()->delete();
+        $this->delete();
         return true;
     }
 
     /**
-     * Prolonger la location
+     * Valider le panier
      */
-    public function extendRental(int $additionalDays): bool
+    public function validate(): array
     {
-        if ($additionalDays <= 0) {
+        $issues = [];
+
+        if ($this->items()->count() === 0) {
+            $issues[] = "Le panier de location est vide.";
+            return $issues;
+        }
+
+        foreach ($this->items as $item) {
+            $itemIssues = $item->validate();
+            $issues = array_merge($issues, $itemIssues);
+        }
+
+        return $issues;
+    }
+
+    /**
+     * Confirmer le panier (passer de draft à pending)
+     */
+    public function submit(): bool
+    {
+        if ($this->status !== self::STATUS_DRAFT) {
             return false;
         }
 
-        $newDuration = $this->rental_duration_days + $additionalDays;
-        return $this->updateDuration($newDuration, $this->rental_start_date);
+        $issues = $this->validate();
+        if (!empty($issues)) {
+            return false;
+        }
+
+        $this->status = self::STATUS_PENDING;
+        
+        // Mettre à jour tous les items
+        $this->items()->update(['status' => CartItemLocation::STATUS_PENDING]);
+        
+        return $this->save();
     }
 
     /**
@@ -193,11 +248,13 @@ class CartLocation extends Model
         }
 
         $this->status = self::STATUS_CONFIRMED;
+        $this->items()->update(['status' => CartItemLocation::STATUS_CONFIRMED]);
+        
         return $this->save();
     }
 
     /**
-     * Démarrer la location (marquer comme active)
+     * Démarrer la location
      */
     public function start(): bool
     {
@@ -206,22 +263,23 @@ class CartLocation extends Model
         }
 
         $this->status = self::STATUS_ACTIVE;
-        $this->rental_start_date = Carbon::now();
-        $this->rental_end_date = Carbon::now()->addDays($this->rental_duration_days);
+        $this->items()->update(['status' => CartItemLocation::STATUS_ACTIVE]);
         
         return $this->save();
     }
 
     /**
-     * Retourner la location
+     * Terminer la location
      */
-    public function returnRental(): bool
+    public function complete(): bool
     {
         if ($this->status !== self::STATUS_ACTIVE) {
             return false;
         }
 
-        $this->status = self::STATUS_RETURNED;
+        $this->status = self::STATUS_COMPLETED;
+        $this->items()->update(['status' => CartItemLocation::STATUS_RETURNED]);
+        
         return $this->save();
     }
 
@@ -230,129 +288,13 @@ class CartLocation extends Model
      */
     public function cancel(): bool
     {
-        if (in_array($this->status, [self::STATUS_RETURNED, self::STATUS_CANCELLED])) {
+        if (in_array($this->status, [self::STATUS_COMPLETED, self::STATUS_CANCELLED])) {
             return false;
         }
 
         $this->status = self::STATUS_CANCELLED;
+        $this->items()->update(['status' => CartItemLocation::STATUS_CANCELLED]);
+        
         return $this->save();
-    }
-
-    /**
-     * Méthodes statiques utilitaires
-     */
-
-    /**
-     * Créer une nouvelle location dans le panier
-     */
-    public static function addToCart(
-        int $userId, 
-        int $productId, 
-        int $quantity, 
-        int $durationDays, 
-        Carbon $startDate,
-        ?float $depositAmount = null
-    ): ?self {
-        $product = Product::find($productId);
-        
-        if (!$product || !$product->hasStock($quantity)) {
-            return null;
-        }
-
-        $endDate = $startDate->copy()->addDays($durationDays);
-        $unitPricePerDay = $product->rental_price_per_day ?? $product->price * 0.1; // 10% du prix de vente par défaut
-        $totalPrice = $quantity * $unitPricePerDay * $durationDays;
-        $deposit = $depositAmount ?? ($product->deposit_amount ?? $product->price * 0.2); // 20% du prix comme caution par défaut
-
-        return self::updateOrCreate(
-            ['user_id' => $userId, 'product_id' => $productId],
-            [
-                'product_name' => $product->name,
-                'product_category' => $product->category->name ?? 'Non catégorisé',
-                'product_description' => $product->description,
-                'product_unit' => $product->unit,
-                'quantity' => $quantity,
-                'rental_duration_days' => $durationDays,
-                'rental_start_date' => $startDate,
-                'rental_end_date' => $endDate,
-                'unit_price_per_day' => $unitPricePerDay,
-                'total_price' => $totalPrice,
-                'deposit_amount' => $deposit,
-                'status' => self::STATUS_PENDING
-            ]
-        );
-    }
-
-    /**
-     * Obtenir le panier de location d'un utilisateur
-     */
-    public static function getCartForUser(int $userId)
-    {
-        return self::forUser($userId)
-                  ->pending()
-                  ->with('product')
-                  ->orderBy('created_at', 'desc')
-                  ->get();
-    }
-
-    /**
-     * Calculer le total du panier de location
-     */
-    public static function getCartTotal(int $userId): array
-    {
-        $cartItems = self::getCartForUser($userId);
-        
-        $totalPrice = $cartItems->sum('total_price');
-        $totalDeposit = $cartItems->sum('deposit_amount');
-        $totalAmount = $totalPrice + $totalDeposit;
-        $itemCount = $cartItems->count();
-
-        return [
-            'total_price' => $totalPrice,
-            'total_deposit' => $totalDeposit,
-            'total_amount' => $totalAmount,
-            'item_count' => $itemCount,
-            'items' => $cartItems
-        ];
-    }
-
-    /**
-     * Vider le panier de location d'un utilisateur
-     */
-    public static function clearCartForUser(int $userId): int
-    {
-        return self::forUser($userId)->pending()->delete();
-    }
-
-    /**
-     * Valider le panier de location
-     */
-    public static function validateCart(int $userId): array
-    {
-        $issues = [];
-        $cartItems = self::getCartForUser($userId);
-
-        foreach ($cartItems as $item) {
-            $product = $item->product;
-            
-            if (!$product) {
-                $issues[] = "Le produit '{$item->product_name}' n'est plus disponible.";
-                continue;
-            }
-
-            if (!$product->hasStock($item->quantity)) {
-                $issues[] = "Stock insuffisant pour '{$product->name}'. Stock disponible: {$product->stock_quantity}";
-            }
-
-            if ($item->rental_start_date->isPast()) {
-                $issues[] = "La date de début de location pour '{$product->name}' est dans le passé.";
-            }
-
-            if ($item->rental_duration_days <= 0) {
-                $issues[] = "La durée de location pour '{$product->name}' doit être supérieure à 0.";
-            }
-        }
-
-        return $issues;
     }
 }

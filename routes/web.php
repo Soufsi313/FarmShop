@@ -85,6 +85,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/orders/automation/dry-run', [App\Http\Controllers\Admin\AdminController::class, 'runDryRun'])->name('orders.automation.dry-run');
     Route::get('/orders/automation/stats', [App\Http\Controllers\Admin\AdminController::class, 'automationStats'])->name('orders.automation.stats');
     
+    // Gestion des annulations et retours
+    Route::get('/orders/cancellation', [App\Http\Controllers\Admin\AdminController::class, 'orderCancellationIndex'])->name('orders.cancellation');
+    Route::get('/orders/{order}/cancellation-check', [App\Http\Controllers\Admin\AdminController::class, 'checkCancellationEligibility'])->name('orders.cancellation.check');
+    Route::post('/orders/{order}/cancel', [App\Http\Controllers\Admin\AdminController::class, 'cancelOrder'])->name('orders.cancel');
+    Route::get('/orders/{order}/return-check', [App\Http\Controllers\Admin\AdminController::class, 'checkReturnEligibility'])->name('orders.return.check');
+    Route::post('/orders/{order}/return', [App\Http\Controllers\Admin\AdminController::class, 'createReturn'])->name('orders.return');
+    
     // Gestion des messages admin
     Route::get('/messages', [App\Http\Controllers\AdminMessageController::class, 'index'])->name('messages.index');
     Route::get('/messages/{adminMessage}', [App\Http\Controllers\AdminMessageController::class, 'show'])->name('messages.show');
@@ -141,6 +148,32 @@ Route::middleware(['auth'])->group(function () {
     // Routes messages utilisateur
     Route::get('/mes-messages', [App\Http\Controllers\UserMessageController::class, 'index'])->name('user.messages.index');
     Route::get('/mes-messages/{message}', [App\Http\Controllers\UserMessageController::class, 'show'])->name('user.messages.show');
+});
+
+// Routes pour le panier de location
+Route::middleware(['auth'])->group(function () {
+    // Panier de location global
+    Route::prefix('panier-location')->name('cart-location.')->group(function () {
+        Route::get('/', [App\Http\Controllers\CartLocationController::class, 'index'])->name('index');
+        Route::post('/ajouter', [App\Http\Controllers\CartLocationController::class, 'addSimple'])->name('add-simple');
+        Route::post('/store', [App\Http\Controllers\CartLocationController::class, 'store'])->name('store');
+        Route::delete('/vider', [App\Http\Controllers\CartLocationController::class, 'clear'])->name('clear');
+        Route::post('/valider', [App\Http\Controllers\CartLocationController::class, 'validateCart'])->name('validate');
+        Route::post('/soumettre', [App\Http\Controllers\CartLocationController::class, 'submit'])->name('submit');
+        
+        // API endpoints
+        Route::get('/api/count', [App\Http\Controllers\CartLocationController::class, 'getCartCount'])->name('api.count');
+        Route::get('/api/total', [App\Http\Controllers\CartLocationController::class, 'getCartTotal'])->name('api.total');
+        Route::post('/api/quick-add/{product}', [App\Http\Controllers\CartLocationController::class, 'quickAdd'])->name('api.quick-add');
+    });
+    
+    // Articles individuels du panier de location
+    Route::prefix('article-location')->name('cart-item-location.')->group(function () {
+        Route::get('/{cartItemLocation}', [App\Http\Controllers\CartLocationController::class, 'show'])->name('show');
+        Route::put('/{cartItemLocation}', [App\Http\Controllers\CartLocationController::class, 'update'])->name('update');
+        Route::delete('/{cartItemLocation}', [App\Http\Controllers\CartLocationController::class, 'destroy'])->name('destroy');
+        Route::post('/{cartItemLocation}/prolonger', [App\Http\Controllers\CartLocationController::class, 'extend'])->name('extend');
+    });
 });
 
 

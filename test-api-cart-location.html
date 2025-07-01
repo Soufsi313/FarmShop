@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Test API Panier Location</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 3px; white-space: pre-wrap; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Test API Panier de Location</h1>
+    
+    <div class="test-section">
+        <h3>État d'authentification</h3>
+        <p id="authStatus">Vérification...</p>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test d'ajout au panier de location</h3>
+        <button onclick="testAddToCart()">Tester ajout produit ID 1</button>
+        <div id="testResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test de récupération du panier</h3>
+        <button onclick="testGetCart()">Récupérer panier</button>
+        <div id="cartResult"></div>
+    </div>
+
+    <script>
+        // Vérifier l'authentification
+        fetch('/panier-location/', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => {
+            if (response.status === 401) {
+                document.getElementById('authStatus').innerHTML = '<span style="color: red;">❌ Non authentifié - Veuillez vous connecter</span>';
+            } else if (response.ok) {
+                document.getElementById('authStatus').innerHTML = '<span style="color: green;">✅ Authentifié</span>';
+            } else {
+                document.getElementById('authStatus').innerHTML = '<span style="color: orange;">⚠️ Statut inconnu: ' + response.status + '</span>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('authStatus').innerHTML = '<span style="color: red;">❌ Erreur: ' + error.message + '</span>';
+        });
+
+        function testAddToCart() {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.innerHTML = '<div class="info">Test en cours...</div>';
+            
+            const testData = {
+                product_id: 1,
+                start_date: '2025-07-02',
+                end_date: '2025-07-06'
+            };
+            
+            console.log('Envoi des données:', testData);
+            
+            fetch('/panier-location/ajouter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(testData)
+            })
+            .then(response => {
+                console.log('Réponse:', response.status, response.statusText);
+                const contentType = response.headers.get('Content-Type');
+                console.log('Content-Type:', contentType);
+                
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json().then(data => ({ response, data, isJson: true }));
+                } else {
+                    return response.text().then(text => ({ response, data: text, isJson: false }));
+                }
+            })
+            .then(result => {
+                const { response, data, isJson } = result;
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="success">✅ Succès (${response.status})\n${JSON.stringify(data, null, 2)}</div>`;
+                } else {
+                    const content = isJson ? JSON.stringify(data, null, 2) : data.substring(0, 500) + '...';
+                    resultDiv.innerHTML = `<div class="error">❌ Erreur ${response.status}\nContent-Type: ${response.headers.get('Content-Type')}\n${content}</div>`;
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                resultDiv.innerHTML = `<div class="error">❌ Erreur réseau: ${error.message}</div>`;
+            });
+        }
+        
+        function testGetCart() {
+            const resultDiv = document.getElementById('cartResult');
+            resultDiv.innerHTML = '<div class="info">Récupération du panier...</div>';
+            
+            fetch('/panier-location/', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => {
+                const contentType = response.headers.get('Content-Type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json().then(data => ({ response, data, isJson: true }));
+                } else {
+                    return response.text().then(text => ({ response, data: text, isJson: false }));
+                }
+            })
+            .then(result => {
+                const { response, data, isJson } = result;
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="success">✅ Panier récupéré (${response.status})\n${JSON.stringify(data, null, 2)}</div>`;
+                } else {
+                    const content = isJson ? JSON.stringify(data, null, 2) : data.substring(0, 500) + '...';
+                    resultDiv.innerHTML = `<div class="error">❌ Erreur ${response.status}\n${content}</div>`;
+                }
+            })
+            .catch(error => {
+                resultDiv.innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
+            });
+        }
+    </script>
+</body>
+</html>

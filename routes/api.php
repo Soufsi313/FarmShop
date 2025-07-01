@@ -99,54 +99,67 @@ Route::middleware('auth:web')->group(function () {
         Route::get('/total', [App\Http\Controllers\CartController::class, 'getCartTotal']); // Obtenir le montant total du panier
     });
 
-    // Routes API pour le panier de location (CartLocation) - Utilisateurs connectés uniquement
+    // API pour le panier de location - Utilisateurs connectés uniquement
     Route::prefix('cart-location')->group(function () {
-        Route::get('/', [App\Http\Controllers\CartLocationController::class, 'index']); // Obtenir le contenu du panier de location
-        Route::post('/add', [App\Http\Controllers\CartLocationController::class, 'store']); // Ajouter un produit au panier de location
-        Route::get('/{cart_location}', [App\Http\Controllers\CartLocationController::class, 'show']); // Obtenir un article spécifique
-        Route::put('/update/{cart_location}', [App\Http\Controllers\CartLocationController::class, 'update']); // Modifier un article de location
-        Route::delete('/remove/{cart_location}', [App\Http\Controllers\CartLocationController::class, 'destroy']); // Supprimer un article du panier de location
-        Route::delete('/clear', [App\Http\Controllers\CartLocationController::class, 'clear']); // Vider complètement le panier de location
-        Route::post('/quick-add/{product}', [App\Http\Controllers\CartLocationController::class, 'quickAdd']); // Ajout rapide d'un produit en location
-        Route::post('/sync', [App\Http\Controllers\CartLocationController::class, 'sync']); // Synchroniser le panier de location
-        Route::post('/validate', [App\Http\Controllers\CartLocationController::class, 'validateCart']); // Valider le panier de location
-        Route::get('/count', [App\Http\Controllers\CartLocationController::class, 'getCartCount']); // Obtenir le nombre total d'articles en location
-        Route::get('/total', [App\Http\Controllers\CartLocationController::class, 'getCartTotal']); // Obtenir le montant total du panier de location
-        Route::post('/{cart_location}/extend', [App\Http\Controllers\CartLocationController::class, 'extend']); // Prolonger une location
+        Route::get('/', [App\Http\Controllers\CartLocationController::class, 'index']); // Obtenir le panier de location
+        Route::post('/add', [App\Http\Controllers\CartLocationController::class, 'store']); // Ajouter un produit au panier
+        Route::delete('/clear', [App\Http\Controllers\CartLocationController::class, 'clear']); // Vider le panier
+        Route::post('/validate', [App\Http\Controllers\CartLocationController::class, 'validateCart']); // Valider le panier
+        Route::post('/submit', [App\Http\Controllers\CartLocationController::class, 'submit']); // Soumettre le panier
+        
+        // API utilitaires
+        Route::get('/count', [App\Http\Controllers\CartLocationController::class, 'getCartCount']); // Nombre d'items
+        Route::get('/total', [App\Http\Controllers\CartLocationController::class, 'getCartTotal']); // Totaux
+        Route::post('/quick-add/{product}', [App\Http\Controllers\CartLocationController::class, 'quickAdd']); // Ajout rapide
+        
+        // Gestion des items individuels
+        Route::prefix('items')->group(function () {
+            Route::get('/{cartItemLocation}', [App\Http\Controllers\CartLocationController::class, 'show']); // Détail d'un item
+            Route::put('/{cartItemLocation}', [App\Http\Controllers\CartLocationController::class, 'update']); // Modifier un item
+            Route::delete('/{cartItemLocation}', [App\Http\Controllers\CartLocationController::class, 'destroy']); // Supprimer un item
+            Route::post('/{cartItemLocation}/extend', [App\Http\Controllers\CartLocationController::class, 'extend']); // Prolonger
+        });
     });
 
-    // API pour la wishlist - Utilisateurs connectés uniquement
-    Route::prefix('wishlist')->group(function () {
-        Route::get('/', [App\Http\Controllers\WishlistController::class, 'index']); // Obtenir la wishlist
-        Route::post('/add', [App\Http\Controllers\WishlistController::class, 'store']); // Ajouter un produit à la wishlist
-        Route::delete('/remove/{product}', [App\Http\Controllers\WishlistController::class, 'destroy']); // Retirer un produit de la wishlist
-        Route::delete('/clear', [App\Http\Controllers\WishlistController::class, 'clear']); // Vider la wishlist
-        Route::post('/toggle/{product}', [App\Http\Controllers\WishlistController::class, 'toggle']); // Toggle produit (ajouter/retirer)
-        Route::get('/check/{product}', [App\Http\Controllers\WishlistController::class, 'check']); // Vérifier si produit en wishlist
-        Route::get('/count', [App\Http\Controllers\WishlistController::class, 'getCount']); // Nombre d'articles
-        Route::post('/move-to-cart', [App\Http\Controllers\WishlistController::class, 'moveToCart']); // Transférer vers le panier
-    });
-
-    // API pour les likes de produits - Utilisateurs connectés uniquement
-    Route::prefix('likes')->group(function () {
-        Route::get('/', [App\Http\Controllers\ProductLikeController::class, 'index']); // Obtenir mes likes
-        Route::post('/toggle', [App\Http\Controllers\ProductLikeController::class, 'store']); // Liker/unliker un produit
-        Route::delete('/remove/{product}', [App\Http\Controllers\ProductLikeController::class, 'destroy']); // Retirer un like
-        Route::delete('/clear', [App\Http\Controllers\ProductLikeController::class, 'clearUserLikes']); // Vider tous mes likes
-        Route::get('/check/{product}', [App\Http\Controllers\ProductLikeController::class, 'check']); // Vérifier si produit liké
-        Route::get('/count', [App\Http\Controllers\ProductLikeController::class, 'getUserLikeCount']); // Nombre de mes likes
-    });
-
-    // API pour les commandes - Utilisateurs connectés uniquement
-    Route::prefix('orders')->group(function () {
-        Route::get('/', [App\Http\Controllers\OrderController::class, 'index']); // Obtenir la liste des commandes
-        Route::post('/', [App\Http\Controllers\OrderController::class, 'store']); // Créer une nouvelle commande
-        Route::get('/{order}', [App\Http\Controllers\OrderController::class, 'show']); // Obtenir les détails d'une commande
-        Route::put('/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel']); // Annuler une commande (admin)
-        Route::put('/{order}/user-cancel', [App\Http\Controllers\OrderController::class, 'userCancel']); // Annuler par l'utilisateur
-        Route::get('/{order}/cancellation-eligibility', [App\Http\Controllers\OrderController::class, 'checkCancellationEligibility']); // Vérifier éligibilité annulation
-        Route::get('/{order}/returns', [App\Http\Controllers\OrderController::class, 'returns']); // Obtenir les retours d'une commande
-        Route::post('/{order}/returns', [App\Http\Controllers\OrderController::class, 'createReturn']); // Créer une demande de retour
+    // Compatibilité avec l'ancienne API rentals/book
+    Route::post('rentals/book', function(\Illuminate\Http\Request $request) {
+        // Convertir les paramètres de l'ancienne API vers la nouvelle
+        $productId = $request->product_id;
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+        
+        if (!$productId || !$startDate || !$endDate) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Paramètres manquants: product_id, start_date, end_date requis'
+            ], 400);
+        }
+        
+        // Calculer la durée en jours
+        $start = \Carbon\Carbon::parse($startDate);
+        $end = \Carbon\Carbon::parse($endDate);
+        $durationDays = $start->diffInDays($end);
+        
+        if ($durationDays <= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La durée de location doit être supérieure à 0 jours'
+            ], 400);
+        }
+        
+        // Convertir la requête pour la nouvelle API
+        $newRequest = new \Illuminate\Http\Request();
+        $newRequest->merge([
+            'quantity' => $request->quantity ?? 1,
+            'rental_duration_days' => $durationDays,
+            'rental_start_date' => $startDate
+        ]);
+        $newRequest->setUserResolver($request->getUserResolver());
+        $newRequest->headers = $request->headers;
+        
+        // Appeler la nouvelle API
+        $product = \App\Models\Product::findOrFail($productId);
+        return app(\App\Http\Controllers\CartLocationController::class)->quickAdd($newRequest, $product);
     });
 
     // API pour les locations - Utilisateurs connectés uniquement

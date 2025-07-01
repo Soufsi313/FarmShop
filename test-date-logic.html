@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de la logique des dates de location</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 3px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Test de la logique des dates de location</h1>
+    <p><strong>Date d'aujourd'hui:</strong> <span id="todayDisplay"></span></p>
+    
+    <div class="test-case">
+        <h3>Test 1: Calcul des jours de location</h3>
+        <div id="test1"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>Test 2: Contraintes de date maximum</h3>
+        <div id="test2"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>Test 3: Simulation produit avec 5 jours maximum</h3>
+        <div id="test3"></div>
+    </div>
+
+    <script>
+        const today = new Date();
+        document.getElementById('todayDisplay').textContent = today.toLocaleDateString('fr-FR');
+        
+        // Test 1: Calcul des jours
+        function testDayCalculation() {
+            const results = [];
+            
+            // Test du 02/07 au 02/07 (1 jour)
+            const start1 = new Date('2025-07-02');
+            const end1 = new Date('2025-07-02');
+            const days1 = Math.floor(Math.abs(end1 - start1) / (1000 * 60 * 60 * 24)) + 1;
+            results.push(`Du 02/07 au 02/07: ${days1} jour(s) - ${days1 === 1 ? '✅' : '❌'}`);
+            
+            // Test du 02/07 au 06/07 (5 jours)
+            const start2 = new Date('2025-07-02');
+            const end2 = new Date('2025-07-06');
+            const days2 = Math.floor(Math.abs(end2 - start2) / (1000 * 60 * 60 * 24)) + 1;
+            results.push(`Du 02/07 au 06/07: ${days2} jour(s) - ${days2 === 5 ? '✅' : '❌'}`);
+            
+            // Test du 02/07 au 03/07 (2 jours)
+            const start3 = new Date('2025-07-02');
+            const end3 = new Date('2025-07-03');
+            const days3 = Math.floor(Math.abs(end3 - start3) / (1000 * 60 * 60 * 24)) + 1;
+            results.push(`Du 02/07 au 03/07: ${days3} jour(s) - ${days3 === 2 ? '✅' : '❌'}`);
+            
+            document.getElementById('test1').innerHTML = results.map(r => 
+                `<div class="result ${r.includes('✅') ? 'success' : 'error'}">${r}</div>`
+            ).join('');
+        }
+        
+        // Test 2: Contraintes de date maximum
+        function testMaxDateConstraints() {
+            const results = [];
+            const maxRentalDays = 5;
+            
+            // Si je commence le 02/07 avec max 5 jours
+            const startDate = new Date('2025-07-02');
+            const maxEndDate = new Date(startDate);
+            maxEndDate.setDate(startDate.getDate() + (maxRentalDays - 1));
+            
+            results.push(`Début: 02/07, Max ${maxRentalDays} jours`);
+            results.push(`Date de fin maximum calculée: ${maxEndDate.toLocaleDateString('fr-FR')}`);
+            results.push(`Devrait être 06/07: ${maxEndDate.toLocaleDateString('fr-FR') === '06/07/2025' ? '✅' : '❌'}`);
+            
+            document.getElementById('test2').innerHTML = results.map(r => 
+                `<div class="result ${r.includes('✅') ? 'success' : (r.includes('❌') ? 'error' : 'info')}">${r}</div>`
+            ).join('');
+        }
+        
+        // Test 3: Simulation produit
+        function testProductSimulation() {
+            const results = [];
+            const product = {
+                minRentalDays: 1,
+                maxRentalDays: 5
+            };
+            
+            results.push(`<strong>Produit:</strong> Min ${product.minRentalDays} jour, Max ${product.maxRentalDays} jours`);
+            
+            // Test différentes périodes
+            const testCases = [
+                { start: '2025-07-02', end: '2025-07-02', expected: 1 },
+                { start: '2025-07-02', end: '2025-07-03', expected: 2 },
+                { start: '2025-07-02', end: '2025-07-06', expected: 5 },
+                { start: '2025-07-02', end: '2025-07-07', expected: 6, shouldFail: true }
+            ];
+            
+            testCases.forEach(testCase => {
+                const start = new Date(testCase.start);
+                const end = new Date(testCase.end);
+                const days = Math.floor(Math.abs(end - start) / (1000 * 60 * 60 * 24)) + 1;
+                const isValid = days >= product.minRentalDays && days <= product.maxRentalDays;
+                const shouldPass = !testCase.shouldFail;
+                const testPassed = isValid === shouldPass;
+                
+                results.push(`${start.toLocaleDateString('fr-FR')} → ${end.toLocaleDateString('fr-FR')}: ${days} jours - ${testPassed ? '✅' : '❌'} ${isValid ? 'Valide' : 'Invalide'}`);
+            });
+            
+            document.getElementById('test3').innerHTML = results.map(r => 
+                `<div class="result ${r.includes('✅') ? 'success' : (r.includes('❌') ? 'error' : 'info')}">${r}</div>`
+            ).join('');
+        }
+        
+        // Empêcher la location le jour même
+        function testTodayRestriction() {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            console.log('Aujourd\'hui:', today.toLocaleDateString('fr-FR'));
+            console.log('Demain (date min autorisée):', tomorrow.toLocaleDateString('fr-FR'));
+            
+            // Vérifier que aujourd'hui <= today renvoie true (donc interdit)
+            console.log('today <= today:', today <= today, '(doit être true = interdit)');
+            
+            // Vérifier que demain > today renvoie true (donc autorisé)
+            console.log('tomorrow > today:', tomorrow > today, '(doit être true = autorisé)');
+        }
+        
+        // Exécuter tous les tests
+        testDayCalculation();
+        testMaxDateConstraints();
+        testProductSimulation();
+        testTodayRestriction();
+    </script>
+</body>
+</html>

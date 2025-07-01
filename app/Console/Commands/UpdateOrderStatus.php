@@ -111,11 +111,36 @@ class UpdateOrderStatus extends Command
         $query = Order::where('status', $fromStatus);
         
         if ($timestampField === 'confirmed_at') {
-            $query->where('confirmed_at', '<=', $now->copy()->subSeconds($delayInSeconds));
+            // Utiliser confirmed_at si disponible, sinon updated_at comme fallback
+            $query->where(function($q) use ($now, $delayInSeconds) {
+                $q->where(function($subQ) use ($now, $delayInSeconds) {
+                    $subQ->whereNotNull('confirmed_at')
+                         ->where('confirmed_at', '<=', $now->copy()->subSeconds($delayInSeconds));
+                })->orWhere(function($subQ) use ($now, $delayInSeconds) {
+                    $subQ->whereNull('confirmed_at')
+                         ->where('updated_at', '<=', $now->copy()->subSeconds($delayInSeconds));
+                });
+            });
         } elseif ($timestampField === 'preparation_at') {
-            $query->where('preparation_at', '<=', $now->copy()->subSeconds($delayInSeconds));
+            $query->where(function($q) use ($now, $delayInSeconds) {
+                $q->where(function($subQ) use ($now, $delayInSeconds) {
+                    $subQ->whereNotNull('preparation_at')
+                         ->where('preparation_at', '<=', $now->copy()->subSeconds($delayInSeconds));
+                })->orWhere(function($subQ) use ($now, $delayInSeconds) {
+                    $subQ->whereNull('preparation_at')
+                         ->where('updated_at', '<=', $now->copy()->subSeconds($delayInSeconds));
+                });
+            });
         } elseif ($timestampField === 'shipped_at') {
-            $query->where('shipped_at', '<=', $now->copy()->subSeconds($delayInSeconds));
+            $query->where(function($q) use ($now, $delayInSeconds) {
+                $q->where(function($subQ) use ($now, $delayInSeconds) {
+                    $subQ->whereNotNull('shipped_at')
+                         ->where('shipped_at', '<=', $now->copy()->subSeconds($delayInSeconds));
+                })->orWhere(function($subQ) use ($now, $delayInSeconds) {
+                    $subQ->whereNull('shipped_at')
+                         ->where('updated_at', '<=', $now->copy()->subSeconds($delayInSeconds));
+                });
+            });
         }
         
         $orders = $query->with('user')->get();

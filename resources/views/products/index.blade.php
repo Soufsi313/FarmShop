@@ -160,7 +160,11 @@
                         <div class="col-lg-4 col-md-6 mb-4">
                             <div class="card product-card h-100 shadow-sm border-0" 
                                  data-product-id="{{ $product->id }}" 
-                                 data-stock="{{ $product->quantity }}">
+                                 data-stock="{{ $product->quantity }}"
+                                 data-rental-price="{{ $product->rental_price_per_day ?? 0 }}"
+                                 data-deposit-amount="{{ $product->deposit_amount ?? 0 }}"
+                                 data-min-rental-days="{{ $product->min_rental_days ?? 1 }}"
+                                 data-max-rental-days="{{ $product->max_rental_days ?? 30 }}">
                                 <div class="position-relative">
                                     <!-- Image du produit -->
                                     @if($product->main_image)
@@ -807,24 +811,53 @@ function showRentNowModal(productId) {
     const productCard = document.querySelector(`[data-product-id="${productId}"]`);
     if (!productCard) {
         showToast('Erreur lors du chargement du produit', 'error');
+        console.error('Product card not found for ID:', productId);
         return;
     }
 
     // Extraire les informations du produit depuis le DOM
-    const productName = productCard.querySelector('.card-title').textContent;
+    const productNameElement = productCard.querySelector('.card-title');
+    if (!productNameElement) {
+        showToast('Erreur: nom du produit non trouvé', 'error');
+        console.error('Product name element not found in card:', productCard);
+        return;
+    }
+    const productName = productNameElement.textContent.trim();
+    
+    // Chercher le prix de location (element avec class h5 text-info)
     const productPriceElement = productCard.querySelector('.h5.text-info');
-    const productPrice = productPriceElement ? productPriceElement.textContent : '0€';
-    const productImage = productCard.querySelector('.card-img-top').src;
-    const productStock = parseInt(productCard.querySelector('[data-stock]').dataset.stock);
+    let productPrice = '0€/jour';
+    if (productPriceElement) {
+        productPrice = productPriceElement.textContent.trim();
+    }
+    
+    // Récupérer l'image
+    const productImageElement = productCard.querySelector('.card-img-top');
+    let productImage = '';
+    if (productImageElement) {
+        productImage = productImageElement.src || productImageElement.dataset.src || '';
+    }
+    
+    // Récupérer toutes les données du produit depuis les attributs data-*
+    const productStock = parseInt(productCard.dataset.stock) || 0;
+    const rentalPrice = parseFloat(productCard.dataset.rentalPrice) || 0;
+    const depositAmount = parseFloat(productCard.dataset.depositAmount) || 0;
+    const minRentalDays = parseInt(productCard.dataset.minRentalDays) || 1;
+    const maxRentalDays = parseInt(productCard.dataset.maxRentalDays) || 30;
 
     const product = {
         id: productId,
         name: productName,
         price: productPrice,
         image: productImage,
-        stock: productStock
+        stock: productStock,
+        rentalPricePerDay: rentalPrice,
+        depositAmount: depositAmount,
+        minRentalDays: minRentalDays,
+        maxRentalDays: maxRentalDays
     };
 
+    console.log('Product data extracted for rental:', product);
     displayRentNowModal(product);
 }
 
@@ -833,8 +866,18 @@ function displayRentNowModal(product) {
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const maxDate = new Date(today);
-    maxDate.setDate(maxDate.getDate() + 30); // Max 30 jours
+    
+    // La date minimum est demain (pas de location le jour même)
+    const minDate = tomorrow;
+    
+    // Calculer la date maximum possible selon les contraintes du produit
+    // On peut commencer demain au plus tôt et louer pour la durée maximum
+    const maxDateFromProduct = new Date(tomorrow);
+    maxDateFromProduct.setDate(maxDateFromProduct.getDate() + product.maxRentalDays);
+    
+    // Format des dates pour les inputs HTML
+    const minDateStr = minDate.toISOString().split('T')[0];
+    const maxDateStr = maxDateFromProduct.toISOString().split('T')[0];
 
     const content = `
         <div class="row">
@@ -843,7 +886,16 @@ function displayRentNowModal(product) {
             </div>
             <div class="col-md-8">
                 <h6>${product.name}</h6>
-                <p class="text-info h5">${product.price}/jour</p>
+                <p class="text-info h5">${product.rentalPricePerDay}€/jour</p>
+                
+                <!-- Contraintes de location -->
+                <div class="alert alert-info small mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Contraintes:</strong><br>
+                    • Durée minimum: ${product.minRentalDays} jour${product.minRentalDays > 1 ? 's' : ''}<br>
+                    • Durée maximum: ${product.maxRentalDays} jours<br>
+                    • Location à partir de demain uniquement
+                </div>
                 
                 <div class="row mb-3">
                     <div class="col-md-6">
@@ -851,8 +903,9 @@ function displayRentNowModal(product) {
                         <input type="date" 
                                class="form-control" 
                                id="startDate" 
-                               min="${tomorrow.toISOString().split('T')[0]}" 
-                               max="${maxDate.toISOString().split('T')[0]}"
+                               min="${minDateStr}" 
+                               max="${maxDateStr}"
+                               value="${minDateStr}"
                                onchange="updateRentalPrice()">
                     </div>
                     <div class="col-md-6">
@@ -860,8 +913,8 @@ function displayRentNowModal(product) {
                         <input type="date" 
                                class="form-control" 
                                id="endDate" 
-                               min="${tomorrow.toISOString().split('T')[0]}" 
-                               max="${maxDate.toISOString().split('T')[0]}"
+                               min="${minDateStr}" 
+                               max="${maxDateStr}"
                                onchange="updateRentalPrice()">
                     </div>
                 </div>
@@ -877,16 +930,22 @@ function displayRentNowModal(product) {
                     </div>
                     <div class="d-flex justify-content-between">
                         <span>Caution:</span>
-                        <span id="depositAmount">À définir</span>
+                        <span id="depositAmount">${product.depositAmount}€</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between fw-bold">
                         <span>Total:</span>
-                        <span class="text-info" id="totalRentalPrice">0€</span>
+                        <span class="text-info" id="totalRentalPrice">${product.depositAmount}€</span>
+                    </div>
+                    
+                    <!-- Message d'erreur pour les contraintes -->
+                    <div id="rentalError" class="alert alert-danger mt-2" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span id="rentalErrorMessage"></span>
                     </div>
                 </div>
 
-                <div class="alert alert-info small">
+                <div class="alert alert-success small">
                     <i class="fas fa-info-circle me-2"></i>
                     La caution sera restituée après retour du matériel en bon état.
                 </div>
@@ -896,42 +955,178 @@ function displayRentNowModal(product) {
 
     document.getElementById('rentNowContent').innerHTML = content;
     
-    // Stocker l'ID du produit pour la finalisation
+    // Stocker les données du produit pour les calculs
     document.getElementById('rentNowModal').dataset.productId = product.id;
-    
+    document.getElementById('rentNowModal').dataset.rentalPrice = product.rentalPricePerDay;
+    document.getElementById('rentNowModal').dataset.depositAmount = product.depositAmount;
+    document.getElementById('rentNowModal').dataset.minRentalDays = product.minRentalDays;
+    document.getElementById('rentNowModal').dataset.maxRentalDays = product.maxRentalDays;
+
     const modal = new bootstrap.Modal(document.getElementById('rentNowModal'));
     modal.show();
+    
+    // Configurer les contraintes de dates après l'affichage du modal
+    setupDateConstraints();
 }
 
-// Fonction pour mettre à jour le prix de location
-function updateRentalPrice() {
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
+// Fonction pour configurer les contraintes de dates
+function setupDateConstraints() {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
     
-    if (startDate && endDate) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const diffTime = Math.abs(end - start);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        if (diffDays > 0) {
-            const pricePerDay = parseFloat(document.querySelector('#rentNowContent .text-info.h5').textContent.replace('€/jour', ''));
-            const totalPrice = pricePerDay * diffDays;
-            
-            // Caution réduite : 20% du prix de location ou minimum 25€
-            const deposit = Math.max(totalPrice * 0.2, 25);
-            
-            document.getElementById('rentalDays').textContent = diffDays;
-            document.getElementById('rentalPrice').textContent = totalPrice.toFixed(2) + '€';
-            document.getElementById('depositAmount').textContent = deposit.toFixed(2) + '€';
-            document.getElementById('totalRentalPrice').textContent = (totalPrice + deposit).toFixed(2) + '€';
+    if (!startDateInput || !endDateInput) return;
+    
+    // Event listeners pour les changements de dates
+    startDateInput.addEventListener('change', function() {
+        updateEndDateConstraints();
+        updateRentalPrice();
+    });
+    
+    endDateInput.addEventListener('change', function() {
+        updateRentalPrice();
+    });
+    
+    // Initialiser les contraintes pour la date de fin
+    updateEndDateConstraints();
+}
+
+// Fonction pour mettre à jour les contraintes de la date de fin selon la date de début
+function updateEndDateConstraints() {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const modal = document.getElementById('rentNowModal');
+    
+    if (!startDateInput || !endDateInput || !modal) return;
+    
+    const startDate = startDateInput.value;
+    if (!startDate) return;
+    
+    // Récupérer les contraintes du produit
+    const minRentalDays = parseInt(modal.dataset.minRentalDays) || 1;
+    const maxRentalDays = parseInt(modal.dataset.maxRentalDays) || 30;
+    
+    // Calculer les dates min et max pour la date de fin
+    const start = new Date(startDate);
+    
+    // Date minimum de fin = date de début + (minimum de jours - 1)
+    // Ex: si je commence le 02/07 pour 1 jour minimum, je finis le 02/07 (même jour = 1 jour)
+    // Ex: si je commence le 02/07 pour 5 jours minimum, je finis le 06/07 (02+4 = 5 jours au total)
+    const minEndDate = new Date(start);
+    minEndDate.setDate(start.getDate() + (minRentalDays - 1));
+    
+    // Date maximum de fin = date de début + (maximum de jours - 1)
+    const maxEndDate = new Date(start);
+    maxEndDate.setDate(start.getDate() + (maxRentalDays - 1));
+    
+    // Appliquer les contraintes
+    endDateInput.min = minEndDate.toISOString().split('T')[0];
+    endDateInput.max = maxEndDate.toISOString().split('T')[0];
+    
+    // Si la date de fin actuelle ne respecte pas les contraintes, la corriger
+    const currentEndDate = endDateInput.value;
+    if (currentEndDate) {
+        const endDate = new Date(currentEndDate);
+        if (endDate < minEndDate) {
+            endDateInput.value = minEndDate.toISOString().split('T')[0];
+        } else if (endDate > maxEndDate) {
+            endDateInput.value = maxEndDate.toISOString().split('T')[0];
         }
+    } else {
+        // Si pas de date de fin sélectionnée, proposer le minimum
+        endDateInput.value = minEndDate.toISOString().split('T')[0];
     }
+}
+
+// Fonction pour mettre à jour le prix de location avec validation des contraintes
+function updateRentalPrice() {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const modal = document.getElementById('rentNowModal');
+    const errorDiv = document.getElementById('rentalError');
+    const errorMessageSpan = document.getElementById('rentalErrorMessage');
+    
+    if (!startDateInput || !endDateInput || !modal) return;
+    
+    const startDate = startDateInput.value;
+    const endDate = endDateInput.value;
+    
+    // Réinitialiser l'affichage
+    document.getElementById('rentalDays').textContent = '0';
+    document.getElementById('rentalPrice').textContent = '0€';
+    
+    // Récupérer les données du produit
+    const rentalPricePerDay = parseFloat(modal.dataset.rentalPrice) || 0;
+    const depositAmount = parseFloat(modal.dataset.depositAmount) || 0;
+    const minRentalDays = parseInt(modal.dataset.minRentalDays) || 1;
+    const maxRentalDays = parseInt(modal.dataset.maxRentalDays) || 30;
+    
+    // Mettre à jour l'affichage de la caution (fixe)
+    document.getElementById('depositAmount').textContent = depositAmount.toFixed(2) + '€';
+    
+    if (!startDate || !endDate) {
+        document.getElementById('totalRentalPrice').textContent = depositAmount.toFixed(2) + '€';
+        errorDiv.style.display = 'none';
+        return;
+    }
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time for date comparison
+    
+    // Validation 1: Date de début doit être au minimum demain
+    if (start <= today) {
+        errorMessageSpan.textContent = 'La location ne peut pas commencer aujourd\'hui. Choisissez une date à partir de demain.';
+        errorDiv.style.display = 'block';
+        document.getElementById('totalRentalPrice').textContent = depositAmount.toFixed(2) + '€';
+        return;
+    }
+    
+    // Validation 2: Date de fin doit être >= date de début
+    if (end < start) {
+        errorMessageSpan.textContent = 'La date de fin doit être postérieure ou égale à la date de début.';
+        errorDiv.style.display = 'block';
+        document.getElementById('totalRentalPrice').textContent = depositAmount.toFixed(2) + '€';
+        return;
+    }
+    
+    // Calculer le nombre de jours (incluant le jour de début et de fin)
+    // Ex: du 02/07 au 02/07 = 1 jour, du 02/07 au 06/07 = 5 jours
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 pour inclure le jour de début
+    
+    // Validation 3: Respecter la durée minimum
+    if (diffDays < minRentalDays) {
+        errorMessageSpan.textContent = `La durée minimum de location est de ${minRentalDays} jour${minRentalDays > 1 ? 's' : ''}.`;
+        errorDiv.style.display = 'block';
+        document.getElementById('totalRentalPrice').textContent = depositAmount.toFixed(2) + '€';
+        return;
+    }
+    
+    // Validation 4: Respecter la durée maximum
+    if (diffDays > maxRentalDays) {
+        errorMessageSpan.textContent = `La durée maximum de location est de ${maxRentalDays} jours.`;
+        errorDiv.style.display = 'block';
+        document.getElementById('totalRentalPrice').textContent = depositAmount.toFixed(2) + '€';
+        return;
+    }
+    
+    // Tout est valide, calculer le prix
+    errorDiv.style.display = 'none';
+    
+    const totalRentalPrice = rentalPricePerDay * diffDays;
+    const grandTotal = totalRentalPrice + depositAmount;
+    
+    // Mettre à jour l'affichage
+    document.getElementById('rentalDays').textContent = diffDays;
+    document.getElementById('rentalPrice').textContent = totalRentalPrice.toFixed(2) + '€';
+    document.getElementById('totalRentalPrice').textContent = grandTotal.toFixed(2) + '€';
 }
 
 // Fonction pour traiter la location
 function processRentNow() {
-    const productId = document.getElementById('rentNowModal').dataset.productId;
+    const modal = document.getElementById('rentNowModal');
+    const productId = modal.dataset.productId;
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
 
@@ -940,8 +1135,53 @@ function processRentNow() {
         return;
     }
 
-    // TODO: Implémenter la logique de réservation
-    fetch(`/api/rentals/book`, {
+    // Récupérer les contraintes du produit
+    const minRentalDays = parseInt(modal.dataset.minRentalDays) || 1;
+    const maxRentalDays = parseInt(modal.dataset.maxRentalDays) || 30;
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Validation complète avant envoi
+    
+    // 1. Date de début doit être au minimum demain
+    if (start <= today) {
+        showToast('La location ne peut pas commencer aujourd\'hui. Choisissez une date à partir de demain.', 'error');
+        return;
+    }
+    
+    // 2. Date de fin >= date de début
+    if (end < start) {
+        showToast('La date de fin doit être postérieure ou égale à la date de début', 'error');
+        return;
+    }
+    
+    // 3. Calculer le nombre de jours et vérifier les contraintes
+    // Ex: du 02/07 au 02/07 = 1 jour, du 02/07 au 06/07 = 5 jours
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 pour inclure le jour de début
+    
+    if (diffDays < minRentalDays) {
+        showToast(`La durée minimum de location est de ${minRentalDays} jour${minRentalDays > 1 ? 's' : ''}.`, 'error');
+        return;
+    }
+    
+    if (diffDays > maxRentalDays) {
+        showToast(`La durée maximum de location est de ${maxRentalDays} jours.`, 'error');
+        return;
+    }
+
+    // Vérifier qu'il n'y a pas d'erreur affichée
+    const errorDiv = document.getElementById('rentalError');
+    if (errorDiv && errorDiv.style.display !== 'none') {
+        showToast('Veuillez corriger les erreurs avant de continuer', 'error');
+        return;
+    }
+
+    // Tout est valide, envoyer la demande
+    fetch(`/panier-location/ajouter`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -954,18 +1194,33 @@ function processRentNow() {
         })
     })
     .then(response => {
-        if (response.ok) {
-            showToast('Réservation effectuée avec succès !', 'success');
+        console.log('Réponse ajout panier location:', response.status, response.statusText);
+        if (!response.ok) {
+            return response.text().then(text => {
+                console.error('Erreur contenu:', text);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Données reçues:', data);
+        if (data.success) {
+            const daysText = diffDays === 1 ? 'jour' : 'jours';
+            showToast(`Produit ajouté au panier de location pour ${diffDays} ${daysText} !`, 'success');
             bootstrap.Modal.getInstance(document.getElementById('rentNowModal')).hide();
+            
+            // Mettre à jour le compteur du panier de location
+            if (window.updateRentalCartCount) {
+                window.updateRentalCartCount();
+            }
         } else {
-            showToast('Erreur lors de la réservation', 'error');
+            showToast(data.message || 'Erreur lors de l\'ajout au panier de location', 'error');
         }
     })
     .catch(error => {
-        // En attendant l'implémentation complète
-        const days = document.getElementById('rentalDays').textContent;
-        showToast(`Réservation simulée: ${days} jours (du ${startDate} au ${endDate})`, 'success');
-        bootstrap.Modal.getInstance(document.getElementById('rentNowModal')).hide();
+        console.error('Erreur lors de l\'ajout au panier de location:', error);
+        showToast('Erreur lors de l\'ajout au panier de location: ' + error.message, 'error');
     });
 }
 

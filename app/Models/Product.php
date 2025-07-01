@@ -577,6 +577,14 @@ class Product extends Model
     }
 
     /**
+     * Vérifier si le produit a suffisamment de stock
+     */
+    public function hasStock(int $quantity = 1): bool
+    {
+        return $this->stock_quantity >= $quantity;
+    }
+
+    /**
      * Obtenir les conditions de retour formatées
      */
     public function getReturnConditionsAttribute($value): ?string

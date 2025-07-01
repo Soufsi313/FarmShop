@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="test-token">
+    <title>Test Cart Location Frontend</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container py-5">
+        <h1 class="mb-4">Test du système de panier de location</h1>
+        
+        <!-- Simuler une carte de produit -->
+        <div class="card product-card" data-product-id="1" data-stock="5" style="max-width: 400px;">
+            <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Test Product">
+            <div class="card-body">
+                <h5 class="card-title">Tracteur Test</h5>
+                <div class="h5 text-info mb-0 fw-bold">50€<small class="fs-6">/jour</small></div>
+                <button class="btn btn-info mt-3" onclick="rentNow(1)">
+                    <i class="fas fa-calendar-check me-1"></i>Louer ce produit
+                </button>
+            </div>
+        </div>
+        
+        <!-- Test des compteurs -->
+        <div class="mt-4">
+            <h3>Tests des compteurs</h3>
+            <div class="d-flex gap-3">
+                <button class="btn btn-success" onclick="updateCartCount()">
+                    <i class="fas fa-shopping-cart me-1"></i>Test compteur achat
+                    <span class="badge bg-light text-dark" id="cart-count">0</span>
+                </button>
+                <button class="btn btn-info" onclick="updateRentalCartCount()">
+                    <i class="fas fa-calendar-alt me-1"></i>Test compteur location
+                    <span class="badge bg-light text-dark" id="rental-cart-count">0</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Test de l'API -->
+        <div class="mt-4">
+            <h3>Test API directe</h3>
+            <button class="btn btn-primary" onclick="testAddToRentalCart()">
+                Test ajout panier location
+            </button>
+            <button class="btn btn-outline-primary" onclick="testGetRentalCartCount()">
+                Test récupération compteur
+            </button>
+        </div>
+        
+        <!-- Zone de logs -->
+        <div class="mt-4">
+            <h3>Logs</h3>
+            <div id="logs" class="border p-3 bg-light" style="height: 200px; overflow-y: scroll;"></div>
+        </div>
+    </div>
+
+    <!-- Modal de location (simplifié) -->
+    <div class="modal fade" id="rentNowModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Location rapide</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="rentNowContent">
+                        <!-- Le contenu sera généré par JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-info" onclick="processRentNow()">Confirmer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Fonction de logging
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = type === 'error' ? 'text-danger' : type === 'success' ? 'text-success' : 'text-info';
+            logsDiv.innerHTML += `<div class="${colorClass}">[${timestamp}] ${message}</div>`;
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        // Fonction pour tester l'ajout au panier de location
+        function testAddToRentalCart() {
+            log('Test ajout panier location...');
+            fetch('/panier-location/ajouter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': 'test-token'
+                },
+                body: JSON.stringify({
+                    product_id: 1,
+                    start_date: '2025-07-02',
+                    end_date: '2025-07-04'
+                })
+            })
+            .then(response => {
+                log(`Réponse: ${response.status} ${response.statusText}`);
+                return response.text();
+            })
+            .then(text => {
+                log(`Contenu: ${text}`);
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        log('✅ Ajout réussi!', 'success');
+                    } else {
+                        log(`❌ Erreur: ${data.message}`, 'error');
+                    }
+                } catch (e) {
+                    log(`❌ Réponse non-JSON: ${text}`, 'error');
+                }
+            })
+            .catch(error => {
+                log(`❌ Erreur réseau: ${error.message}`, 'error');
+            });
+        }
+
+        // Fonction pour tester le compteur
+        function testGetRentalCartCount() {
+            log('Test récupération compteur...');
+            fetch('/panier-location/api/count', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': 'test-token'
+                }
+            })
+            .then(response => {
+                log(`Réponse: ${response.status} ${response.statusText}`);
+                return response.text();
+            })
+            .then(text => {
+                log(`Contenu: ${text}`);
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        log(`✅ Compteur: ${data.count}`, 'success');
+                        document.getElementById('rental-cart-count').textContent = data.count;
+                    } else {
+                        log(`❌ Erreur: ${data.message}`, 'error');
+                    }
+                } catch (e) {
+                    log(`❌ Réponse non-JSON: ${text}`, 'error');
+                }
+            })
+            .catch(error => {
+                log(`❌ Erreur réseau: ${error.message}`, 'error');
+            });
+        }
+
+        // Fonctions de mise à jour des compteurs (copiées de navigation.blade.php)
+        function updateCartCount() {
+            log('Mise à jour compteur panier achat...');
+            fetch('/api/cart/count', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': 'test-token'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const cartCountElement = document.getElementById('cart-count');
+                if (cartCountElement && data.success && data.count !== undefined) {
+                    cartCountElement.textContent = data.count;
+                    log(`✅ Compteur achat: ${data.count}`, 'success');
+                }
+            })
+            .catch(error => {
+                log(`❌ Erreur compteur achat: ${error.message}`, 'error');
+            });
+        }
+
+        function updateRentalCartCount() {
+            log('Mise à jour compteur panier location...');
+            fetch('/panier-location/api/count', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': 'test-token'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const rentalCartCountElement = document.getElementById('rental-cart-count');
+                if (rentalCartCountElement && data.success && data.count !== undefined) {
+                    rentalCartCountElement.textContent = data.count;
+                    log(`✅ Compteur location: ${data.count}`, 'success');
+                }
+            })
+            .catch(error => {
+                log(`❌ Erreur compteur location: ${error.message}`, 'error');
+            });
+        }
+
+        // Fonctions simplifiées pour le test de location
+        function rentNow(productId) {
+            log(`Tentative de location du produit ${productId}...`);
+            showRentNowModal(productId);
+        }
+
+        function showRentNowModal(productId) {
+            const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+            if (!productCard) {
+                log('❌ Carte produit non trouvée', 'error');
+                return;
+            }
+
+            const productName = productCard.querySelector('.card-title').textContent.trim();
+            const productPriceElement = productCard.querySelector('.h5.text-info');
+            const productPrice = productPriceElement ? productPriceElement.textContent.trim() : '0€/jour';
+            const productImage = productCard.querySelector('.card-img-top').src;
+            const productStock = parseInt(productCard.dataset.stock) || 0;
+
+            log(`✅ Données produit extraites: ${productName}, ${productPrice}`, 'success');
+
+            const product = {
+                id: productId,
+                name: productName,
+                price: productPrice,
+                image: productImage,
+                stock: productStock
+            };
+
+            displayRentNowModal(product);
+        }
+
+        function displayRentNowModal(product) {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const todayStr = today.toISOString().split('T')[0];
+            const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+            const content = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="${product.image}" class="img-fluid rounded" alt="${product.name}">
+                    </div>
+                    <div class="col-md-8">
+                        <h6>${product.name}</h6>
+                        <p class="text-info h5">${product.price}</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startDate" class="form-label">Date de début</label>
+                                <input type="date" class="form-control" id="startDate" value="${todayStr}" min="${todayStr}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endDate" class="form-label">Date de fin</label>
+                                <input type="date" class="form-control" id="endDate" value="${tomorrowStr}" min="${todayStr}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('rentNowContent').innerHTML = content;
+            document.getElementById('rentNowModal').dataset.productId = product.id;
+
+            const modal = new bootstrap.Modal(document.getElementById('rentNowModal'));
+            modal.show();
+            log('✅ Modal de location affiché', 'success');
+        }
+
+        function processRentNow() {
+            const productId = document.getElementById('rentNowModal').dataset.productId;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                log('❌ Dates manquantes', 'error');
+                return;
+            }
+
+            log(`Ajout au panier: produit ${productId}, du ${startDate} au ${endDate}`);
+
+            fetch('/panier-location/ajouter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': 'test-token'
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    start_date: startDate,
+                    end_date: endDate
+                })
+            })
+            .then(response => {
+                log(`Réponse: ${response.status} ${response.statusText}`);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP ${response.status}: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    log('✅ Produit ajouté au panier de location!', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('rentNowModal')).hide();
+                    updateRentalCartCount();
+                } else {
+                    log(`❌ Erreur: ${data.message}`, 'error');
+                }
+            })
+            .catch(error => {
+                log(`❌ Erreur: ${error.message}`, 'error');
+            });
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            log('✅ Page de test chargée', 'success');
+            log('Vous pouvez maintenant tester les fonctionnalités');
+        });
+    </script>
+</body>
+</html>

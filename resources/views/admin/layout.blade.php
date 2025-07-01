@@ -155,6 +155,10 @@
                     <i class="fas fa-robot me-2"></i>Automatisation
                 </a>
                 
+                <a class="nav-link {{ request()->routeIs('admin.orders.cancellation*') ? 'active' : '' }}" href="{{ route('admin.orders.cancellation') }}">
+                    <i class="fas fa-ban me-2"></i>Annulations & Retours
+                </a>
+                
                 <a class="nav-link {{ request()->routeIs('admin.messages*') ? 'active' : '' }}" href="{{ route('admin.messages.index') }}">
                     <i class="fas fa-envelope me-2"></i>Messages
                     @php

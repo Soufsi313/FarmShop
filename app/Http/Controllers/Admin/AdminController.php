@@ -326,7 +326,10 @@ class AdminController extends Controller
         // Calculer les prochaines transitions
         $nextTransitions = $this->getNextTransitions();
 
-        return view('admin.orders.automation', compact('stats', 'nextTransitions'));
+        // Passer les traductions de statuts à la vue
+        $statusTranslations = $this->getStatusTranslations();
+
+        return view('admin.orders.automation', compact('stats', 'nextTransitions', 'statusTranslations'));
     }
 
     public function runAutomation(Request $request)
@@ -439,5 +442,319 @@ class AdminController extends Controller
         }
 
         return collect($transitions)->sortBy('time_remaining')->take(10)->values()->all();
+    }
+
+    // GESTION DES ANNULATIONS ET RETOURS
+    
+    /**
+     * Traduire les statuts en français
+     */
+    private function translateStatus($status)
+    {
+        $translations = $this->getStatusTranslations();
+        return $translations[$status] ?? ucfirst($status);
+    }
+    
+    /**
+     * Obtenir les traductions de statuts
+     */
+    private function getStatusTranslations()
+    {
+        return [
+            'pending' => 'En attente',
+            'confirmed' => 'Confirmée',
+            'preparation' => 'En préparation',
+            'shipped' => 'Expédiée',
+            'delivered' => 'Livrée',
+            'cancelled' => 'Annulée',
+            'returned' => 'Retournée'
+        ];
+    }
+    
+    /**
+     * Interface de recherche et gestion des commandes pour annulation/retour
+     */
+    public function orderCancellationIndex(Request $request)
+    {
+        $query = Order::with(['user', 'items.product'])
+            ->whereIn('status', [
+                Order::STATUS_CONFIRMED, 
+                Order::STATUS_PREPARATION, 
+                Order::STATUS_SHIPPED, 
+                Order::STATUS_DELIVERED,
+                Order::STATUS_CANCELLED,
+                Order::STATUS_RETURNED
+            ]);
+
+        // Recherche par numéro de commande ou email client
+        if ($request->search) {
+            $query->where(function($q) use ($request) {
+                $q->where('order_number', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('user', function($userQuery) use ($request) {
+                      $userQuery->where('email', 'like', '%' . $request->search . '%')
+                               ->orWhere('name', 'like', '%' . $request->search . '%');
+                  });
+            });
+        }
+
+        // Filtre par statut
+        if ($request->status && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        // Filtre par date
+        if ($request->date_from) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->date_to) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $orders = $query->latest()->paginate(20);
+        
+        // Passer les traductions de statuts à la vue
+        $statusTranslations = $this->getStatusTranslations();
+        
+        return view('admin.orders.cancellation', compact('orders', 'statusTranslations'));
+    }
+
+    /**
+     * Vérifier si une commande peut être annulée
+     */
+    public function checkCancellationEligibility(Order $order)
+    {
+        $canCancel = in_array($order->status, [
+            Order::STATUS_CONFIRMED, 
+            Order::STATUS_PREPARATION
+        ]);
+
+        $reason = $canCancel ? null : 'La commande a déjà été expédiée et ne peut plus être annulée.';
+
+        return response()->json([
+            'can_cancel' => $canCancel,
+            'reason' => $reason,
+            'current_status' => $order->status
+        ]);
+    }
+
+    /**
+     * Annuler une commande
+     */
+    public function cancelOrder(Request $request, Order $order)
+    {
+        $request->validate([
+            'cancellation_reason' => 'required|string|max:500',
+            'refund_method' => 'required|in:original,store_credit',
+            'admin_notes' => 'nullable|string|max:1000'
+        ]);
+
+        // Vérifier que la commande peut être annulée
+        if (!in_array($order->status, [Order::STATUS_CONFIRMED, Order::STATUS_PREPARATION])) {
+            return back()->with('error', 'Cette commande ne peut plus être annulée car elle a déjà été expédiée.');
+        }
+
+        DB::transaction(function() use ($request, $order) {
+            // Mettre à jour la commande
+            $order->update([
+                'status' => Order::STATUS_CANCELLED,
+                'cancelled_at' => now(),
+                'cancellation_reason' => $request->cancellation_reason,
+                'payment_status' => Order::PAYMENT_REFUNDED,
+            ]);
+
+            // Remettre en stock les produits
+            foreach ($order->items as $item) {
+                $item->product->increment('quantity', $item->quantity);
+            }
+
+            // Log de l'action admin
+            \Illuminate\Support\Facades\Log::info('Commande annulée par admin', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'admin_user_id' => auth()->id(),
+                'admin_user_name' => auth()->user()->name,
+                'reason' => $request->cancellation_reason,
+                'refund_method' => $request->refund_method,
+                'admin_notes' => $request->admin_notes,
+                'cancelled_at' => now()
+            ]);
+
+            // Envoyer notification au client
+            $order->user->notify(new \App\Notifications\OrderCancelled($order, $request->cancellation_reason));
+        });
+
+        return redirect()->route('admin.orders.cancellation')
+            ->with('success', "Commande #{$order->order_number} annulée avec succès.");
+    }
+
+    /**
+     * Vérifier l'éligibilité au retour d'une commande
+     */
+    public function checkReturnEligibility(Order $order)
+    {
+        if ($order->status !== Order::STATUS_DELIVERED) {
+            return response()->json([
+                'can_return' => false,
+                'reason' => 'La commande doit être livrée pour pouvoir être retournée.',
+                'returnable_items' => []
+            ]);
+        }
+
+        // Vérifier le délai de 14 jours
+        $returnDeadline = $order->return_deadline ?? Carbon::parse($order->delivered_at)->addDays(14);
+        $isWithinDeadline = now()->lte($returnDeadline);
+
+        if (!$isWithinDeadline) {
+            return response()->json([
+                'can_return' => false,
+                'reason' => 'Le délai de retour de 14 jours est dépassé.',
+                'deadline' => $returnDeadline->format('d/m/Y'),
+                'returnable_items' => []
+            ]);
+        }
+
+        // Identifier les produits retournables (non périssables)
+        $returnableItems = [];
+        $nonReturnableItems = [];
+
+        foreach ($order->items as $item) {
+            // Vérifier si le produit est périssable (en utilisant le produit ou les données de l'item)
+            $isPerishable = $item->product ? $item->product->isPerishable() : $item->is_perishable;
+            
+            if (!$isPerishable) {
+                $returnableItems[] = [
+                    'id' => $item->id,
+                    'product_name' => $item->product_name,
+                    'quantity' => $item->quantity,
+                    'price' => $item->unit_price,
+                    'total' => $item->total_price
+                ];
+            } else {
+                $nonReturnableItems[] = [
+                    'product_name' => $item->product_name,
+                    'reason' => 'Produit périssable'
+                ];
+            }
+        }
+
+        return response()->json([
+            'can_return' => count($returnableItems) > 0,
+            'reason' => count($returnableItems) === 0 ? 'Aucun produit de cette commande n\'est retournable (produits périssables).' : null,
+            'deadline' => $returnDeadline->format('d/m/Y'),
+            'returnable_items' => $returnableItems,
+            'non_returnable_items' => $nonReturnableItems,
+            'total_returnable_amount' => collect($returnableItems)->sum('total')
+        ]);
+    }
+
+    /**
+     * Créer un retour pour une commande
+     */
+    public function createReturn(Request $request, Order $order)
+    {
+        $request->validate([
+            'return_items' => 'required|array|min:1',
+            'return_items.*.item_id' => 'required|exists:order_items,id',
+            'return_items.*.quantity' => 'required|integer|min:1',
+            'return_reason' => 'required|string|max:500',
+            'admin_notes' => 'nullable|string|max:1000'
+        ]);
+
+        // Vérifier l'éligibilité
+        $eligibility = $this->checkReturnEligibility($order);
+        $eligibilityData = $eligibility->getData(true);
+        
+        if (!$eligibilityData['can_return']) {
+            return back()->with('error', $eligibilityData['reason']);
+        }
+
+        try {
+            $returnNumber = '';
+            $totalRefundAmount = 0;
+            
+            DB::transaction(function() use ($request, $order, &$returnNumber, &$totalRefundAmount) {
+                // Générer un numéro de retour unique avec timestamp précis et random
+                $maxAttempts = 10;
+                $attempt = 0;
+                do {
+                    $attempt++;
+                    $microtime = str_replace('.', '', microtime(true)); // Timestamp avec microsecondes
+                    $random = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT); // 4 chiffres random
+                    $returnNumber = 'RET' . substr($microtime, 0, 14) . $random;
+                } while (\App\Models\OrderReturn::where('return_number', $returnNumber)->exists() && $attempt < $maxAttempts);
+                
+                if ($attempt >= $maxAttempts) {
+                    throw new \Exception('Impossible de générer un numéro de retour unique après ' . $maxAttempts . ' tentatives.');
+                }
+
+                foreach ($request->return_items as $returnItemData) {
+                    $orderItem = $order->items()->find($returnItemData['item_id']);
+                    
+                    // Vérifier que le produit n'est pas périssable
+                    $isPerishable = $orderItem->product ? $orderItem->product->isPerishable() : $orderItem->is_perishable;
+                    if ($isPerishable) {
+                        continue;
+                    }
+
+                    // Vérifier la quantité
+                    $returnQuantity = min($returnItemData['quantity'], $orderItem->quantity);
+                    $refundAmount = $returnQuantity * $orderItem->unit_price;
+                    $totalRefundAmount += $refundAmount;
+
+                    // Créer l'enregistrement de retour
+                    \App\Models\OrderReturn::create([
+                        'order_id' => $order->id,
+                        'order_item_id' => $orderItem->id,
+                        'user_id' => $order->user_id,
+                        'return_number' => $returnNumber,
+                        'quantity_returned' => $returnQuantity,
+                        'refund_amount' => $refundAmount,
+                        'return_reason' => $request->return_reason,
+                        'admin_notes' => $request->admin_notes,
+                        'status' => 'approved', // Auto-approuvé par admin
+                        'refund_status' => 'pending',
+                        'requested_at' => now(),
+                        'approved_at' => now(),
+                        'is_within_return_period' => true,
+                        'return_deadline' => $order->return_deadline ?? Carbon::parse($order->delivered_at)->addDays(14),
+                    ]);
+
+                    // Remettre en stock
+                    $orderItem->product->increment('quantity', $returnQuantity);
+                }
+
+                // Changer le statut de la commande à "retournée"
+                $order->update(['status' => \App\Models\Order::STATUS_RETURNED]);
+
+                // Log de l'action
+                \Illuminate\Support\Facades\Log::info('Retour créé par admin', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'return_number' => $returnNumber,
+                    'admin_user_id' => auth()->id(),
+                    'admin_user_name' => auth()->user()->name,
+                    'reason' => $request->return_reason,
+                    'admin_notes' => $request->admin_notes,
+                    'refund_amount' => $totalRefundAmount,
+                    'created_at' => now()
+                ]);
+
+                // Envoyer notification au client
+                $order->user->notify(new \App\Notifications\OrderReturnApproved($order, $returnNumber, $totalRefundAmount));
+            });
+
+            return redirect()->route('admin.orders.cancellation')
+                ->with('success', "Retour créé avec succès pour la commande #{$order->order_number}.");
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Si c'est une erreur de contrainte d'unicité, on essaie de nouveau
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'return_number_unique') !== false) {
+                return back()->with('error', 'Une erreur temporaire s\'est produite. Veuillez réessayer dans quelques secondes.');
+            }
+            // Pour les autres erreurs, on les relance
+            throw $e;
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de la création du retour : ' . $e->getMessage());
+        }
     }
 }

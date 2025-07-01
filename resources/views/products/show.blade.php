@@ -513,18 +513,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const endDateInput = document.querySelector('#rentalModal{{ $product->id }} input[name="end_date"]');
     
     if (startDateInput && endDateInput) {
-        // Date minimum = aujourd'hui
-        const today = new Date().toISOString().split('T')[0];
-        startDateInput.min = today;
-        endDateInput.min = today;
+        // Date minimum = demain (pas de location le jour même)
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+        
+        startDateInput.min = tomorrowStr;
+        endDateInput.min = tomorrowStr;
         
         function calculateRental() {
             const startDate = new Date(startDateInput.value);
             const endDate = new Date(endDateInput.value);
             
             if (startDate && endDate && endDate >= startDate) {
+                // Calculer le nombre de jours (incluant le jour de début et de fin)
                 const diffTime = Math.abs(endDate - startDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 pour inclure le jour de début
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 pour inclure le jour de début
                 
                 const pricePerDay = {{ $product->rental_price_per_day }};
                 const deposit = {{ $product->deposit_amount ?? 0 }};
@@ -553,7 +558,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         startDateInput.addEventListener('change', function() {
-            endDateInput.min = this.value;
+            // Mettre à jour la date minimum de fin selon la date de début
+            const minDays = {{ $product->min_rental_days ?? 1 }};
+            const maxDays = {{ $product->max_rental_days ?? 365 }};
+            
+            if (this.value) {
+                const start = new Date(this.value);
+                
+                // Date minimum de fin = date de début + (minimum de jours - 1)
+                const minEndDate = new Date(start);
+                minEndDate.setDate(start.getDate() + (minDays - 1));
+                
+                // Date maximum de fin = date de début + (maximum de jours - 1)
+                const maxEndDate = new Date(start);
+                maxEndDate.setDate(start.getDate() + (maxDays - 1));
+                
+                endDateInput.min = minEndDate.toISOString().split('T')[0];
+                endDateInput.max = maxEndDate.toISOString().split('T')[0];
+                
+                // Si la date de fin actuelle ne respecte pas les contraintes, la corriger
+                const currentEndDate = endDateInput.value;
+                if (currentEndDate) {
+                    const endDate = new Date(currentEndDate);
+                    if (endDate < minEndDate) {
+                        endDateInput.value = minEndDate.toISOString().split('T')[0];
+                    } else if (endDate > maxEndDate) {
+                        endDateInput.value = maxEndDate.toISOString().split('T')[0];
+                    }
+                } else {
+                    // Si pas de date de fin sélectionnée, proposer le minimum
+                    endDateInput.value = minEndDate.toISOString().split('T')[0];
+                }
+            }
+            
             calculateRental();
         });
         
@@ -577,14 +614,39 @@ function processRental(productId) {
     
     const start = new Date(startDate);
     const end = new Date(endDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
+    // Validation 1: Date de début doit être au minimum demain
+    if (start <= today) {
+        showToast('La location ne peut pas commencer aujourd\'hui. Choisissez une date à partir de demain.', 'error');
+        return;
+    }
+    
+    // Validation 2: Date de fin >= date de début
     if (end < start) {
         showToast('La date de fin doit être postérieure à la date de début', 'error');
         return;
     }
     
-    // Simulation de la réservation
-    fetch(`/api/rentals/book`, {
+    // Vérification des contraintes de durée
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 pour inclure le jour de début
+    const minDays = {{ $product->min_rental_days ?? 1 }};
+    const maxDays = {{ $product->max_rental_days ?? 365 }};
+    
+    if (diffDays < minDays) {
+        showToast(`Durée minimum de location : ${minDays} jour${minDays > 1 ? 's' : ''}`, 'error');
+        return;
+    }
+    
+    if (diffDays > maxDays) {
+        showToast(`Durée maximum de location : ${maxDays} jours`, 'error');
+        return;
+    }
+    
+    // Ajout au panier de location via la nouvelle API
+    fetch(`/panier-location/ajouter`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -597,17 +659,32 @@ function processRental(productId) {
         })
     })
     .then(response => {
-        if (response.ok) {
-            showToast('Location réservée avec succès !', 'success');
+        console.log('Réponse ajout panier location:', response.status, response.statusText);
+        if (!response.ok) {
+            return response.text().then(text => {
+                console.error('Erreur contenu:', text);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Données reçues:', data);
+        if (data.success) {
+            showToast('Produit ajouté au panier de location !', 'success');
             document.querySelector(`#rentalModal${productId} .btn-close`).click();
+            
+            // Mettre à jour le compteur du panier de location
+            if (window.updateRentalCartCount) {
+                window.updateRentalCartCount();
+            }
         } else {
-            showToast('Erreur lors de la réservation', 'error');
+            showToast(data.message || 'Erreur lors de l\'ajout au panier de location', 'error');
         }
     })
     .catch(error => {
-        // En attendant l'implémentation complète
-        showToast(`Location réservée: {{ $product->name ?? "" }} du ${startDate} au ${endDate} (Simulation)`, 'success');
-        document.querySelector(`#rentalModal${productId} .btn-close`).click();
+        console.error('Erreur lors de l\'ajout au panier de location:', error);
+        showToast('Erreur lors de l\'ajout au panier de location: ' + error.message, 'error');
     });
 }
 

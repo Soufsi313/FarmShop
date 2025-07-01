@@ -29,11 +29,19 @@
                 </li>
 
                 @auth
-                    <!-- Panier - Lien direct -->
+                    <!-- Panier d'achat -->
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('cart.index') }}">
-                            <i class="fas fa-shopping-cart me-1"></i> Mon Panier
+                            <i class="fas fa-shopping-cart me-1"></i> Panier d'achat
                             <span class="badge bg-success ms-1" id="cart-count">0</span>
+                        </a>
+                    </li>
+
+                    <!-- Panier de location -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('cart-location.index') }}">
+                            <i class="fas fa-calendar-alt me-1"></i> Panier location
+                            <span class="badge bg-info ms-1" id="rental-cart-count">0</span>
                         </a>
                     </li>
 
@@ -130,8 +138,8 @@
 <script>
 // Mettre à jour le compteur du panier au chargement de la page
 document.addEventListener('DOMContentLoaded', function() {
-    // Désactivé temporairement pour debug
-    // updateCartCount();
+    updateCartCount();
+    updateRentalCartCount();
 });
 
 function updateCartCount() {
@@ -166,12 +174,46 @@ function updateCartCount() {
     });
 }
 
-// Fonction globale pour mettre à jour le panier depuis d'autres pages
-window.updateCartCount = updateCartCount;
+function updateRentalCartCount() {
+    fetch('/panier-location/api/count', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const rentalCartCountElement = document.getElementById('rental-cart-count');
+        if (rentalCartCountElement && data.success && data.count !== undefined) {
+            rentalCartCountElement.textContent = data.count;
+            rentalCartCountElement.style.display = data.count > 0 ? 'inline' : 'none';
+        }
+    })
+    .catch(error => {
+        console.error('Erreur lors de la récupération du compteur panier location:', error);
+        // Masquer le badge en cas d'erreur
+        const rentalCartCountElement = document.getElementById('rental-cart-count');
+        if (rentalCartCountElement) {
+            rentalCartCountElement.style.display = 'none';
+        }
+    });
+}
 
-// Mettre à jour le compteur au chargement de la page
+// Fonctions globales pour mettre à jour les paniers depuis d'autres pages
+window.updateCartCount = updateCartCount;
+window.updateRentalCartCount = updateRentalCartCount;
+
+// Mettre à jour les compteurs au chargement de la page
 document.addEventListener('DOMContentLoaded', function() {
     updateCartCount();
+    updateRentalCartCount();
 });
 </script>
 @endauth
