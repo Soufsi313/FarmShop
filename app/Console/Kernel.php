@@ -15,9 +15,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // Automatiser les changements de statuts des commandes toutes les 90 secondes
+        // Automatiser les changements de statuts des commandes toutes les 30 secondes
         $schedule->command('orders:update-status')
-            ->everyMinute()
+            ->everyThirtySeconds()
             ->withoutOverlapping()
             ->runInBackground()
             ->appendOutputTo(storage_path('logs/order-status-automation.log'));

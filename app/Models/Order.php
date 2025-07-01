@@ -103,7 +103,22 @@ class Order extends Model
         static::updating(function ($order) {
             // Mettre à jour automatiquement les timestamps selon le statut
             if ($order->isDirty('status')) {
+                $oldStatus = $order->getOriginal('status');
                 $order->updateStatusTimestamp();
+                
+                // Envoyer notification automatique si changement de statut (sauf lors de la création)
+                if ($oldStatus && $oldStatus !== $order->status && $order->user) {
+                    try {
+                        $order->user->notify(new \App\Notifications\OrderStatusChanged($order, $oldStatus));
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('Erreur envoi notification commande', [
+                            'order_id' => $order->id,
+                            'old_status' => $oldStatus,
+                            'new_status' => $order->status,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
             }
         });
     }

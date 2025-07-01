@@ -1,128 +1,137 @@
-@extends('layouts.app')
+@extends('admin.layout')
 
 @section('title', 'Automatisation des commandes')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-6xl mx-auto">
-        <!-- En-tête -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Automatisation des commandes</h1>
-            <p class="text-gray-600">Gérez l'automatisation des statuts de commandes et exécutez les tâches manuellement.</p>
-        </div>
-
-        <!-- Messages de succès/erreur -->
-        @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                {{ session('success') }}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- En-tête -->
+            <div class="mb-4">
+                <h1 class="h2 mb-3">Automatisation des commandes</h1>
+                <p class="text-muted">Gérez l'automatisation des statuts de commandes et exécutez les tâches manuellement.</p>
             </div>
-        @endif
 
-        @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        <!-- Statistiques -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="p-2 bg-blue-100 rounded-lg">
-                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-semibold text-gray-900">Commandes en attente</h3>
-                        <p class="text-sm text-gray-600">{{ App\Models\Order::where('status', 'pending')->count() }} commandes</p>
-                    </div>
+            <!-- Messages de succès/erreur -->
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-            </div>
+            @endif
 
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="p-2 bg-yellow-100 rounded-lg">
-                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-semibold text-gray-900">Confirmées</h3>
-                        <p class="text-sm text-gray-600">{{ App\Models\Order::where('status', 'confirmed')->count() }} commandes</p>
-                    </div>
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-            </div>
+            @endif
 
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="p-2 bg-green-100 rounded-lg">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-semibold text-gray-900">Expédiées</h3>
-                        <p class="text-sm text-gray-600">{{ App\Models\Order::where('status', 'shipped')->count() }} commandes</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Actions d'automatisation -->
-        <div class="bg-white rounded-lg shadow">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-900">Actions d'automatisation</h2>
-            </div>
-            
-            <div class="p-6">
-                <div class="space-y-6">
-                    <!-- Automatisation manuelle -->
-                    <div class="border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900">Exécuter l'automatisation maintenant</h3>
-                                <p class="text-sm text-gray-600 mt-1">
-                                    Déclenche immédiatement la mise à jour automatique des statuts de toutes les commandes éligibles.
-                                </p>
-                                <div class="mt-2 text-sm text-gray-500">
-                                    <ul class="list-disc list-inside space-y-1">
-                                        <li>Confirme automatiquement les commandes en attente depuis plus de 24h</li>
-                                        <li>Expédie les commandes confirmées depuis plus de 24h</li>
-                                        <li>Livre les commandes expédiées depuis plus de 3 jours</li>
-                                    </ul>
+            <!-- Statistiques -->
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="me-3">
+                                <div class="bg-primary bg-opacity-10 rounded p-2">
+                                    <i class="fas fa-clock text-primary fs-4"></i>
                                 </div>
                             </div>
-                            <div class="ml-4">
-                                <form action="{{ route('admin.orders.automation.run') }}" method="POST" class="inline">
+                            <div>
+                                <h5 class="card-title mb-1">Commandes en attente</h5>
+                                <p class="card-text text-muted">{{ App\Models\Order::where('status', 'pending')->count() }} commandes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="me-3">
+                                <div class="bg-warning bg-opacity-10 rounded p-2">
+                                    <i class="fas fa-check-circle text-warning fs-4"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h5 class="card-title mb-1">Confirmées</h5>
+                                <p class="card-text text-muted">{{ App\Models\Order::where('status', 'confirmed')->count() }} commandes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="me-3">
+                                <div class="bg-success bg-opacity-10 rounded p-2">
+                                    <i class="fas fa-shipping-fast text-success fs-4"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h5 class="card-title mb-1">Expédiées</h5>
+                                <p class="card-text text-muted">{{ App\Models\Order::where('status', 'shipped')->count() }} commandes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+        </div>
+
+            <!-- Actions d'automatisation -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Actions d'automatisation</h3>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Automatisation manuelle -->
+                    <div class="border rounded p-3 mb-3">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h4 class="h5 mb-2">Exécuter l'automatisation maintenant</h4>
+                                <p class="text-muted mb-2">
+                                    Déclenche immédiatement la mise à jour automatique des statuts de toutes les commandes éligibles.
+                                </p>
+                                <ul class="list-unstyled small text-muted">
+                                    <li><i class="fas fa-check text-success me-1"></i> Confirme automatiquement les commandes en attente depuis plus de 24h</li>
+                                    <li><i class="fas fa-check text-success me-1"></i> Expédie les commandes confirmées depuis plus de 24h</li>
+                                    <li><i class="fas fa-check text-success me-1"></i> Livre les commandes expédiées depuis plus de 3 jours</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <form action="{{ route('admin.orders.automation.run') }}" method="POST" class="d-inline">
                                     @csrf
                                     <button type="submit" 
-                                            class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                            class="btn btn-primary"
                                             onclick="return confirm('Êtes-vous sûr de vouloir exécuter l\'automatisation maintenant ?')">
-                                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                        </svg>
+                                        <i class="fas fa-bolt me-1"></i>
                                         Exécuter maintenant
                                     </button>
                                 </form>
                             </div>
                         </div>
                     </div>
+                        </div>
+                    </div>
 
                     <!-- Informations sur la planification -->
-                    <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                        <div class="flex items-start">
-                            <div class="p-2 bg-blue-100 rounded-lg mr-4">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
+                    <div class="border rounded p-3 bg-light">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3">
+                                <div class="bg-info bg-opacity-10 rounded p-2">
+                                    <i class="fas fa-info-circle text-info fs-5"></i>
+                                </div>
                             </div>
                             <div>
-                                <h3 class="text-lg font-medium text-gray-900">Automatisation planifiée</h3>
-                                <p class="text-sm text-gray-600 mt-1">
+                                <h4 class="h5 mb-2">Automatisation planifiée</h4>
+                                <p class="text-muted mb-2">
                                     L'automatisation des statuts s'exécute automatiquement <strong>tous les jours à 6h00</strong> via le cron de Laravel.
                                 </p>
-                                <div class="mt-3 text-sm text-gray-500">
+                                <div class="small text-muted">
                                     <p><strong>Commande cron :</strong> <code class="bg-white px-2 py-1 rounded">php artisan orders:automate-statuses</code></p>
                                     <p class="mt-1"><strong>Planification :</strong> <code class="bg-white px-2 py-1 rounded">$schedule->command('orders:automate-statuses')->dailyAt('06:00')</code></p>
                                 </div>
@@ -131,16 +140,16 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Liens de navigation -->
-        <div class="mt-8 flex space-x-4">
-            <a href="{{ route('admin.orders.index') }}" class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
-                ← Retour aux commandes
-            </a>
-            <a href="{{ route('admin.orders.statistics') }}" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
-                Voir les statistiques
-            </a>
+            <!-- Liens de navigation -->
+            <div class="mt-4 d-flex gap-2">
+                <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Retour aux commandes
+                </a>
+                <a href="{{ route('admin.orders.automation.stats') }}" class="btn btn-success">
+                    <i class="fas fa-chart-bar me-1"></i> Voir les statistiques
+                </a>
+            </div>
         </div>
     </div>
 </div>

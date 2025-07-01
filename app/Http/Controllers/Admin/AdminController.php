@@ -310,4 +310,134 @@ class AdminController extends Controller
 
         return response()->json(['success' => 'Statut de la commande mis à jour.']);
     }
+
+    // AUTOMATISATION DES COMMANDES
+    public function automationDashboard()
+    {
+        $stats = [
+            'confirmed' => Order::where('status', Order::STATUS_CONFIRMED)->count(),
+            'preparation' => Order::where('status', Order::STATUS_PREPARATION)->count(),
+            'shipped' => Order::where('status', Order::STATUS_SHIPPED)->count(),
+            'automated_today' => Order::whereDate('updated_at', today())
+                                     ->whereIn('status', [Order::STATUS_PREPARATION, Order::STATUS_SHIPPED, Order::STATUS_DELIVERED])
+                                     ->count(),
+        ];
+
+        // Calculer les prochaines transitions
+        $nextTransitions = $this->getNextTransitions();
+
+        return view('admin.orders.automation', compact('stats', 'nextTransitions'));
+    }
+
+    public function runAutomation(Request $request)
+    {
+        try {
+            $output = [];
+            $exitCode = \Artisan::call('orders:update-status', [], $output);
+            
+            $commandOutput = \Artisan::output();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Automatisation exécutée avec succès',
+                'details' => $commandOutput,
+                'exit_code' => $exitCode
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'exécution de l\'automatisation',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function runDryRun(Request $request)
+    {
+        try {
+            $output = [];
+            $exitCode = \Artisan::call('orders:update-status', ['--dry-run' => true], $output);
+            
+            $commandOutput = \Artisan::output();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Test (Dry Run) exécuté avec succès',
+                'details' => $commandOutput,
+                'exit_code' => $exitCode
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du test',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function automationStats()
+    {
+        return response()->json([
+            'confirmed' => Order::where('status', Order::STATUS_CONFIRMED)->count(),
+            'preparation' => Order::where('status', Order::STATUS_PREPARATION)->count(),
+            'shipped' => Order::where('status', Order::STATUS_SHIPPED)->count(),
+            'automated_today' => Order::whereDate('updated_at', today())
+                                     ->whereIn('status', [Order::STATUS_PREPARATION, Order::STATUS_SHIPPED, Order::STATUS_DELIVERED])
+                                     ->count(),
+        ]);
+    }
+
+    private function getNextTransitions()
+    {
+        $transitions = [];
+        $now = Carbon::now();
+
+        // Commandes confirmées → préparation (après 90 secondes)
+        $confirmedOrders = Order::where('status', Order::STATUS_CONFIRMED)
+                                ->where('confirmed_at', '>', $now->copy()->subSeconds(90))
+                                ->orderBy('confirmed_at')
+                                ->take(5)
+                                ->get();
+
+        foreach ($confirmedOrders as $order) {
+            $nextTransitionTime = $order->confirmed_at->addSeconds(90);
+            $timeRemaining = $now->diffInSeconds($nextTransitionTime, false);
+            
+            if ($timeRemaining > 0) {
+                $transitions[] = [
+                    'order_number' => $order->order_number,
+                    'current_status' => 'Confirmée',
+                    'next_status' => 'En préparation',
+                    'time_remaining' => $timeRemaining > 60 ? 
+                        ceil($timeRemaining / 60) . ' min' : 
+                        $timeRemaining . ' sec'
+                ];
+            }
+        }
+
+        // Commandes en préparation → expédition (après 90 secondes)
+        $preparationOrders = Order::where('status', Order::STATUS_PREPARATION)
+                                  ->where('preparation_at', '>', $now->copy()->subSeconds(90))
+                                  ->orderBy('preparation_at')
+                                  ->take(5)
+                                  ->get();
+
+        foreach ($preparationOrders as $order) {
+            $nextTransitionTime = $order->preparation_at->addSeconds(90);
+            $timeRemaining = $now->diffInSeconds($nextTransitionTime, false);
+            
+            if ($timeRemaining > 0) {
+                $transitions[] = [
+                    'order_number' => $order->order_number,
+                    'current_status' => 'En préparation',
+                    'next_status' => 'Expédiée',
+                    'time_remaining' => $timeRemaining > 60 ? 
+                        ceil($timeRemaining / 60) . ' min' : 
+                        $timeRemaining . ' sec'
+                ];
+            }
+        }
+
+        return collect($transitions)->sortBy('time_remaining')->take(10)->values()->all();
+    }
 }

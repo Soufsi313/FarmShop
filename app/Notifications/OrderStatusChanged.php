@@ -41,7 +41,8 @@ class OrderStatusChanged extends Notification implements ShouldQueue
     {
         $statusMessages = [
             Order::STATUS_PENDING => 'En attente de confirmation',
-            Order::STATUS_CONFIRMED => 'Confirmée et en préparation',
+            Order::STATUS_CONFIRMED => 'Confirmée',
+            Order::STATUS_PREPARATION => 'En cours de préparation',
             Order::STATUS_SHIPPED => 'Expédiée',
             Order::STATUS_DELIVERED => 'Livrée',
             Order::STATUS_CANCELLED => 'Annulée',
@@ -58,26 +59,35 @@ class OrderStatusChanged extends Notification implements ShouldQueue
         // Messages personnalisés selon le statut
         switch ($this->order->status) {
             case Order::STATUS_CONFIRMED:
-                $mailMessage->line('Votre commande a été confirmée et est maintenant en préparation.');
+                $mailMessage->line('Votre commande a été confirmée ! Nous commençons la préparation.');
+                $mailMessage->line('Vous recevrez une nouvelle notification dès qu\'elle sera prête.');
+                break;
+            case Order::STATUS_PREPARATION:
+                $mailMessage->line('Votre commande est maintenant en cours de préparation.');
+                $mailMessage->line('Nos équipes préparent soigneusement vos produits.');
                 break;
             case Order::STATUS_SHIPPED:
-                $mailMessage->line('Votre commande a été expédiée. Vous devriez la recevoir sous peu.');
+                $mailMessage->line('Bonne nouvelle ! Votre commande a été expédiée.');
+                $mailMessage->line('Vous devriez la recevoir dans les 24-48h.');
                 if ($this->order->tracking_number) {
                     $mailMessage->line('Numéro de suivi : ' . $this->order->tracking_number);
                 }
                 break;
             case Order::STATUS_DELIVERED:
-                $mailMessage->line('Votre commande a été livrée avec succès !');
+                $mailMessage->line('🎉 Votre commande a été livrée avec succès !');
                 $mailMessage->line('Nous espérons que vous êtes satisfait(e) de vos achats.');
+                $mailMessage->line('N\'hésitez pas à nous faire un retour !');
                 break;
             case Order::STATUS_CANCELLED:
                 $mailMessage->line('Votre commande a été annulée.');
-                $mailMessage->line('Le remboursement sera effectué sous 3-5 jours ouvrés.');
+                if ($this->order->refund_amount > 0) {
+                    $mailMessage->line('Le remboursement de ' . number_format($this->order->refund_amount, 2) . '€ sera effectué sous 3-5 jours ouvrés.');
+                }
                 break;
         }
 
         return $mailMessage
-            ->action('Voir ma commande', url('/orders/' . $this->order->id))
+            ->action('Voir ma commande', route('orders.user.show', $this->order))
             ->line('Merci de faire confiance à FarmShop !')
             ->salutation('L\'équipe FarmShop');
     }

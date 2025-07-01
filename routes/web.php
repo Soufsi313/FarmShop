@@ -79,6 +79,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::patch('/orders/{order}/status', [App\Http\Controllers\Admin\AdminController::class, 'updateOrderStatus'])->name('orders.status');
     Route::get('/orders/{order}/invoice', [App\Http\Controllers\OrderController::class, 'downloadInvoice'])->name('orders.invoice');
     
+    // Automatisation des commandes
+    Route::get('/orders/automation', [App\Http\Controllers\Admin\AdminController::class, 'automationDashboard'])->name('orders.automation');
+    Route::post('/orders/automation/run', [App\Http\Controllers\Admin\AdminController::class, 'runAutomation'])->name('orders.automation.run');
+    Route::post('/orders/automation/dry-run', [App\Http\Controllers\Admin\AdminController::class, 'runDryRun'])->name('orders.automation.dry-run');
+    Route::get('/orders/automation/stats', [App\Http\Controllers\Admin\AdminController::class, 'automationStats'])->name('orders.automation.stats');
+    
     // Gestion des messages admin
     Route::get('/messages', [App\Http\Controllers\AdminMessageController::class, 'index'])->name('messages.index');
     Route::get('/messages/{adminMessage}', [App\Http\Controllers\AdminMessageController::class, 'show'])->name('messages.show');

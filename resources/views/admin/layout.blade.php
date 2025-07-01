@@ -151,6 +151,10 @@
                     <i class="fas fa-shopping-cart me-2"></i>Commandes
                 </a>
                 
+                <a class="nav-link {{ request()->routeIs('admin.orders.automation*') ? 'active' : '' }}" href="{{ route('admin.orders.automation') }}">
+                    <i class="fas fa-robot me-2"></i>Automatisation
+                </a>
+                
                 <a class="nav-link {{ request()->routeIs('admin.messages*') ? 'active' : '' }}" href="{{ route('admin.messages.index') }}">
                     <i class="fas fa-envelope me-2"></i>Messages
                     @php
