@@ -226,4 +226,16 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
+// Routes de paiement Stripe (utilisateurs connectés)
+Route::middleware(['auth'])->prefix('payment')->name('payment.')->group(function () {
+    Route::get('/form', [App\Http\Controllers\PaymentController::class, 'showPaymentForm'])->name('form');
+    Route::post('/create-intent', [App\Http\Controllers\PaymentController::class, 'createPaymentIntent'])->name('create-intent');
+    Route::post('/confirm', [App\Http\Controllers\PaymentController::class, 'confirmPayment'])->name('confirm');
+    Route::post('/rental', [App\Http\Controllers\PaymentController::class, 'createRentalPayment'])->name('rental');
+    Route::get('/test-cards', [App\Http\Controllers\PaymentController::class, 'testCards'])->name('test-cards');
+});
+
+// Webhook Stripe (public, sans authentification)
+Route::post('/stripe/webhook', [App\Http\Controllers\StripeWebhookController::class, 'handle'])->name('stripe.webhook');
+
 
