@@ -476,3 +476,11 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin/messages')->gro
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/contact-admin', [App\Http\Controllers\AdminMessageController::class, 'store']);
 });
+
+// Routes API pour les commandes de location (OrderLocation)
+Route::prefix('order-locations')->group(function () {
+    Route::get('/', [App\Http\Controllers\OrderLocationController::class, 'apiIndex']); // Liste des commandes
+    Route::post('/create-from-cart', [App\Http\Controllers\OrderLocationController::class, 'createFromCart']); // Créer depuis panier
+    Route::get('/{orderLocation}', [App\Http\Controllers\OrderLocationController::class, 'apiShow']); // Détails d'une commande
+    Route::post('/{orderLocation}/cancel', [App\Http\Controllers\OrderLocationController::class, 'cancel']); // Annuler une commande
+});

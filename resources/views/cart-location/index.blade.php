@@ -424,7 +424,13 @@ function validateRentalCart() {
 
 // Fonction pour procéder au checkout
 function proceedToCheckout() {
-    fetch('/panier-location/soumettre', {
+    // Afficher un indicateur de chargement
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Création de la commande...';
+    button.disabled = true;
+    
+    fetch('/commandes-location/creer-depuis-panier', {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -439,23 +445,29 @@ function proceedToCheckout() {
     })
     .then(data => {
         if (data.success) {
-            showToast('Commande soumise avec succès !', 'success');
+            showToast('Commande de location créée avec succès !', 'success');
             
-            // Rediriger vers la page de confirmation ou de paiement
+            // Rediriger vers la page de la commande créée
             setTimeout(() => {
                 if (data.redirect_url) {
                     window.location.href = data.redirect_url;
                 } else {
-                    window.location.reload();
+                    window.location.href = '/commandes-location/' + data.order_id;
                 }
             }, 1500);
         } else {
-            showToast(data.message || 'Erreur lors de la soumission', 'error');
+            showToast(data.message || 'Erreur lors de la création de la commande', 'error');
+            // Restaurer le bouton
+            button.innerHTML = originalText;
+            button.disabled = false;
         }
     })
     .catch(error => {
         console.error('Erreur:', error);
-        showToast('Erreur lors de la soumission: ' + error.message, 'error');
+        showToast('Erreur lors de la création de la commande: ' + error.message, 'error');
+        // Restaurer le bouton
+        button.innerHTML = originalText;
+        button.disabled = false;
     });
 }
 

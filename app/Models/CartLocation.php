@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Carbon\Carbon;
 
 class CartLocation extends Model
@@ -44,6 +45,11 @@ class CartLocation extends Model
     public function items(): HasMany
     {
         return $this->hasMany(CartItemLocation::class);
+    }
+
+    public function orderLocation(): HasOne
+    {
+        return $this->hasOne(OrderLocation::class);
     }
 
     /**

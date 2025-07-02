@@ -61,7 +61,7 @@
 
                     <!-- Mes locations -->
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="{{ route('order-locations.index') }}">
                             <i class="fas fa-calendar-check me-1"></i> Mes locations
                         </a>
                     </li>

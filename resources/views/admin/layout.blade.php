@@ -41,6 +41,11 @@
             transform: translateX(5px);
         }
         
+        .nav-section-title {
+            padding: 8px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
         .admin-header {
             background: white;
             padding: 15px 20px;
@@ -150,6 +155,24 @@
                 <a class="nav-link {{ request()->routeIs('admin.orders*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
                     <i class="fas fa-shopping-cart me-2"></i>Commandes
                 </a>
+                
+                <!-- Section Locations -->
+                <div class="nav-section-title mt-3 mb-2">
+                    <small class="text-muted fw-bold">LOCATIONS</small>
+                </div>
+                
+                <a class="nav-link {{ request()->routeIs('admin.locations.dashboard') ? 'active' : '' }}" href="{{ route('admin.locations.dashboard') }}">
+                    <i class="fas fa-chart-line me-2"></i>Tableau de bord
+                </a>
+                
+                <a class="nav-link {{ request()->routeIs('admin.locations.index') ? 'active' : '' }}" href="{{ route('admin.locations.index') }}">
+                    <i class="fas fa-calendar-alt me-2"></i>Toutes les locations
+                </a>
+                
+                <!-- Section Automatisation -->
+                <div class="nav-section-title mt-3 mb-2">
+                    <small class="text-muted fw-bold">AUTOMATISATION</small>
+                </div>
                 
                 <a class="nav-link {{ request()->routeIs('admin.orders.automation*') ? 'active' : '' }}" href="{{ route('admin.orders.automation') }}">
                     <i class="fas fa-robot me-2"></i>Automatisation

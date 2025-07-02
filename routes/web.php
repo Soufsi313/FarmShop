@@ -92,6 +92,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/orders/{order}/return-check', [App\Http\Controllers\Admin\AdminController::class, 'checkReturnEligibility'])->name('orders.return.check');
     Route::post('/orders/{order}/return', [App\Http\Controllers\Admin\AdminController::class, 'createReturn'])->name('orders.return');
     
+    // Gestion des locations (admin)
+    Route::prefix('locations')->name('locations.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'index'])->name('index');
+        Route::get('/dashboard', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'dashboard'])->name('dashboard');
+        Route::get('/{orderLocation}', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'show'])->name('show');
+        Route::get('/{orderLocation}/pickup', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'showPickup'])->name('pickup.show');
+        Route::post('/{orderLocation}/confirm', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'confirm'])->name('confirm');
+        Route::post('/{orderLocation}/pickup', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'markAsPickedUp'])->name('pickup');
+        Route::get('/{orderLocation}/return', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'showReturn'])->name('return.show');
+        Route::post('/{orderLocation}/return', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'markAsReturned'])->name('return');
+        Route::post('/{orderLocation}/cancel', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'cancel'])->name('cancel');
+        Route::post('/{orderLocation}/overdue', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'markAsOverdue'])->name('overdue');
+        Route::get('/export/data', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'export'])->name('export');
+    });
+    
     // Gestion des messages admin
     Route::get('/messages', [App\Http\Controllers\AdminMessageController::class, 'index'])->name('messages.index');
     Route::get('/messages/{adminMessage}', [App\Http\Controllers\AdminMessageController::class, 'show'])->name('messages.show');
@@ -173,6 +188,21 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{cartItemLocation}', [App\Http\Controllers\CartLocationController::class, 'update'])->name('update');
         Route::delete('/{cartItemLocation}', [App\Http\Controllers\CartLocationController::class, 'destroy'])->name('destroy');
         Route::post('/{cartItemLocation}/prolonger', [App\Http\Controllers\CartLocationController::class, 'extend'])->name('extend');
+    });
+});
+
+// Routes pour les commandes de location
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('commandes-location')->name('order-locations.')->group(function () {
+        Route::get('/', [App\Http\Controllers\OrderLocationController::class, 'index'])->name('index');
+        Route::get('/validation', [App\Http\Controllers\OrderLocationController::class, 'checkout'])->name('checkout');
+        Route::post('/creer-depuis-panier', [App\Http\Controllers\OrderLocationController::class, 'createFromCart'])->name('create-from-cart');
+        Route::get('/{orderLocation}', [App\Http\Controllers\OrderLocationController::class, 'show'])->name('show');
+        Route::post('/{orderLocation}/annuler', [App\Http\Controllers\OrderLocationController::class, 'cancel'])->name('cancel');
+        
+        // Nouvelles routes pour l'automatisation
+        Route::post('/{orderLocation}/cloturer', [App\Http\Controllers\OrderLocationController::class, 'closeLocation'])->name('close');
+        Route::post('/{orderLocation}/annuler-client', [App\Http\Controllers\OrderLocationController::class, 'cancelByClient'])->name('cancel-by-client');
     });
 });
 
