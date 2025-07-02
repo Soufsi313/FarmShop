@@ -1,0 +1,202 @@
+/* Styles pour les offres spéciales */
+
+/* Animation de pulsation pour les badges de promotion */
+@keyframes pulse-promo {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.promo-badge {
+    animation: pulse-promo 2s infinite;
+}
+
+/* Badge de promotion avec gradient */
+.special-offer-badge {
+    background: linear-gradient(45deg, #dc3545, #ff6b7a) !important;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Banderole diagonale PROMO */
+.promo-banner {
+    position: absolute;
+    top: 15px;
+    right: -30px;
+    background: linear-gradient(45deg, #ffc107, #ffb300);
+    color: #212529;
+    padding: 5px 35px;
+    font-weight: bold;
+    font-size: 11px;
+    transform: rotate(45deg);
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.4);
+    z-index: 10;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Container pour les cartes produits avec offres */
+.product-card-special {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.product-card-special::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(255, 107, 122, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+    pointer-events: none; /* IMPORTANT: Permet aux clics de passer à travers */
+}
+
+.product-card-special:hover::before {
+    opacity: 1;
+}
+
+/* Prix avec remise */
+.price-with-discount {
+    position: relative;
+}
+
+.original-price {
+    position: relative;
+    color: #6c757d !important;
+}
+
+.original-price::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 2px;
+    background: #dc3545;
+    transform: rotate(-5deg);
+}
+
+.discounted-price {
+    color: #dc3545 !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(220, 53, 69, 0.2);
+}
+
+/* Alert box pour les offres spéciales */
+.special-offer-alert {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb) !important;
+    border: none !important;
+    border-left: 4px solid #28a745 !important;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.special-offer-alert::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #28a745, #20c997);
+    animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Icône de feu animée */
+.fire-icon {
+    color: #dc3545 !important;
+    animation: flicker 1.5s infinite alternate;
+}
+
+@keyframes flicker {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+/* Badge d'économie */
+.savings-badge {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    animation: glow-green 3s infinite;
+}
+
+@keyframes glow-green {
+    0%, 100% { box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3); }
+    50% { box-shadow: 0 4px 16px rgba(40, 167, 69, 0.5); }
+}
+
+/* Styles pour mobile */
+@media (max-width: 768px) {
+    .promo-banner {
+        top: 10px;
+        right: -25px;
+        padding: 3px 25px;
+        font-size: 10px;
+    }
+    
+    .special-offer-badge {
+        font-size: 0.7rem !important;
+    }
+    
+    .price-with-discount {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/* Hover effects */
+.product-card:hover .special-offer-badge {
+    transform: scale(1.1);
+}
+
+.product-card:hover .fire-icon {
+    animation-duration: 0.8s;
+}
+
+/* Style pour le countdown des offres */
+.offer-countdown {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 0.85rem;
+}
+
+/* Animation d'apparition pour les éléments d'offre */
+.fade-in-special {
+    animation: fadeInSpecial 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInSpecial {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Style pour les cartes produits en promotion sur la page d'accueil */
+.featured-product-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(220, 53, 69, 0.1) !important;
+}
+
+.featured-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.15) !important;
+    border-color: rgba(220, 53, 69, 0.3) !important;
+}

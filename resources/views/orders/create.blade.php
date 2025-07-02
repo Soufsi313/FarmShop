@@ -139,7 +139,7 @@
                     
                     <div class="space-y-4">
                         @foreach($cartItems as $item)
-                            <div class="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
+                            <div class="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg @if($item->hasDiscount()) bg-green-50 border-green-200 @endif">
                                 <!-- Image du produit -->
                                 <div class="flex-shrink-0">
                                     @if($item->product && $item->product->main_image)
@@ -157,14 +157,40 @@
                                 
                                 <!-- Informations du produit -->
                                 <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-900">{{ $item->product ? $item->product->name : 'Produit supprimé' }}</h3>
+                                    <div class="flex items-center space-x-2">
+                                        <h3 class="font-semibold text-gray-900">{{ $item->product ? $item->product->name : 'Produit supprimé' }}</h3>
+                                        @if($item->hasDiscount())
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                                </svg>
+                                                PROMO
+                                            </span>
+                                        @endif
+                                    </div>
                                     <p class="text-sm text-gray-600">Quantité: {{ $item->quantity }}</p>
-                                    <p class="text-sm text-gray-600">Prix unitaire: {{ number_format($item->unit_price, 2) }} €</p>
+                                    @if($item->hasDiscount())
+                                        @php
+                                            $offerDetails = $item->special_offer_details;
+                                            $discountedUnitPrice = $item->unit_price * (1 - ($offerDetails['discount_percentage'] ?? 0) / 100);
+                                        @endphp
+                                        <p class="text-sm text-gray-500">Prix unitaire: <span class="line-through">{{ number_format($item->unit_price, 2) }} €</span></p>
+                                        <p class="text-sm text-green-600 font-medium">Prix avec remise: {{ number_format($discountedUnitPrice, 2) }} €</p>
+                                        <p class="text-xs text-green-600">Économie: {{ number_format($item->discount_amount, 2) }} €</p>
+                                    @else
+                                        <p class="text-sm text-gray-600">Prix unitaire: {{ number_format($item->unit_price, 2) }} €</p>
+                                    @endif
                                 </div>
                                 
                                 <!-- Prix total -->
                                 <div class="text-right">
-                                    <p class="text-lg font-semibold text-green-600">{{ number_format($item->total_price, 2) }} €</p>
+                                    @if($item->hasDiscount())
+                                        <p class="text-sm text-gray-400 line-through">{{ number_format($item->original_total, 2) }} €</p>
+                                        <p class="text-lg font-semibold text-green-600">{{ number_format($item->total_price, 2) }} €</p>
+                                        <p class="text-xs text-green-600">-{{ number_format($item->discount_amount, 2) }} €</p>
+                                    @else
+                                        <p class="text-lg font-semibold text-green-600">{{ number_format($item->total_price, 2) }} €</p>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach

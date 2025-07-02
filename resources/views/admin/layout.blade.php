@@ -156,6 +156,25 @@
                     <i class="fas fa-shopping-cart me-2"></i>Commandes
                 </a>
                 
+                <!-- Section Offres Spéciales -->
+                <div class="nav-section-title mt-3 mb-2">
+                    <small class="text-muted fw-bold">OFFRES SPÉCIALES</small>
+                </div>
+                
+                <a class="nav-link {{ request()->routeIs('admin.special-offers.index') ? 'active' : '' }}" href="{{ route('admin.special-offers.index') }}">
+                    <i class="fas fa-percent me-2"></i>Toutes les offres
+                    @php
+                        $activeOffersCount = \App\Models\SpecialOffer::available()->count();
+                    @endphp
+                    @if($activeOffersCount > 0)
+                        <span class="badge bg-success ms-2">{{ $activeOffersCount }}</span>
+                    @endif
+                </a>
+                
+                <a class="nav-link {{ request()->routeIs('admin.special-offers.create') ? 'active' : '' }}" href="{{ route('admin.special-offers.create') }}">
+                    <i class="fas fa-plus me-2"></i>Créer une offre
+                </a>
+                
                 <!-- Section Locations -->
                 <div class="nav-section-title mt-3 mb-2">
                     <small class="text-muted fw-bold">LOCATIONS</small>

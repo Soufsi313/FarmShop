@@ -5,7 +5,13 @@ use Illuminate\Support\Facades\Auth;
 
 // Route d'accueil
 Route::get('/', function () {
-    return view('welcome');
+    $featuredProducts = \App\Models\Product::with('specialOffers')
+        ->active()
+        ->latest()
+        ->take(8)
+        ->get();
+    
+    return view('welcome', compact('featuredProducts'));
 })->name('welcome');
 
 // Route de debug pour l'authentification
@@ -105,6 +111,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::post('/{orderLocation}/cancel', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'cancel'])->name('cancel');
         Route::post('/{orderLocation}/overdue', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'markAsOverdue'])->name('overdue');
         Route::get('/export/data', [App\Http\Controllers\Admin\OrderLocationAdminController::class, 'export'])->name('export');
+    });
+    
+    // Gestion des offres spéciales (admin)
+    Route::prefix('special-offers')->name('special-offers.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\SpecialOfferController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\Admin\SpecialOfferController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\Admin\SpecialOfferController::class, 'store'])->name('store');
+        Route::get('/{specialOffer}', [App\Http\Controllers\Admin\SpecialOfferController::class, 'show'])->name('show');
+        Route::get('/{specialOffer}/edit', [App\Http\Controllers\Admin\SpecialOfferController::class, 'edit'])->name('edit');
+        Route::put('/{specialOffer}', [App\Http\Controllers\Admin\SpecialOfferController::class, 'update'])->name('update');
+        Route::delete('/{specialOffer}', [App\Http\Controllers\Admin\SpecialOfferController::class, 'destroy'])->name('destroy');
+        Route::patch('/{specialOffer}/toggle', [App\Http\Controllers\Admin\SpecialOfferController::class, 'toggle'])->name('toggle');
+        Route::patch('/{specialOffer}/activate', [App\Http\Controllers\Admin\SpecialOfferController::class, 'activate'])->name('activate');
+        Route::patch('/{specialOffer}/deactivate', [App\Http\Controllers\Admin\SpecialOfferController::class, 'deactivate'])->name('deactivate');
     });
     
     // Gestion des messages admin

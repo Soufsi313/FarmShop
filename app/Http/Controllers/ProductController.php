@@ -27,7 +27,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'images'])
+        $query = Product::with(['category', 'images', 'specialOffers'])
                        ->active();
 
         // Recherche
@@ -176,13 +176,14 @@ class ProductController extends Controller
             abort(404);
         }
 
-        $product->load(['category', 'images']);
+        $product->load(['category', 'images', 'specialOffers']);
         
         // Incrémenter le compteur de vues
         $product->incrementViews();
 
         // Produits similaires
-        $relatedProducts = Product::active()
+        $relatedProducts = Product::with('specialOffers')
+            ->active()
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->inStock()

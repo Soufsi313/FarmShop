@@ -158,7 +158,7 @@
                 <div class="row">
                     @foreach($products as $product)
                         <div class="col-lg-4 col-md-6 mb-4">
-                            <div class="card product-card h-100 shadow-sm border-0" 
+                            <div class="card product-card h-100 shadow-sm border-0 @if($product->hasActiveSpecialOffer()) product-card-special @endif" 
                                  data-product-id="{{ $product->id }}" 
                                  data-stock="{{ $product->quantity }}"
                                  data-rental-price="{{ $product->rental_price_per_day ?? 0 }}"
@@ -181,6 +181,14 @@
                                     
                                     <!-- Badges -->
                                     <div class="position-absolute top-0 end-0 m-2">
+                                        @if($product->hasActiveSpecialOffer())
+                                            @php
+                                                $offer = $product->getActiveSpecialOffer();
+                                            @endphp
+                                            <span class="badge special-offer-badge promo-badge d-block mb-1 fs-6">
+                                                <i class="fas fa-fire fire-icon me-1"></i>-{{ $offer->discount_percentage }}%
+                                            </span>
+                                        @endif
                                         @if($product->category)
                                             <span class="badge bg-secondary d-block mb-1">
                                                 {{ $product->category->name }}
@@ -268,14 +276,39 @@
                                                 @endif
                                                 @if($product->price > 0)
                                                     <div class="mt-1">
-                                                        <small class="text-success">Achat: {{ number_format($product->price, 2) }}€/{{ $product->unit_symbol }}</small>
+                                                        @if($product->hasActiveSpecialOffer())
+                                                            @php
+                                                                $offer = $product->getActiveSpecialOffer();
+                                                                $discountedPrice = $product->price * (1 - $offer->discount_percentage / 100);
+                                                            @endphp
+                                                            <small class="text-decoration-line-through text-muted">Achat: {{ number_format($product->price, 2) }}€/{{ $product->unit_symbol }}</small><br>
+                                                            <small class="text-danger fw-bold">PROMO: {{ number_format($discountedPrice, 2) }}€/{{ $product->unit_symbol }}</small><br>
+                                                            <small class="text-success">-{{ $offer->discount_percentage }}% dès {{ $offer->min_quantity }}{{ $product->unit_symbol }}</small>
+                                                        @else
+                                                            <small class="text-success">Achat: {{ number_format($product->price, 2) }}€/{{ $product->unit_symbol }}</small>
+                                                        @endif
                                                     </div>
                                                 @endif
                                             </div>
                                         @else
                                             <div class="text-center">
-                                                <span class="h5 text-success mb-0 fw-bold">{{ number_format($product->price, 2) }}€</span>
-                                                <small class="text-muted">/{{ $product->unit_symbol }}</small>
+                                                @if($product->hasActiveSpecialOffer())
+                                                    @php
+                                                        $offer = $product->getActiveSpecialOffer();
+                                                        $discountedPrice = $product->price * (1 - $offer->discount_percentage / 100);
+                                                    @endphp
+                                                    <div class="d-flex align-items-center justify-content-center flex-wrap gap-1">
+                                                        <span class="text-decoration-line-through text-muted">{{ number_format($product->price, 2) }}€</span>
+                                                        <span class="h5 text-danger mb-0 fw-bold">{{ number_format($discountedPrice, 2) }}€</span>
+                                                        <small class="text-muted">/{{ $product->unit_symbol }}</small>
+                                                    </div>
+                                                    <small class="text-success">
+                                                        <i class="fas fa-gift me-1"></i>-{{ $offer->discount_percentage }}% dès {{ $offer->min_quantity }}{{ $product->unit_symbol }}
+                                                    </small>
+                                                @else
+                                                    <span class="h5 text-success mb-0 fw-bold">{{ number_format($product->price, 2) }}€</span>
+                                                    <small class="text-muted">/{{ $product->unit_symbol }}</small>
+                                                @endif
                                             </div>
                                         @endif
                                         

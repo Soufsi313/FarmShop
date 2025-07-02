@@ -77,6 +77,41 @@
                         @endif
                     </div>
                     
+                    <!-- Offre spéciale -->
+                    @if($product->hasActiveSpecialOffer())
+                        @php
+                            $offer = $product->getActiveSpecialOffer();
+                        @endphp
+                        <div class="special-offer-alert alert border-0 shadow-sm mb-4 fade-in-special">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-fire fire-icon fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="alert-heading mb-2">
+                                        <i class="fas fa-gift me-2"></i>{{ $offer->name }}
+                                    </h5>
+                                    <p class="mb-2">
+                                        <strong>{{ $offer->discount_percentage }}% de remise</strong> 
+                                        dès {{ $offer->min_quantity }} {{ $product->unit_symbol }} achetés !
+                                    </p>
+                                    @if($offer->description)
+                                        <p class="mb-2 text-muted">{{ $offer->description }}</p>
+                                    @endif
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted offer-countdown">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Offre valable jusqu'au {{ $offer->end_date->format('d/m/Y à H:i') }}
+                                        </small>
+                                        <span class="savings-badge badge fs-6">
+                                            Économisez {{ number_format($product->price * $offer->min_quantity * $offer->discount_percentage / 100, 2) }}€
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                    
                     <!-- Nom du produit -->
                     <h1 class="h2 mb-3">{{ $product->name }}</h1>
                     
@@ -154,8 +189,28 @@
                                     </span>
                                 </div>
                                 <div>
-                                    <span class="h3 text-success">{{ number_format($product->price, 2) }}€</span>
-                                    <span class="text-muted">/{{ $product->unit_symbol }}</span>
+                                    @if($product->hasActiveSpecialOffer())
+                                        @php
+                                            $offer = $product->getActiveSpecialOffer();
+                                            $discountedPrice = $product->price * (1 - $offer->discount_percentage / 100);
+                                        @endphp
+                                        <div class="price-with-discount d-flex align-items-center flex-wrap gap-2 mb-2">
+                                            <span class="original-price h4">
+                                                {{ number_format($product->price, 2) }}€
+                                            </span>
+                                            <span class="discounted-price h3 fw-bold">
+                                                {{ number_format($discountedPrice, 2) }}€
+                                            </span>
+                                            <span class="text-muted">/{{ $product->unit_symbol }}</span>
+                                        </div>
+                                        <small class="text-success">
+                                            <i class="fas fa-percentage me-1"></i>
+                                            Prix avec remise de {{ $offer->discount_percentage }}% (dès {{ $offer->min_quantity }} {{ $product->unit_symbol }})
+                                        </small>
+                                    @else
+                                        <span class="h3 text-success">{{ number_format($product->price, 2) }}€</span>
+                                        <span class="text-muted">/{{ $product->unit_symbol }}</span>
+                                    @endif
                                 </div>
                             </div>
                         @endif

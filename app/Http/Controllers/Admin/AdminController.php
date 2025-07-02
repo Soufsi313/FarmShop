@@ -27,8 +27,22 @@ class AdminController extends Controller
             'products_count' => Product::count(),
             'orders_count' => Order::count(),
             'categories_count' => Category::count(),
+            'special_offers_count' => \App\Models\SpecialOffer::count(),
+            'active_special_offers_count' => \App\Models\SpecialOffer::available()->count(),
+            'expiring_offers_count' => \App\Models\SpecialOffer::where('end_date', '<=', now()->addDays(7))
+                ->where('end_date', '>=', now())
+                ->where('is_active', true)
+                ->count(),
             'recent_users' => User::latest()->take(5)->get(),
             'recent_orders' => Order::with('user')->latest()->take(5)->get(),
+            'recent_special_offers' => \App\Models\SpecialOffer::with('product')->latest()->take(5)->get(),
+            'expiring_offers' => \App\Models\SpecialOffer::with('product')
+                ->where('end_date', '<=', now()->addDays(7))
+                ->where('end_date', '>=', now())
+                ->where('is_active', true)
+                ->orderBy('end_date', 'asc')
+                ->take(3)
+                ->get(),
         ];
 
         return view('admin.dashboard', compact('stats'));

@@ -42,7 +42,60 @@ class CartItem extends Model
      */
     public function getTotalPriceAttribute()
     {
+        // Chargement du produit avec ses offres spéciales si pas déjà chargé
+        if (!$this->relationLoaded('product')) {
+            $this->load(['product.specialOffers']);
+        }
+
+        // Vérifier s'il y a une offre spéciale active
+        if ($this->product && $this->product->hasActiveSpecialOffer()) {
+            $offer = $this->product->getActiveSpecialOffer();
+            $discountResult = $offer->calculateDiscount($this->quantity, $this->unit_price);
+            
+            if ($discountResult['qualifies']) {
+                return $discountResult['final_total'];
+            }
+        }
+
+        // Prix normal sans offre
         return $this->quantity * $this->unit_price;
+    }
+
+    /**
+     * Obtenir le prix original (sans remise)
+     */
+    public function getOriginalTotalAttribute()
+    {
+        return $this->quantity * $this->unit_price;
+    }
+
+    /**
+     * Obtenir le montant de la remise appliquée
+     */
+    public function getDiscountAmountAttribute()
+    {
+        return $this->original_total - $this->total_price;
+    }
+
+    /**
+     * Vérifier si cet article a une remise appliquée
+     */
+    public function hasDiscount(): bool
+    {
+        return $this->discount_amount > 0;
+    }
+
+    /**
+     * Obtenir les détails de l'offre spéciale si applicable
+     */
+    public function getSpecialOfferDetailsAttribute()
+    {
+        if (!$this->product || !$this->product->hasActiveSpecialOffer()) {
+            return null;
+        }
+
+        $offer = $this->product->getActiveSpecialOffer();
+        return $offer->calculateDiscount($this->quantity, $this->unit_price);
     }
 
     /**
@@ -51,7 +104,7 @@ class CartItem extends Model
     public function incrementQuantity($amount = 1)
     {
         $this->increment('quantity', $amount);
-        $this->update(['total_price' => $this->quantity * $this->unit_price]);
+        // Le total_price sera recalculé automatiquement via l'accesseur
         $this->touch(); // Mettre à jour updated_at
         return $this;
     }
@@ -59,20 +112,16 @@ class CartItem extends Model
     public function decrementQuantity($amount = 1)
     {
         $newQuantity = max(1, $this->quantity - $amount);
-        $this->update([
-            'quantity' => $newQuantity,
-            'total_price' => $newQuantity * $this->unit_price
-        ]);
+        $this->update(['quantity' => $newQuantity]);
+        // Le total_price sera recalculé automatiquement via l'accesseur
         return $this;
     }
 
     public function updateQuantity($quantity)
     {
         $newQuantity = max(1, $quantity);
-        $this->update([
-            'quantity' => $newQuantity,
-            'total_price' => $newQuantity * $this->unit_price
-        ]);
+        $this->update(['quantity' => $newQuantity]);
+        // Le total_price sera recalculé automatiquement via l'accesseur
         return $this;
     }
 

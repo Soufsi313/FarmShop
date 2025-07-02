@@ -125,6 +125,30 @@ class Product extends Model
     }
 
     /**
+     * Relation avec les offres spéciales
+     */
+    public function specialOffers()
+    {
+        return $this->hasMany(SpecialOffer::class);
+    }
+
+    /**
+     * Obtenir l'offre spéciale active pour ce produit
+     */
+    public function getActiveSpecialOffer()
+    {
+        return $this->specialOffers()->available()->first();
+    }
+
+    /**
+     * Vérifier si le produit a une offre spéciale active
+     */
+    public function hasActiveSpecialOffer(): bool
+    {
+        return $this->getActiveSpecialOffer() !== null;
+    }
+
+    /**
      * Relation avec les articles de location
      */
     public function rentalItems()

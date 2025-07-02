@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test des interactions des cartes produits</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .product-card {
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            overflow: hidden;
+            min-height: 500px;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+        }
+
+        .card-img-top {
+            transition: transform 0.3s ease;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .product-card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+
+        .btn-sm {
+            font-size: 0.875rem;
+            padding: 0.375rem 0.75rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* CSS pour débogage */
+        .debug-info {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 2px 5px;
+            font-size: 10px;
+            z-index: 1000;
+        }
+
+        .clickable-test {
+            cursor: pointer;
+            border: 2px dashed #28a745;
+        }
+
+        .clicked {
+            background-color: #d4edda !important;
+            border-color: #28a745 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <h1 class="mb-4">Test des interactions des cartes produits</h1>
+        
+        <div class="alert alert-info">
+            <strong>Instructions :</strong> Cliquez sur les différents éléments pour tester les interactions.
+            Les éléments cliquables changeront de couleur quand ils sont cliqués.
+        </div>
+
+        <div class="row">
+            <!-- Carte produit test 1 -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card product-card h-100 shadow-sm border-0" 
+                     data-product-id="1" 
+                     data-stock="10"
+                     data-rental-price="5.99"
+                     data-deposit-amount="20"
+                     data-min-rental-days="1"
+                     data-max-rental-days="30">
+                    <div class="debug-info">Card ID: 1</div>
+                    <div class="position-relative">
+                        <!-- Image du produit -->
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                             style="height: 250px;">
+                            <i class="fas fa-image text-muted fa-3x"></i>
+                        </div>
+                        
+                        <!-- Badges -->
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-secondary d-block mb-1">
+                                Légumes
+                            </span>
+                            <span class="badge bg-warning d-block">
+                                <i class="fas fa-star me-1"></i>Vedette
+                            </span>
+                        </div>
+
+                        <!-- Badge type de produit -->
+                        <div class="position-absolute bottom-0 start-0 m-2">
+                            <span class="badge bg-success">
+                                <i class="fas fa-shopping-cart me-1"></i>Achat
+                            </span>
+                        </div>
+
+                        <!-- Indicateur de stock -->
+                        <div class="position-absolute top-0 start-0 m-2">
+                            <span class="badge bg-success">
+                                <i class="fas fa-check me-1"></i>En stock
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0 flex-grow-1">Tomates bio</h5>
+                            <div class="dropdown">
+                                <button class="btn btn-link p-0 text-muted clickable-test" 
+                                        type="button" 
+                                        data-bs-toggle="dropdown"
+                                        onclick="testClick(this, 'Dropdown menu')">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item clickable-test" href="#" onclick="testClick(this, 'Favoris'); return false;">
+                                            <i class="fas fa-heart me-2 text-danger"></i>Ajouter aux favoris
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item clickable-test" href="#" onclick="testClick(this, 'Partager'); return false;">
+                                            <i class="fas fa-share me-2 text-info"></i>Partager
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <p class="card-text text-muted flex-grow-1 small mb-3">
+                            Tomates bio fraîches du producteur local. Idéales pour vos salades.
+                        </p>
+                        
+                        <!-- Informations prix -->
+                        <div class="mb-3">
+                            <div class="text-center">
+                                <span class="h5 text-success mb-0 fw-bold">3.50€</span>
+                                <small class="text-muted">/kg</small>
+                            </div>
+                            
+                            <!-- Stock -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Stock: 10</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="d-grid gap-2">
+                            <!-- Bouton Voir détails -->
+                            <a href="#" 
+                               class="btn btn-outline-primary btn-sm clickable-test"
+                               onclick="testClick(this, 'Voir détails'); return false;">
+                                <i class="fas fa-eye me-1"></i>Voir détails
+                            </a>
+                            
+                            <!-- Sélecteur de quantité -->
+                            <div class="mb-2">
+                                <label class="form-label small mb-1">Quantité</label>
+                                <div class="input-group input-group-sm">
+                                    <button class="btn btn-outline-secondary clickable-test" type="button" 
+                                            onclick="testClick(this, 'Quantité -')">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number" 
+                                           class="form-control text-center clickable-test" 
+                                           id="quantity-1"
+                                           value="1" 
+                                           min="1" 
+                                           max="10"
+                                           onclick="testClick(this, 'Input quantité')">
+                                    <button class="btn btn-outline-secondary clickable-test" type="button" 
+                                            onclick="testClick(this, 'Quantité +')">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Boutons d'action -->
+                            <div class="btn-group w-100" role="group">
+                                <button class="btn btn-outline-success btn-sm clickable-test" 
+                                        onclick="testClick(this, 'Ajouter au panier')">
+                                    <i class="fas fa-shopping-cart me-1"></i>Panier
+                                </button>
+                                <button class="btn btn-success btn-sm clickable-test" 
+                                        onclick="testClick(this, 'Acheter maintenant')">
+                                    <i class="fas fa-bolt me-1"></i>Acheter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carte produit test 2 (location) -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card product-card h-100 shadow-sm border-0" 
+                     data-product-id="2" 
+                     data-stock="3"
+                     data-rental-price="15.99"
+                     data-deposit-amount="50"
+                     data-min-rental-days="1"
+                     data-max-rental-days="7">
+                    <div class="debug-info">Card ID: 2</div>
+                    <div class="position-relative">
+                        <!-- Image du produit -->
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                             style="height: 250px;">
+                            <i class="fas fa-tools text-muted fa-3x"></i>
+                        </div>
+                        
+                        <!-- Badge type de produit -->
+                        <div class="position-absolute bottom-0 start-0 m-2">
+                            <span class="badge bg-info">
+                                <i class="fas fa-calendar-alt me-1"></i>Location
+                            </span>
+                        </div>
+
+                        <!-- Indicateur de stock -->
+                        <div class="position-absolute top-0 start-0 m-2">
+                            <span class="badge bg-warning">
+                                <i class="fas fa-exclamation-triangle me-1"></i>Stock faible
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title mb-2">Bêche de jardinage</h5>
+                        
+                        <p class="card-text text-muted flex-grow-1 small mb-3">
+                            Bêche robuste pour tous vos travaux de jardinage.
+                        </p>
+                        
+                        <!-- Informations prix et location -->
+                        <div class="mb-3">
+                            <div class="text-center rental-price-box rounded p-2 mb-2" 
+                                 style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border: 1px solid #b3e5fc;">
+                                <div class="h5 text-info mb-0 fw-bold">15.99€<small class="fs-6">/jour</small></div>
+                                <small class="text-muted">+ 50.00€ de caution</small>
+                            </div>
+                            
+                            <!-- Stock -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Stock: 3</small>
+                                <small class="text-warning">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>Dernières pièces !
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="d-grid gap-2">
+                            <!-- Bouton Voir détails -->
+                            <a href="#" 
+                               class="btn btn-outline-primary btn-sm clickable-test"
+                               onclick="testClick(this, 'Voir détails location'); return false;">
+                                <i class="fas fa-eye me-1"></i>Voir détails
+                            </a>
+                            
+                            <!-- Actions pour location -->
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-outline-info btn-sm clickable-test" 
+                                        onclick="testClick(this, 'Réserver')">
+                                    <i class="fas fa-calendar-plus me-1"></i>Réserver
+                                </button>
+                                <button class="btn btn-info btn-sm clickable-test" 
+                                        onclick="testClick(this, 'Louer maintenant')">
+                                    <i class="fas fa-calendar-check me-1"></i>Louer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carte produit test 3 (mixte) -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card product-card h-100 shadow-sm border-0" 
+                     data-product-id="3" 
+                     data-stock="0">
+                    <div class="debug-info">Card ID: 3</div>
+                    <div class="position-relative">
+                        <!-- Image du produit -->
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                             style="height: 250px;">
+                            <i class="fas fa-seedling text-muted fa-3x"></i>
+                        </div>
+                        
+                        <!-- Badge type de produit -->
+                        <div class="position-absolute bottom-0 start-0 m-2">
+                            <span class="badge bg-warning">
+                                <i class="fas fa-star me-1"></i>Achat + Location
+                            </span>
+                        </div>
+
+                        <!-- Indicateur de stock -->
+                        <div class="position-absolute top-0 start-0 m-2">
+                            <span class="badge bg-danger">
+                                <i class="fas fa-times me-1"></i>Rupture
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title mb-2">Graines de radis</h5>
+                        
+                        <p class="card-text text-muted flex-grow-1 small mb-3">
+                            Graines bio de radis rouges, récolte rapide.
+                        </p>
+                        
+                        <!-- Informations prix -->
+                        <div class="mb-3">
+                            <div class="text-center">
+                                <span class="h5 text-success mb-0 fw-bold">2.50€</span>
+                                <small class="text-muted">/sachet</small>
+                            </div>
+                            
+                            <!-- Stock -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Stock: 0</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="d-grid gap-2">
+                            <!-- Bouton Voir détails -->
+                            <a href="#" 
+                               class="btn btn-outline-primary btn-sm clickable-test"
+                               onclick="testClick(this, 'Voir détails rupture'); return false;">
+                                <i class="fas fa-eye me-1"></i>Voir détails
+                            </a>
+                            
+                            <!-- Bouton désactivé -->
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="fas fa-ban me-1"></i>Rupture de stock
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zone de test des résultats -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Résultats des tests de clic</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="test-results" class="list-group">
+                            <div class="list-group-item">Aucun test effectué</div>
+                        </div>
+                        <button class="btn btn-warning mt-3" onclick="clearTests()">
+                            <i class="fas fa-trash me-1"></i>Effacer les résultats
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let testCount = 0;
+        
+        // Fonction pour tester les clics
+        function testClick(element, action) {
+            testCount++;
+            
+            // Ajouter la classe "clicked" pour indiquer visuellement le clic
+            element.classList.add('clicked');
+            
+            // Créer un résultat de test
+            const timestamp = new Date().toLocaleTimeString();
+            const resultHtml = `
+                <div class="list-group-item list-group-item-success">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">Test #${testCount}: ${action}</h6>
+                        <small>${timestamp}</small>
+                    </div>
+                    <p class="mb-1">Élément: ${element.tagName.toLowerCase()}${element.className ? '.' + element.className.split(' ').join('.') : ''}</p>
+                    <small>Position: ${element.getBoundingClientRect().top.toFixed(0)}px du haut</small>
+                </div>
+            `;
+            
+            // Ajouter le résultat
+            const resultsContainer = document.getElementById('test-results');
+            if (resultsContainer.children[0].textContent === 'Aucun test effectué') {
+                resultsContainer.innerHTML = '';
+            }
+            resultsContainer.insertAdjacentHTML('afterbegin', resultHtml);
+            
+            console.log(`✅ Test #${testCount}: ${action} - Element clicked:`, element);
+            
+            // Enlever la classe "clicked" après 2 secondes
+            setTimeout(() => {
+                element.classList.remove('clicked');
+            }, 2000);
+        }
+        
+        // Fonction pour effacer les tests
+        function clearTests() {
+            testCount = 0;
+            document.getElementById('test-results').innerHTML = '<div class="list-group-item">Aucun test effectué</div>';
+            
+            // Enlever toutes les classes "clicked"
+            document.querySelectorAll('.clicked').forEach(el => {
+                el.classList.remove('clicked');
+            });
+            
+            console.log('🧹 Tests effacés');
+        }
+        
+        // Test des événements sur les cartes
+        document.querySelectorAll('.product-card').forEach((card, index) => {
+            card.addEventListener('click', function(e) {
+                // Ne pas déclencher si on clique sur un élément spécifique
+                if (e.target.closest('.clickable-test')) {
+                    return;
+                }
+                
+                console.log(`🃏 Carte produit ${index + 1} cliquée:`, e.target);
+                testClick(this, `Carte produit ${index + 1}`);
+            });
+            
+            card.addEventListener('mouseenter', function() {
+                console.log(`🐭 Hover sur carte produit ${index + 1}`);
+            });
+        });
+        
+        // Test des overlays invisibles
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔍 Diagnostic des éléments interactifs...');
+            
+            // Vérifier les z-index
+            document.querySelectorAll('.position-absolute').forEach(el => {
+                const zIndex = window.getComputedStyle(el).zIndex;
+                if (zIndex !== 'auto' && parseInt(zIndex) > 100) {
+                    console.warn('⚠️ Z-index élevé détecté:', el, 'z-index:', zIndex);
+                }
+            });
+            
+            // Vérifier les overlays
+            document.querySelectorAll('[style*="position"]').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.width > 200 && rect.height > 200) {
+                    console.log('📏 Grand élément positionné:', el, rect);
+                }
+            });
+            
+            console.log('✅ Diagnostic terminé');
+        });
+        
+        // Test des événements de propagation
+        document.addEventListener('click', function(e) {
+            console.log('🎯 Clic global détecté:', e.target);
+        }, true);
+    </script>
+</body>
+</html>

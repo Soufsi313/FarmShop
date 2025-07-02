@@ -216,6 +216,132 @@
                 </div>
             </section>
 
+            <!-- Section Produits en vedette -->
+            <section class="py-5 bg-light">
+                <div class="container">
+                    <div class="row text-center mb-5">
+                        <div class="col-lg-8 mx-auto">
+                            <h2 class="display-5 fw-bold mb-4">
+                                <i class="fas fa-fire text-danger me-3"></i>
+                                Produits en vedette
+                            </h2>
+                            <p class="lead text-muted">
+                                Découvrez notre sélection de produits de qualité avec des offres spéciales
+                            </p>
+                        </div>
+                    </div>
+                    
+                    @if(isset($featuredProducts) && $featuredProducts->count() > 0)
+                    <div class="row g-4">
+                        @foreach($featuredProducts as $product)
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card h-100 border-0 shadow-sm hover-lift position-relative @if($product->hasActiveSpecialOffer()) featured-product-card @endif"
+                                 data-product-special="@if($product->hasActiveSpecialOffer()) true @else false @endif">
+                                @if($product->hasActiveSpecialOffer())
+                                    @php
+                                        $offer = $product->getActiveSpecialOffer();
+                                    @endphp
+                                    <!-- Badge de promotion -->
+                                    <div class="position-absolute top-0 start-0 m-2" style="z-index: 10;">
+                                        <span class="badge special-offer-badge promo-badge fs-6 rounded-pill px-3 py-2 shadow-sm">
+                                            <i class="fas fa-fire fire-icon me-1"></i>
+                                            -{{ $offer->discount_percentage }}%
+                                        </span>
+                                    </div>
+                                    <!-- Banderole diagonale -->
+                                    <div class="promo-banner fade-in-special">
+                                        PROMO
+                                    </div>
+                                @endif
+                                
+                                <!-- Image du produit -->
+                                <div class="position-relative overflow-hidden" style="height: 200px;">
+                                    @if($product->main_image)
+                                        <img src="{{ asset('storage/' . $product->main_image) }}" 
+                                             alt="{{ $product->name }}"
+                                             class="card-img-top h-100 w-100" 
+                                             style="object-fit: cover;">
+                                    @else
+                                        <div class="bg-light h-100 d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-image fa-3x text-muted"></i>
+                                        </div>
+                                    @endif
+                                </div>
+                                
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">{{ $product->name }}</h5>
+                                    <p class="card-text text-muted flex-grow-1">
+                                        {{ Str::limit($product->description, 80) }}
+                                    </p>
+                                    
+                                    <!-- Prix -->
+                                    <div class="mb-3">
+                                        @if($product->hasActiveSpecialOffer())
+                                            @php
+                                                $offer = $product->getActiveSpecialOffer();
+                                                $discountedPrice = $product->price * (1 - $offer->discount_percentage / 100);
+                                            @endphp
+                                            <div class="price-with-discount d-flex align-items-center justify-content-center flex-wrap gap-2">
+                                                <span class="original-price text-decoration-line-through text-muted">
+                                                    {{ number_format($product->price, 2) }}€
+                                                </span>
+                                                <span class="discounted-price h5 mb-0 fw-bold">
+                                                    {{ number_format($discountedPrice, 2) }}€
+                                                </span>
+                                            </div>
+                                            <small class="text-success d-block text-center">
+                                                <i class="fas fa-gift me-1"></i>
+                                                Dès {{ $offer->min_quantity }} unités
+                                            </small>
+                                        @else
+                                            <span class="h5 text-primary mb-0 fw-bold d-block text-center">
+                                                {{ number_format($product->price, 2) }}€
+                                            </span>
+                                        @endif
+                                    </div>
+                                    
+                                    <!-- Boutons d'action -->
+                                    <div class="d-grid gap-2">
+                                        <a href="{{ route('products.show', $product) }}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>
+                                            Voir le détail
+                                        </a>
+                                        @auth
+                                            <form action="{{ route('cart.add', $product) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                                    <i class="fas fa-cart-plus me-1"></i>
+                                                    Ajouter au panier
+                                                </button>
+                                            </form>
+                                        @endauth
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    
+                    <div class="text-center mt-5">
+                        <a href="{{ route('products.index') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            Voir tous les produits
+                        </a>
+                    </div>
+                    @else
+                    <div class="text-center">
+                        <div class="bg-light rounded p-5">
+                            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Aucun produit disponible pour le moment</h4>
+                            <p class="text-muted">Revenez bientôt pour découvrir nos nouveautés !</p>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+            </section>
+
             <!-- Testimonials Section -->
             <section class="py-5" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
                 <div class="container">
