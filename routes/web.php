@@ -155,6 +155,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/api/cart/items/{cartItem}', [App\Http\Controllers\CartController::class, 'destroy'])->name('cart.remove');
     Route::delete('/api/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
     
+    // Route "Acheter maintenant"
+    Route::post('/api/orders/buy-now', [App\Http\Controllers\OrderController::class, 'buyNow'])->name('orders.buy-now');
+    
     // Routes commandes (utilisateurs connectés)
     Route::get('/checkout', [App\Http\Controllers\OrderController::class, 'create'])->name('orders.create');
     Route::post('/checkout', [App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
@@ -162,6 +165,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/mes-commandes/{order}', [App\Http\Controllers\OrderController::class, 'show'])->name('orders.user.show');
     Route::get('/mes-commandes/{order}/facture', [App\Http\Controllers\OrderController::class, 'downloadInvoice'])->name('orders.user.invoice');
     Route::post('/mes-commandes/{order}/annuler', [App\Http\Controllers\OrderController::class, 'userCancel'])->name('orders.user.cancel');
+    
+    // Routes locations (utilisateurs connectés)
+    Route::get('/mes-locations', [App\Http\Controllers\RentalController::class, 'index'])->name('rentals.user.index');
+    Route::get('/mes-locations/{rental}', [App\Http\Controllers\RentalController::class, 'show'])->name('rentals.user.show');
+    Route::post('/mes-locations/{rental}/retour', [App\Http\Controllers\RentalController::class, 'userReturn'])->name('rentals.user.return');
     
     // Route de test pour vérifier l'authentification
     Route::get('/api/test-auth', function () {
@@ -231,6 +239,7 @@ Route::middleware(['auth'])->prefix('payment')->name('payment.')->group(function
     Route::get('/form', [App\Http\Controllers\PaymentController::class, 'showPaymentForm'])->name('form');
     Route::post('/create-intent', [App\Http\Controllers\PaymentController::class, 'createPaymentIntent'])->name('create-intent');
     Route::post('/confirm', [App\Http\Controllers\PaymentController::class, 'confirmPayment'])->name('confirm');
+    Route::get('/finalize-order', [App\Http\Controllers\PaymentController::class, 'finalizeOrder'])->name('finalize-order');
     Route::post('/rental', [App\Http\Controllers\PaymentController::class, 'createRentalPayment'])->name('rental');
     Route::get('/test-cards', [App\Http\Controllers\PaymentController::class, 'testCards'])->name('test-cards');
 });

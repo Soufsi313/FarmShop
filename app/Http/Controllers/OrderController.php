@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderReturn;
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Product;
 use App\Notifications\OrderConfirmation;
 use App\Notifications\OrderStatusChanged;
@@ -143,82 +144,23 @@ class OrderController extends Controller
             'country' => $request->shipping_country ?: 'France',
         ];
 
-        DB::beginTransaction();
+        // Stocker les données de commande en session pour les récupérer après le paiement
+        session()->put('order_data', [
+            'user_id' => $user->id,
+            'subtotal' => $subtotal,
+            'tax_amount' => $taxAmount,
+            'shipping_cost' => $shippingCost,
+            'total_amount' => $totalAmount,
+            'shipping_address' => $shippingAddress,
+            'notes' => $request->notes,
+        ]);
 
-        try {
-            // Créer la commande
-            $order = Order::create([
-                'user_id' => $user->id,
-                'order_number' => Order::generateOrderNumber(),
-                'status' => Order::STATUS_CONFIRMED, // Changer en confirmé directement
-                'subtotal' => $subtotal,
-                'tax_amount' => $taxAmount,
-                'shipping_cost' => $shippingCost,
-                'total_amount' => $totalAmount,
-                'shipping_address' => json_encode($shippingAddress),
-                'billing_address' => json_encode($shippingAddress), // Utiliser la même adresse pour la facturation
-                'payment_method' => 'stripe', // Méthode par défaut
-                'payment_status' => Order::PAYMENT_PENDING,
-                'notes' => $request->notes,
-            ]);
-
-            // Créer les articles de commande
-            foreach ($cartItems as $cartItem) {
-                $product = $cartItem->product;
-
-                // Vérifier le stock
-                if ($product->quantity < $cartItem->quantity) {
-                    throw new \Exception("Stock insuffisant pour le produit {$product->name}");
-                }
-
-                $orderItem = OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'product_name' => $product->name,
-                    'product_description' => $product->description,
-                    'unit_price' => $cartItem->unit_price,
-                    'quantity' => $cartItem->quantity,
-                    'total_price' => $cartItem->total_price,
-                    'status' => OrderItem::STATUS_PENDING,
-                ]);
-
-                // Décrémenter le stock
-                $product->decrement('quantity', $cartItem->quantity);
-            }
-
-            // Vider le panier
-            $user->cartItems()->delete();
-
-            // Envoyer notification email de confirmation
-            $this->sendOrderConfirmationEmail($order);
-
-            DB::commit();
-
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Commande créée avec succès.',
-                    'data' => $order->load('items.product')
-                ], 201);
-            }
-
-            return redirect()->route('orders.user.show', $order)
-                ->with('success', 'Votre commande a été créée avec succès !');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Erreur lors de la création de la commande: ' . $e->getMessage()
-                ], 500);
-            }
-
-            return redirect()->back()
-                ->with('error', 'Erreur lors de la création de la commande: ' . $e->getMessage())
-                ->withInput();
-        }
+        // Rediriger vers le paiement Stripe avec les informations du panier
+        return redirect()->route('payment.form', [
+            'amount' => $totalAmount,
+            'currency' => 'eur',
+            'description' => 'Commande FarmShop (' . $cartItems->count() . ' articles)'
+        ]);
     }
 
     /**
@@ -768,5 +710,52 @@ class OrderController extends Controller
                 'refund_amount' => $canCancel && $order->isPaid() ? $order->total_amount : 0,
             ]
         ]);
+    }
+
+    /**
+     * Achat immédiat - ajoute au panier et redirige vers le paiement
+     */
+    public function buyNow(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1|max:99',
+        ]);
+
+        try {
+            $user = Auth::user();
+            $product = Product::findOrFail($request->product_id);
+            
+            // Vérifier la disponibilité du stock
+            if ($product->quantity < $request->quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stock insuffisant. Stock disponible: ' . $product->quantity
+                ], 400);
+            }
+
+            // Vider le panier existant pour l'achat immédiat
+            $user->cartItems()->delete();
+
+            // Ajouter le produit au panier
+            $cartItem = $user->cartItems()->create([
+                'product_id' => $product->id,
+                'quantity' => $request->quantity,
+                'unit_price' => $product->price,
+                'total_price' => $product->price * $request->quantity,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Produit ajouté au panier',
+                'redirect_url' => route('payment.form')
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'achat immédiat: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

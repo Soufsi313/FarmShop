@@ -161,8 +161,8 @@
                         <div class="flex items-center space-x-4 overflow-x-auto">
                             @foreach($order->items->take(3) as $item)
                             <div class="flex-shrink-0 flex items-center space-x-2">
-                                @if($item->product && $item->product->image)
-                                <img src="{{ asset('storage/' . $item->product->image) }}" 
+                                @if($item->product && $item->product->main_image)
+                                <img src="{{ $item->product->main_image_url }}" 
                                      alt="{{ $item->product_name }}"
                                      class="w-10 h-10 object-cover rounded-md">
                                 @else
@@ -247,7 +247,6 @@
     </div>
 </div>
 
-@push('scripts')
 <script>
 function cancelOrder(orderId) {
     const modal = document.getElementById('cancelModal');
@@ -269,5 +268,4 @@ document.getElementById('cancelModal').addEventListener('click', function(e) {
     }
 });
 </script>
-@endpush
 @endsection

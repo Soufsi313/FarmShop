@@ -814,18 +814,21 @@ function buyNowFromDetail(productId) {
             quantity: parseInt(quantity)
         })
     })
-    .then(response => {
-        if (response.ok) {
-            showToast('Achat effectué avec succès !', 'success');
-            // Rediriger vers la page de confirmation
-            // window.location.href = '/orders/confirmation';
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+            // Rediriger vers la page de paiement après un court délai
+            setTimeout(() => {
+                window.location.href = data.redirect_url;
+            }, 1000);
         } else {
-            showToast('Erreur lors de l\'achat', 'error');
+            showToast(data.message || 'Erreur lors de l\'achat', 'error');
         }
     })
     .catch(error => {
-        // En attendant l'implémentation complète
-        showToast(`Achat effectué: ${quantity}x {{ $product->name ?? "" }} (Simulation)`, 'success');
+        console.error('Erreur:', error);
+        showToast('Erreur lors de l\'achat', 'error');
     });
 }
 
