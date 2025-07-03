@@ -242,6 +242,103 @@ class Order extends Model
     /**
      * Méthodes utilitaires
      */
+    /**
+     * Formate l'adresse de livraison pour l'affichage
+     */
+    public function getFormattedShippingAddressAttribute(): string
+    {
+        if (!$this->shipping_address) {
+            return 'Adresse non définie';
+        }
+        
+        $address = $this->shipping_address;
+        
+        // Si c'est une string JSON, on la décode
+        if (is_string($address)) {
+            $decoded = json_decode($address, true);
+            if ($decoded !== null && is_array($decoded)) {
+                $address = $decoded;
+            } else {
+                return 'Adresse non définie';
+            }
+        }
+        
+        // Maintenant $address devrait être un array
+        if (!is_array($address)) {
+            return 'Adresse non définie';
+        }
+        
+        $formatted = [];
+        
+        if (!empty($address['street'])) {
+            $formatted[] = $address['street'];
+        }
+        
+        if (!empty($address['additional_info'])) {
+            $formatted[] = $address['additional_info'];
+        }
+        
+        $cityLine = [];
+        if (!empty($address['postal_code'])) {
+            $cityLine[] = $address['postal_code'];
+        }
+        if (!empty($address['city'])) {
+            $cityLine[] = $address['city'];
+        }
+        
+        if (!empty($cityLine)) {
+            $formatted[] = implode(' ', $cityLine);
+        }
+        
+        if (!empty($address['country'])) {
+            $formatted[] = $address['country'];
+        }
+        
+        return implode(', ', array_filter($formatted));
+    }
+    
+    /**
+     * Formate l'adresse de facturation pour l'affichage
+     */
+    public function getFormattedBillingAddressAttribute(): string
+    {
+        if (!$this->billing_address || !is_array($this->billing_address)) {
+            return 'Adresse non définie';
+        }
+        
+        $address = $this->billing_address;
+        $formatted = [];
+        
+        if (!empty($address['street'])) {
+            $formatted[] = $address['street'];
+        }
+        
+        if (!empty($address['additional_info'])) {
+            $formatted[] = $address['additional_info'];
+        }
+        
+        $cityLine = [];
+        if (!empty($address['postal_code'])) {
+            $cityLine[] = $address['postal_code'];
+        }
+        if (!empty($address['city'])) {
+            $cityLine[] = $address['city'];
+        }
+        
+        if (!empty($cityLine)) {
+            $formatted[] = implode(' ', $cityLine);
+        }
+        
+        if (!empty($address['country'])) {
+            $formatted[] = $address['country'];
+        }
+        
+        return implode(', ', array_filter($formatted));
+    }
+
+    /**
+     * Méthodes utilitaires
+     */
     public function generateOrderNumber(): string
     {
         $year = now()->format('Y');

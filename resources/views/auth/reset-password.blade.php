@@ -1,36 +1,92 @@
 <x-guest-layout>
-    <x-jet-authentication-card>
-        <x-slot name="logo">
-            <x-jet-authentication-card-logo />
-        </x-slot>
+    <div class="min-vh-100 d-flex flex-column justify-content-center align-items-center pt-4">
+        <div class="w-100" style="max-width: 400px;">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <!-- Logo -->
+                    <div class="text-center mb-4">
+                        <a href="{{ route('welcome') }}" class="h3 text-success text-decoration-none fw-bold">
+                            🌱 FarmShop
+                        </a>
+                    </div>
 
-        <x-jet-validation-errors class="mb-4" />
+                    <!-- Titre -->
+                    <h2 class="h4 mb-4 text-center text-dark">
+                        Nouveau mot de passe
+                    </h2>
 
-        <form method="POST" action="{{ route('password.update') }}">
-            @csrf
+                    <!-- Erreurs de validation -->
+                    @if ($errors->any())
+                        <div class="alert alert-danger" role="alert">
+                            <strong>Quelque chose s'est mal passé.</strong>
+                            <ul class="mt-2 mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-            <input type="hidden" name="token" value="{{ $request->route('token') }}">
+                    <!-- Formulaire -->
+                    <form method="POST" action="{{ route('password.update') }}">
+                        @csrf
 
-            <div class="block">
-                <x-jet-label for="email" value="{{ __('Email') }}" />
-                <x-jet-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus />
+                        <input type="hidden" name="token" value="{{ $request->route('token') }}">
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                Adresse e-mail
+                            </label>
+                            <input 
+                                id="email" 
+                                class="form-control" 
+                                type="email" 
+                                name="email" 
+                                value="{{ old('email', $request->email) }}" 
+                                required 
+                                autofocus 
+                                autocomplete="email"
+                                readonly
+                            />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                Nouveau mot de passe
+                            </label>
+                            <input 
+                                id="password" 
+                                class="form-control" 
+                                type="password" 
+                                name="password" 
+                                required 
+                                autocomplete="new-password"
+                            />
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password_confirmation" class="form-label">
+                                Confirmer le mot de passe
+                            </label>
+                            <input 
+                                id="password_confirmation" 
+                                class="form-control" 
+                                type="password" 
+                                name="password_confirmation" 
+                                required 
+                                autocomplete="new-password"
+                            />
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-lock me-1"></i>
+                                Réinitialiser le mot de passe
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-
-            <div class="mt-4">
-                <x-jet-label for="password" value="{{ __('Password') }}" />
-                <x-jet-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            </div>
-
-            <div class="mt-4">
-                <x-jet-label for="password_confirmation" value="{{ __('Confirm Password') }}" />
-                <x-jet-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
-            </div>
-
-            <div class="flex items-center justify-end mt-4">
-                <x-jet-button>
-                    {{ __('Reset Password') }}
-                </x-jet-button>
-            </div>
-        </form>
-    </x-jet-authentication-card>
+        </div>
+    </div>
 </x-guest-layout>

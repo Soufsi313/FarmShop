@@ -43,7 +43,7 @@ class OrderConfirmation extends Notification implements ShouldQueue
             ->line('Nous avons bien reçu votre commande #' . $this->order->order_number)
             ->line('Montant total : ' . number_format($this->order->total_amount, 2) . ' €')
             ->line('Statut de paiement : ' . $this->order->payment_status_label)
-            ->line('Adresse de livraison : ' . $this->order->shipping_address)
+            ->line('Adresse de livraison : ' . $this->order->formatted_shipping_address)
             ->action('Voir ma commande', url('/orders/' . $this->order->id))
             ->line('Merci pour votre achat sur FarmShop !')
             ->line('Vous recevrez une notification dès que le statut de votre commande évoluera.')
