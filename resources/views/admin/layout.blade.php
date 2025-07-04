@@ -211,6 +211,11 @@
                     @endif
                 </a>
                 
+                <a class="nav-link {{ request()->routeIs('admin.notifications*') ? 'active' : '' }}" href="{{ route('admin.notifications.index') }}">
+                    <i class="fas fa-bell me-2"></i>Notifications
+                    <span class="badge bg-danger ms-2 d-none" id="sidebarNotificationBadge">0</span>
+                </a>
+                
                 <hr class="my-3" style="border-color: rgba(255, 255, 255, 0.2);">
                 
                 <a class="nav-link" href="#">
@@ -268,17 +273,33 @@
                         <i class="fas fa-circle me-1"></i>En ligne
                     </span>
                     <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" id="notificationDropdown">
                             <i class="fas fa-bell"></i>
-                            <span class="badge bg-danger">3</span>
+                            <span class="badge bg-danger d-none" id="notificationBadge">0</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">Notifications</h6></li>
-                            <li><a class="dropdown-item" href="#">Nouvelle commande #000123</a></li>
-                            <li><a class="dropdown-item" href="#">Produit en rupture de stock</a></li>
-                            <li><a class="dropdown-item" href="#">Nouvel utilisateur inscrit</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end" style="width: 320px;" id="notificationDropdownMenu">
+                            <li>
+                                <h6 class="dropdown-header d-flex justify-content-between align-items-center">
+                                    Notifications
+                                    <button class="btn btn-sm btn-outline-primary" id="markAllReadBtn">
+                                        <i class="fas fa-check-double"></i>
+                                    </button>
+                                </h6>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-center" href="#">Voir toutes</a></li>
+                            <div id="notificationDropdownList" style="max-height: 300px; overflow-y: auto;">
+                                <li class="text-center py-3">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                        <span class="visually-hidden">Chargement...</span>
+                                    </div>
+                                </li>
+                            </div>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-center" href="{{ route('admin.notifications.index') }}">
+                                    <i class="fas fa-list me-1"></i>Voir toutes les notifications
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -316,6 +337,9 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('adminSidebar');
@@ -334,6 +358,151 @@
                 sidebar.classList.remove('show');
             }
         });
+        
+        // Système de notifications
+        $(document).ready(function() {
+            // Charger les notifications au démarrage
+            loadHeaderNotifications();
+            
+            // Recharger les notifications toutes les 60 secondes
+            setInterval(loadHeaderNotifications, 60000);
+            
+            // Marquer toutes les notifications comme lues depuis le header
+            $('#markAllReadBtn').click(function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: "{{ route('admin.notifications.mark-all-read') }}",
+                    method: 'PATCH',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            loadHeaderNotifications();
+                            if (typeof toastr !== 'undefined') {
+                                toastr.success('Toutes les notifications ont été marquées comme lues');
+                            }
+                        }
+                    },
+                    error: function() {
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error('Erreur lors de la mise à jour');
+                        }
+                    }
+                });
+            });
+        });
+        
+        function loadHeaderNotifications() {
+            $.ajax({
+                url: "{{ route('admin.notifications.index') }}",
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        updateHeaderNotifications(response.notifications, response.count);
+                    }
+                },
+                error: function() {
+                    console.error('Erreur lors du chargement des notifications');
+                }
+            });
+        }
+        
+        function updateHeaderNotifications(notifications, count) {
+            // Mise à jour du badge
+            if (count > 0) {
+                $('#notificationBadge').text(count).removeClass('d-none');
+                $('#sidebarNotificationBadge').text(count).removeClass('d-none');
+            } else {
+                $('#notificationBadge').addClass('d-none');
+                $('#sidebarNotificationBadge').addClass('d-none');
+            }
+            
+            // Mise à jour de la liste dans le dropdown
+            let html = '';
+            if (notifications.length === 0) {
+                html = '<li class="text-center py-3 text-muted">Aucune notification</li>';
+            } else {
+                notifications.slice(0, 5).forEach(function(notification) {
+                    let icon = getHeaderNotificationIcon(notification.type);
+                    let title = getHeaderNotificationTitle(notification.type, notification.data);
+                    let description = getHeaderNotificationDescription(notification.type, notification.data);
+                    
+                    html += `
+                        <li>
+                            <a class="dropdown-item py-2" href="#" onclick="markNotificationAsRead('${notification.id}')">
+                                <div class="d-flex">
+                                    <div class="text-primary me-2">
+                                        <i class="${icon}"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold small">${title}</div>
+                                        <div class="text-muted small">${description.substring(0, 50)}...</div>
+                                        <div class="text-muted" style="font-size: 0.7em;">${notification.created_at}</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    `;
+                });
+            }
+            
+            $('#notificationDropdownList').html(html);
+        }
+        
+        function markNotificationAsRead(id) {
+            $.ajax({
+                url: `/admin/notifications/${id}/read`,
+                method: 'PATCH',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        loadHeaderNotifications();
+                    }
+                }
+            });
+        }
+        
+        function getHeaderNotificationIcon(type) {
+            const icons = {
+                'App\\Notifications\\ProductLowStock': 'fas fa-exclamation-triangle',
+                'App\\Notifications\\ProductOutOfStock': 'fas fa-times-circle',
+                'App\\Notifications\\OrderStatusChanged': 'fas fa-shopping-cart',
+                'App\\Notifications\\RentalOverdue': 'fas fa-clock',
+                'default': 'fas fa-bell'
+            };
+            
+            return icons[type] || icons['default'];
+        }
+        
+        function getHeaderNotificationTitle(type, data) {
+            const titles = {
+                'App\\Notifications\\ProductLowStock': 'Stock faible',
+                'App\\Notifications\\ProductOutOfStock': 'Rupture de stock',
+                'App\\Notifications\\OrderStatusChanged': 'Commande mise à jour',
+                'App\\Notifications\\RentalOverdue': 'Location en retard',
+                'default': 'Notification'
+            };
+            
+            return titles[type] || titles['default'];
+        }
+        
+        function getHeaderNotificationDescription(type, data) {
+            switch(type) {
+                case 'App\\Notifications\\ProductLowStock':
+                    return `${data.product_name} (${data.quantity} restant)`;
+                case 'App\\Notifications\\ProductOutOfStock':
+                    return `${data.product_name} en rupture`;
+                case 'App\\Notifications\\OrderStatusChanged':
+                    return `Commande ${data.order_number}`;
+                case 'App\\Notifications\\RentalOverdue':
+                    return `Location ${data.rental_number}`;
+                default:
+                    return 'Nouvelle notification';
+            }
+        }
     </script>
     
     @yield('scripts')

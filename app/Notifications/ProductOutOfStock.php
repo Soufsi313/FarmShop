@@ -32,7 +32,7 @@ class ProductOutOfStock extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['database']; // Seulement notifications internes, pas d'emails
     }
 
     /**
@@ -49,7 +49,7 @@ class ProductOutOfStock extends Notification implements ShouldQueue
                     ->line('Le produit **' . $this->product->name . '** est maintenant en rupture de stock.')
                     ->line('Quantité restante : ' . $this->product->quantity)
                     ->line('Il est urgent de réapprovisionner ce produit.')
-                    ->action('Voir le produit', route('admin.products.show', $this->product->id))
+                    ->action('Voir les produits', route('admin.products.index'))
                     ->line('Merci de prendre les mesures nécessaires rapidement.');
     }
 
@@ -67,7 +67,7 @@ class ProductOutOfStock extends Notification implements ShouldQueue
             'product_name' => $this->product->name,
             'quantity' => $this->product->quantity,
             'message' => 'Le produit "' . $this->product->name . '" est en rupture de stock.',
-            'url' => route('admin.products.show', $this->product->id)
+            'url' => route('admin.products.index')
         ];
     }
 

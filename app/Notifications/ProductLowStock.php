@@ -32,7 +32,7 @@ class ProductLowStock extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['database']; // Seulement notifications internes, pas d'emails
     }
 
     /**
@@ -50,7 +50,7 @@ class ProductLowStock extends Notification implements ShouldQueue
                     ->line('Quantité restante : ' . $this->product->quantity)
                     ->line('Seuil critique : ' . $this->product->critical_stock_threshold)
                     ->line('Il est recommandé de réapprovisionner ce produit prochainement.')
-                    ->action('Voir le produit', route('admin.products.show', $this->product->id))
+                    ->action('Voir les produits', route('admin.products.index'))
                     ->line('Merci de votre attention.');
     }
 
@@ -69,7 +69,7 @@ class ProductLowStock extends Notification implements ShouldQueue
             'quantity' => $this->product->quantity,
             'critical_threshold' => $this->product->critical_stock_threshold,
             'message' => 'Le produit "' . $this->product->name . '" a atteint le seuil critique de stock.',
-            'url' => route('admin.products.show', $this->product->id)
+            'url' => route('admin.products.index')
         ];
     }
 }

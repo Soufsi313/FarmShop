@@ -141,6 +141,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::put('/messages/{adminMessage}/replies/{reply}', [App\Http\Controllers\AdminMessageReplyController::class, 'update'])->name('messages.replies.update');
     Route::delete('/messages/{adminMessage}/replies/{reply}', [App\Http\Controllers\AdminMessageReplyController::class, 'destroy'])->name('messages.replies.destroy');
     Route::patch('/messages/{adminMessage}/mark-read', [App\Http\Controllers\AdminMessageReplyController::class, 'markAsRead'])->name('messages.mark_read');
+    
+    // Gestion des notifications admin
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('index');
+        Route::get('/count', [App\Http\Controllers\Admin\NotificationController::class, 'unreadCount'])->name('count');
+        Route::patch('/{id}/read', [App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('read');
+        Route::patch('/mark-all-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::delete('/{id}', [App\Http\Controllers\Admin\NotificationController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // Routes pour envoyer des messages à l'admin (utilisateurs connectés)

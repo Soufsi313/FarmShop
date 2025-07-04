@@ -39,63 +39,55 @@
                         </div>
 
                         <!-- Inspection de chaque produit -->
-                        <h6 class="mb-3">Inspection des produits ({{ $orderLocation->items->count() }} produits)</h6>
+                        <h6 class="mb-3">Inspection des produits</h6>
                         
-                        @if($orderLocation->items->count() === 0)
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                <strong>Aucun produit trouvé dans cette commande !</strong>
-                                Il semble qu'il y ait un problème avec les données de la commande.
-                            </div>
-                        @else
-                            @foreach($orderLocation->items as $index => $item)
-                            <div class="border rounded p-3 mb-3">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="d-flex align-items-center mb-3">
-                                            @if($item->product && $item->product->image)
-                                                <img src="{{ asset('storage/' . $item->product->image) }}" 
-                                                     alt="{{ $item->product_name }}" 
-                                                     class="me-3" width="60" height="60" 
-                                                     style="object-fit: cover; border-radius: 5px;">
-                                            @else
-                                                <div class="bg-light d-flex align-items-center justify-content-center me-3" 
-                                                     style="width: 60px; height: 60px; border-radius: 5px;">
-                                                    <i class="fas fa-tools text-muted"></i>
-                                                </div>
-                                            @endif
-                                            <div>
-                                                <h6 class="mb-1">{{ $item->product_name }}</h6>
-                                                <small class="text-muted">{{ $item->duration_days }} jours - {{ number_format($item->rental_price_per_day, 2) }}€/jour</small>
+                        @foreach($orderLocation->items as $index => $item)
+                        <div class="border rounded p-3 mb-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-3">
+                                        @if($item->product && $item->product->image)
+                                            <img src="{{ asset('storage/' . $item->product->image) }}" 
+                                                 alt="{{ $item->product_name }}" 
+                                                 class="me-3" width="60" height="60" 
+                                                 style="object-fit: cover; border-radius: 5px;">
+                                        @else
+                                            <div class="bg-light d-flex align-items-center justify-content-center me-3" 
+                                                 style="width: 60px; height: 60px; border-radius: 5px;">
+                                                <i class="fas fa-tools text-muted"></i>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <!-- Champs cachés pour l'ID -->
-                                        <input type="hidden" name="items[{{ $index }}][id]" value="{{ $item->id }}">
-                                        
-                                        <!-- État du produit -->
-                                        <div class="mb-3">
-                                            <label class="form-label">État du produit <span class="text-danger">*</span></label>
-                                            <select name="items[{{ $index }}][condition]" class="form-select" required>
-                                                <option value="excellent">✅ Excellent - Comme neuf</option>
-                                                <option value="good" selected>✔️ Bon - Légères traces d'usure</option>
-                                                <option value="fair">⚠️ Correct - Quelques défauts visibles</option>
-                                                <option value="poor">❌ Mauvais - Défauts importants</option>
-                                            </select>
-                                        </div>
-                                        
-                                        <!-- Notes spécifiques -->
-                                        <div class="mb-2">
-                                            <label class="form-label">Notes spécifiques</label>
-                                            <textarea class="form-control" name="items[{{ $index }}][notes]" rows="2" 
-                                                      placeholder="Défauts, usure, accessoires manquants..."></textarea>
+                                        @endif
+                                        <div>
+                                            <h6 class="mb-1">{{ $item->product_name }}</h6>
+                                            <small class="text-muted">{{ $item->duration_days }} jours - {{ number_format($item->rental_price_per_day, 2) }}€/jour</small>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <!-- Champs cachés pour l'ID -->
+                                    <input type="hidden" name="items[{{ $index }}][id]" value="{{ $item->id }}">
+                                    
+                                    <!-- État du produit -->
+                                    <div class="mb-3">
+                                        <label class="form-label">État du produit <span class="text-danger">*</span></label>
+                                        <select name="items[{{ $index }}][condition]" class="form-select" required>
+                                            <option value="excellent">✅ Excellent - Comme neuf</option>
+                                            <option value="good" selected>✔️ Bon - Légères traces d'usure</option>
+                                            <option value="fair">⚠️ Correct - Quelques défauts visibles</option>
+                                            <option value="poor">❌ Mauvais - Défauts importants</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Notes spécifiques -->
+                                    <div class="mb-2">
+                                        <label class="form-label">Notes spécifiques</label>
+                                        <textarea class="form-control" name="items[{{ $index }}][notes]" rows="2" 
+                                                  placeholder="Défauts, usure, accessoires manquants..."></textarea>
+                                    </div>
+                                </div>
                             </div>
-                            @endforeach
-                        @endif
+                        </div>
+                        @endforeach
 
                         <!-- Boutons d'action -->
                         <div class="d-flex justify-content-between mt-4">
