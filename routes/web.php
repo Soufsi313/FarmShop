@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\RentalCategoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,6 +12,10 @@ Route::get('/', function () {
 // Routes publiques pour les catégories
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
+
+// Routes publiques pour les catégories de location
+Route::get('/rental-categories', [RentalCategoryController::class, 'index'])->name('rental-categories.index');
+Route::get('/rental-categories/{rentalCategory}', [RentalCategoryController::class, 'show'])->name('rental-categories.show');
 
 // Routes d'authentification et utilisateur (pour interface web si nécessaire)
 Route::middleware(['auth'])->group(function () {
@@ -39,4 +44,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('categories', CategoryController::class);
     Route::post('categories/{id}/restore', [CategoryController::class, 'restore'])->name('categories.restore');
     Route::patch('categories/{category}/toggle-status', [CategoryController::class, 'toggleStatus'])->name('categories.toggle-status');
+    
+    // Gestion des catégories de location
+    Route::resource('rental-categories', RentalCategoryController::class);
+    Route::post('rental-categories/{id}/restore', [RentalCategoryController::class, 'restore'])->name('rental-categories.restore');
+    Route::patch('rental-categories/{rentalCategory}/toggle-status', [RentalCategoryController::class, 'toggleStatus'])->name('rental-categories.toggle-status');
 });

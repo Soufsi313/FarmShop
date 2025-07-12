@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\RentalCategoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,11 @@ Route::post('/register', [UserController::class, 'store'])->name('api.users.regi
 Route::get('/categories', [CategoryController::class, 'index'])->name('api.categories.index');
 Route::get('/categories/active', [CategoryController::class, 'active'])->name('api.categories.active');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('api.categories.show');
+
+// Routes publiques pour les catégories de location (consultation)
+Route::get('/rental-categories', [RentalCategoryController::class, 'index'])->name('api.rental-categories.index');
+Route::get('/rental-categories/active', [RentalCategoryController::class, 'active'])->name('api.rental-categories.active');
+Route::get('/rental-categories/{rentalCategory}', [RentalCategoryController::class, 'show'])->name('api.rental-categories.show');
 
 // Routes protégées nécessitant une authentification
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -58,6 +64,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
             Route::post('/{id}/restore', [CategoryController::class, 'restore'])->name('restore');
             Route::patch('/{category}/toggle-status', [CategoryController::class, 'toggleStatus'])->name('toggle-status');
+        });
+        
+        // Gestion des catégories de location (Admin seulement)
+        Route::prefix('admin/rental-categories')->name('api.admin.rental-categories.')->group(function () {
+            Route::post('/', [RentalCategoryController::class, 'store'])->name('store');
+            Route::put('/{rentalCategory}', [RentalCategoryController::class, 'update'])->name('update');
+            Route::delete('/{rentalCategory}', [RentalCategoryController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/restore', [RentalCategoryController::class, 'restore'])->name('restore');
+            Route::patch('/{rentalCategory}/toggle-status', [RentalCategoryController::class, 'toggleStatus'])->name('toggle-status');
         });
     });
 });
