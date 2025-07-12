@@ -297,4 +297,128 @@ class MessageController extends Controller
             'message' => "Action appliquée à {$count} messages"
         ]);
     }
+
+    /**
+     * Obtenir les alertes de stock pour l'admin
+     */
+    public function getStockAlerts(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (!$user->hasRole('admin')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Accès non autorisé'
+            ], 403);
+        }
+
+        $query = Message::where('type', 'stock_alert')
+                        ->where('user_id', $user->id)
+                        ->with('sender')
+                        ->latest();
+
+        // Filtrer par type d'alerte
+        if ($request->has('alert_type')) {
+            $query->where('metadata->alert_type', $request->alert_type);
+        }
+
+        // Filtrer par statut
+        if ($request->has('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        // Filtrer par priorité
+        if ($request->has('priority') && $request->priority !== 'all') {
+            $query->where('priority', $request->priority);
+        }
+
+        $alerts = $query->paginate($request->get('per_page', 15));
+
+        // Statistiques des alertes
+        $alertStats = [
+            'total' => Message::where('type', 'stock_alert')->where('user_id', $user->id)->count(),
+            'unread' => Message::where('type', 'stock_alert')->where('user_id', $user->id)->where('status', 'unread')->count(),
+            'by_type' => Message::where('type', 'stock_alert')
+                               ->where('user_id', $user->id)
+                               ->selectRaw('JSON_EXTRACT(metadata, "$.alert_type") as alert_type, COUNT(*) as count')
+                               ->groupBy('alert_type')
+                               ->pluck('count', 'alert_type'),
+            'by_priority' => Message::where('type', 'stock_alert')
+                                   ->where('user_id', $user->id)
+                                   ->selectRaw('priority, COUNT(*) as count')
+                                   ->groupBy('priority')
+                                   ->pluck('count', 'priority')
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $alerts,
+            'statistics' => $alertStats,
+            'message' => 'Alertes de stock récupérées'
+        ]);
+    }
+
+    /**
+     * Marquer toutes les alertes de stock comme lues
+     */
+    public function markStockAlertsAsRead()
+    {
+        $user = Auth::user();
+        
+        if (!$user->hasRole('admin')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Accès non autorisé'
+            ], 403);
+        }
+
+        $updated = Message::where('type', 'stock_alert')
+                         ->where('user_id', $user->id)
+                         ->where('status', 'unread')
+                         ->update([
+                             'status' => 'read',
+                             'read_at' => now()
+                         ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "{$updated} alerte(s) marquée(s) comme lue(s)",
+            'updated_count' => $updated
+        ]);
+    }
+
+    /**
+     * Obtenir le résumé des alertes non lues pour le badge
+     */
+    public function getUnreadAlertsCount()
+    {
+        $user = Auth::user();
+        
+        if (!$user->hasRole('admin')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Accès non autorisé'
+            ], 403);
+        }
+
+        $counts = [
+            'stock_alerts' => Message::where('type', 'stock_alert')
+                                    ->where('user_id', $user->id)
+                                    ->where('status', 'unread')
+                                    ->count(),
+            'urgent_alerts' => Message::where('type', 'stock_alert')
+                                     ->where('user_id', $user->id)
+                                     ->where('status', 'unread')
+                                     ->where('priority', 'high')
+                                     ->count(),
+            'total_unread' => Message::where('user_id', $user->id)
+                                    ->where('status', 'unread')
+                                    ->count()
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $counts
+        ]);
+    }
 }

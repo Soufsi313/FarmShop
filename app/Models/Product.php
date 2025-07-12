@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\StockUpdated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -249,8 +250,17 @@ class Product extends Model
      */
     public function decreaseStock($quantity)
     {
+        $oldQuantity = $this->quantity;
+        
         if ($this->quantity >= $quantity) {
             $this->decrement('quantity', $quantity);
+            
+            // Déclencher l'événement de mise à jour de stock
+            event(new StockUpdated($this, $oldQuantity, $this->quantity, 'decrease'));
+            
+            // Vérifier et créer des alertes de stock après la diminution
+            $this->checkStockAlerts($oldQuantity);
+            
             return true;
         }
         return false;
@@ -258,205 +268,210 @@ class Product extends Model
 
     public function increaseStock($quantity)
     {
+        $oldQuantity = $this->quantity;
         $this->increment('quantity', $quantity);
+        
+        // Déclencher l'événement de mise à jour de stock
+        event(new StockUpdated($this, $oldQuantity, $this->quantity, 'increase'));
+        
+        // Vérifier si on sort d'une alerte de stock critique
+        $this->checkStockRecovery($oldQuantity);
     }
 
     public function setStock($quantity)
     {
+        $oldQuantity = $this->quantity;
         $this->update(['quantity' => $quantity]);
+        
+        // Déclencher l'événement de mise à jour de stock
+        event(new StockUpdated($this, $oldQuantity, $this->quantity, 'set'));
+        
+        // Vérifier les alertes après modification manuelle
+        $this->checkStockAlerts($oldQuantity);
     }
 
     /**
-     * Vérifier si le produit est disponible pour la location
+     * Vérifier et créer des alertes de stock si nécessaire
      */
-    public function isRentable(): bool
+    protected function checkStockAlerts($previousQuantity = null)
     {
-        return in_array($this->type, ['rental', 'both']) && 
-               $this->is_active && 
-               $this->rental_price_per_day > 0;
-    }
-
-    /**
-     * Obtenir les jours de la semaine disponibles pour la location
-     * Par défaut : Lundi à Samedi (1-6)
-     */
-    public function getAvailableDays(): array
-    {
-        return $this->available_days ?? [1, 2, 3, 4, 5, 6]; // Lundi à Samedi
-    }
-
-    /**
-     * Vérifier si un jour de la semaine est disponible pour la location
-     */
-    public function isDayAvailable(int $dayOfWeek): bool
-    {
-        return in_array($dayOfWeek, $this->getAvailableDays());
-    }
-
-    /**
-     * Valider une période de location pour ce produit
-     */
-    public function validateRentalPeriod(\Carbon\Carbon $startDate, \Carbon\Carbon $endDate): array
-    {
-        $errors = [];
-        
-        // Vérifier que le produit est louable
-        if (!$this->isRentable()) {
-            $errors[] = "Ce produit n'est pas disponible à la location";
-            return ['valid' => false, 'errors' => $errors];
-        }
-        
-        // Vérifier que la date de début n'est pas aujourd'hui ou dans le passé
-        if ($startDate->lte(now()->startOfDay())) {
-            $errors[] = "La location ne peut pas commencer aujourd'hui. Date minimum : " . now()->addDay()->format('d/m/Y');
-        }
-        
-        // Vérifier que la date de fin est après la date de début
-        if ($endDate->lte($startDate)) {
-            $errors[] = "La date de fin doit être après la date de début";
-        }
-        
-        // Calculer la durée en jours
-        $duration = $startDate->diffInDays($endDate) + 1; // +1 pour inclure le jour de début
-        
-        // Vérifier la durée minimale
-        if ($duration < $this->min_rental_days) {
-            $errors[] = "Durée minimale de location : {$this->min_rental_days} jour(s)";
-        }
-        
-        // Vérifier la durée maximale
-        if ($duration > $this->max_rental_days) {
-            $errors[] = "Durée maximale de location : {$this->max_rental_days} jour(s)";
-        }
-        
-        // Vérifier que tous les jours de la période sont disponibles
-        $current = $startDate->copy();
-        while ($current->lte($endDate)) {
-            $dayOfWeek = $current->dayOfWeek === 0 ? 7 : $current->dayOfWeek; // Dimanche = 7, Lundi = 1
+        // Éviter les alertes multiples pour le même état
+        if ($previousQuantity !== null) {
+            $previousStatus = $this->getStockStatusFromQuantity($previousQuantity);
+            $currentStatus = $this->stock_status;
             
-            if (!$this->isDayAvailable($dayOfWeek)) {
-                $dayName = $this->getDayName($dayOfWeek);
-                $errors[] = "Location non disponible le {$dayName} ({$current->format('d/m/Y')})";
+            // Si le statut n'a pas changé, pas besoin de nouvelle alerte
+            if ($previousStatus === $currentStatus) {
+                return;
             }
-            
-            $current->addDay();
         }
+
+        // Alerte rupture de stock
+        if ($this->is_out_of_stock) {
+            $this->createStockAlert('out_of_stock');
+        }
+        // Alerte stock critique
+        elseif ($this->is_critical_stock) {
+            $this->createStockAlert('critical_stock');
+        }
+        // Alerte stock faible
+        elseif ($this->is_low_stock) {
+            $this->createStockAlert('low_stock');
+        }
+    }
+
+    /**
+     * Vérifier si le produit sort d'une alerte critique
+     */
+    protected function checkStockRecovery($previousQuantity)
+    {
+        $previousStatus = $this->getStockStatusFromQuantity($previousQuantity);
+        $currentStatus = $this->stock_status;
         
-        $costDetails = empty($errors) ? $this->calculateRentalCost($startDate, $endDate) : null;
-        
-        return [
-            'valid' => empty($errors),
-            'errors' => $errors,
-            'duration' => $duration,
-            'cost_details' => $costDetails,
-            'total_cost' => $costDetails ? $costDetails['total_cost'] : null,
-            'deposit_required' => $this->deposit_amount
+        // Si on passe d'un état critique à normal, notifier la récupération
+        if (in_array($previousStatus, ['out_of_stock', 'critical']) && $currentStatus === 'in_stock') {
+            $this->createStockAlert('stock_recovered');
+        }
+    }
+
+    /**
+     * Créer une alerte de stock dans la table messages
+     */
+    protected function createStockAlert($alertType)
+    {
+        // Éviter les doublons récents (moins de 1 heure)
+        $recentAlert = Message::where('type', 'stock_alert')
+            ->where('metadata->product_id', $this->id)
+            ->where('metadata->alert_type', $alertType)
+            ->where('created_at', '>', now()->subHour())
+            ->exists();
+
+        if ($recentAlert) {
+            return;
+        }
+
+        $admins = User::whereHas('roles', function($q) {
+            $q->where('name', 'admin');
+        })->get();
+
+        $alertMessages = [
+            'out_of_stock' => [
+                'subject' => '🚨 RUPTURE DE STOCK - ' . $this->name,
+                'content' => "Le produit \"{$this->name}\" (SKU: {$this->sku}) est en rupture de stock.\n\nStock actuel: {$this->quantity}\nSeuil critique: {$this->critical_threshold}\n\nAction immédiate requise pour reconstituer le stock.",
+                'priority' => 'high'
+            ],
+            'critical_stock' => [
+                'subject' => '⚠️ STOCK CRITIQUE - ' . $this->name,
+                'content' => "Le produit \"{$this->name}\" (SKU: {$this->sku}) a atteint le seuil critique.\n\nStock actuel: {$this->quantity}\nSeuil critique: {$this->critical_threshold}\n\nRecommandation: Réapprovisionner rapidement.",
+                'priority' => 'high'
+            ],
+            'low_stock' => [
+                'subject' => '📉 STOCK FAIBLE - ' . $this->name,
+                'content' => "Le produit \"{$this->name}\" (SKU: {$this->sku}) a un stock faible.\n\nStock actuel: {$this->quantity}\nSeuil de stock faible: {$this->low_stock_threshold}\n\nPensez à commander du stock supplémentaire.",
+                'priority' => 'medium'
+            ],
+            'stock_recovered' => [
+                'subject' => '✅ STOCK RECONSTITUÉ - ' . $this->name,
+                'content' => "Le produit \"{$this->name}\" (SKU: {$this->sku}) a un stock reconstitué.\n\nStock actuel: {$this->quantity}\n\nLe produit est de nouveau disponible normalement.",
+                'priority' => 'low'
+            ]
         ];
+
+        $alertData = $alertMessages[$alertType] ?? null;
+        
+        if (!$alertData) {
+            return;
+        }
+
+        foreach ($admins as $admin) {
+            Message::create([
+                'user_id' => $admin->id,
+                'sender_id' => null, // Message système
+                'type' => 'stock_alert',
+                'subject' => $alertData['subject'],
+                'content' => $alertData['content'],
+                'metadata' => [
+                    'product_id' => $this->id,
+                    'product_name' => $this->name,
+                    'product_sku' => $this->sku,
+                    'alert_type' => $alertType,
+                    'current_stock' => $this->quantity,
+                    'critical_threshold' => $this->critical_threshold,
+                    'low_stock_threshold' => $this->low_stock_threshold,
+                    'category' => $this->category?->name
+                ],
+                'status' => 'unread',
+                'priority' => $alertData['priority'],
+                'is_important' => in_array($alertType, ['out_of_stock', 'critical_stock']),
+                'action_url' => "/admin/products/{$this->id}",
+                'action_label' => 'Voir le produit'
+            ]);
+        }
     }
 
     /**
-     * Calculer le coût total d'une location
+     * Obtenir le statut de stock basé sur une quantité donnée
      */
-    public function calculateRentalCost(\Carbon\Carbon $startDate, \Carbon\Carbon $endDate): array
+    protected function getStockStatusFromQuantity($quantity)
     {
-        $durationDays = $startDate->diffInDays($endDate) + 1;
-        $dailyPrice = $this->rental_price_per_day;
-        $subtotal = $dailyPrice * $durationDays;
-        
-        // Application d'éventuelles remises pour location longue
-        $discount = 0;
-        $discountPercentage = 0;
-        
-        if ($durationDays >= 5) {
-            $discountPercentage = 5; // 5% de remise à partir de 5 jours
+        if ($quantity <= 0) {
+            return 'out_of_stock';
+        } elseif ($quantity <= $this->critical_threshold) {
+            return 'critical';
+        } elseif ($this->low_stock_threshold && $quantity <= $this->low_stock_threshold) {
+            return 'low';
         }
-        if ($durationDays >= 7) {
-            $discountPercentage = 10; // 10% de remise pour la durée maximale
-        }
-        
-        if ($discountPercentage > 0) {
-            $discount = $subtotal * ($discountPercentage / 100);
-        }
-        
-        $total = $subtotal - $discount;
-        
-        return [
-            'duration_days' => $durationDays,
-            'daily_price' => $dailyPrice,
-            'subtotal' => round($subtotal, 2),
-            'discount_percentage' => $discountPercentage,
-            'discount_amount' => round($discount, 2),
-            'total_cost' => round($total, 2),
-            'deposit_required' => $this->deposit_amount,
-            'currency' => 'EUR'
-        ];
+        return 'in_stock';
     }
 
     /**
-     * Obtenir la prochaine date de début disponible
+     * Vérifier si le produit a un stock faible
      */
-    public function getNextAvailableStartDate(): \Carbon\Carbon
+    public function getIsLowStockAttribute()
     {
-        $date = now()->addDay()->startOfDay();
-        
-        // Trouver le prochain jour disponible
-        while (!$this->isDayAvailable($date->dayOfWeek === 0 ? 7 : $date->dayOfWeek)) {
-            $date->addDay();
-        }
-        
-        return $date;
+        return $this->low_stock_threshold && 
+               $this->quantity <= $this->low_stock_threshold && 
+               $this->quantity > $this->critical_threshold;
     }
 
     /**
-     * Obtenir la prochaine date de fin disponible pour une date de début donnée
+     * Scope pour les produits avec stock faible
      */
-    public function getNextAvailableEndDate(\Carbon\Carbon $startDate): \Carbon\Carbon
+    public function scopeLowStock($query)
     {
-        $endDate = $startDate->copy()->addDays($this->min_rental_days - 1);
-        
-        // S'assurer que la date de fin est un jour disponible
-        while (!$this->isDayAvailable($endDate->dayOfWeek === 0 ? 7 : $endDate->dayOfWeek)) {
-            $endDate->addDay();
-        }
-        
-        return $endDate;
+        return $query->whereColumn('quantity', '<=', 'low_stock_threshold')
+                    ->whereColumn('quantity', '>', 'critical_threshold')
+                    ->whereNotNull('low_stock_threshold');
     }
 
     /**
-     * Obtenir le nom du jour en français
+     * Obtenir tous les produits nécessitant une attention (stock critique ou faible)
      */
-    private function getDayName(int $dayOfWeek): string
+    public static function getStockAlerts()
     {
-        $days = [
-            1 => 'Lundi',
-            2 => 'Mardi', 
-            3 => 'Mercredi',
-            4 => 'Jeudi',
-            5 => 'Vendredi',
-            6 => 'Samedi',
-            7 => 'Dimanche'
-        ];
-        
-        return $days[$dayOfWeek] ?? 'Jour inconnu';
+        return static::where(function($query) {
+            $query->outOfStock()
+                  ->orWhere(function($q) {
+                      $q->criticalStock();
+                  })
+                  ->orWhere(function($q) {
+                      $q->lowStock();
+                  });
+        })->with('category')->get();
     }
 
     /**
-     * Obtenir les informations de contraintes de location
+     * Obtenir le nombre de produits par statut de stock
      */
-    public function getRentalConstraints(): array
+    public static function getStockStatistics()
     {
         return [
-            'min_days' => $this->min_rental_days,
-            'max_days' => $this->max_rental_days,
-            'available_days' => $this->getAvailableDays(),
-            'available_days_names' => array_map(
-                fn($day) => $this->getDayName($day), 
-                $this->getAvailableDays()
-            ),
-            'daily_price' => $this->rental_price_per_day,
-            'deposit_amount' => $this->deposit_amount,
-            'next_available_start' => $this->getNextAvailableStartDate()->format('Y-m-d'),
-            'business_hours' => 'Lundi - Samedi'
+            'total_products' => static::count(),
+            'out_of_stock' => static::outOfStock()->count(),
+            'critical_stock' => static::criticalStock()->count(),
+            'low_stock' => static::lowStock()->count(),
+            'in_stock' => static::inStock()->count(),
+            'alerts' => static::getStockAlerts()->count()
         ];
     }
 }

@@ -507,69 +507,205 @@ class ProductController extends Controller
     }
 
     /**
-     * Mise à jour du stock
+     * Obtenir les alertes de stock pour le dashboard admin
      */
-    public function updateStock(Request $request, Product $product): JsonResponse
+    public function getStockAlerts(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'quantity' => 'required|integer|min:0',
-            'operation' => 'required|in:set,add,subtract',
-            'reason' => 'nullable|string|max:255'
-        ]);
-
-        $oldQuantity = $product->quantity;
-
-        switch ($validated['operation']) {
-            case 'set':
-                $newQuantity = $validated['quantity'];
-                break;
-            case 'add':
-                $newQuantity = $oldQuantity + $validated['quantity'];
-                break;
-            case 'subtract':
-                $newQuantity = max(0, $oldQuantity - $validated['quantity']);
-                break;
-        }
-
-        $product->update(['quantity' => $newQuantity]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Stock mis à jour avec succès',
-            'data' => [
-                'product' => $product,
-                'old_quantity' => $oldQuantity,
-                'new_quantity' => $newQuantity,
-                'operation' => $validated['operation'],
-                'reason' => $validated['reason'] ?? null
-            ]
-        ]);
-    }
-
-    /**
-     * Alertes de stock
-     */
-    public function getStockAlerts(): JsonResponse
-    {
-        $lowStockProducts = Product::whereColumn('quantity', '<=', 'low_stock_threshold')
-            ->where('is_active', true)
-            ->with('category')
-            ->get();
-
-        $outOfStockProducts = Product::where('quantity', '<=', DB::raw('COALESCE(out_of_stock_threshold, 0)'))
-            ->where('is_active', true)
-            ->with('category')
-            ->get();
+        $alerts = Product::getStockAlerts();
+        
+        $alertsByType = [
+            'out_of_stock' => $alerts->filter(fn($p) => $p->is_out_of_stock),
+            'critical_stock' => $alerts->filter(fn($p) => $p->is_critical_stock),
+            'low_stock' => $alerts->filter(fn($p) => $p->is_low_stock)
+        ];
 
         return response()->json([
             'success' => true,
             'message' => 'Alertes de stock récupérées',
             'data' => [
-                'low_stock' => $lowStockProducts,
-                'out_of_stock' => $outOfStockProducts,
-                'low_stock_count' => $lowStockProducts->count(),
-                'out_of_stock_count' => $outOfStockProducts->count()
+                'summary' => Product::getStockStatistics(),
+                'alerts_by_type' => [
+                    'out_of_stock' => $alertsByType['out_of_stock']->values(),
+                    'critical_stock' => $alertsByType['critical_stock']->values(),
+                    'low_stock' => $alertsByType['low_stock']->values()
+                ],
+                'total_alerts' => $alerts->count(),
+                'urgent_alerts' => $alertsByType['out_of_stock']->count() + $alertsByType['critical_stock']->count()
             ]
+        ]);
+    }
+
+    /**
+     * Obtenir les statistiques globales de stock pour le dashboard
+     */
+    public function getStockDashboard(Request $request): JsonResponse
+    {
+        $stats = Product::getStockStatistics();
+        
+        // Produits nécessitant une action immédiate
+        $urgentProducts = Product::where(function($query) {
+            $query->outOfStock()->orWhere(function($q) {
+                $q->criticalStock();
+            });
+        })->with('category')->get();
+
+        // Évolution du stock sur les 7 derniers jours
+        $stockEvolution = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $stockEvolution[] = [
+                'date' => $date->format('Y-m-d'),
+                'out_of_stock' => Product::outOfStock()->whereDate('updated_at', $date)->count(),
+                'critical_stock' => Product::criticalStock()->whereDate('updated_at', $date)->count()
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Dashboard stock récupéré',
+            'data' => [
+                'statistics' => $stats,
+                'urgent_products' => $urgentProducts,
+                'stock_evolution' => $stockEvolution,
+                'recommendations' => $this->getStockRecommendations($stats)
+            ]
+        ]);
+    }
+
+    /**
+     * Générer des recommandations basées sur les statistiques de stock
+     */
+    private function getStockRecommendations(array $stats): array
+    {
+        $recommendations = [];
+
+        if ($stats['out_of_stock'] > 0) {
+            $recommendations[] = [
+                'type' => 'urgent',
+                'icon' => '🚨',
+                'title' => 'Action immédiate requise',
+                'message' => "{$stats['out_of_stock']} produit(s) en rupture de stock",
+                'action' => 'Réapprovisionner immédiatement'
+            ];
+        }
+
+        if ($stats['critical_stock'] > 0) {
+            $recommendations[] = [
+                'type' => 'warning',
+                'icon' => '⚠️',
+                'title' => 'Stock critique',
+                'message' => "{$stats['critical_stock']} produit(s) avec stock critique",
+                'action' => 'Programmer un réapprovisionnement'
+            ];
+        }
+
+        if ($stats['low_stock'] > 0) {
+            $recommendations[] = [
+                'type' => 'info',
+                'icon' => '📉',
+                'title' => 'Stock faible',
+                'message' => "{$stats['low_stock']} produit(s) avec stock faible",
+                'action' => 'Surveiller et prévoir réapprovisionnement'
+            ];
+        }
+
+        if (empty($recommendations)) {
+            $recommendations[] = [
+                'type' => 'success',
+                'icon' => '✅',
+                'title' => 'Stock sous contrôle',
+                'message' => 'Tous les produits ont un stock suffisant',
+                'action' => 'Maintenir la surveillance'
+            ];
+        }
+
+        return $recommendations;
+    }
+
+    /**
+     * Mettre à jour manuellement le stock d'un produit avec notification
+     */
+    public function updateStock(Request $request, Product $product): JsonResponse
+    {
+        $validated = $request->validate([
+            'action' => 'required|in:set,increase,decrease',
+            'quantity' => 'required|integer|min:0',
+            'reason' => 'nullable|string|max:255'
+        ]);
+
+        $oldQuantity = $product->quantity;
+
+        try {
+            DB::beginTransaction();
+
+            switch ($validated['action']) {
+                case 'set':
+                    $product->setStock($validated['quantity']);
+                    break;
+                case 'increase':
+                    $product->increaseStock($validated['quantity']);
+                    break;
+                case 'decrease':
+                    $success = $product->decreaseStock($validated['quantity']);
+                    if (!$success) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Stock insuffisant pour cette opération'
+                        ], 400);
+                    }
+                    break;
+            }
+
+            // Log de l'action pour l'audit
+            $this->logStockChange($product, $oldQuantity, $product->fresh()->quantity, $validated['reason'] ?? 'Mise à jour manuelle admin');
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Stock mis à jour avec succès',
+                'data' => [
+                    'product' => $product->fresh(),
+                    'old_quantity' => $oldQuantity,
+                    'new_quantity' => $product->quantity,
+                    'stock_status' => $product->stock_status
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour du stock: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Enregistrer les changements de stock pour l'audit
+     */
+    private function logStockChange(Product $product, int $oldQuantity, int $newQuantity, string $reason)
+    {
+        // On peut utiliser la table messages pour l'audit aussi
+        Message::create([
+            'user_id' => Auth::id(),
+            'sender_id' => Auth::id(),
+            'type' => 'stock_change_log',
+            'subject' => "Modification stock - {$product->name}",
+            'content' => "Stock modifié: {$oldQuantity} → {$newQuantity}\nRaison: {$reason}",
+            'metadata' => [
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'product_sku' => $product->sku,
+                'old_quantity' => $oldQuantity,
+                'new_quantity' => $newQuantity,
+                'difference' => $newQuantity - $oldQuantity,
+                'reason' => $reason,
+                'admin_id' => Auth::id()
+            ],
+            'status' => 'read', // Les logs sont automatiquement lus
+            'priority' => 'low'
         ]);
     }
 

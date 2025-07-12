@@ -101,6 +101,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('messages')->name('api.messages.')->group(function () {
         Route::get('/', [MessageController::class, 'index'])->name('index');
         Route::get('/stats', [MessageController::class, 'getStats'])->name('stats');
+        Route::get('/stock-alerts', [MessageController::class, 'getStockAlerts'])->name('stock-alerts');
+        Route::post('/stock-alerts/mark-read', [MessageController::class, 'markStockAlertsAsRead'])->name('stock-alerts.mark-read');
+        Route::get('/unread-count', [MessageController::class, 'getUnreadAlertsCount'])->name('unread-count');
         Route::get('/{message}', [MessageController::class, 'show'])->name('show');
         Route::put('/{message}/read', [MessageController::class, 'markAsRead'])->name('mark-read');
         Route::put('/{message}/unread', [MessageController::class, 'markAsUnread'])->name('mark-unread');
@@ -237,6 +240,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             // Gestion de stock
             Route::post('/{product}/stock/update', [ProductController::class, 'updateStock'])->name('stock.update');
             Route::get('/stock/alerts', [ProductController::class, 'getStockAlerts'])->name('stock.alerts');
+            Route::get('/stock/dashboard', [ProductController::class, 'getStockDashboard'])->name('stock.dashboard');
             Route::get('/stock/low', [ProductController::class, 'getLowStockProducts'])->name('stock.low');
         });
         
