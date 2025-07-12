@@ -140,6 +140,22 @@ class Product extends Model
     }
 
     /**
+     * Relation avec les offres spéciales
+     */
+    public function specialOffers()
+    {
+        return $this->hasMany(SpecialOffer::class);
+    }
+
+    /**
+     * Offres spéciales actives pour ce produit
+     */
+    public function activeSpecialOffers()
+    {
+        return $this->hasMany(SpecialOffer::class)->valid()->available();
+    }
+
+    /**
      * Scopes
      */
     public function scopeActive($query)
