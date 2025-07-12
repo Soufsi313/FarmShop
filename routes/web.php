@@ -3,11 +3,48 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RentalCategoryController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Test Tailwind CSS
+Route::get('/test-tailwind', function () {
+    return view('test-tailwind');
+})->name('test.tailwind');
+
+// Pages légales
+Route::get('/privacy', function () {
+    return view('legal.privacy');
+})->name('privacy');
+
+Route::get('/returns', function () {
+    return view('legal.returns');
+})->name('returns');
+
+Route::get('/gdpr-rights', function () {
+    return view('legal.gdpr-rights');
+})->name('gdpr-rights');
+
+// Routes pour les produits (temporaires pour les liens de la landing page)
+Route::get('/products', function () {
+    return redirect('/')->with('message', 'Page produits en cours de développement');
+})->name('products.index');
+
+Route::get('/rentals', function () {
+    return redirect('/')->with('message', 'Page locations en cours de développement');
+})->name('rentals.index');
+
+// Routes d'authentification
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
 
 // Routes publiques pour les catégories
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');

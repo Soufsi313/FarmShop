@@ -19,18 +19,22 @@ class AdminUserSeeder extends Seeder
         
         if (!$existingAdmin) {
             User::create([
-                'username' => 'Saurouk',
+                'username' => 'admin_soufiane',
                 'name' => 'Meftah Soufiane',
                 'email' => 's.mef2703@gmail.com',
                 'password' => Hash::make('blade313'),
-                'role' => 'Admin',
+                'role' => 'admin',
                 'newsletter_subscribed' => false,
                 'email_verified_at' => now(),
             ]);
             
             $this->command->info('Compte administrateur créé avec succès !');
+            $this->command->info('Username: admin_soufiane');
+            $this->command->info('Email: s.mef2703@gmail.com');
+            $this->command->info('Mot de passe: blade313');
         } else {
             $this->command->info('Le compte administrateur existe déjà.');
+            $this->command->info('Email: s.mef2703@gmail.com');
         }
     }
 }
