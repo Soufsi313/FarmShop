@@ -302,6 +302,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::patch('/{blogComment}/toggle-pin', [App\Http\Controllers\BlogCommentController::class, 'togglePin'])->name('toggle-pin');
             Route::delete('/{blogComment}', [App\Http\Controllers\BlogCommentController::class, 'destroy'])->name('destroy');
         });
+        
+        // Gestion des signalements de commentaires (Admin seulement)
+        Route::prefix('admin/blog/comment-reports')->name('api.admin.blog.comment-reports.')->group(function () {
+            Route::get('/', [App\Http\Controllers\BlogCommentReportController::class, 'index'])->name('index');
+            Route::get('/statistics', [App\Http\Controllers\BlogCommentReportController::class, 'statistics'])->name('statistics');
+            Route::get('/{blogCommentReport}', [App\Http\Controllers\BlogCommentReportController::class, 'show'])->name('show');
+            Route::post('/{blogCommentReport}/review', [App\Http\Controllers\BlogCommentReportController::class, 'review'])->name('review');
+            Route::post('/{blogCommentReport}/resolve', [App\Http\Controllers\BlogCommentReportController::class, 'resolve'])->name('resolve');
+            Route::post('/{blogCommentReport}/dismiss', [App\Http\Controllers\BlogCommentReportController::class, 'dismiss'])->name('dismiss');
+            Route::patch('/{blogCommentReport}/priority', [App\Http\Controllers\BlogCommentReportController::class, 'updatePriority'])->name('update-priority');
+            Route::get('/comments/{blogComment}/reports', [App\Http\Controllers\BlogCommentReportController::class, 'commentReports'])->name('comment-reports');
+            Route::post('/bulk-action', [App\Http\Controllers\BlogCommentReportController::class, 'bulkAction'])->name('bulk-action');
+        });
     });
 });
 
@@ -319,4 +332,5 @@ Route::prefix('blog')->name('api.blog.')->group(function () {
     Route::put('/comments/{blogComment}', [App\Http\Controllers\BlogCommentController::class, 'update'])->name('comments.update');
     Route::delete('/comments/{blogComment}', [App\Http\Controllers\BlogCommentController::class, 'destroy'])->name('comments.destroy');
     Route::post('/comments/{blogComment}/like', [App\Http\Controllers\BlogCommentController::class, 'like'])->name('comments.like');
+    Route::post('/comments/{blogComment}/report', [App\Http\Controllers\BlogCommentReportController::class, 'store'])->name('comments.report');
 });
