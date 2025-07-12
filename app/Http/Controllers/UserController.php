@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserController extends Controller
 {
@@ -192,29 +193,152 @@ class UserController extends Controller
     }
 
     /**
-     * Télécharger les données utilisateur (RGPD)
+     * Télécharger les données utilisateur complètes (RGPD) en ZIP avec PDF
      */
     public function downloadData()
     {
         $user = Auth::user();
         
-        $userData = [
-            'informations_personnelles' => [
-                'username' => $user->username,
-                'nom' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
-                'abonne_newsletter' => $user->newsletter_subscribed,
-                'date_creation' => $user->created_at,
-                'derniere_modification' => $user->updated_at,
-            ]
-        ];
-
-        return response()->json([
-            'success' => true,
-            'data' => $userData,
-            'message' => 'Données utilisateur exportées avec succès'
+        // Charger toutes les données de l'utilisateur avec les relations
+        $user->load([
+            'newsletterSubscription',
+            'carts' => function($query) {
+                $query->where('status', 'active');
+            },
+            'cartLocations'
         ]);
+        
+        // Récupérer toutes les données liées
+        $orders = $user->hasMany(\App\Models\Order::class, 'user_id')->get();
+        $rentalOrders = $user->orderLocations;
+        $likedProducts = \App\Models\ProductLike::where('user_id', $user->id)
+            ->with('product.category')->get();
+        $wishlistItems = \App\Models\Wishlist::where('user_id', $user->id)
+            ->with('product.category')->get();
+        $activeCarts = $user->carts;
+        $activeCartLocations = $user->cartLocations;
+        $newsletterSubscription = $user->newsletterSubscription;
+        
+        // Générer le PDF avec toutes les données
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.user-data', compact(
+            'user', 'orders', 'rentalOrders', 'likedProducts', 'wishlistItems',
+            'activeCarts', 'activeCartLocations', 'newsletterSubscription'
+        ));
+        
+        // Créer un ZIP avec le PDF et les données JSON
+        $zipFileName = "donnees-{$user->username}-" . now()->format('Y-m-d-H-i-s') . ".zip";
+        $zipPath = storage_path('app/temp/' . $zipFileName);
+        
+        // S'assurer que le dossier temp existe
+        if (!file_exists(storage_path('app/temp'))) {
+            mkdir(storage_path('app/temp'), 0755, true);
+        }
+        
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath, \ZipArchive::CREATE) === TRUE) {
+            
+            // Ajouter le PDF principal
+            $pdfContent = $pdf->output();
+            $zip->addFromString("donnees-personnelles-{$user->username}.pdf", $pdfContent);
+            
+            // Ajouter un fichier JSON avec toutes les données brutes
+            $jsonData = [
+                'utilisateur' => [
+                    'informations_personnelles' => [
+                        'username' => $user->username,
+                        'nom' => $user->name,
+                        'email' => $user->email,
+                        'telephone' => $user->phone,
+                        'role' => $user->role,
+                        'abonne_newsletter' => $user->newsletter_subscribed,
+                        'date_creation' => $user->created_at,
+                        'derniere_modification' => $user->updated_at,
+                    ],
+                    'adresse' => [
+                        'adresse' => $user->address,
+                        'complement' => $user->address_line_2,
+                        'ville' => $user->city,
+                        'code_postal' => $user->postal_code,
+                        'pays' => $user->country,
+                    ]
+                ],
+                'commandes_achat' => $orders->map(function($order) {
+                    return [
+                        'numero' => $order->order_number,
+                        'date' => $order->created_at,
+                        'statut' => $order->status,
+                        'total' => $order->total_amount,
+                        'adresse_facturation' => $order->billing_address,
+                        'adresse_livraison' => $order->shipping_address,
+                        'methode_paiement' => $order->payment_method,
+                        'statut_paiement' => $order->payment_status,
+                    ];
+                }),
+                'commandes_location' => $rentalOrders->map(function($rental) {
+                    return [
+                        'numero' => $rental->order_number,
+                        'date_debut' => $rental->start_date,
+                        'date_fin' => $rental->end_date,
+                        'statut' => $rental->status,
+                        'total' => $rental->total_amount,
+                        'caution' => $rental->deposit_amount,
+                        'adresse_livraison' => $rental->delivery_address,
+                    ];
+                }),
+                'produits_favoris' => $likedProducts->map(function($like) {
+                    return [
+                        'produit' => $like->product->name,
+                        'categorie' => $like->product->category->name ?? null,
+                        'prix' => $like->product->price,
+                        'date_ajout' => $like->created_at,
+                    ];
+                }),
+                'liste_souhaits' => $wishlistItems->map(function($wishlist) {
+                    return [
+                        'produit' => $wishlist->product->name,
+                        'categorie' => $wishlist->product->category->name ?? null,
+                        'prix' => $wishlist->product->price,
+                        'date_ajout' => $wishlist->created_at,
+                    ];
+                }),
+                'newsletter' => $newsletterSubscription ? [
+                    'abonne' => $newsletterSubscription->is_subscribed,
+                    'date_abonnement' => $newsletterSubscription->subscribed_at,
+                    'date_desabonnement' => $newsletterSubscription->unsubscribed_at,
+                    'source' => $newsletterSubscription->source,
+                ] : null,
+                'statistiques' => [
+                    'total_commandes_achat' => $orders->count(),
+                    'total_commandes_location' => $rentalOrders->count(),
+                    'montant_total_depense' => $orders->sum('total_amount'),
+                    'nombre_produits_favoris' => $likedProducts->count(),
+                    'nombre_liste_souhaits' => $wishlistItems->count(),
+                ]
+            ];
+            
+            $zip->addFromString("donnees-brutes-{$user->username}.json", json_encode($jsonData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            
+            // Ajouter un fichier README explicatif
+            $readmeContent = "ARCHIVE DES DONNÉES PERSONNELLES - FARMSHOP\n";
+            $readmeContent .= "==========================================\n\n";
+            $readmeContent .= "Utilisateur: {$user->name} ({$user->email})\n";
+            $readmeContent .= "Généré le: " . now()->format('d/m/Y à H:i:s') . "\n\n";
+            $readmeContent .= "CONTENU DE L'ARCHIVE:\n";
+            $readmeContent .= "- donnees-personnelles-{$user->username}.pdf : Document PDF complet et lisible\n";
+            $readmeContent .= "- donnees-brutes-{$user->username}.json : Données au format JSON pour traitement informatique\n";
+            $readmeContent .= "- README.txt : Ce fichier explicatif\n\n";
+            $readmeContent .= "CONFORMITÉ RGPD:\n";
+            $readmeContent .= "Cette archive contient TOUTES vos données personnelles stockées sur FarmShop.\n";
+            $readmeContent .= "Vous avez le droit de modifier ou supprimer ces données à tout moment.\n";
+            $readmeContent .= "Pour toute question, contactez-nous à l'adresse: support@farmshop.com\n";
+            
+            $zip->addFromString("README.txt", $readmeContent);
+            
+            $zip->close();
+        }
+        
+        // Retourner le fichier ZIP
+        return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
     }
 
     /**

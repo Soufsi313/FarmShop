@@ -6,7 +6,9 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-zip": "*",
         "barryvdh/laravel-dompdf": "^3.1",
+        "dompdf/dompdf": "^3.1",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9"
     },
