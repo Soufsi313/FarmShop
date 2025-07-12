@@ -148,4 +148,31 @@ class User extends Authenticatable
         
         return $cart;
     }
+
+    /**
+     * Relations avec les paniers de location
+     */
+    public function cartLocations()
+    {
+        return $this->hasMany(CartLocation::class);
+    }
+
+    public function activeCartLocation()
+    {
+        return $this->hasOne(CartLocation::class)->latest();
+    }
+
+    /**
+     * Récupérer ou créer le panier de location actif de l'utilisateur
+     */
+    public function getOrCreateActiveCartLocation(): CartLocation
+    {
+        $cartLocation = $this->activeCartLocation()->first();
+        
+        if (!$cartLocation) {
+            $cartLocation = $this->cartLocations()->create();
+        }
+        
+        return $cartLocation;
+    }
 }

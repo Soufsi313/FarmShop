@@ -21,14 +21,25 @@ class Product extends Model
         'description',
         'slug',
         'price',
+        'rental_price_per_day',
+        'deposit_amount',
+        'type',
         'quantity',
         'critical_threshold',
+        'low_stock_threshold',
+        'out_of_stock_threshold',
         'unit_symbol',
+        'sku',
+        'short_description',
+        'weight',
+        'dimensions',
         'main_image',
         'gallery_images',
+        'images',
         'is_active',
         'is_featured',
         'category_id',
+        'rental_category_id',
         'meta_title',
         'meta_description',
         'meta_keywords',
@@ -43,7 +54,11 @@ class Product extends Model
     {
         return [
             'price' => 'decimal:2',
+            'rental_price_per_day' => 'decimal:2',
+            'deposit_amount' => 'decimal:2',
+            'weight' => 'decimal:3',
             'gallery_images' => 'array',
+            'images' => 'array',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
         ];
@@ -75,6 +90,14 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Relation avec la catégorie de location
+     */
+    public function rentalCategory()
+    {
+        return $this->belongsTo(RentalCategory::class);
     }
 
     /**
