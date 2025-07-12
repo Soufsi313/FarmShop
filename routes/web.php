@@ -6,6 +6,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\SpecialOfferController as AdminSpecialOfferController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -78,16 +81,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
     
-    // Sections du dashboard
-    Route::get('/users', [DashboardController::class, 'users'])->name('users.index');
-    Route::get('/products', [DashboardController::class, 'products'])->name('products.index');
-    Route::get('/categories', [DashboardController::class, 'categories'])->name('categories.index');
-    Route::get('/orders', [DashboardController::class, 'orders'])->name('orders.index');
-    Route::get('/special-offers', [DashboardController::class, 'specialOffers'])->name('special-offers.index');
-    Route::get('/settings', [DashboardController::class, 'settings'])->name('settings.index');
+    // Gestion des produits
+    Route::resource('products', AdminProductController::class);
     
-    // CRUD Routes existantes (à garder pour plus tard)
-    // Route::resource('users', UserController::class);
-    // Route::resource('categories', CategoryController::class);
-    // Route::resource('rental-categories', RentalCategoryController::class);
+    // Gestion des catégories
+    Route::resource('categories', AdminCategoryController::class);
+    
+    // Gestion des offres spéciales - CRUD complet avec contrôleur admin
+    Route::resource('special-offers', AdminSpecialOfferController::class);
+    Route::patch('/special-offers/{specialOffer}/toggle', [AdminSpecialOfferController::class, 'toggle'])->name('special-offers.toggle');
+    
+    // Sections du dashboard (pages existantes)
+    Route::get('/users', [DashboardController::class, 'users'])->name('users.index');
+    Route::get('/orders', [DashboardController::class, 'orders'])->name('orders.index');
+    Route::get('/settings', [DashboardController::class, 'settings'])->name('settings.index');
 });

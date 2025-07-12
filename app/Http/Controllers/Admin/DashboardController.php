@@ -85,36 +85,19 @@ class DashboardController extends Controller
     }
 
     /**
-     * Gestion des produits
+     * Gestion des produits - Redirection vers le contrôleur dédié
      */
     public function products(Request $request)
     {
-        $this->checkAdminAccess();
-        
-        // Pour l'instant simulation avec pagination vide
-        $products = collect([]); // Collection vide pour simulation
-        
-        // Simulation de pagination pour l'interface
-        $currentPage = $request->get('page', 1);
-        $perPage = 20;
-        
-        return view('admin.products.index', compact('products', 'currentPage', 'perPage'));
+        return redirect()->route('admin.products.index');
     }
 
     /**
-     * Gestion des catégories
+     * Gestion des catégories - Redirection vers le contrôleur dédié
      */
     public function categories(Request $request)
     {
-        $this->checkAdminAccess();
-        
-        // Pour l'instant simulation avec pagination vide
-        $categories = collect([]); // Collection vide pour simulation
-        
-        $currentPage = $request->get('page', 1);
-        $perPage = 20;
-        
-        return view('admin.categories.index', compact('categories', 'currentPage', 'perPage'));
+        return redirect()->route('admin.categories.index');
     }
 
     /**

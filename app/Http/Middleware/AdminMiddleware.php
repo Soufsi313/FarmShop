@@ -17,18 +17,24 @@ class AdminMiddleware
     {
         // Vérifier si l'utilisateur est authentifié
         if (!auth()->check()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Non authentifié'
-            ], 401);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Non authentifié'
+                ], 401);
+            }
+            return redirect()->route('login')->with('error', 'Vous devez être connecté pour accéder à cette page.');
         }
 
         // Vérifier si l'utilisateur a le rôle Admin
         if (!auth()->user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Accès refusé. Privilèges administrateur requis.'
-            ], 403);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès refusé. Privilèges administrateur requis.'
+                ], 403);
+            }
+            abort(403, 'Accès refusé. Seuls les administrateurs peuvent accéder à cette section.');
         }
 
         return $next($request);
