@@ -24,6 +24,12 @@ class User extends Authenticatable
         'password',
         'role',
         'newsletter_subscribed',
+        'phone',
+        'address',
+        'address_line_2',
+        'city',
+        'postal_code',
+        'country',
     ];
 
     /**
@@ -238,37 +244,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Relations avec les messages
-     */
-    public function messages()
-    {
-        return $this->hasMany(Message::class);
-    }
-
-    public function sentMessages()
-    {
-        return $this->hasMany(Message::class, 'sender_id');
-    }
-
-    public function unreadMessages()
-    {
-        return $this->hasMany(Message::class)->unread();
-    }
-
-    public function importantMessages()
-    {
-        return $this->hasMany(Message::class)->important();
-    }
-
-    /**
-     * Obtenir le nombre de messages non lus
-     */
-    public function getUnreadMessagesCount(): int
-    {
-        return $this->messages()->unread()->count();
-    }
-
-    /**
      * Commandes de location par statut
      */
     public function activeRentalOrders()
@@ -284,5 +259,51 @@ class User extends Authenticatable
     public function finishedRentalOrders()
     {
         return $this->orderLocations()->where('status', 'finished');
+    }
+
+    /**
+     * Méthodes utilitaires pour les adresses
+     */
+
+    /**
+     * Vérifier si l'utilisateur a une adresse complète
+     */
+    public function hasCompleteAddress(): bool
+    {
+        return !empty($this->address) && 
+               !empty($this->city) && 
+               !empty($this->postal_code) && 
+               !empty($this->country);
+    }
+
+    /**
+     * Obtenir l'adresse formatée
+     */
+    public function getFormattedAddress(): array
+    {
+        return [
+            'name' => $this->name,
+            'phone' => $this->phone,
+            'address' => $this->address,
+            'address_line_2' => $this->address_line_2,
+            'city' => $this->city,
+            'postal_code' => $this->postal_code,
+            'country' => $this->country ?? 'France'
+        ];
+    }
+
+    /**
+     * Obtenir l'adresse sous forme de texte
+     */
+    public function getAddressText(): string
+    {
+        $parts = array_filter([
+            $this->address,
+            $this->address_line_2,
+            trim($this->postal_code . ' ' . $this->city),
+            $this->country
+        ]);
+        
+        return implode(', ', $parts);
     }
 }
