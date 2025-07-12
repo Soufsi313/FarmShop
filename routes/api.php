@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductLikeController;
@@ -101,6 +102,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/checkout/prepare', [CartController::class, 'prepareForCheckout'])->name('prepare-checkout');
     });
     
+    // Routes éléments de panier pour utilisateurs connectés
+    Route::prefix('cart-items')->name('api.cart-items.')->group(function () {
+        Route::get('/', [CartItemController::class, 'index'])->name('index');
+        Route::get('/{cartItem}', [CartItemController::class, 'show'])->name('show');
+        Route::put('/{cartItem}', [CartItemController::class, 'update'])->name('update');
+        Route::delete('/{cartItem}', [CartItemController::class, 'destroy'])->name('destroy');
+        Route::get('/{cartItem}/availability', [CartItemController::class, 'checkAvailability'])->name('check-availability');
+        Route::post('/{cartItem}/duplicate', [CartItemController::class, 'duplicate'])->name('duplicate');
+        Route::patch('/{cartItem}/details', [CartItemController::class, 'updateDetails'])->name('update-details');
+    });
+    
     // Routes administration (Admin seulement)
     Route::middleware(['admin'])->group(function () {
         // Gestion des utilisateurs
@@ -166,6 +178,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::prefix('admin/carts')->name('api.admin.carts.')->group(function () {
             Route::get('/stats', [CartController::class, 'adminStats'])->name('stats');
             Route::get('/', [CartController::class, 'adminIndex'])->name('index');
+        });
+        
+        // Gestion des éléments de panier (Admin seulement)
+        Route::prefix('admin/cart-items')->name('api.admin.cart-items.')->group(function () {
+            Route::get('/stats', [CartItemController::class, 'adminStats'])->name('stats');
+            Route::get('/', [CartItemController::class, 'adminIndex'])->name('index');
         });
     });
 });
