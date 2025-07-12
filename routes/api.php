@@ -374,6 +374,48 @@ Route::middleware(['auth:sanctum'])->group(function () {
                     Route::patch('/{return}/received', [App\Http\Controllers\OrderReturnController::class, 'markAsReceived'])->name('mark-as-received');
                     Route::patch('/{return}/refund', [App\Http\Controllers\OrderReturnController::class, 'processRefund'])->name('process-refund');
                 });
+
+                // Gestion des commandes de location (Admin seulement)
+                Route::prefix('admin/rental-orders')->name('api.admin.rental-orders.')->group(function () {
+                    Route::get('/', [App\Http\Controllers\OrderLocationController::class, 'index'])->name('index');
+                    Route::get('/statistics', [App\Http\Controllers\OrderLocationController::class, 'statistics'])->name('statistics');
+                    Route::get('/export', [App\Http\Controllers\OrderLocationController::class, 'export'])->name('export');
+                    Route::get('/{orderLocation}', [App\Http\Controllers\OrderLocationController::class, 'show'])->name('show');
+                    Route::patch('/{orderLocation}/confirm', [App\Http\Controllers\OrderLocationController::class, 'confirm'])->name('confirm');
+                    Route::patch('/{orderLocation}/cancel', [App\Http\Controllers\OrderLocationController::class, 'cancel'])->name('cancel');
+                    Route::patch('/{orderLocation}/start-inspection', [App\Http\Controllers\OrderLocationController::class, 'startInspection'])->name('start-inspection');
+                    Route::patch('/{orderLocation}/finish-inspection', [App\Http\Controllers\OrderLocationController::class, 'finishInspection'])->name('finish-inspection');
+                });
+
+                // Gestion des articles de location (Admin seulement)
+                Route::prefix('admin/rental-items')->name('api.admin.rental-items.')->group(function () {
+                    Route::get('/{orderLocation}', [App\Http\Controllers\OrderItemLocationController::class, 'index'])->name('index');
+                    Route::get('/{orderLocation}/{orderItemLocation}', [App\Http\Controllers\OrderItemLocationController::class, 'show'])->name('show');
+                    Route::patch('/{orderLocation}/{orderItemLocation}/pickup-condition', [App\Http\Controllers\OrderItemLocationController::class, 'updatePickupCondition'])->name('update-pickup-condition');
+                    Route::patch('/{orderLocation}/{orderItemLocation}/return-condition', [App\Http\Controllers\OrderItemLocationController::class, 'updateReturnCondition'])->name('update-return-condition');
+                    Route::get('/{orderLocation}/{orderItemLocation}/condition-summary', [App\Http\Controllers\OrderItemLocationController::class, 'getConditionSummary'])->name('condition-summary');
+                    Route::get('/{orderLocation}/{orderItemLocation}/history', [App\Http\Controllers\OrderItemLocationController::class, 'getHistory'])->name('history');
+                    Route::get('/{orderLocation}/{orderItemLocation}/penalties', [App\Http\Controllers\OrderItemLocationController::class, 'calculatePenalties'])->name('calculate-penalties');
+                    Route::patch('/{orderLocation}/{orderItemLocation}/penalties', [App\Http\Controllers\OrderItemLocationController::class, 'updatePenalties'])->name('update-penalties');
+                });
+            });
+
+            // Routes commandes de location pour utilisateurs connectés
+            Route::prefix('rental-orders')->name('api.rental-orders.')->group(function () {
+                Route::get('/', [App\Http\Controllers\OrderLocationController::class, 'index'])->name('index');
+                Route::post('/', [App\Http\Controllers\OrderLocationController::class, 'store'])->name('store');
+                Route::get('/{orderLocation}', [App\Http\Controllers\OrderLocationController::class, 'show'])->name('show');
+                Route::patch('/{orderLocation}/cancel', [App\Http\Controllers\OrderLocationController::class, 'cancel'])->name('cancel');
+                Route::patch('/{orderLocation}/complete', [App\Http\Controllers\OrderLocationController::class, 'complete'])->name('complete');
+                Route::patch('/{orderLocation}/close', [App\Http\Controllers\OrderLocationController::class, 'close'])->name('close');
+
+                // Routes pour les articles de location
+                Route::prefix('{orderLocation}/items')->name('items.')->group(function () {
+                    Route::get('/', [App\Http\Controllers\OrderItemLocationController::class, 'index'])->name('index');
+                    Route::get('/{orderItemLocation}', [App\Http\Controllers\OrderItemLocationController::class, 'show'])->name('show');
+                    Route::get('/{orderItemLocation}/condition-summary', [App\Http\Controllers\OrderItemLocationController::class, 'getConditionSummary'])->name('condition-summary');
+                    Route::get('/{orderItemLocation}/penalties', [App\Http\Controllers\OrderItemLocationController::class, 'calculatePenalties'])->name('calculate-penalties');
+                });
             });
         });
     });
