@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AccountDeletionNotification;
 
 class UserController extends Controller
 {
@@ -342,7 +344,7 @@ class UserController extends Controller
     }
 
     /**
-     * Auto-suppression du compte utilisateur
+     * Auto-suppression du compte utilisateur avec notification email
      */
     public function selfDelete()
     {
@@ -356,11 +358,33 @@ class UserController extends Controller
             ], 403);
         }
 
-        $user->delete();
+        // Préparer les données pour l'email avant suppression
+        $userEmail = $user->email;
+        $userName = $user->name;
+        $deletionDate = now()->format('d/m/Y à H:i:s');
+        
+        try {
+            // Envoyer l'email de notification avant la suppression
+            Mail::to($userEmail)->send(new AccountDeletionNotification($user, $deletionDate));
+            
+            // Supprimer le compte (soft delete)
+            $user->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Votre compte a été supprimé avec succès'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Votre compte a été supprimé avec succès. Un email de confirmation vous a été envoyé.'
+            ]);
+            
+        } catch (\Exception $e) {
+            // En cas d'erreur d'envoi d'email, on supprime quand même le compte
+            // mais on informe l'utilisateur
+            $user->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Votre compte a été supprimé avec succès. L\'email de confirmation n\'a pu être envoyé.',
+                'warning' => 'Erreur d\'envoi d\'email : ' . $e->getMessage()
+            ]);
+        }
     }
 }
