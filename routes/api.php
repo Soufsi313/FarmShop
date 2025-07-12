@@ -11,6 +11,8 @@ use App\Http\Controllers\RentalCategoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\NewsletterSubscriptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -239,8 +241,29 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::delete('/{contact}', [ContactController::class, 'destroy'])->name('destroy');
             Route::post('/mark-as-read', [ContactController::class, 'markAsRead'])->name('mark-as-read');
         });
+        
+        // Gestion des newsletters (Admin seulement)
+        Route::prefix('admin/newsletters')->name('api.admin.newsletters.')->group(function () {
+            Route::get('/', [NewsletterController::class, 'index'])->name('index');
+            Route::post('/', [NewsletterController::class, 'store'])->name('store');
+            Route::get('/statistics', [NewsletterController::class, 'statistics'])->name('statistics');
+            Route::get('/templates', [NewsletterController::class, 'templates'])->name('templates');
+            Route::get('/{newsletter}', [NewsletterController::class, 'show'])->name('show');
+            Route::put('/{newsletter}', [NewsletterController::class, 'update'])->name('update');
+            Route::delete('/{newsletter}', [NewsletterController::class, 'destroy'])->name('destroy');
+            Route::post('/{newsletter}/send', [NewsletterController::class, 'sendNow'])->name('send-now');
+            Route::post('/{newsletter}/schedule', [NewsletterController::class, 'schedule'])->name('schedule');
+            Route::post('/{newsletter}/cancel', [NewsletterController::class, 'cancel'])->name('cancel');
+            Route::post('/{newsletter}/duplicate-template', [NewsletterController::class, 'duplicateAsTemplate'])->name('duplicate-template');
+            Route::post('/templates/{template}/create', [NewsletterController::class, 'createFromTemplate'])->name('create-from-template');
+        });
     });
 });
 
 // Route publique pour le formulaire de contact
 Route::post('/contact', [ContactController::class, 'store'])->name('api.contact.store');
+
+// Routes publiques pour newsletter (tracking et désabonnement)
+Route::get('/newsletter/track/open/{token}', [NewsletterSubscriptionController::class, 'trackOpen'])->name('api.newsletter.track-open');
+Route::post('/newsletter/track/click/{token}', [NewsletterSubscriptionController::class, 'trackClick'])->name('api.newsletter.track-click');
+Route::get('/newsletter/unsubscribe/{token}', [NewsletterSubscriptionController::class, 'unsubscribeByToken'])->name('api.newsletter.unsubscribe-token');
