@@ -23,5 +23,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Enregistrer l'observer pour les commandes
         Order::observe(OrderObserver::class);
+        
+        // Enregistrer l'observer pour les produits (gestion du stock)
+        \App\Models\Product::observe(\App\Observers\ProductStockObserver::class);
     }
 }

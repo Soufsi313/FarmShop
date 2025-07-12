@@ -51,6 +51,7 @@ Route::get('/rental-categories/{rentalCategory}', [RentalCategoryController::cla
 Route::get('/products', [ProductController::class, 'index'])->name('api.products.index');
 Route::get('/products/search', [ProductController::class, 'search'])->name('api.products.search');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('api.products.show');
+Route::post('/products/{product}/check-availability', [ProductController::class, 'checkAvailability'])->name('api.products.check-availability');
 Route::get('/products/category/{category}', [ProductController::class, 'byCategory'])->name('api.products.by-category');
 
 // Routes publiques pour les contraintes de location
@@ -145,8 +146,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Routes panier pour utilisateurs connectés
     Route::prefix('cart')->name('api.cart.')->group(function () {
         Route::get('/', [CartController::class, 'index'])->name('index');
-        Route::post('/products/{product}', [CartController::class, 'addProduct'])->name('add-product');
-        Route::put('/products/{product}', [CartController::class, 'updateQuantity'])->name('update-quantity');
+        Route::post('/products/{product}', [CartController::class, 'addProduct'])->middleware('check.product.availability')->name('add-product');
+        Route::put('/products/{product}', [CartController::class, 'updateQuantity'])->middleware('check.product.availability')->name('update-quantity');
         Route::delete('/products/{product}', [CartController::class, 'removeProduct'])->name('remove-product');
         Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
         Route::get('/availability', [CartController::class, 'checkAvailability'])->name('check-availability');
@@ -168,8 +169,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Routes panier de location pour utilisateurs connectés
     Route::prefix('cart-location')->name('api.cart-location.')->group(function () {
         Route::get('/', [CartLocationController::class, 'index'])->name('index');
-        Route::post('/products/{product}', [CartLocationController::class, 'addProduct'])->name('add-product');
-        Route::put('/products/{product}/quantity', [CartLocationController::class, 'updateQuantity'])->name('update-quantity');
+        Route::post('/products/{product}', [CartLocationController::class, 'addProduct'])->middleware('check.product.availability')->name('add-product');
+        Route::put('/products/{product}/quantity', [CartLocationController::class, 'updateQuantity'])->middleware('check.product.availability')->name('update-quantity');
         Route::put('/products/{product}/dates', [CartLocationController::class, 'updateDates'])->name('update-dates');
         Route::delete('/products/{product}', [CartLocationController::class, 'removeProduct'])->name('remove-product');
         Route::delete('/clear', [CartLocationController::class, 'clear'])->name('clear');

@@ -60,6 +60,16 @@ class CartLocation extends Model
             throw new \Exception("Ce produit n'est pas disponible à la location");
         }
 
+        // Vérifier que le produit n'est pas en rupture de stock
+        if ($product->is_out_of_stock) {
+            throw new \Exception("Ce produit est en rupture de stock et ne peut pas être loué");
+        }
+
+        // Vérifier que le produit est actif
+        if (!$product->is_active) {
+            throw new \Exception("Ce produit n'est plus disponible");
+        }
+
         // Vérifier si le produit n'est pas déjà dans le panier
         $existingItem = $this->items()->where('product_id', $product->id)->first();
         if ($existingItem) {
@@ -159,6 +169,11 @@ class CartLocation extends Model
      */
     public function checkProductAvailability(Product $product, int $quantity, Carbon $startDate, Carbon $endDate, ?int $excludeItemId = null): void
     {
+        // Vérifier que le produit n'est pas en rupture de stock
+        if ($product->is_out_of_stock) {
+            throw new \Exception("Ce produit est en rupture de stock et ne peut pas être loué");
+        }
+
         // Vérifier le stock global
         if ($quantity > $product->quantity) {
             throw new \Exception("Stock insuffisant. Stock disponible: {$product->quantity}");

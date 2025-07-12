@@ -726,4 +726,54 @@ class ProductController extends Controller
             'data' => $products
         ]);
     }
+
+    /**
+     * Vérifier la disponibilité d'un produit pour l'achat ou la location
+     */
+    public function checkAvailability(Product $product, Request $request): JsonResponse
+    {
+        $request->validate([
+            'type' => 'required|in:sale,rental',
+            'quantity' => 'required|integer|min:1'
+        ]);
+
+        $availability = [
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'available' => false,
+            'reasons' => []
+        ];
+
+        // Vérifications communes
+        if (!$product->is_active) {
+            $availability['reasons'][] = 'Produit non disponible';
+        }
+
+        if ($product->is_out_of_stock) {
+            $availability['reasons'][] = 'Produit en rupture de stock';
+        }
+
+        if ($product->quantity < $request->quantity) {
+            $availability['reasons'][] = "Stock insuffisant. Disponible: {$product->quantity}";
+        }
+
+        // Vérifications spécifiques au type
+        if ($request->type === 'sale') {
+            if (!in_array($product->type, ['sale', 'both'])) {
+                $availability['reasons'][] = 'Produit non disponible à la vente';
+            }
+        } elseif ($request->type === 'rental') {
+            if (!in_array($product->type, ['rental', 'both'])) {
+                $availability['reasons'][] = 'Produit non disponible à la location';
+            }
+        }
+
+        // Le produit est disponible s'il n'y a aucune raison d'indisponibilité
+        $availability['available'] = empty($availability['reasons']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $availability
+        ]);
+    }
 }

@@ -74,6 +74,11 @@ class Cart extends Model
      */
     public function addProduct(Product $product, int $quantity = 1): CartItem
     {
+        // Vérifier que le produit n'est pas en rupture de stock
+        if ($product->is_out_of_stock) {
+            throw new \Exception("Ce produit est en rupture de stock et ne peut pas être acheté");
+        }
+
         // Vérifier la disponibilité du stock
         if ($product->quantity < $quantity) {
             throw new \Exception("Stock insuffisant. Disponible: {$product->quantity}");
@@ -149,6 +154,11 @@ class Cart extends Model
     {
         if ($quantity <= 0) {
             throw new \Exception("La quantité doit être supérieure à 0");
+        }
+
+        // Vérifier que le produit n'est pas en rupture de stock
+        if ($product->is_out_of_stock) {
+            throw new \Exception("Ce produit est en rupture de stock et ne peut pas être modifié");
         }
 
         // Vérifier le stock
