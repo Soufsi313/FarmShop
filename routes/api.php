@@ -11,6 +11,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductLikeController;
 use App\Http\Controllers\RentalCategoryController;
 use App\Http\Controllers\RentalConstraintController;
+use App\Http\Controllers\StripePaymentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ContactController;
@@ -84,6 +85,9 @@ Route::get('/blog/posts/tag/{tag}', [App\Http\Controllers\BlogPostController::cl
 // Routes publiques pour les commentaires de blog (consultation)
 Route::get('/blog/posts/{blogPost}/comments', [App\Http\Controllers\BlogCommentController::class, 'show'])->name('api.blog.comments.show');
 Route::get('/blog/comments/{blogComment}/replies', [App\Http\Controllers\BlogCommentController::class, 'replies'])->name('api.blog.comments.replies');
+
+// Route webhook Stripe (publique, sans authentification)
+Route::post('/stripe/webhook', [StripePaymentController::class, 'webhook'])->name('api.stripe.webhook');
 
 // Routes protégées nécessitant une authentification
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -485,4 +489,15 @@ Route::prefix('blog')->name('api.blog.')->group(function () {
     Route::delete('/comments/{blogComment}', [App\Http\Controllers\BlogCommentController::class, 'destroy'])->name('comments.destroy');
     Route::post('/comments/{blogComment}/like', [App\Http\Controllers\BlogCommentController::class, 'like'])->name('comments.like');
     Route::post('/comments/{blogComment}/report', [App\Http\Controllers\BlogCommentReportController::class, 'store'])->name('comments.report');
+});
+
+// Routes Stripe pour les paiements
+Route::prefix('stripe')->name('api.stripe.')->group(function () {
+    Route::post('/payment-intent/purchase', [StripePaymentController::class, 'createPaymentIntentForPurchase'])->name('payment-intent.purchase');
+    Route::post('/payment-intent/rental', [StripePaymentController::class, 'createPaymentIntentForRental'])->name('payment-intent.rental');
+    Route::post('/confirm-payment', [StripePaymentController::class, 'confirmPayment'])->name('confirm-payment');
+    Route::post('/cancel-purchase/{order}', [StripePaymentController::class, 'cancelPurchaseOrder'])->name('cancel-purchase');
+    Route::post('/cancel-rental/{orderLocation}', [StripePaymentController::class, 'cancelRentalOrder'])->name('cancel-rental');
+    Route::post('/rental/return/{orderLocation}', [StripePaymentController::class, 'markRentalAsReturned'])->name('rental.return');
+    Route::get('/payment-info', [StripePaymentController::class, 'getPaymentInfo'])->name('payment-info');
 });

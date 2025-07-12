@@ -10,7 +10,8 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "dompdf/dompdf": "^3.1",
         "laravel/framework": "^11.0",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "stripe/stripe-php": "^17.4"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
