@@ -5,6 +5,7 @@ use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\CartLocationController;
 use App\Http\Controllers\CartItemLocationController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductLikeController;
 use App\Http\Controllers\RentalCategoryController;
@@ -80,6 +81,21 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Routes newsletter
     Route::post('/newsletter/subscribe', [UserController::class, 'subscribeNewsletter'])->name('api.newsletter.subscribe');
     Route::post('/newsletter/unsubscribe', [UserController::class, 'unsubscribeNewsletter'])->name('api.newsletter.unsubscribe');
+    
+    // Routes messages (boîte de réception)
+    Route::prefix('messages')->name('api.messages.')->group(function () {
+        Route::get('/', [MessageController::class, 'index'])->name('index');
+        Route::get('/stats', [MessageController::class, 'getStats'])->name('stats');
+        Route::get('/{message}', [MessageController::class, 'show'])->name('show');
+        Route::put('/{message}/read', [MessageController::class, 'markAsRead'])->name('mark-read');
+        Route::put('/{message}/unread', [MessageController::class, 'markAsUnread'])->name('mark-unread');
+        Route::put('/{message}/archive', [MessageController::class, 'archive'])->name('archive');
+        Route::put('/{message}/unarchive', [MessageController::class, 'unarchive'])->name('unarchive');
+        Route::put('/{message}/important', [MessageController::class, 'toggleImportant'])->name('toggle-important');
+        Route::delete('/{message}', [MessageController::class, 'destroy'])->name('delete');
+        Route::put('/mark-all-read', [MessageController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::post('/bulk-action', [MessageController::class, 'bulkAction'])->name('bulk-action');
+    });
     
     // Routes produits pour utilisateurs connectés
     Route::prefix('products')->name('api.products.')->group(function () {

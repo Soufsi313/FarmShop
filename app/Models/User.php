@@ -238,6 +238,37 @@ class User extends Authenticatable
     }
 
     /**
+     * Relations avec les messages
+     */
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function unreadMessages()
+    {
+        return $this->hasMany(Message::class)->unread();
+    }
+
+    public function importantMessages()
+    {
+        return $this->hasMany(Message::class)->important();
+    }
+
+    /**
+     * Obtenir le nombre de messages non lus
+     */
+    public function getUnreadMessagesCount(): int
+    {
+        return $this->messages()->unread()->count();
+    }
+
+    /**
      * Commandes de location par statut
      */
     public function activeRentalOrders()
