@@ -7,6 +7,7 @@ use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class WishlistController extends Controller
 {
@@ -212,6 +213,235 @@ class WishlistController extends Controller
             'data' => [
                 'in_wishlist' => $inWishlist,
                 'product_id' => $product->id
+            ]
+        ]);
+    }
+
+    // ==================== MÉTHODES ADMIN ====================
+
+    /**
+     * Statistiques des wishlists (Admin seulement)
+     */
+    public function adminStats(): JsonResponse
+    {
+        // Statistiques générales
+        $totalWishlists = Wishlist::count();
+        $totalUniqueUsers = Wishlist::distinct('user_id')->count();
+        $totalWishlistedProducts = Wishlist::distinct('product_id')->count();
+        $avgItemsPerUser = $totalUniqueUsers > 0 ? round($totalWishlists / $totalUniqueUsers, 2) : 0;
+
+        // Top 10 des produits les plus ajoutés en wishlist
+        $topWishlistedProducts = Product::withCount('wishlists')
+            ->with('category')
+            ->orderBy('wishlists_count', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Top 10 des utilisateurs avec le plus d'éléments en wishlist
+        $topActiveUsers = Wishlist::select('user_id', DB::raw('COUNT(*) as wishlist_count'))
+            ->with(['user:id,username,email'])
+            ->groupBy('user_id')
+            ->orderBy('wishlist_count', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Évolution des ajouts en wishlist par mois (6 derniers mois)
+        $wishlistsPerMonth = Wishlist::select(
+                DB::raw('YEAR(created_at) as year'),
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('COUNT(*) as count')
+            )
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc')
+            ->get();
+
+        // Top 10 des catégories les plus wishlistées
+        $topWishlistedCategories = DB::table('wishlists')
+            ->join('products', 'wishlists.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->select('categories.id', 'categories.name', DB::raw('COUNT(*) as wishlist_count'))
+            ->where('products.is_active', true)
+            ->groupBy('categories.id', 'categories.name')
+            ->orderBy('wishlist_count', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Produits récemment ajoutés en wishlist
+        $recentWishlists = Wishlist::with(['product.category', 'user:id,username'])
+            ->orderBy('created_at', 'desc')
+            ->limit(20)
+            ->get();
+
+        // Valeur totale des produits en wishlist (estimation)
+        $totalWishlistValue = DB::table('wishlists')
+            ->join('products', 'wishlists.product_id', '=', 'products.id')
+            ->where('products.is_active', true)
+            ->sum('products.price');
+
+        // Taux de conversion wishlist -> like (approximatif)
+        $productsInWishlist = Wishlist::distinct('product_id')->count();
+        $productsLiked = DB::table('product_likes')->distinct('product_id')->count();
+        $conversionRate = $productsInWishlist > 0 ? round(($productsLiked / $productsInWishlist) * 100, 2) : 0;
+
+        // Analyse par type de produit en wishlist
+        $wishlistsByProductType = DB::table('wishlists')
+            ->join('products', 'wishlists.product_id', '=', 'products.id')
+            ->select('products.type', DB::raw('COUNT(*) as count'))
+            ->where('products.is_active', true)
+            ->groupBy('products.type')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Statistiques des wishlists récupérées',
+            'data' => [
+                'overview' => [
+                    'total_wishlists' => $totalWishlists,
+                    'unique_users' => $totalUniqueUsers,
+                    'wishlisted_products' => $totalWishlistedProducts,
+                    'avg_items_per_user' => $avgItemsPerUser,
+                    'total_wishlist_value' => round($totalWishlistValue, 2),
+                    'conversion_rate_to_likes' => $conversionRate
+                ],
+                'top_wishlisted_products' => $topWishlistedProducts,
+                'top_active_users' => $topActiveUsers,
+                'wishlists_per_month' => $wishlistsPerMonth,
+                'top_wishlisted_categories' => $topWishlistedCategories,
+                'recent_wishlists' => $recentWishlists,
+                'wishlists_by_product_type' => $wishlistsByProductType
+            ]
+        ]);
+    }
+
+    /**
+     * Gestion admin des wishlists - Liste complète
+     */
+    public function adminIndex(Request $request): JsonResponse
+    {
+        $query = Wishlist::with(['product.category', 'user:id,username,email']);
+
+        // Filtres
+        if ($request->has('product_id')) {
+            $query->where('product_id', $request->product_id);
+        }
+
+        if ($request->has('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        if ($request->has('category_id')) {
+            $query->whereHas('product', function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            });
+        }
+
+        if ($request->has('product_type')) {
+            $query->whereHas('product', function ($q) use ($request) {
+                $q->where('type', $request->product_type);
+            });
+        }
+
+        if ($request->has('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->has('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        // Tri
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        
+        $allowedSorts = ['created_at', 'product_id', 'user_id'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortOrder);
+        }
+
+        $wishlists = $query->paginate($request->get('per_page', 20));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Wishlists récupérées (admin)',
+            'data' => $wishlists
+        ]);
+    }
+
+    /**
+     * Supprimer un élément de wishlist spécifique (Admin)
+     */
+    public function adminDestroy(Wishlist $wishlist): JsonResponse
+    {
+        $productName = $wishlist->product->name;
+        $userName = $wishlist->user->username;
+        
+        $wishlist->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Élément de wishlist de {$userName} pour {$productName} supprimé avec succès"
+        ]);
+    }
+
+    /**
+     * Analyse détaillée d'un utilisateur spécifique (Admin)
+     */
+    public function adminUserAnalysis($userId): JsonResponse
+    {
+        $user = \App\Models\User::findOrFail($userId);
+
+        // Wishlist de l'utilisateur
+        $userWishlists = Wishlist::where('user_id', $userId)
+            ->with(['product.category'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Statistiques de l'utilisateur
+        $totalItems = $userWishlists->count();
+        $totalValue = $userWishlists->sum(function ($wishlist) {
+            return $wishlist->product->price ?? 0;
+        });
+
+        // Catégories préférées
+        $preferredCategories = $userWishlists->groupBy('product.category.name')
+            ->map(function ($items, $categoryName) {
+                return [
+                    'category' => $categoryName,
+                    'count' => $items->count(),
+                    'percentage' => round(($items->count() / max(1, $items->count())) * 100, 2)
+                ];
+            })
+            ->sortByDesc('count')
+            ->take(5)
+            ->values();
+
+        // Types de produits préférés
+        $preferredTypes = $userWishlists->groupBy('product.type')
+            ->map(function ($items, $type) {
+                return [
+                    'type' => $type,
+                    'count' => $items->count()
+                ];
+            })
+            ->sortByDesc('count')
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Analyse de l\'utilisateur récupérée',
+            'data' => [
+                'user' => $user->only(['id', 'username', 'email']),
+                'overview' => [
+                    'total_items' => $totalItems,
+                    'total_value' => round($totalValue, 2),
+                    'first_wishlist' => $userWishlists->last()?->created_at,
+                    'last_wishlist' => $userWishlists->first()?->created_at
+                ],
+                'preferred_categories' => $preferredCategories,
+                'preferred_types' => $preferredTypes,
+                'wishlist_items' => $userWishlists
             ]
         ]);
     }
