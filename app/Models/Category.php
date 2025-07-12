@@ -21,6 +21,8 @@ class Category extends Model
         'description',
         'slug',
         'is_active',
+        'food_type',
+        'is_returnable',
     ];
 
     /**
@@ -32,6 +34,7 @@ class Category extends Model
     {
         return [
             'is_active' => 'boolean',
+            'is_returnable' => 'boolean',
         ];
     }
 
