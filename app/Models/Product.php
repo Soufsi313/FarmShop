@@ -23,6 +23,9 @@ class Product extends Model
         'price',
         'rental_price_per_day',
         'deposit_amount',
+        'min_rental_days',
+        'max_rental_days',
+        'available_days',
         'type',
         'quantity',
         'critical_threshold',
@@ -56,6 +59,9 @@ class Product extends Model
             'price' => 'decimal:2',
             'rental_price_per_day' => 'decimal:2',
             'deposit_amount' => 'decimal:2',
+            'min_rental_days' => 'integer',
+            'max_rental_days' => 'integer',
+            'available_days' => 'array',
             'weight' => 'decimal:3',
             'gallery_images' => 'array',
             'images' => 'array',
@@ -258,5 +264,199 @@ class Product extends Model
     public function setStock($quantity)
     {
         $this->update(['quantity' => $quantity]);
+    }
+
+    /**
+     * Vérifier si le produit est disponible pour la location
+     */
+    public function isRentable(): bool
+    {
+        return in_array($this->type, ['rental', 'both']) && 
+               $this->is_active && 
+               $this->rental_price_per_day > 0;
+    }
+
+    /**
+     * Obtenir les jours de la semaine disponibles pour la location
+     * Par défaut : Lundi à Samedi (1-6)
+     */
+    public function getAvailableDays(): array
+    {
+        return $this->available_days ?? [1, 2, 3, 4, 5, 6]; // Lundi à Samedi
+    }
+
+    /**
+     * Vérifier si un jour de la semaine est disponible pour la location
+     */
+    public function isDayAvailable(int $dayOfWeek): bool
+    {
+        return in_array($dayOfWeek, $this->getAvailableDays());
+    }
+
+    /**
+     * Valider une période de location pour ce produit
+     */
+    public function validateRentalPeriod(\Carbon\Carbon $startDate, \Carbon\Carbon $endDate): array
+    {
+        $errors = [];
+        
+        // Vérifier que le produit est louable
+        if (!$this->isRentable()) {
+            $errors[] = "Ce produit n'est pas disponible à la location";
+            return ['valid' => false, 'errors' => $errors];
+        }
+        
+        // Vérifier que la date de début n'est pas aujourd'hui ou dans le passé
+        if ($startDate->lte(now()->startOfDay())) {
+            $errors[] = "La location ne peut pas commencer aujourd'hui. Date minimum : " . now()->addDay()->format('d/m/Y');
+        }
+        
+        // Vérifier que la date de fin est après la date de début
+        if ($endDate->lte($startDate)) {
+            $errors[] = "La date de fin doit être après la date de début";
+        }
+        
+        // Calculer la durée en jours
+        $duration = $startDate->diffInDays($endDate) + 1; // +1 pour inclure le jour de début
+        
+        // Vérifier la durée minimale
+        if ($duration < $this->min_rental_days) {
+            $errors[] = "Durée minimale de location : {$this->min_rental_days} jour(s)";
+        }
+        
+        // Vérifier la durée maximale
+        if ($duration > $this->max_rental_days) {
+            $errors[] = "Durée maximale de location : {$this->max_rental_days} jour(s)";
+        }
+        
+        // Vérifier que tous les jours de la période sont disponibles
+        $current = $startDate->copy();
+        while ($current->lte($endDate)) {
+            $dayOfWeek = $current->dayOfWeek === 0 ? 7 : $current->dayOfWeek; // Dimanche = 7, Lundi = 1
+            
+            if (!$this->isDayAvailable($dayOfWeek)) {
+                $dayName = $this->getDayName($dayOfWeek);
+                $errors[] = "Location non disponible le {$dayName} ({$current->format('d/m/Y')})";
+            }
+            
+            $current->addDay();
+        }
+        
+        $costDetails = empty($errors) ? $this->calculateRentalCost($startDate, $endDate) : null;
+        
+        return [
+            'valid' => empty($errors),
+            'errors' => $errors,
+            'duration' => $duration,
+            'cost_details' => $costDetails,
+            'total_cost' => $costDetails ? $costDetails['total_cost'] : null,
+            'deposit_required' => $this->deposit_amount
+        ];
+    }
+
+    /**
+     * Calculer le coût total d'une location
+     */
+    public function calculateRentalCost(\Carbon\Carbon $startDate, \Carbon\Carbon $endDate): array
+    {
+        $durationDays = $startDate->diffInDays($endDate) + 1;
+        $dailyPrice = $this->rental_price_per_day;
+        $subtotal = $dailyPrice * $durationDays;
+        
+        // Application d'éventuelles remises pour location longue
+        $discount = 0;
+        $discountPercentage = 0;
+        
+        if ($durationDays >= 5) {
+            $discountPercentage = 5; // 5% de remise à partir de 5 jours
+        }
+        if ($durationDays >= 7) {
+            $discountPercentage = 10; // 10% de remise pour la durée maximale
+        }
+        
+        if ($discountPercentage > 0) {
+            $discount = $subtotal * ($discountPercentage / 100);
+        }
+        
+        $total = $subtotal - $discount;
+        
+        return [
+            'duration_days' => $durationDays,
+            'daily_price' => $dailyPrice,
+            'subtotal' => round($subtotal, 2),
+            'discount_percentage' => $discountPercentage,
+            'discount_amount' => round($discount, 2),
+            'total_cost' => round($total, 2),
+            'deposit_required' => $this->deposit_amount,
+            'currency' => 'EUR'
+        ];
+    }
+
+    /**
+     * Obtenir la prochaine date de début disponible
+     */
+    public function getNextAvailableStartDate(): \Carbon\Carbon
+    {
+        $date = now()->addDay()->startOfDay();
+        
+        // Trouver le prochain jour disponible
+        while (!$this->isDayAvailable($date->dayOfWeek === 0 ? 7 : $date->dayOfWeek)) {
+            $date->addDay();
+        }
+        
+        return $date;
+    }
+
+    /**
+     * Obtenir la prochaine date de fin disponible pour une date de début donnée
+     */
+    public function getNextAvailableEndDate(\Carbon\Carbon $startDate): \Carbon\Carbon
+    {
+        $endDate = $startDate->copy()->addDays($this->min_rental_days - 1);
+        
+        // S'assurer que la date de fin est un jour disponible
+        while (!$this->isDayAvailable($endDate->dayOfWeek === 0 ? 7 : $endDate->dayOfWeek)) {
+            $endDate->addDay();
+        }
+        
+        return $endDate;
+    }
+
+    /**
+     * Obtenir le nom du jour en français
+     */
+    private function getDayName(int $dayOfWeek): string
+    {
+        $days = [
+            1 => 'Lundi',
+            2 => 'Mardi', 
+            3 => 'Mercredi',
+            4 => 'Jeudi',
+            5 => 'Vendredi',
+            6 => 'Samedi',
+            7 => 'Dimanche'
+        ];
+        
+        return $days[$dayOfWeek] ?? 'Jour inconnu';
+    }
+
+    /**
+     * Obtenir les informations de contraintes de location
+     */
+    public function getRentalConstraints(): array
+    {
+        return [
+            'min_days' => $this->min_rental_days,
+            'max_days' => $this->max_rental_days,
+            'available_days' => $this->getAvailableDays(),
+            'available_days_names' => array_map(
+                fn($day) => $this->getDayName($day), 
+                $this->getAvailableDays()
+            ),
+            'daily_price' => $this->rental_price_per_day,
+            'deposit_amount' => $this->deposit_amount,
+            'next_available_start' => $this->getNextAvailableStartDate()->format('Y-m-d'),
+            'business_hours' => 'Lundi - Samedi'
+        ];
     }
 }

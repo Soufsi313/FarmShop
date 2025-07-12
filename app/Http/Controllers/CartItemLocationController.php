@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CartLocation;
 use App\Models\CartItemLocation;
 use App\Models\Product;
+use App\Rules\RentalDateValidation;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -137,8 +138,17 @@ class CartItemLocationController extends Controller
         }
 
         $validated = $request->validate([
-            'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date'
+            'start_date' => [
+                'required',
+                'date',
+                new RentalDateValidation($cartItemLocation->product, null, 'start')
+            ],
+            'end_date' => [
+                'required', 
+                'date',
+                'after:start_date',
+                new RentalDateValidation($cartItemLocation->product, $request->start_date, 'end')
+            ]
         ]);
 
         try {
@@ -146,6 +156,15 @@ class CartItemLocationController extends Controller
 
             $startDate = Carbon::parse($validated['start_date']);
             $endDate = Carbon::parse($validated['end_date']);
+
+            // Validation supplémentaire avec les contraintes du produit
+            $validation = $cartItemLocation->product->validateRentalPeriod($startDate, $endDate);
+            
+            if (!$validation['valid']) {
+                throw ValidationException::withMessages([
+                    'rental_period' => $validation['errors']
+                ]);
+            }
 
             // Vérifier la disponibilité pour les nouvelles dates
             $cartItemLocation->cartLocation->checkProductAvailability(

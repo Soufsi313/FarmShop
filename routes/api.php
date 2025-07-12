@@ -9,6 +9,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductLikeController;
 use App\Http\Controllers\RentalCategoryController;
+use App\Http\Controllers\RentalConstraintController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ContactController;
@@ -50,6 +51,12 @@ Route::get('/products', [ProductController::class, 'index'])->name('api.products
 Route::get('/products/search', [ProductController::class, 'search'])->name('api.products.search');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('api.products.show');
 Route::get('/products/category/{category}', [ProductController::class, 'byCategory'])->name('api.products.by-category');
+
+// Routes publiques pour les contraintes de location
+Route::get('/rental-constraints/{product}', [RentalConstraintController::class, 'getProductConstraints'])->name('api.rental-constraints.product');
+Route::post('/rental-constraints/{product}/validate', [RentalConstraintController::class, 'validateRentalPeriod'])->name('api.rental-constraints.validate');
+Route::get('/rental-constraints/{product}/calendar', [RentalConstraintController::class, 'getAvailabilityCalendar'])->name('api.rental-constraints.calendar');
+Route::get('/rental-constraints/{product}/suggestions', [RentalConstraintController::class, 'suggestOptimalDates'])->name('api.rental-constraints.suggestions');
 
 // Routes publiques pour les likes (consultation seulement)
 Route::get('/products-likes', [ProductLikeController::class, 'index'])->name('api.product-likes.index');

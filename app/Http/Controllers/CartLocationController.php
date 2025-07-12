@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
+use App\Rules\RentalDateValidation;
 
 class CartLocationController extends Controller
 {
@@ -40,10 +41,31 @@ class CartLocationController extends Controller
         $user = Auth::user();
         $cartLocation = $user->getOrCreateActiveCartLocation();
 
+        // Vérifier que le produit est louable
+        if (!$product->isRentable()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ce produit n\'est pas disponible à la location'
+            ], 400);
+        }
+
         $validated = $request->validate([
             'quantity' => 'required|integer|min:1',
-            'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date',
+            'start_date' => [
+                'required',
+                'date',
+                new RentalDateValidation($product, null, null, 'start')
+            ],
+            'end_date' => [
+                'required', 
+                'date',
+                function ($attribute, $value, $fail) use ($request, $product) {
+                    $startDate = Carbon::parse($request->start_date);
+                    $endDate = Carbon::parse($value);
+                    $rule = new RentalDateValidation($product, $startDate, $endDate, 'end');
+                    $rule->validate($attribute, $value, $fail);
+                }
+            ],
             'notes' => 'nullable|string|max:500'
         ]);
 
@@ -52,6 +74,14 @@ class CartLocationController extends Controller
 
             $startDate = Carbon::parse($validated['start_date']);
             $endDate = Carbon::parse($validated['end_date']);
+
+            // Validation supplémentaire de la période complète
+            $validation = $product->validateRentalPeriod($startDate, $endDate);
+            if (!$validation['valid']) {
+                throw ValidationException::withMessages([
+                    'rental_period' => $validation['errors']
+                ]);
+            }
 
             $cartItem = $cartLocation->addProduct(
                 $product,
@@ -68,10 +98,22 @@ class CartLocationController extends Controller
                 'message' => 'Produit ajouté au panier de location avec succès',
                 'data' => [
                     'cart_item' => $cartItem->toDisplayArray(),
-                    'cart_summary' => $cartLocation->fresh()->getSummary()
+                    'cart_summary' => $cartLocation->fresh()->getSummary(),
+                    'rental_info' => [
+                        'duration_days' => $validation['duration'],
+                        'total_cost' => $validation['total_cost'],
+                        'deposit_required' => $validation['deposit_required']
+                    ]
                 ]
             ], 201);
 
+        } catch (ValidationException $e) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreurs de validation',
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
             DB::rollback();
             
