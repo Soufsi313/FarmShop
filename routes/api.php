@@ -140,5 +140,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/', [ProductLikeController::class, 'adminIndex'])->name('index');
             Route::delete('/{like}', [ProductLikeController::class, 'adminDestroy'])->name('destroy');
         });
+        
+        // Gestion des wishlists (Admin seulement)
+        Route::prefix('admin/wishlists')->name('api.admin.wishlists.')->group(function () {
+            Route::get('/stats', [WishlistController::class, 'adminStats'])->name('stats');
+            Route::get('/', [WishlistController::class, 'adminIndex'])->name('index');
+            Route::delete('/{wishlist}', [WishlistController::class, 'adminDestroy'])->name('destroy');
+            Route::get('/users/{userId}/analysis', [WishlistController::class, 'adminUserAnalysis'])->name('user-analysis');
+        });
     });
 });
