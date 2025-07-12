@@ -129,6 +129,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/checkout/prepare', [CartLocationController::class, 'prepareForCheckout'])->name('prepare-checkout');
     });
     
+    // Routes éléments de panier de location pour utilisateurs connectés
+    Route::prefix('cart-location-items')->name('api.cart-location-items.')->group(function () {
+        Route::get('/', [CartItemLocationController::class, 'index'])->name('index');
+        Route::get('/{cartItemLocation}', [CartItemLocationController::class, 'show'])->name('show');
+        Route::put('/{cartItemLocation}/quantity', [CartItemLocationController::class, 'updateQuantity'])->name('update-quantity');
+        Route::put('/{cartItemLocation}/dates', [CartItemLocationController::class, 'updateDates'])->name('update-dates');
+        Route::delete('/{cartItemLocation}', [CartItemLocationController::class, 'destroy'])->name('destroy');
+        Route::get('/{cartItemLocation}/availability', [CartItemLocationController::class, 'checkAvailability'])->name('check-availability');
+        Route::post('/{cartItemLocation}/duplicate', [CartItemLocationController::class, 'duplicate'])->name('duplicate');
+        Route::patch('/{cartItemLocation}/details', [CartItemLocationController::class, 'updateDetails'])->name('update-details');
+        Route::get('/{cartItemLocation}/suggest-dates', [CartItemLocationController::class, 'suggestOptimalDates'])->name('suggest-dates');
+    });
+    
     // Routes administration (Admin seulement)
     Route::middleware(['admin'])->group(function () {
         // Gestion des utilisateurs
@@ -206,6 +219,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::prefix('admin/cart-locations')->name('api.admin.cart-locations.')->group(function () {
             Route::get('/stats', [CartLocationController::class, 'adminStats'])->name('stats');
             Route::get('/', [CartLocationController::class, 'adminIndex'])->name('index');
+        });
+        
+        // Gestion des éléments de panier de location (Admin seulement)
+        Route::prefix('admin/cart-location-items')->name('api.admin.cart-location-items.')->group(function () {
+            Route::get('/stats', [CartItemLocationController::class, 'adminStats'])->name('stats');
+            Route::get('/', [CartItemLocationController::class, 'adminIndex'])->name('index');
         });
     });
 });
