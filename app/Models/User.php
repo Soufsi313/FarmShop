@@ -175,4 +175,57 @@ class User extends Authenticatable
         
         return $cartLocation;
     }
+
+    /**
+     * Relation avec l'abonnement newsletter
+     */
+    public function newsletterSubscription()
+    {
+        return $this->hasOne(NewsletterSubscription::class);
+    }
+
+    /**
+     * Relation avec les envois de newsletter reçus
+     */
+    public function newsletterSends()
+    {
+        return $this->hasMany(NewsletterSend::class);
+    }
+
+    /**
+     * Vérifier si l'utilisateur est abonné à la newsletter
+     */
+    public function isSubscribedToNewsletter(): bool
+    {
+        $subscription = $this->newsletterSubscription;
+        return $subscription && $subscription->is_subscribed;
+    }
+
+    /**
+     * Gérer l'abonnement newsletter (nouvelle approche avec table dédiée)
+     */
+    public function subscribeToNewsletterNew(string $source = 'manual'): NewsletterSubscription
+    {
+        $subscription = NewsletterSubscription::findOrCreateForUser($this, true, $source);
+        $subscription->subscribe($source);
+        
+        // Mettre à jour aussi l'ancien champ pour compatibilité
+        $this->update(['newsletter_subscribed' => true]);
+        
+        return $subscription;
+    }
+
+    /**
+     * Se désabonner de la newsletter (nouvelle approche)
+     */
+    public function unsubscribeFromNewsletterNew(string $reason = null): void
+    {
+        $subscription = $this->newsletterSubscription;
+        if ($subscription) {
+            $subscription->unsubscribe($reason);
+        }
+        
+        // Mettre à jour aussi l'ancien champ pour compatibilité
+        $this->update(['newsletter_subscribed' => false]);
+    }
 }
