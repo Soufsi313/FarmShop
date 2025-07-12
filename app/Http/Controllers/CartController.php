@@ -34,13 +34,7 @@ class CartController extends Controller
                     return $item->toDisplayArray();
                 }),
                 'unavailable_items' => $unavailableItems,
-                'summary' => [
-                    'total_items' => $cart->total_items,
-                    'subtotal' => $cart->subtotal,
-                    'tax_amount' => $cart->tax_amount,
-                    'total' => $cart->total,
-                    'tax_rate' => $cart->tax_rate
-                ]
+                'summary' => $cart->getCostSummary() // 🚚 Inclut automatiquement les frais de livraison
             ]
         ]);
     }
@@ -286,17 +280,13 @@ class CartController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Résumé du panier récupéré',
-            'data' => [
+            'data' => array_merge([
                 'cart_id' => $cart->id,
                 'total_items' => $cart->total_items,
-                'subtotal' => $cart->subtotal,
-                'tax_amount' => $cart->tax_amount,
-                'total' => $cart->total,
-                'tax_rate' => $cart->tax_rate,
                 'is_empty' => $cart->isEmpty(),
                 'created_at' => $cart->created_at,
                 'expires_at' => $cart->expires_at
-            ]
+            ], $cart->getCostSummary()) // 🚚 Inclut les frais de livraison
         ]);
     }
 
@@ -339,13 +329,7 @@ class CartController extends Controller
                 'items' => $cart->items->map(function ($item) {
                     return $item->toDisplayArray();
                 }),
-                'summary' => [
-                    'total_items' => $cart->total_items,
-                    'subtotal' => $cart->subtotal,
-                    'tax_amount' => $cart->tax_amount,
-                    'total' => $cart->total,
-                    'tax_rate' => $cart->tax_rate
-                ]
+                'summary' => $cart->getCostSummary() // 🚚 Inclut les frais de livraison
             ]
         ]);
     }
