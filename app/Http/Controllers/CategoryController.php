@@ -17,9 +17,9 @@ class CategoryController extends Controller
         // Les visiteurs et users peuvent voir les catégories actives
         // Les admins peuvent voir toutes les catégories (y compris supprimées)
         if (Auth::user()?->isAdmin()) {
-            $categories = Category::withTrashed()->withCount('products')->paginate(15);
+            $categories = Category::withTrashed()->paginate(15);
         } else {
-            $categories = Category::active()->withCount('products')->paginate(15);
+            $categories = Category::active()->paginate(15);
         }
 
         return response()->json([
@@ -64,9 +64,9 @@ class CategoryController extends Controller
     {
         // Recherche par ID ou slug
         if (is_numeric($identifier)) {
-            $category = Category::withCount('products')->findOrFail($identifier);
+            $category = Category::findOrFail($identifier);
         } else {
-            $category = Category::where('slug', $identifier)->withCount('products')->firstOrFail();
+            $category = Category::where('slug', $identifier)->firstOrFail();
         }
 
         // Les non-admins ne peuvent voir que les catégories actives

@@ -58,10 +58,10 @@ class Category extends Model
     /**
      * Relation avec les produits (sera définie quand le modèle Product sera créé)
      */
-    public function products()
-    {
-        return $this->hasMany(Product::class);
-    }
+    // public function products()
+    // {
+    //     return $this->hasMany(Product::class);
+    // }
 
     /**
      * Scope pour récupérer seulement les catégories actives
@@ -74,10 +74,10 @@ class Category extends Model
     /**
      * Scope pour récupérer les catégories avec leurs produits
      */
-    public function scopeWithProducts($query)
-    {
-        return $query->with('products');
-    }
+    // public function scopeWithProducts($query)
+    // {
+    //     return $query->with('products');
+    // }
 
     /**
      * Accessor pour obtenir l'URL de la catégorie
