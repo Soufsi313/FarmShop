@@ -100,6 +100,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         
         // Gestion des catégories (Admin seulement)
         Route::prefix('admin/categories')->name('api.admin.categories.')->group(function () {
+            Route::get('/stats', [CategoryController::class, 'adminStats'])->name('stats');
             Route::post('/', [CategoryController::class, 'store'])->name('store');
             Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
             Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
@@ -109,6 +110,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         
         // Gestion des catégories de location (Admin seulement)
         Route::prefix('admin/rental-categories')->name('api.admin.rental-categories.')->group(function () {
+            Route::get('/stats', [RentalCategoryController::class, 'adminStats'])->name('stats');
             Route::post('/', [RentalCategoryController::class, 'store'])->name('store');
             Route::put('/{rentalCategory}', [RentalCategoryController::class, 'update'])->name('update');
             Route::delete('/{rentalCategory}', [RentalCategoryController::class, 'destroy'])->name('destroy');
