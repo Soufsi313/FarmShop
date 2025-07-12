@@ -26,12 +26,14 @@ class RegisterController extends Controller
     {
         // Validation des données
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users',
+            'name' => 'nullable|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'terms' => 'required|accepted',
         ], [
-            'name.required' => 'Le nom est obligatoire.',
+            'username.required' => 'Le nom d\'utilisateur est obligatoire.',
+            'username.unique' => 'Ce nom d\'utilisateur est déjà utilisé.',
             'name.max' => 'Le nom ne peut pas dépasser 255 caractères.',
             'email.required' => 'L\'adresse email est obligatoire.',
             'email.email' => 'L\'adresse email doit être valide.',
@@ -51,10 +53,11 @@ class RegisterController extends Controller
 
         // Créer l'utilisateur
         $user = User::create([
+            'username' => $request->username,
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'customer', // Par défaut tous les nouveaux comptes sont des particuliers/customers
+            'role' => 'User', // Par défaut tous les nouveaux comptes sont des utilisateurs standards
             'newsletter_subscribed' => $request->has('newsletter'),
         ]);
 

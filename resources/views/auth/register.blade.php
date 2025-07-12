@@ -26,17 +26,39 @@
             <form class="space-y-6" method="POST" action="{{ route('register') }}">
                 @csrf
                 
+                <!-- Nom d'utilisateur -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-farm-green-700">
+                        Nom d'utilisateur
+                    </label>
+                    <div class="mt-1">
+                        <input id="username" 
+                               name="username" 
+                               type="text" 
+                               autocomplete="username" 
+                               required 
+                               value="{{ old('username') }}"
+                               placeholder="Ex: jdupont"
+                               class="appearance-none block w-full px-3 py-2 border border-farm-green-300 rounded-md placeholder-farm-green-400 focus:outline-none focus:ring-farm-green-500 focus:border-farm-green-500 sm:text-sm bg-white/80 @error('username') border-red-500 @enderror">
+                        @error('username')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <p class="mt-1 text-xs text-farm-green-500">
+                        Identifiant unique pour votre compte.
+                    </p>
+                </div>
+
                 <!-- Nom complet -->
                 <div>
                     <label for="name" class="block text-sm font-medium text-farm-green-700">
-                        Nom complet
+                        Nom complet (optionnel)
                     </label>
                     <div class="mt-1">
                         <input id="name" 
                                name="name" 
                                type="text" 
                                autocomplete="name" 
-                               required 
                                value="{{ old('name') }}"
                                placeholder="Ex: Jean Dupont"
                                class="appearance-none block w-full px-3 py-2 border border-farm-green-300 rounded-md placeholder-farm-green-400 focus:outline-none focus:ring-farm-green-500 focus:border-farm-green-500 sm:text-sm bg-white/80 @error('name') border-red-500 @enderror">

@@ -72,25 +72,41 @@ class UserController extends Controller
     /**
      * Afficher un utilisateur spécifique
      */
-    public function show(User $user)
+    public function show(Request $request, User $user = null)
     {
+        // Si aucun utilisateur spécifié, utiliser l'utilisateur connecté (pour /profile)
+        if (!$user) {
+            $user = Auth::user();
+        }
+
         // Un utilisateur peut voir son propre profil, ou admin peut voir tous
         if (!Auth::user()?->isAdmin() && Auth::id() !== $user->id) {
             abort(403, 'Accès refusé.');
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => $user,
-            'message' => 'Utilisateur récupéré avec succès'
-        ]);
+        // Si c'est une requête API (Accept: application/json), retourner JSON
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $user,
+                'message' => 'Utilisateur récupéré avec succès'
+            ]);
+        }
+
+        // Sinon, retourner la vue pour l'interface web
+        return view('users.profile', compact('user'));
     }
 
     /**
      * Mettre à jour un utilisateur
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user = null)
     {
+        // Si aucun utilisateur spécifié, utiliser l'utilisateur connecté (pour /profile)
+        if (!$user) {
+            $user = Auth::user();
+        }
+
         // Un utilisateur peut modifier son propre profil, ou admin peut modifier tous
         if (!Auth::user()?->isAdmin() && Auth::id() !== $user->id) {
             abort(403, 'Accès refusé.');
@@ -102,7 +118,13 @@ class UserController extends Controller
             'email' => ['sometimes', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => 'sometimes|string|min:8|confirmed',
             'role' => ['sometimes', Rule::in(['Admin', 'User'])],
-            'newsletter_subscribed' => 'sometimes|boolean'
+            'newsletter_subscribed' => 'sometimes|boolean',
+            'phone' => 'sometimes|nullable|string|max:255',
+            'address' => 'sometimes|nullable|string|max:255',
+            'address_line_2' => 'sometimes|nullable|string|max:255',
+            'city' => 'sometimes|nullable|string|max:255',
+            'postal_code' => 'sometimes|nullable|string|max:20',
+            'country' => 'sometimes|nullable|string|max:2',
         ]);
 
         // Seuls les admins peuvent modifier les rôles
@@ -117,11 +139,18 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return response()->json([
-            'success' => true,
-            'data' => $user->fresh(),
-            'message' => 'Utilisateur mis à jour avec succès'
-        ]);
+        // Si c'est une requête API (Accept: application/json), retourner JSON
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $user->fresh(),
+                'message' => 'Utilisateur mis à jour avec succès'
+            ]);
+        }
+
+        // Sinon, rediriger vers le profil avec un message de succès
+        return redirect()->route('users.profile')
+                        ->with('success', 'Profil mis à jour avec succès !');
     }
 
     /**
