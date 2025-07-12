@@ -64,6 +64,10 @@ Route::get('/blog/posts', [App\Http\Controllers\BlogPostController::class, 'inde
 Route::get('/blog/posts/{slug}', [App\Http\Controllers\BlogPostController::class, 'show'])->name('api.blog.posts.show');
 Route::get('/blog/posts/tag/{tag}', [App\Http\Controllers\BlogPostController::class, 'byTag'])->name('api.blog.posts.by-tag');
 
+// Routes publiques pour les commentaires de blog (consultation)
+Route::get('/blog/posts/{blogPost}/comments', [App\Http\Controllers\BlogCommentController::class, 'show'])->name('api.blog.comments.show');
+Route::get('/blog/comments/{blogComment}/replies', [App\Http\Controllers\BlogCommentController::class, 'replies'])->name('api.blog.comments.replies');
+
 // Routes protégées nécessitant une authentification
 Route::middleware(['auth:sanctum'])->group(function () {
     
@@ -289,6 +293,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('/{blogPost}/unpublish', [App\Http\Controllers\BlogPostController::class, 'unpublish'])->name('unpublish');
             Route::post('/{blogPost}/schedule', [App\Http\Controllers\BlogPostController::class, 'schedule'])->name('schedule');
         });
+        
+        // Gestion des commentaires de blog (Admin seulement)
+        Route::prefix('admin/blog/comments')->name('api.admin.blog.comments.')->group(function () {
+            Route::get('/', [App\Http\Controllers\BlogCommentController::class, 'index'])->name('index');
+            Route::get('/statistics', [App\Http\Controllers\BlogCommentController::class, 'statistics'])->name('statistics');
+            Route::post('/{blogComment}/moderate', [App\Http\Controllers\BlogCommentController::class, 'moderate'])->name('moderate');
+            Route::patch('/{blogComment}/toggle-pin', [App\Http\Controllers\BlogCommentController::class, 'togglePin'])->name('toggle-pin');
+            Route::delete('/{blogComment}', [App\Http\Controllers\BlogCommentController::class, 'destroy'])->name('destroy');
+        });
     });
 });
 
@@ -299,3 +312,11 @@ Route::post('/contact', [ContactController::class, 'store'])->name('api.contact.
 Route::get('/newsletter/track/open/{token}', [NewsletterSubscriptionController::class, 'trackOpen'])->name('api.newsletter.track-open');
 Route::post('/newsletter/track/click/{token}', [NewsletterSubscriptionController::class, 'trackClick'])->name('api.newsletter.track-click');
 Route::get('/newsletter/unsubscribe/{token}', [NewsletterSubscriptionController::class, 'unsubscribeByToken'])->name('api.newsletter.unsubscribe-token');
+
+// Routes commentaires de blog pour utilisateurs connectés
+Route::prefix('blog')->name('api.blog.')->group(function () {
+    Route::post('/posts/{blogPost}/comments', [App\Http\Controllers\BlogCommentController::class, 'store'])->name('comments.store');
+    Route::put('/comments/{blogComment}', [App\Http\Controllers\BlogCommentController::class, 'update'])->name('comments.update');
+    Route::delete('/comments/{blogComment}', [App\Http\Controllers\BlogCommentController::class, 'destroy'])->name('comments.destroy');
+    Route::post('/comments/{blogComment}/like', [App\Http\Controllers\BlogCommentController::class, 'like'])->name('comments.like');
+});
