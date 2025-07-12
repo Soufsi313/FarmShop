@@ -55,6 +55,10 @@ Route::get('/products-likes', [ProductLikeController::class, 'index'])->name('ap
 Route::get('/products/{product}/likes', [ProductLikeController::class, 'show'])->name('api.product-likes.show');
 Route::get('/products/{product}/likes/check', [ProductLikeController::class, 'check'])->name('api.product-likes.check');
 
+// Routes publiques pour les catégories de blog (consultation)
+Route::get('/blog/categories', [App\Http\Controllers\BlogCategoryController::class, 'index'])->name('api.blog.categories.index');
+Route::get('/blog/categories/{slug}', [App\Http\Controllers\BlogCategoryController::class, 'show'])->name('api.blog.categories.show');
+
 // Routes protégées nécessitant une authentification
 Route::middleware(['auth:sanctum'])->group(function () {
     
@@ -256,6 +260,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('/{newsletter}/cancel', [NewsletterController::class, 'cancel'])->name('cancel');
             Route::post('/{newsletter}/duplicate-template', [NewsletterController::class, 'duplicateAsTemplate'])->name('duplicate-template');
             Route::post('/templates/{template}/create', [NewsletterController::class, 'createFromTemplate'])->name('create-from-template');
+        });
+        
+        // Gestion des catégories de blog (Admin seulement)
+        Route::prefix('admin/blog/categories')->name('api.admin.blog.categories.')->group(function () {
+            Route::get('/', [App\Http\Controllers\BlogCategoryController::class, 'index'])->name('index');
+            Route::post('/', [App\Http\Controllers\BlogCategoryController::class, 'store'])->name('store');
+            Route::get('/statistics', [App\Http\Controllers\BlogCategoryController::class, 'statistics'])->name('statistics');
+            Route::put('/{blogCategory}', [App\Http\Controllers\BlogCategoryController::class, 'update'])->name('update');
+            Route::delete('/{blogCategory}', [App\Http\Controllers\BlogCategoryController::class, 'destroy'])->name('destroy');
+            Route::patch('/{blogCategory}/toggle-status', [App\Http\Controllers\BlogCategoryController::class, 'toggleStatus'])->name('toggle-status');
+            Route::post('/update-order', [App\Http\Controllers\BlogCategoryController::class, 'updateOrder'])->name('update-order');
         });
     });
 });
