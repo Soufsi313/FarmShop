@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductLikeController;
 use App\Http\Controllers\RentalCategoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishlistController;
@@ -42,6 +43,11 @@ Route::get('/products/search', [ProductController::class, 'search'])->name('api.
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('api.products.show');
 Route::get('/products/category/{category}', [ProductController::class, 'byCategory'])->name('api.products.by-category');
 
+// Routes publiques pour les likes (consultation seulement)
+Route::get('/products-likes', [ProductLikeController::class, 'index'])->name('api.product-likes.index');
+Route::get('/products/{product}/likes', [ProductLikeController::class, 'show'])->name('api.product-likes.show');
+Route::get('/products/{product}/likes/check', [ProductLikeController::class, 'check'])->name('api.product-likes.check');
+
 // Routes protégées nécessitant une authentification
 Route::middleware(['auth:sanctum'])->group(function () {
     
@@ -61,6 +67,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/{product}/wishlist', [ProductController::class, 'toggleWishlist'])->name('toggle-wishlist');
         Route::get('/wishlist', [ProductController::class, 'getWishlist'])->name('wishlist');
         Route::get('/liked', [ProductController::class, 'getLikedProducts'])->name('liked');
+    });
+    
+    // Routes likes pour utilisateurs connectés
+    Route::prefix('likes')->name('api.likes.')->group(function () {
+        Route::post('/products/{product}', [ProductLikeController::class, 'store'])->name('add');
+        Route::delete('/products/{product}', [ProductLikeController::class, 'destroy'])->name('remove');
+        Route::post('/products/{product}/toggle', [ProductLikeController::class, 'toggle'])->name('toggle');
+        Route::get('/my-likes', [ProductLikeController::class, 'getUserLikes'])->name('user-likes');
     });
     
     // Routes wishlist pour utilisateurs connectés
@@ -116,6 +130,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('/{product}/stock/update', [ProductController::class, 'updateStock'])->name('stock.update');
             Route::get('/stock/alerts', [ProductController::class, 'getStockAlerts'])->name('stock.alerts');
             Route::get('/stock/low', [ProductController::class, 'getLowStockProducts'])->name('stock.low');
+        });
+        
+        // Gestion des likes (Admin seulement)
+        Route::prefix('admin/likes')->name('api.admin.likes.')->group(function () {
+            Route::get('/stats', [ProductLikeController::class, 'adminStats'])->name('stats');
+            Route::get('/', [ProductLikeController::class, 'adminIndex'])->name('index');
+            Route::delete('/{like}', [ProductLikeController::class, 'adminDestroy'])->name('destroy');
         });
     });
 });
