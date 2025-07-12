@@ -403,6 +403,41 @@ class Order extends Model
         return $pdfPath;
     }
 
+    /**
+     * 🚚 Calculer les frais de livraison pour une commande
+     * Règle : < 25€ = 2.50€ de frais | ≥ 25€ = gratuit
+     */
+    public static function calculateShippingCost(float $subtotal): float
+    {
+        $freeShippingThreshold = 25.00;
+        $shippingFee = 2.50;
+        
+        return $subtotal >= $freeShippingThreshold ? 0.00 : $shippingFee;
+    }
+
+    /**
+     * 🎁 Vérifier si une commande est éligible à la livraison gratuite
+     */
+    public static function isFreeShippingEligible(float $subtotal): bool
+    {
+        return $subtotal >= 25.00;
+    }
+
+    /**
+     * 📊 Récapitulatif des frais de livraison
+     */
+    public function getShippingSummary(): array
+    {
+        return [
+            'subtotal' => $this->subtotal,
+            'shipping_cost' => $this->shipping_cost,
+            'free_shipping_eligible' => static::isFreeShippingEligible($this->subtotal),
+            'shipping_message' => $this->shipping_cost > 0 
+                ? "Frais de livraison: {$this->shipping_cost}€" 
+                : '🎉 Livraison gratuite'
+        ];
+    }
+
     // Méthodes statiques
     public static function generateOrderNumber()
     {
@@ -423,13 +458,12 @@ class Order extends Model
 
     public static function createFromCart($cart, $billingAddress, $shippingAddress, $paymentMethod)
     {
-        // Calculer les totaux
-        $subtotal = $cart->items->sum(function($item) {
-            return $item->quantity * $item->product->price;
-        });
-
-        $taxAmount = $subtotal * 0.20; // 20% TVA
-        $shippingCost = $subtotal >= 50 ? 0 : 5.99; // Livraison gratuite > 50€
+        // Calculer les totaux depuis le panier (qui a déjà les bons calculs)
+        $subtotal = $cart->subtotal;
+        $taxAmount = $cart->tax_amount;
+        
+        // 🚚 FRAIS DE LIVRAISON AUTOMATIQUES : < 25€ = 2.50€ | ≥ 25€ = gratuit
+        $shippingCost = $cart->calculateShippingCost($subtotal);
         $totalAmount = $subtotal + $taxAmount + $shippingCost;
 
         // Créer la commande
