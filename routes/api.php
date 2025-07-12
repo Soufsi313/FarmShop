@@ -315,6 +315,67 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/comments/{blogComment}/reports', [App\Http\Controllers\BlogCommentReportController::class, 'commentReports'])->name('comment-reports');
             Route::post('/bulk-action', [App\Http\Controllers\BlogCommentReportController::class, 'bulkAction'])->name('bulk-action');
         });
+        
+        // Routes pour le système de commandes
+        Route::middleware(['auth:sanctum'])->group(function () {
+            // Routes commandes pour les utilisateurs connectés
+            Route::prefix('orders')->name('api.orders.')->group(function () {
+                Route::get('/', [App\Http\Controllers\OrderController::class, 'index'])->name('index');
+                Route::post('/', [App\Http\Controllers\OrderController::class, 'store'])->name('store');
+                Route::get('/{order}', [App\Http\Controllers\OrderController::class, 'show'])->name('show');
+                Route::patch('/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel'])->name('cancel');
+                Route::get('/{order}/invoice', [App\Http\Controllers\OrderController::class, 'downloadInvoice'])->name('download-invoice');
+                Route::get('/{order}/track', [App\Http\Controllers\OrderController::class, 'track'])->name('track');
+                
+                // Routes articles de commandes
+                Route::prefix('{order}/items')->name('items.')->group(function () {
+                    Route::get('/', [App\Http\Controllers\OrderItemController::class, 'index'])->name('index');
+                    Route::get('/{item}', [App\Http\Controllers\OrderItemController::class, 'show'])->name('show');
+                    Route::get('/{item}/return-eligibility', [App\Http\Controllers\OrderItemController::class, 'checkReturnEligibility'])->name('return-eligibility');
+                    Route::get('/{item}/return-history', [App\Http\Controllers\OrderItemController::class, 'returnHistory'])->name('return-history');
+                });
+            });
+            
+            // Routes retours de commandes pour les utilisateurs connectés
+            Route::prefix('returns')->name('api.returns.')->group(function () {
+                Route::get('/', [App\Http\Controllers\OrderReturnController::class, 'index'])->name('index');
+                Route::post('/', [App\Http\Controllers\OrderReturnController::class, 'store'])->name('store');
+                Route::get('/{return}', [App\Http\Controllers\OrderReturnController::class, 'show'])->name('show');
+                Route::patch('/{return}/cancel', [App\Http\Controllers\OrderReturnController::class, 'cancel'])->name('cancel');
+            });
+            
+            // Routes administrateur pour les commandes
+            Route::middleware(['admin'])->group(function () {
+                // Gestion des commandes (Admin seulement)
+                Route::prefix('admin/orders')->name('api.admin.orders.')->group(function () {
+                    Route::get('/', [App\Http\Controllers\OrderController::class, 'adminIndex'])->name('index');
+                    Route::get('/statistics', [App\Http\Controllers\OrderController::class, 'adminStats'])->name('statistics');
+                    Route::get('/export', [App\Http\Controllers\OrderController::class, 'export'])->name('export');
+                    Route::get('/{order}', [App\Http\Controllers\OrderController::class, 'adminShow'])->name('show');
+                    Route::patch('/{order}/status', [App\Http\Controllers\OrderController::class, 'updateStatus'])->name('update-status');
+                });
+                
+                // Gestion des articles de commandes (Admin seulement)
+                Route::prefix('admin/order-items')->name('api.admin.order-items.')->group(function () {
+                    Route::get('/', [App\Http\Controllers\OrderItemController::class, 'adminIndex'])->name('index');
+                    Route::get('/statistics', [App\Http\Controllers\OrderItemController::class, 'adminStats'])->name('statistics');
+                    Route::get('/export', [App\Http\Controllers\OrderItemController::class, 'export'])->name('export');
+                    Route::get('/{item}', [App\Http\Controllers\OrderItemController::class, 'adminShow'])->name('show');
+                });
+                
+                // Gestion des retours (Admin seulement)
+                Route::prefix('admin/returns')->name('api.admin.returns.')->group(function () {
+                    Route::get('/', [App\Http\Controllers\OrderReturnController::class, 'adminIndex'])->name('index');
+                    Route::get('/statistics', [App\Http\Controllers\OrderReturnController::class, 'adminStats'])->name('statistics');
+                    Route::get('/export', [App\Http\Controllers\OrderReturnController::class, 'export'])->name('export');
+                    Route::get('/{return}', [App\Http\Controllers\OrderReturnController::class, 'adminShow'])->name('show');
+                    Route::patch('/{return}/approve', [App\Http\Controllers\OrderReturnController::class, 'approve'])->name('approve');
+                    Route::patch('/{return}/reject', [App\Http\Controllers\OrderReturnController::class, 'reject'])->name('reject');
+                    Route::patch('/{return}/received', [App\Http\Controllers\OrderReturnController::class, 'markAsReceived'])->name('mark-as-received');
+                    Route::patch('/{return}/refund', [App\Http\Controllers\OrderReturnController::class, 'processRefund'])->name('process-refund');
+                });
+            });
+        });
     });
 });
 
