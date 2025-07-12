@@ -451,17 +451,15 @@ class ContactController extends Controller
     private function sendNewContactNotification(Contact $contact): void
     {
         try {
-            // Configuration Gmail SMTP sera ajoutée dans la configuration email
-            // Pour l'instant, on log juste l'événement
-            Log::info('Nouveau contact reçu', [
+            Mail::send(new \App\Mail\NewContactNotification($contact));
+            
+            Log::info('Notification de nouveau contact envoyée', [
                 'contact_id' => $contact->id,
                 'name' => $contact->name,
                 'email' => $contact->email,
                 'subject' => $contact->subject,
                 'reason' => $contact->reason
             ]);
-
-            // TODO: Implémenter l'envoi d'email aux admins
             
         } catch (\Exception $e) {
             Log::error('Erreur lors de l\'envoi de la notification: ' . $e->getMessage());
@@ -474,18 +472,16 @@ class ContactController extends Controller
     private function sendResponseEmail(Contact $contact): void
     {
         try {
-            // Configuration Gmail SMTP sera ajoutée dans la configuration email
-            // Pour l'instant, on log juste l'événement
+            Mail::send(new \App\Mail\ContactResponseMail($contact));
+            
+            // Marquer l'email comme envoyé
+            $contact->markEmailSent();
+            
             Log::info('Réponse envoyée par email', [
                 'contact_id' => $contact->id,
                 'email' => $contact->email,
                 'admin_id' => $contact->admin_id
             ]);
-
-            // Marquer l'email comme envoyé
-            $contact->markEmailSent();
-
-            // TODO: Implémenter l'envoi d'email avec la réponse
             
         } catch (\Exception $e) {
             Log::error('Erreur lors de l\'envoi de l\'email de réponse: ' . $e->getMessage());
