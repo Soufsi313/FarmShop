@@ -59,6 +59,11 @@ Route::get('/products/{product}/likes/check', [ProductLikeController::class, 'ch
 Route::get('/blog/categories', [App\Http\Controllers\BlogCategoryController::class, 'index'])->name('api.blog.categories.index');
 Route::get('/blog/categories/{slug}', [App\Http\Controllers\BlogCategoryController::class, 'show'])->name('api.blog.categories.show');
 
+// Routes publiques pour les articles de blog (consultation)
+Route::get('/blog/posts', [App\Http\Controllers\BlogPostController::class, 'index'])->name('api.blog.posts.index');
+Route::get('/blog/posts/{slug}', [App\Http\Controllers\BlogPostController::class, 'show'])->name('api.blog.posts.show');
+Route::get('/blog/posts/tag/{tag}', [App\Http\Controllers\BlogPostController::class, 'byTag'])->name('api.blog.posts.by-tag');
+
 // Routes protégées nécessitant une authentification
 Route::middleware(['auth:sanctum'])->group(function () {
     
@@ -271,6 +276,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::delete('/{blogCategory}', [App\Http\Controllers\BlogCategoryController::class, 'destroy'])->name('destroy');
             Route::patch('/{blogCategory}/toggle-status', [App\Http\Controllers\BlogCategoryController::class, 'toggleStatus'])->name('toggle-status');
             Route::post('/update-order', [App\Http\Controllers\BlogCategoryController::class, 'updateOrder'])->name('update-order');
+        });
+        
+        // Gestion des articles de blog (Admin seulement)
+        Route::prefix('admin/blog/posts')->name('api.admin.blog.posts.')->group(function () {
+            Route::get('/', [App\Http\Controllers\BlogPostController::class, 'index'])->name('index');
+            Route::post('/', [App\Http\Controllers\BlogPostController::class, 'store'])->name('store');
+            Route::get('/statistics', [App\Http\Controllers\BlogPostController::class, 'statistics'])->name('statistics');
+            Route::put('/{blogPost}', [App\Http\Controllers\BlogPostController::class, 'update'])->name('update');
+            Route::delete('/{blogPost}', [App\Http\Controllers\BlogPostController::class, 'destroy'])->name('destroy');
+            Route::post('/{blogPost}/publish', [App\Http\Controllers\BlogPostController::class, 'publish'])->name('publish');
+            Route::post('/{blogPost}/unpublish', [App\Http\Controllers\BlogPostController::class, 'unpublish'])->name('unpublish');
+            Route::post('/{blogPost}/schedule', [App\Http\Controllers\BlogPostController::class, 'schedule'])->name('schedule');
         });
     });
 });
