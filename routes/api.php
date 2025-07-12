@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductLikeController;
 use App\Http\Controllers\RentalCategoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\ContactController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -226,5 +227,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/stats', [CartItemLocationController::class, 'adminStats'])->name('stats');
             Route::get('/', [CartItemLocationController::class, 'adminIndex'])->name('index');
         });
+        
+        // Gestion des contacts (Admin seulement)
+        Route::prefix('admin/contacts')->name('api.admin.contacts.')->group(function () {
+            Route::get('/', [ContactController::class, 'index'])->name('index');
+            Route::get('/statistics', [ContactController::class, 'statistics'])->name('statistics');
+            Route::get('/{contact}', [ContactController::class, 'show'])->name('show');
+            Route::post('/{contact}/respond', [ContactController::class, 'respond'])->name('respond');
+            Route::patch('/{contact}/status', [ContactController::class, 'updateStatus'])->name('update-status');
+            Route::patch('/{contact}/priority', [ContactController::class, 'updatePriority'])->name('update-priority');
+            Route::delete('/{contact}', [ContactController::class, 'destroy'])->name('destroy');
+            Route::post('/mark-as-read', [ContactController::class, 'markAsRead'])->name('mark-as-read');
+        });
     });
 });
+
+// Route publique pour le formulaire de contact
+Route::post('/contact', [ContactController::class, 'store'])->name('api.contact.store');
