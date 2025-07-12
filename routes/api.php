@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RentalCategoryController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WishlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +36,12 @@ Route::get('/rental-categories', [RentalCategoryController::class, 'index'])->na
 Route::get('/rental-categories/active', [RentalCategoryController::class, 'active'])->name('api.rental-categories.active');
 Route::get('/rental-categories/{rentalCategory}', [RentalCategoryController::class, 'show'])->name('api.rental-categories.show');
 
+// Routes publiques pour les produits (consultation, recherche, tri)
+Route::get('/products', [ProductController::class, 'index'])->name('api.products.index');
+Route::get('/products/search', [ProductController::class, 'search'])->name('api.products.search');
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('api.products.show');
+Route::get('/products/category/{category}', [ProductController::class, 'byCategory'])->name('api.products.by-category');
+
 // Routes protégées nécessitant une authentification
 Route::middleware(['auth:sanctum'])->group(function () {
     
@@ -46,6 +54,25 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Routes newsletter
     Route::post('/newsletter/subscribe', [UserController::class, 'subscribeNewsletter'])->name('api.newsletter.subscribe');
     Route::post('/newsletter/unsubscribe', [UserController::class, 'unsubscribeNewsletter'])->name('api.newsletter.unsubscribe');
+    
+    // Routes produits pour utilisateurs connectés
+    Route::prefix('products')->name('api.products.')->group(function () {
+        Route::post('/{product}/like', [ProductController::class, 'toggleLike'])->name('toggle-like');
+        Route::post('/{product}/wishlist', [ProductController::class, 'toggleWishlist'])->name('toggle-wishlist');
+        Route::get('/wishlist', [ProductController::class, 'getWishlist'])->name('wishlist');
+        Route::get('/liked', [ProductController::class, 'getLikedProducts'])->name('liked');
+    });
+    
+    // Routes wishlist pour utilisateurs connectés
+    Route::prefix('wishlist')->name('api.wishlist.')->group(function () {
+        Route::get('/', [WishlistController::class, 'index'])->name('index');
+        Route::post('/products/{product}', [WishlistController::class, 'store'])->name('add');
+        Route::delete('/products/{product}', [WishlistController::class, 'destroy'])->name('remove');
+        Route::post('/products/{product}/toggle', [WishlistController::class, 'toggle'])->name('toggle');
+        Route::delete('/clear', [WishlistController::class, 'clear'])->name('clear');
+        Route::get('/count', [WishlistController::class, 'count'])->name('count');
+        Route::get('/products/{product}/check', [WishlistController::class, 'check'])->name('check');
+    });
     
     // Routes administration (Admin seulement)
     Route::middleware(['admin'])->group(function () {
@@ -73,6 +100,22 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::delete('/{rentalCategory}', [RentalCategoryController::class, 'destroy'])->name('destroy');
             Route::post('/{id}/restore', [RentalCategoryController::class, 'restore'])->name('restore');
             Route::patch('/{rentalCategory}/toggle-status', [RentalCategoryController::class, 'toggleStatus'])->name('toggle-status');
+        });
+        
+        // Gestion des produits (Admin seulement)
+        Route::prefix('admin/products')->name('api.admin.products.')->group(function () {
+            Route::get('/', [ProductController::class, 'adminIndex'])->name('index');
+            Route::post('/', [ProductController::class, 'store'])->name('store');
+            Route::get('/{product}', [ProductController::class, 'adminShow'])->name('show');
+            Route::put('/{product}', [ProductController::class, 'update'])->name('update');
+            Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/restore', [ProductController::class, 'restore'])->name('restore');
+            Route::patch('/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('toggle-status');
+            
+            // Gestion de stock
+            Route::post('/{product}/stock/update', [ProductController::class, 'updateStock'])->name('stock.update');
+            Route::get('/stock/alerts', [ProductController::class, 'getStockAlerts'])->name('stock.alerts');
+            Route::get('/stock/low', [ProductController::class, 'getLowStockProducts'])->name('stock.low');
         });
     });
 });
