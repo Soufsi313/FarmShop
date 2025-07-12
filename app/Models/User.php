@@ -117,4 +117,35 @@ class User extends Authenticatable
     {
         $this->update(['newsletter_subscribed' => false]);
     }
+
+    /**
+     * Relations avec les paniers
+     */
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    public function activeCart()
+    {
+        return $this->hasOne(Cart::class)->where('status', 'active');
+    }
+
+    /**
+     * Récupérer ou créer le panier actif de l'utilisateur
+     */
+    public function getOrCreateActiveCart(): Cart
+    {
+        $cart = $this->activeCart()->notExpired()->first();
+        
+        if (!$cart) {
+            $cart = $this->carts()->create([
+                'status' => 'active',
+                'tax_rate' => 20.00, // TVA par défaut
+                'expires_at' => now()->addDays(7) // Expiration dans 7 jours
+            ]);
+        }
+        
+        return $cart;
+    }
 }
