@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RentalCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class RentalCategoryController extends Controller
@@ -200,6 +201,96 @@ class RentalCategoryController extends Controller
             'success' => true,
             'data' => $rentalCategories,
             'message' => 'Catégories de location actives récupérées avec succès'
+        ]);
+    }
+
+    /**
+     * Statistiques des catégories de location (Admin seulement)
+     */
+    public function adminStats()
+    {
+        // Statistiques générales
+        $totalRentalCategories = RentalCategory::count();
+        $activeRentalCategories = RentalCategory::where('is_active', true)->count();
+        $inactiveRentalCategories = RentalCategory::where('is_active', false)->count();
+        $deletedRentalCategories = RentalCategory::onlyTrashed()->count();
+
+        // Catégories avec le plus de produits de location
+        $categoriesWithRentalProducts = RentalCategory::withCount(['products' => function ($query) {
+                $query->where('is_active', true)
+                      ->whereIn('type', ['rental', 'both']);
+            }])
+            ->orderBy('products_count', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Catégories avec le plus de likes (via leurs produits de location)
+        $categoriesWithLikes = RentalCategory::withCount(['products as total_likes' => function ($query) {
+                $query->join('product_likes', 'products.id', '=', 'product_likes.product_id')
+                      ->where('products.is_active', true)
+                      ->whereIn('products.type', ['rental', 'both']);
+            }])
+            ->orderBy('total_likes', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Évolution des créations de catégories par mois (6 derniers mois)
+        $categoriesPerMonth = RentalCategory::select(
+                DB::raw('YEAR(created_at) as year'),
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('COUNT(*) as count')
+            )
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc')
+            ->get();
+
+        // Catégories sans produits de location
+        $emptyRentalCategoriesCount = RentalCategory::whereDoesntHave('products', function ($query) {
+                $query->whereIn('type', ['rental', 'both']);
+            })
+            ->where('is_active', true)
+            ->count();
+
+        // Catégories récemment créées
+        $recentRentalCategories = RentalCategory::with(['products' => function ($query) {
+                $query->where('is_active', true)
+                      ->whereIn('type', ['rental', 'both'])
+                      ->limit(3);
+            }])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Statistiques de revenus par catégorie de location (basé sur les prix de location)
+        $revenueByRentalCategory = RentalCategory::withSum(['products as total_rental_value' => function ($query) {
+                $query->where('is_active', true)
+                      ->whereIn('type', ['rental', 'both'])
+                      ->whereNotNull('rental_price_per_day')
+                      ->selectRaw('SUM(rental_price_per_day * quantity * 30)'); // Estimation sur 30 jours
+            }], 'rental_price_per_day')
+            ->orderBy('total_rental_value', 'desc')
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Statistiques des catégories de location récupérées',
+            'data' => [
+                'overview' => [
+                    'total_rental_categories' => $totalRentalCategories,
+                    'active_rental_categories' => $activeRentalCategories,
+                    'inactive_rental_categories' => $inactiveRentalCategories,
+                    'deleted_rental_categories' => $deletedRentalCategories,
+                    'empty_rental_categories' => $emptyRentalCategoriesCount
+                ],
+                'top_categories_by_rental_products' => $categoriesWithRentalProducts,
+                'top_categories_by_likes' => $categoriesWithLikes,
+                'categories_per_month' => $categoriesPerMonth,
+                'recent_rental_categories' => $recentRentalCategories,
+                'revenue_by_rental_category' => $revenueByRentalCategory
+            ]
         ]);
     }
 }

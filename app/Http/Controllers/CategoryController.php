@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
@@ -200,6 +201,88 @@ class CategoryController extends Controller
             'success' => true,
             'data' => $categories,
             'message' => 'Catégories actives récupérées avec succès'
+        ]);
+    }
+
+    /**
+     * Statistiques des catégories (Admin seulement)
+     */
+    public function adminStats()
+    {
+        // Statistiques générales
+        $totalCategories = Category::count();
+        $activeCategories = Category::where('is_active', true)->count();
+        $inactiveCategories = Category::where('is_active', false)->count();
+        $deletedCategories = Category::onlyTrashed()->count();
+
+        // Catégories avec le plus de produits
+        $categoriesWithProducts = Category::withCount(['products' => function ($query) {
+                $query->where('is_active', true);
+            }])
+            ->orderBy('products_count', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Catégories avec le plus de likes (via leurs produits)
+        $categoriesWithLikes = Category::withCount(['products as total_likes' => function ($query) {
+                $query->join('product_likes', 'products.id', '=', 'product_likes.product_id')
+                      ->where('products.is_active', true);
+            }])
+            ->orderBy('total_likes', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Évolution des créations de catégories par mois (6 derniers mois)
+        $categoriesPerMonth = Category::select(
+                DB::raw('YEAR(created_at) as year'),
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('COUNT(*) as count')
+            )
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc')
+            ->get();
+
+        // Catégories sans produits
+        $emptyCategoriesCount = Category::whereDoesntHave('products')
+            ->where('is_active', true)
+            ->count();
+
+        // Catégories récemment créées
+        $recentCategories = Category::with(['products' => function ($query) {
+                $query->where('is_active', true)->limit(3);
+            }])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Statistiques de revenus par catégorie (approximatif basé sur les prix des produits)
+        $revenueByCategory = Category::withSum(['products as total_value' => function ($query) {
+                $query->where('is_active', true)
+                      ->selectRaw('SUM(price * quantity)');
+            }], 'price')
+            ->orderBy('total_value', 'desc')
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Statistiques des catégories récupérées',
+            'data' => [
+                'overview' => [
+                    'total_categories' => $totalCategories,
+                    'active_categories' => $activeCategories,
+                    'inactive_categories' => $inactiveCategories,
+                    'deleted_categories' => $deletedCategories,
+                    'empty_categories' => $emptyCategoriesCount
+                ],
+                'top_categories_by_products' => $categoriesWithProducts,
+                'top_categories_by_likes' => $categoriesWithLikes,
+                'categories_per_month' => $categoriesPerMonth,
+                'recent_categories' => $recentCategories,
+                'revenue_by_category' => $revenueByCategory
+            ]
         ]);
     }
 }
