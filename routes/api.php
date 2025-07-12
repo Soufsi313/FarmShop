@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CartItemController;
+use App\Http\Controllers\CartLocationController;
+use App\Http\Controllers\CartItemLocationController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductLikeController;
@@ -113,6 +115,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::patch('/{cartItem}/details', [CartItemController::class, 'updateDetails'])->name('update-details');
     });
     
+    // Routes panier de location pour utilisateurs connectés
+    Route::prefix('cart-location')->name('api.cart-location.')->group(function () {
+        Route::get('/', [CartLocationController::class, 'index'])->name('index');
+        Route::post('/products/{product}', [CartLocationController::class, 'addProduct'])->name('add-product');
+        Route::put('/products/{product}/quantity', [CartLocationController::class, 'updateQuantity'])->name('update-quantity');
+        Route::put('/products/{product}/dates', [CartLocationController::class, 'updateDates'])->name('update-dates');
+        Route::delete('/products/{product}', [CartLocationController::class, 'removeProduct'])->name('remove-product');
+        Route::delete('/clear', [CartLocationController::class, 'clear'])->name('clear');
+        Route::get('/availability', [CartLocationController::class, 'checkAvailability'])->name('check-availability');
+        Route::get('/summary', [CartLocationController::class, 'summary'])->name('summary');
+        Route::put('/default-dates', [CartLocationController::class, 'updateDefaultDates'])->name('update-default-dates');
+        Route::get('/checkout/prepare', [CartLocationController::class, 'prepareForCheckout'])->name('prepare-checkout');
+    });
+    
     // Routes administration (Admin seulement)
     Route::middleware(['admin'])->group(function () {
         // Gestion des utilisateurs
@@ -184,6 +200,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::prefix('admin/cart-items')->name('api.admin.cart-items.')->group(function () {
             Route::get('/stats', [CartItemController::class, 'adminStats'])->name('stats');
             Route::get('/', [CartItemController::class, 'adminIndex'])->name('index');
+        });
+        
+        // Gestion des paniers de location (Admin seulement)
+        Route::prefix('admin/cart-locations')->name('api.admin.cart-locations.')->group(function () {
+            Route::get('/stats', [CartLocationController::class, 'adminStats'])->name('stats');
+            Route::get('/', [CartLocationController::class, 'adminIndex'])->name('index');
         });
     });
 });
