@@ -5,6 +5,7 @@ use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\CartLocationController;
 use App\Http\Controllers\CartItemLocationController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CookieController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductLikeController;
@@ -57,6 +58,13 @@ Route::get('/rental-constraints/{product}', [RentalConstraintController::class, 
 Route::post('/rental-constraints/{product}/validate', [RentalConstraintController::class, 'validateRentalPeriod'])->name('api.rental-constraints.validate');
 Route::get('/rental-constraints/{product}/calendar', [RentalConstraintController::class, 'getAvailabilityCalendar'])->name('api.rental-constraints.calendar');
 Route::get('/rental-constraints/{product}/suggestions', [RentalConstraintController::class, 'suggestOptimalDates'])->name('api.rental-constraints.suggestions');
+
+// Routes publiques pour la gestion des cookies
+Route::get('/cookies/preferences', [CookieController::class, 'getPreferences'])->name('api.cookies.preferences');
+Route::post('/cookies/preferences', [CookieController::class, 'updatePreferences'])->name('api.cookies.update-preferences');
+Route::post('/cookies/accept-all', [CookieController::class, 'acceptAll'])->name('api.cookies.accept-all');
+Route::post('/cookies/reject-all', [CookieController::class, 'rejectAll'])->name('api.cookies.reject-all');
+Route::get('/cookies/consent/{cookieType}', [CookieController::class, 'checkConsent'])->name('api.cookies.check-consent');
 
 // Routes publiques pour les likes (consultation seulement)
 Route::get('/products-likes', [ProductLikeController::class, 'index'])->name('api.product-likes.index');
@@ -181,7 +189,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{cartItemLocation}/suggest-dates', [CartItemLocationController::class, 'suggestOptimalDates'])->name('suggest-dates');
     });
     
-    // Routes administration (Admin seulement)
+    // Routes cookies pour utilisateurs connectés
+    Route::prefix('cookies')->name('api.cookies.')->group(function () {
+        Route::get('/history', [CookieController::class, 'getUserHistory'])->name('history');
+    });
+    
+    // Routes admin protégées par middleware
     Route::middleware(['admin'])->group(function () {
         // Gestion des utilisateurs
         Route::get('/admin/users', [UserController::class, 'index'])->name('api.admin.users.index');
@@ -264,6 +277,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::prefix('admin/cart-location-items')->name('api.admin.cart-location-items.')->group(function () {
             Route::get('/stats', [CartItemLocationController::class, 'adminStats'])->name('stats');
             Route::get('/', [CartItemLocationController::class, 'adminIndex'])->name('index');
+        });
+        
+        // Gestion des cookies (Admin seulement)
+        Route::prefix('admin/cookies')->name('api.admin.cookies.')->group(function () {
+            Route::get('/', [CookieController::class, 'index'])->name('index');
+            Route::get('/stats', [CookieController::class, 'getGlobalStats'])->name('stats');
+            Route::get('/{cookie}', [CookieController::class, 'show'])->name('show');
+            Route::delete('/{cookie}', [CookieController::class, 'destroy'])->name('destroy');
         });
         
         // Gestion des contacts (Admin seulement)
