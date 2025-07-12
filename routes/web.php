@@ -5,6 +5,7 @@ use App\Http\Controllers\RentalCategoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -72,18 +73,21 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Routes administration
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Gestion des utilisateurs
-    Route::resource('users', UserController::class);
-    Route::post('users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard admin (avec vérification du rôle dans le contrôleur)
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
     
-    // Gestion des catégories
-    Route::resource('categories', CategoryController::class);
-    Route::post('categories/{id}/restore', [CategoryController::class, 'restore'])->name('categories.restore');
-    Route::patch('categories/{category}/toggle-status', [CategoryController::class, 'toggleStatus'])->name('categories.toggle-status');
+    // Sections du dashboard
+    Route::get('/users', [DashboardController::class, 'users'])->name('users.index');
+    Route::get('/products', [DashboardController::class, 'products'])->name('products.index');
+    Route::get('/categories', [DashboardController::class, 'categories'])->name('categories.index');
+    Route::get('/orders', [DashboardController::class, 'orders'])->name('orders.index');
+    Route::get('/special-offers', [DashboardController::class, 'specialOffers'])->name('special-offers.index');
+    Route::get('/settings', [DashboardController::class, 'settings'])->name('settings.index');
     
-    // Gestion des catégories de location
-    Route::resource('rental-categories', RentalCategoryController::class);
-    Route::post('rental-categories/{id}/restore', [RentalCategoryController::class, 'restore'])->name('rental-categories.restore');
-    Route::patch('rental-categories/{rentalCategory}/toggle-status', [RentalCategoryController::class, 'toggleStatus'])->name('rental-categories.toggle-status');
+    // CRUD Routes existantes (à garder pour plus tard)
+    // Route::resource('users', UserController::class);
+    // Route::resource('categories', CategoryController::class);
+    // Route::resource('rental-categories', RentalCategoryController::class);
 });

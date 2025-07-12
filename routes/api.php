@@ -86,6 +86,12 @@ Route::get('/blog/posts/tag/{tag}', [App\Http\Controllers\BlogPostController::cl
 Route::get('/blog/posts/{blogPost}/comments', [App\Http\Controllers\BlogCommentController::class, 'show'])->name('api.blog.comments.show');
 Route::get('/blog/comments/{blogComment}/replies', [App\Http\Controllers\BlogCommentController::class, 'replies'])->name('api.blog.comments.replies');
 
+// Routes publiques pour les offres spéciales (consultation)
+Route::get('/special-offers', [App\Http\Controllers\SpecialOfferController::class, 'index'])->name('api.special-offers.index');
+Route::get('/special-offers/{specialOffer}', [App\Http\Controllers\SpecialOfferController::class, 'show'])->name('api.special-offers.show');
+Route::get('/products/{product}/special-offers', [App\Http\Controllers\SpecialOfferController::class, 'getProductOffers'])->name('api.products.special-offers');
+Route::post('/special-offers/calculate-discount', [App\Http\Controllers\SpecialOfferController::class, 'calculateDiscount'])->name('api.special-offers.calculate-discount');
+
 // Route webhook Stripe (publique, sans authentification)
 Route::post('/stripe/webhook', [StripePaymentController::class, 'webhook'])->name('api.stripe.webhook');
 
@@ -286,6 +292,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::prefix('admin/cart-location-items')->name('api.admin.cart-location-items.')->group(function () {
             Route::get('/stats', [CartItemLocationController::class, 'adminStats'])->name('stats');
             Route::get('/', [CartItemLocationController::class, 'adminIndex'])->name('index');
+        });
+        
+        // Gestion des offres spéciales (Admin seulement)
+        Route::prefix('admin/special-offers')->name('api.admin.special-offers.')->group(function () {
+            Route::get('/stats', [App\Http\Controllers\SpecialOfferController::class, 'adminStats'])->name('stats');
+            Route::post('/', [App\Http\Controllers\SpecialOfferController::class, 'store'])->name('store');
+            Route::put('/{specialOffer}', [App\Http\Controllers\SpecialOfferController::class, 'update'])->name('update');
+            Route::delete('/{specialOffer}', [App\Http\Controllers\SpecialOfferController::class, 'destroy'])->name('destroy');
+            Route::patch('/{specialOffer}/toggle-status', [App\Http\Controllers\SpecialOfferController::class, 'toggleStatus'])->name('toggle-status');
         });
         
         // Gestion des cookies (Admin seulement)
