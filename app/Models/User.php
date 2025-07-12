@@ -228,4 +228,30 @@ class User extends Authenticatable
         // Mettre à jour aussi l'ancien champ pour compatibilité
         $this->update(['newsletter_subscribed' => false]);
     }
+
+    /**
+     * Relations avec les commandes de location
+     */
+    public function orderLocations()
+    {
+        return $this->hasMany(OrderLocation::class);
+    }
+
+    /**
+     * Commandes de location par statut
+     */
+    public function activeRentalOrders()
+    {
+        return $this->orderLocations()->whereIn('status', ['confirmed', 'active', 'completed']);
+    }
+
+    public function pendingRentalOrders()
+    {
+        return $this->orderLocations()->where('status', 'pending');
+    }
+
+    public function finishedRentalOrders()
+    {
+        return $this->orderLocations()->where('status', 'finished');
+    }
 }
