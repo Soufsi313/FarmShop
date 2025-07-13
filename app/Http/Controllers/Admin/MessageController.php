@@ -90,9 +90,16 @@ class MessageController extends Controller
         $sortOrder = $request->get('sort_order', 'desc');
         $query->orderBy($sortBy, $sortOrder);
 
+        // Nombre d'éléments par page (personnalisable)
+        $perPage = $request->get('per_page', 15);
+        // Limiter les valeurs acceptées pour éviter les abus
+        $allowedPerPage = [10, 15, 25, 50, 100];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 15;
+        }
+
         // Si c'est une requête API, retourner JSON avec pagination
         if ($request->expectsJson()) {
-            $perPage = $request->get('per_page', 15);
             $messages = $query->paginate($perPage);
 
             return response()->json([
@@ -103,8 +110,9 @@ class MessageController extends Controller
         }
 
         // Sinon, retourner la vue pour l'interface web
-        $messages = $query->paginate(15);
-        return view('admin.messages.index', compact('messages'));
+        $messages = $query->paginate($perPage);
+        $statistics = $this->getMessageStatistics();
+        return view('admin.messages.index', compact('messages', 'statistics'));
     }
 
     /**
@@ -354,11 +362,11 @@ class MessageController extends Controller
         $total = Message::count();
         $unread = Message::where('status', 'unread')->count();
         $important = Message::where('is_important', true)->count();
-        $contactAdmin = Message::where('type', 'contact_admin')->count();
+        $contactMessages = Message::where('type', 'contact')->count();
         $adminResponses = Message::where('type', 'admin_response')->count();
 
         $byPriority = [];
-        $priorities = ['low', 'medium', 'high', 'urgent'];
+        $priorities = ['low', 'normal', 'high', 'urgent'];
         foreach ($priorities as $priority) {
             $byPriority[$priority] = Message::where('priority', $priority)->count();
         }
@@ -374,14 +382,14 @@ class MessageController extends Controller
             'unread' => $unread,
             'read' => $total - $unread,
             'important' => $important,
-            'contact_admin' => $contactAdmin,
+            'contact_messages' => $contactMessages,
             'admin_responses' => $adminResponses,
             'by_priority' => $byPriority,
             'by_type' => $byType,
-            'recent_contacts' => Message::where('type', 'contact_admin')
+            'recent_contacts' => Message::where('type', 'contact')
                                      ->where('created_at', '>=', now()->subDays(7))
                                      ->count(),
-            'response_rate' => $contactAdmin > 0 ? round(($adminResponses / $contactAdmin) * 100, 2) : 0
+            'response_rate' => $contactMessages > 0 ? round(($adminResponses / $contactMessages) * 100, 2) : 0
         ];
     }
 

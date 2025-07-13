@@ -16,6 +16,24 @@ class DatabaseSeeder extends Seeder
         // Créer le compte administrateur
         $this->call(AdminUserSeeder::class);
         
+        // Créer les utilisateurs normaux
+        $this->call(UserSeeder::class);
+        
+        // Créer les catégories
+        $this->call(CategorySeeder::class);
+        
+        // Créer les produits
+        $this->call(ProductSeeder::class);
+        
+        // Créer les catégories de location
+        $this->call(RentalCategorySeeder::class);
+        
+        // Créer les contraintes de location
+        $this->call(RentalConstraintsSeeder::class);
+        
+        // Créer les messages (datafixture)
+        $this->call(MessageSeeder::class);
+        
         // User::factory(10)->create();
 
         // User::factory()->create([

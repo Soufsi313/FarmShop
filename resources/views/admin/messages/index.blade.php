@@ -3,11 +3,80 @@
 @section('title', 'Messages')
 
 @section('content')
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
+
 <div class="container mx-auto px-4 py-6">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-800">Messages reçus</h1>
-        <div class="text-sm text-gray-600">
-            Total: {{ $messages->total() }} messages
+    </div>
+
+    <!-- Compteurs de messages -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Total des messages -->
+        <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <div class="flex items-center">
+                <div class="p-2 bg-blue-100 rounded-lg">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $statistics['total'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages non lus -->
+        <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <div class="flex items-center">
+                <div class="p-2 bg-red-100 rounded-lg">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Non lus</p>
+                    <p class="text-2xl font-bold text-red-600">{{ $statistics['unread'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages lus -->
+        <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <div class="flex items-center">
+                <div class="p-2 bg-green-100 rounded-lg">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Lus</p>
+                    <p class="text-2xl font-bold text-green-600">{{ $statistics['read'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages importants -->
+        <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <div class="flex items-center">
+                <div class="p-2 bg-yellow-100 rounded-lg">
+                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Importants</p>
+                    <p class="text-2xl font-bold text-yellow-600">{{ $statistics['important'] ?? 0 }}</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -60,7 +129,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <!-- Date de début -->
                 <div>
                     <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">Date de début</label>
@@ -82,6 +151,18 @@
                            placeholder="Rechercher dans le contenu..."
                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 </div>
+
+                <!-- Nombre par page -->
+                <div>
+                    <label for="per_page" class="block text-sm font-medium text-gray-700 mb-1">Par page</label>
+                    <select id="per_page" name="per_page" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="10" {{ request('per_page') == '10' ? 'selected' : '' }}>10</option>
+                        <option value="15" {{ request('per_page') == '15' || !request('per_page') ? 'selected' : '' }}>15</option>
+                        <option value="25" {{ request('per_page') == '25' ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == '50' ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ request('per_page') == '100' ? 'selected' : '' }}>100</option>
+                    </select>
+                </div>
             </div>
 
             <div class="flex justify-end space-x-3">
@@ -100,15 +181,26 @@
     <!-- Liste compacte des messages -->
     <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
         @if($messages->count() > 0)
+            <!-- En-tête des colonnes (caché sur mobile) -->
+            <div class="hidden md:block bg-gray-50 border-b border-gray-200">
+                <div class="grid grid-cols-12 gap-4 items-center p-4 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    <div class="col-span-3">Expéditeur</div>
+                    <div class="col-span-4">Message</div>
+                    <div class="col-span-2 text-center">Date / Motif</div>
+                    <div class="col-span-2 text-center">Statut</div>
+                    <div class="col-span-1 text-center">Actions</div>
+                </div>
+            </div>
+
             @foreach($messages as $message)
                 <div class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
                     <div class="p-4">
                         <!-- Ligne principale desktop -->
-                        <div class="hidden md:flex items-center justify-between">
-                            <!-- Informations de l'auteur (compactes) -->
-                            <div class="flex items-center space-x-3 flex-1">
+                        <div class="hidden md:grid md:grid-cols-12 md:gap-4 md:items-center">
+                            <!-- Informations de l'auteur (compactes) - 3 colonnes -->
+                            <div class="col-span-3 flex items-center space-x-3">
                                 @if($message->sender)
-                                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                                         {{ substr($message->sender->name ?: $message->sender->username, 0, 1) }}
                                     </div>
                                     <div class="flex-1 min-w-0">
@@ -116,24 +208,24 @@
                                             <h4 class="font-medium text-gray-900 text-sm truncate">
                                                 {{ $message->sender->name ?: $message->sender->username }}
                                             </h4>
-                                            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                                            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full flex-shrink-0">
                                                 Inscrit
                                             </span>
                                         </div>
                                         <p class="text-xs text-gray-600 truncate">{{ $message->sender->email }}</p>
                                     </div>
                                 @elseif($message->metadata && isset($message->metadata['sender_name']))
-                                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-sm">
+                                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                                         {{ substr($message->metadata['sender_name'], 0, 1) }}
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center space-x-2">
                                             <h4 class="font-medium text-gray-900 text-sm truncate">{{ $message->metadata['sender_name'] }}</h4>
-                                            <span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full">
+                                            <span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full flex-shrink-0">
                                                 Visiteur
                                             </span>
                                             @if(isset($message->metadata['migrated_from_contacts']))
-                                                <span class="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">
+                                                <span class="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full flex-shrink-0">
                                                     Migré
                                                 </span>
                                             @endif
@@ -143,7 +235,7 @@
                                         @endif
                                     </div>
                                 @else
-                                    <div class="h-8 w-8 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold text-sm">
+                                    <div class="h-8 w-8 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                                         ?
                                     </div>
                                     <div class="flex-1 min-w-0">
@@ -155,62 +247,59 @@
                                 @endif
                             </div>
 
-                            <!-- Sujet et contenu (aperçu) -->
-                            <div class="flex-2 px-4 min-w-0">
+                            <!-- Sujet et contenu (aperçu) - 4 colonnes -->
+                            <div class="col-span-4 min-w-0">
                                 <h3 class="font-medium text-gray-900 text-sm mb-1 truncate">{{ $message->subject }}</h3>
-                                <p class="text-xs text-gray-600" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ Str::limit($message->content, 100) }}</p>
+                                <p class="text-xs text-gray-600 line-clamp-2">{{ Str::limit($message->content, 100) }}</p>
                             </div>
 
-                            <!-- Métadonnées et actions -->
-                            <div class="flex items-center space-x-4">
-                                <!-- Date et motif -->
-                                <div class="text-right">
-                                    <div class="text-xs text-gray-500">{{ $message->created_at->format('d/m/Y') }}</div>
-                                    <div class="text-xs text-gray-500">{{ $message->created_at->format('H:i') }}</div>
-                                    @if($message->metadata && isset($message->metadata['contact_reason']))
-                                        <div class="text-xs text-blue-600 font-medium">
-                                            {{ ucfirst($message->metadata['contact_reason']) }}
-                                        </div>
-                                    @endif
-                                </div>
+                            <!-- Date et motif - 2 colonnes -->
+                            <div class="col-span-2 text-center">
+                                <div class="text-xs text-gray-500">{{ $message->created_at->format('d/m/Y') }}</div>
+                                <div class="text-xs text-gray-500">{{ $message->created_at->format('H:i') }}</div>
+                                @if($message->metadata && isset($message->metadata['contact_reason']))
+                                    <div class="text-xs text-blue-600 font-medium mt-1">
+                                        {{ ucfirst($message->metadata['contact_reason']) }}
+                                    </div>
+                                @endif
+                            </div>
 
-                                <!-- Badges de statut -->
-                                <div class="flex flex-col items-end space-y-1">
-                                    @if(!$message->read_at)
-                                        <span class="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">
-                                            Nouveau
-                                        </span>
-                                    @endif
-                                    
-                                    @if($message->is_important)
-                                        <span class="px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
-                                            Important
-                                        </span>
-                                    @endif
+                            <!-- Badges de statut - 2 colonnes -->
+                            <div class="col-span-2 flex flex-wrap justify-center gap-1">
+                                @if(!$message->read_at)
+                                    <span class="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">
+                                        Nouveau
+                                    </span>
+                                @endif
+                                
+                                @if($message->is_important)
+                                    <span class="px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                                        Important
+                                    </span>
+                                @endif
 
-                                    @if($message->priority && $message->priority !== 'normal')
-                                        <span class="px-2 py-0.5 text-xs rounded-full text-white
-                                            {{ $message->priority === 'urgent' ? 'bg-red-500' : 
-                                               ($message->priority === 'high' ? 'bg-orange-500' : 'bg-blue-500') }}">
-                                            {{ ucfirst($message->priority) }}
-                                        </span>
-                                    @endif
-                                </div>
+                                @if($message->priority && $message->priority !== 'normal')
+                                    <span class="px-2 py-0.5 text-xs rounded-full text-white
+                                        {{ $message->priority === 'urgent' ? 'bg-red-500' : 
+                                           ($message->priority === 'high' ? 'bg-orange-500' : 'bg-blue-500') }}">
+                                        {{ ucfirst($message->priority) }}
+                                    </span>
+                                @endif
+                            </div>
 
-                                <!-- Actions -->
-                                <div class="flex space-x-2">
-                                    <a href="{{ route('admin.messages.show', $message) }}" 
-                                       class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors">
-                                        Voir
-                                    </a>
-                                    
-                                    @if($message->type === 'contact' && !($message->metadata['admin_responded'] ?? false))
-                                        <button onclick="openResponseModal({{ $message->id }})" 
-                                                class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors">
-                                            Répondre
-                                        </button>
-                                    @endif
-                                </div>
+                            <!-- Actions - 1 colonne -->
+                            <div class="col-span-1 flex flex-col space-y-1">
+                                <a href="{{ route('admin.messages.show', $message) }}" 
+                                   class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors text-center">
+                                    Voir
+                                </a>
+                                
+                                @if($message->type === 'contact' && !($message->metadata['admin_responded'] ?? false))
+                                    <button onclick="openResponseModal({{ $message->id }})" 
+                                            class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors">
+                                        Répondre
+                                    </button>
+                                @endif
                             </div>
                         </div>
 
@@ -314,7 +403,18 @@
 
     <!-- Pagination -->
     <div class="mt-8">
-        {{ $messages->links() }}
+        <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+            <!-- Informations sur la pagination -->
+            <div class="text-sm text-gray-700">
+                Affichage de {{ $messages->firstItem() ?? 0 }} à {{ $messages->lastItem() ?? 0 }} 
+                sur {{ $messages->total() }} résultats
+            </div>
+            
+            <!-- Liens de pagination -->
+            <div class="flex-1 flex justify-center sm:justify-end">
+                {{ $messages->appends(request()->query())->links() }}
+            </div>
+        </div>
     </div>
 </div>
 
@@ -401,6 +501,11 @@ document.getElementById('responseModal').addEventListener('click', function(e) {
     if (e.target === this) {
         closeResponseModal();
     }
+});
+
+// Auto-submit quand on change le nombre d'éléments par page
+document.getElementById('per_page').addEventListener('change', function() {
+    this.form.submit();
 });
 </script>
 @endsection
