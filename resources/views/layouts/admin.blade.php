@@ -128,8 +128,8 @@
                                     Commandes Achat
                                 </a>
 
-                                <a href="#" onclick="alert('Module commandes de location en développement')" 
-                                   class="text-blue-100 hover:bg-blue-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
+                                <a href="{{ route('admin.order-locations.index') }}" 
+                                   class="@if(request()->routeIs('admin.order-locations*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
                                     <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
@@ -176,42 +176,10 @@
                             </div>
                         </div>
 
-                        <!-- Section Gestion Client -->
+                        <!-- Section Messages Contact -->
                         <div class="mt-6">
-                            <h3 class="px-3 text-xs font-semibold text-blue-200 uppercase tracking-wider">CRUD Client</h3>
+                            <h3 class="px-3 text-xs font-semibold text-blue-200 uppercase tracking-wider">Communication</h3>
                             <div class="mt-1 space-y-1">
-                                <a href="#" onclick="alert('Module paniers en développement')" 
-                                   class="text-blue-100 hover:bg-blue-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"/>
-                                    </svg>
-                                    Paniers Achat
-                                </a>
-
-                                <a href="#" onclick="alert('Module paniers location en développement')" 
-                                   class="text-blue-100 hover:bg-blue-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    Paniers Location
-                                </a>
-
-                                <a href="#" onclick="alert('Module wishlists en développement')" 
-                                   class="text-blue-100 hover:bg-blue-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                    </svg>
-                                    Listes de souhaits
-                                </a>
-
-                                <a href="#" onclick="alert('Module likes en développement')" 
-                                   class="text-blue-100 hover:bg-blue-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
-                                    </svg>
-                                    Likes Produits
-                                </a>
-
                                 <a href="#" onclick="alert('Module messages en développement')" 
                                    class="text-blue-100 hover:bg-blue-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
                                     <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

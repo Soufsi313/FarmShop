@@ -55,6 +55,16 @@ class CategorySeeder extends Seeder
                 'seo_title' => 'Féculents et légumineuses bio - FarmShop',
                 'seo_description' => 'Pommes de terre, haricots, lentilles et tubercules cultivés naturellement pour votre bien-être.'
             ],
+            [
+                'name' => 'Produits Laitiers',
+                'description' => 'Produits laitiers frais et artisanaux. Lait, fromages, yaourts, beurre et crème issus de fermes locales respectueuses du bien-être animal.',
+                'icon' => '🥛',
+                'is_food' => true,
+                'is_active' => true,
+                'display_order' => 5,
+                'seo_title' => 'Produits laitiers frais et artisanaux - FarmShop',
+                'seo_description' => 'Découvrez nos produits laitiers authentiques issus de fermes locales. Qualité, fraîcheur et savoir-faire traditionnel.'
+            ],
 
             // Catégories non alimentaires
             [
@@ -63,7 +73,7 @@ class CategorySeeder extends Seeder
                 'icon' => '🔨',
                 'is_food' => false,
                 'is_active' => true,
-                'display_order' => 5,
+                'display_order' => 6,
                 'seo_title' => 'Outils agricoles professionnels - FarmShop',
                 'seo_description' => 'Outillage agricole de qualité pour professionnels et amateurs. Durabilité et performance garanties.'
             ],
@@ -73,7 +83,7 @@ class CategorySeeder extends Seeder
                 'icon' => '🚜',
                 'is_food' => false,
                 'is_active' => true,
-                'display_order' => 6,
+                'display_order' => 7,
                 'seo_title' => 'Machines agricoles et équipements motorisés - FarmShop',
                 'seo_description' => 'Machines agricoles légères et équipements motorisés pour optimiser votre travail agricole.'
             ],
@@ -83,7 +93,7 @@ class CategorySeeder extends Seeder
                 'icon' => '⚙️',
                 'is_food' => false,
                 'is_active' => true,
-                'display_order' => 7,
+                'display_order' => 8,
                 'seo_title' => 'Équipements agricoles et accessoires - FarmShop',
                 'seo_description' => 'Équipements agricoles professionnels et accessoires pour améliorer votre productivité.'
             ],
@@ -93,7 +103,7 @@ class CategorySeeder extends Seeder
                 'icon' => '🌱',
                 'is_food' => false,
                 'is_active' => true,
-                'display_order' => 8,
+                'display_order' => 9,
                 'seo_title' => 'Semences biologiques certifiées - FarmShop',
                 'seo_description' => 'Semences biologiques de qualité supérieure pour un jardinage naturel et productif.'
             ],
@@ -103,7 +113,7 @@ class CategorySeeder extends Seeder
                 'icon' => '🌿',
                 'is_food' => false,
                 'is_active' => true,
-                'display_order' => 9,
+                'display_order' => 10,
                 'seo_title' => 'Engrais naturels et biologiques - FarmShop',
                 'seo_description' => 'Engrais biologiques et amendements naturels pour des sols fertiles et des récoltes abondantes.'
             ],
@@ -113,31 +123,32 @@ class CategorySeeder extends Seeder
                 'icon' => '💧',
                 'is_food' => false,
                 'is_active' => true,
-                'display_order' => 10,
+                'display_order' => 11,
                 'seo_title' => 'Systèmes d\'irrigation et arrosage - FarmShop',
                 'seo_description' => 'Solutions d\'irrigation efficaces et économiques pour optimiser l\'arrosage de vos cultures.'
             ]
         ];
 
         foreach ($categories as $categoryData) {
-            Category::create([
-                'name' => $categoryData['name'],
-                'description' => $categoryData['description'],
-                'is_active' => $categoryData['is_active'],
-                'food_type' => $categoryData['is_food'] ? 'alimentaire' : 'non_alimentaire',
-                'is_returnable' => false,
-                'meta_title' => $categoryData['seo_title'],
-                'meta_description' => $categoryData['seo_description'],
-                'icon' => $categoryData['icon'],
-                'display_order' => $categoryData['display_order'],
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
+            Category::updateOrCreate(
+                ['name' => $categoryData['name']], // Condition de recherche
+                [
+                    'description' => $categoryData['description'],
+                    'is_active' => $categoryData['is_active'],
+                    'food_type' => $categoryData['is_food'] ? 'alimentaire' : 'non_alimentaire',
+                    'is_returnable' => false,
+                    'meta_title' => $categoryData['seo_title'],
+                    'meta_description' => $categoryData['seo_description'],
+                    'icon' => $categoryData['icon'],
+                    'display_order' => $categoryData['display_order'],
+                    'updated_at' => Carbon::now(),
+                ]
+            );
         }
 
-        echo "✅ 10 catégories créées avec succès !\n";
+        echo "✅ 11 catégories créées avec succès !\n";
         echo "📊 Répartition :\n";
-        echo "   🍎 4 catégories alimentaires : Fruits, Légumes, Céréales, Féculents\n";
+        echo "   🍎 5 catégories alimentaires : Fruits, Légumes, Céréales, Féculents, Produits Laitiers\n";
         echo "   🔧 6 catégories non alimentaires : Outils agricoles, Machines, Équipement, Semences, Engrais, Irrigation\n";
         echo "🎯 Toutes les catégories sont actives avec SEO optimisé\n";
         echo "📱 Icônes emoji assignées pour une meilleure visualisation\n";

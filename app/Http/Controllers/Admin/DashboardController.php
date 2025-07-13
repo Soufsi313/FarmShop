@@ -178,19 +178,6 @@ class DashboardController extends Controller
     /**
      * Gestion des commandes
      */
-    public function orders(Request $request)
-    {
-        $this->checkAdminAccess();
-        
-        // Pour l'instant simulation avec pagination vide
-        $orders = collect([]); // Collection vide pour simulation
-        
-        $currentPage = $request->get('page', 1);
-        $perPage = 20;
-        
-        return view('admin.orders.index', compact('orders', 'currentPage', 'perPage'));
-    }
-
     /**
      * Gestion des offres spéciales
      */
