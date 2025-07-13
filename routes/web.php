@@ -10,6 +10,8 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\OrderLocationController as AdminOrderLocationController;
+use App\Http\Controllers\Admin\SpecialOfferController as AdminSpecialOfferController;
+use App\Http\Controllers\Admin\MessageController as AdminMessageController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -64,6 +66,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [UserController::class, 'show'])->name('users.profile');
     Route::put('/profile', [UserController::class, 'update'])->name('users.update');
     
+    // Gestion des messages
+    Route::patch('/messages/{message}/read', [UserController::class, 'markMessageAsRead'])->name('messages.read');
+    Route::patch('/messages/{message}/archive', [UserController::class, 'archiveMessage'])->name('messages.archive');
+    Route::delete('/messages/{message}', [UserController::class, 'deleteMessage'])->name('messages.delete');
+    
     // Newsletter
     Route::post('/newsletter/subscribe', [UserController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
     Route::post('/newsletter/unsubscribe', [UserController::class, 'unsubscribeNewsletter'])->name('newsletter.unsubscribe');
@@ -117,5 +124,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/order-locations/{orderLocation}', [AdminOrderLocationController::class, 'show'])->name('order-locations.show');
     Route::patch('/order-locations/{orderLocation}/status', [AdminOrderLocationController::class, 'updateStatus'])->name('order-locations.update-status');
     Route::delete('/order-locations/{orderLocation}', [AdminOrderLocationController::class, 'destroy'])->name('order-locations.destroy');
+    
+    // Gestion des messages (nouvelle section)
+    Route::get('/messages', [AdminMessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/statistics', [AdminMessageController::class, 'statistics'])->name('messages.statistics');
+    Route::get('/messages/{message}', [AdminMessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages/{message}/respond', [AdminMessageController::class, 'respond'])->name('messages.respond');
+    Route::post('/messages/{message}/mark-read', [AdminMessageController::class, 'markAsRead'])->name('messages.mark-read');
+    Route::post('/messages/{message}/archive', [AdminMessageController::class, 'archive'])->name('messages.archive');
+    Route::delete('/messages/{message}', [AdminMessageController::class, 'destroy'])->name('messages.destroy');
+    
     Route::get('/settings', [DashboardController::class, 'settings'])->name('settings.index');
 });

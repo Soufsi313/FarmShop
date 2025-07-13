@@ -180,8 +180,8 @@
                         <div class="mt-6">
                             <h3 class="px-3 text-xs font-semibold text-blue-200 uppercase tracking-wider">Communication</h3>
                             <div class="mt-1 space-y-1">
-                                <a href="#" onclick="alert('Module messages en développement')" 
-                                   class="text-blue-100 hover:bg-blue-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
+                                <a href="{{ route('admin.messages.index') }}" 
+                                   class="@if(request()->routeIs('admin.messages*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
                                     <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                     </svg>

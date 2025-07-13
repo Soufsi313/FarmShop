@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contact;
+use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -120,27 +121,65 @@ class ContactController extends Controller
                 'submitted_at' => now()->toISOString()
             ];
 
-            // Créer le contact
-            $contact = Contact::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
+            // Créer un message dans la table messages au lieu d'un contact
+            $messageContent = "Nouveau message de contact reçu :\n\n";
+            $messageContent .= "Nom : {$request->name}\n";
+            $messageContent .= "Email : {$request->email}\n";
+            if ($request->phone) {
+                $messageContent .= "Téléphone : {$request->phone}\n";
+            }
+            $messageContent .= "Raison : " . (Contact::REASONS[$request->reason] ?? $request->reason) . "\n";
+            $messageContent .= "Priorité : " . (Contact::PRIORITIES[$request->priority ?? 'medium'] ?? 'Moyenne') . "\n";
+            $messageContent .= "Date : " . now()->format('d/m/Y à H:i') . "\n\n";
+            $messageContent .= "Message :\n{$request->message}";
+
+            // Créer le message pour l'admin (user_id = 1 pour l'admin principal)
+            $adminMessage = Message::create([
+                'user_id' => 1, // ID de l'admin principal
+                'sender_id' => auth()->check() ? auth()->id() : null,
+                'type' => 'contact_admin',
                 'subject' => $request->subject,
-                'reason' => $request->reason,
-                'message' => $request->message,
+                'content' => $messageContent,
+                'status' => 'unread',
                 'priority' => $request->priority ?? 'medium',
-                'metadata' => $metadata
+                'is_important' => in_array($request->priority ?? 'medium', ['high', 'urgent']),
+                'metadata' => [
+                    'sender_name' => $request->name,
+                    'sender_email' => $request->email,
+                    'sender_phone' => $request->phone,
+                    'contact_reason' => $request->reason,
+                    'original_priority' => $request->priority ?? 'medium',
+                    'submitted_at' => now()->toISOString(),
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent()
+                ]
             ]);
 
-            // Envoyer une notification email à l'admin (optionnel)
-            $this->sendNewContactNotification($contact);
+            // Créer une copie de confirmation dans la boîte de réception de l'utilisateur (si connecté)
+            if (auth()->check()) {
+                Message::create([
+                    'user_id' => auth()->id(),
+                    'sender_id' => null, // Message du système
+                    'type' => 'contact_confirmation',
+                    'subject' => 'Confirmation : ' . $request->subject,
+                    'content' => "Votre message a été envoyé avec succès à l'administration.\n\nSujet: {$request->subject}\nRaison: " . (Contact::REASONS[$request->reason] ?? $request->reason) . "\nPriorité: " . (Contact::PRIORITIES[$request->priority ?? 'medium'] ?? 'Moyenne') . "\nDate: " . now()->format('d/m/Y à H:i') . "\n\nMessage:\n{$request->message}\n\nRéférence: MSG-" . str_pad($adminMessage->id, 6, '0', STR_PAD_LEFT) . "\n\nNous vous répondrons dans les plus brefs délais.",
+                    'status' => 'unread',
+                    'priority' => $request->priority ?? 'medium',
+                    'is_important' => false,
+                    'metadata' => [
+                        'original_message_id' => $adminMessage->id,
+                        'message_reference' => 'MSG-' . str_pad($adminMessage->id, 6, '0', STR_PAD_LEFT),
+                        'original_reason' => $request->reason
+                    ]
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
                 'data' => [
-                    'contact_id' => $contact->id,
-                    'reference' => 'CONTACT-' . str_pad($contact->id, 6, '0', STR_PAD_LEFT)
+                    'message_id' => $adminMessage->id,
+                    'reference' => 'MSG-' . str_pad($adminMessage->id, 6, '0', STR_PAD_LEFT)
                 ]
             ], 201);
 

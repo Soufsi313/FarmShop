@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Message;
 
 class Contact extends Model
 {
@@ -96,6 +98,27 @@ class Contact extends Model
             'is_read' => true,
             'read_at' => $this->read_at ?? now()
         ]);
+
+        // Créer un message dans la boîte de réception de l'utilisateur s'il existe
+        $user = User::where('email', $this->email)->first();
+        if ($user) {
+            Message::create([
+                'user_id' => $user->id,
+                'sender_id' => $adminId,
+                'type' => 'admin_response',
+                'subject' => 'Réponse à votre contact : ' . $this->subject,
+                'content' => "Bonjour {$this->name},\n\nVoici la réponse à votre message de contact :\n\n" . $response . "\n\nRéférence: CONTACT-" . str_pad($this->id, 6, '0', STR_PAD_LEFT) . "\n\nCordialement,\nL'équipe FarmShop",
+                'status' => 'unread',
+                'priority' => $this->priority,
+                'is_important' => true,
+                'metadata' => [
+                    'contact_id' => $this->id,
+                    'contact_reference' => 'CONTACT-' . str_pad($this->id, 6, '0', STR_PAD_LEFT),
+                    'original_subject' => $this->subject,
+                    'response_date' => now()->toISOString()
+                ]
+            ]);
+        }
     }
 
     /**

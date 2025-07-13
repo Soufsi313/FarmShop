@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -94,7 +95,24 @@ class UserController extends Controller
         }
 
         // Sinon, retourner la vue pour l'interface web
-        return view('users.profile', compact('user'));
+        // Récupérer les messages de la boîte de réception si c'est son propre profil
+        $messages = null;
+        $unreadCount = 0;
+        
+        if (Auth::id() === $user->id) {
+            // Messages de la table messages seulement
+            $messages = Message::where('user_id', $user->id)
+                ->with('sender')
+                ->orderBy('created_at', 'desc')
+                ->get();
+                
+            // Compter les messages non lus
+            $unreadCount = Message::where('user_id', $user->id)
+                ->whereNull('read_at')
+                ->count();
+        }
+        
+        return view('users.profile', compact('user', 'messages', 'unreadCount'));
     }
 
     /**
@@ -415,5 +433,54 @@ class UserController extends Controller
                 'warning' => 'Erreur d\'envoi d\'email : ' . $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * Marquer un message comme lu
+     */
+    public function markMessageAsRead(Message $message)
+    {
+        // Vérifier que le message appartient à l'utilisateur connecté
+        if ($message->user_id !== Auth::id()) {
+            abort(403, 'Accès refusé.');
+        }
+
+        $message->update([
+            'read_at' => now()
+        ]);
+
+        return redirect()->back()->with('success', 'Message marqué comme lu.');
+    }
+
+    /**
+     * Archiver un message
+     */
+    public function archiveMessage(Message $message)
+    {
+        // Vérifier que le message appartient à l'utilisateur connecté
+        if ($message->user_id !== Auth::id()) {
+            abort(403, 'Accès refusé.');
+        }
+
+        $message->update([
+            'archived_at' => now()
+        ]);
+
+        return redirect()->back()->with('success', 'Message archivé.');
+    }
+
+    /**
+     * Supprimer un message
+     */
+    public function deleteMessage(Message $message)
+    {
+        // Vérifier que le message appartient à l'utilisateur connecté
+        if ($message->user_id !== Auth::id()) {
+            abort(403, 'Accès refusé.');
+        }
+
+        $message->delete();
+
+        return redirect()->back()->with('success', 'Message supprimé.');
     }
 }
