@@ -28,6 +28,9 @@ class DatabaseSeeder extends Seeder
         // Créer les fruits biologiques
         $this->call(FruitProductSeeder::class);
         
+        // Créer les légumes biologiques belges
+        $this->call(VegetableProductSeeder::class);
+        
         // Créer les catégories de location
         $this->call(RentalCategorySeeder::class);
         
