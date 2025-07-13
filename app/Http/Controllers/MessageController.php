@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\VisitorMessageReply;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class MessageController extends Controller
 {
@@ -420,5 +423,234 @@ class MessageController extends Controller
             'success' => true,
             'data' => $counts
         ]);
+    }
+
+    /**
+     * Répondre à un message de visiteur (Admin seulement)
+     */
+    public function replyToVisitor(Request $request, Message $message)
+    {
+        $user = Auth::user();
+        
+        // Vérifier que c'est un admin
+        if (!$user || !$user->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Accès non autorisé'
+            ], 403);
+        }
+
+        // Vérifier que c'est un message de visiteur (type contact)
+        if ($message->type !== 'contact' || !isset($message->metadata['sender_email'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ce message ne provient pas d\'un visiteur ou n\'a pas d\'email'
+            ], 400);
+        }
+
+        $request->validate([
+            'reply_content' => 'required|string|min:10|max:5000',
+            'mark_as_resolved' => 'boolean'
+        ]);
+
+        try {
+            // Créer la réponse dans la table messages
+            $replyMessage = Message::create([
+                'user_id' => $message->user_id, // Admin qui répond
+                'sender_id' => $user->id,
+                'type' => 'admin_reply',
+                'subject' => 'Re: ' . $message->subject,
+                'content' => $request->reply_content,
+                'status' => 'sent',
+                'priority' => $message->priority,
+                'metadata' => [
+                    'original_message_id' => $message->id,
+                    'visitor_email' => $message->metadata['sender_email'],
+                    'visitor_name' => $message->metadata['sender_name'] ?? 'Visiteur',
+                    'reply_type' => 'visitor_email_response'
+                ]
+            ]);
+
+            // Envoyer l'email au visiteur
+            $visitorEmail = $message->metadata['sender_email'];
+            $adminName = $user->first_name . ' ' . $user->last_name;
+            
+            Mail::to($visitorEmail)->send(new VisitorMessageReply(
+                $message, 
+                $request->reply_content, 
+                $adminName
+            ));
+
+            // Marquer le message original comme traité si demandé
+            if ($request->mark_as_resolved) {
+                $message->update([
+                    'status' => 'resolved',
+                    'metadata' => array_merge($message->metadata ?? [], [
+                        'resolved_at' => now()->toISOString(),
+                        'resolved_by' => $user->id,
+                        'admin_response_sent' => true
+                    ])
+                ]);
+            }
+
+            // Log de l'action
+            Log::info('Réponse envoyée à un visiteur', [
+                'admin_id' => $user->id,
+                'original_message_id' => $message->id,
+                'visitor_email' => $visitorEmail,
+                'reply_message_id' => $replyMessage->id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Réponse envoyée avec succès à ' . $visitorEmail,
+                'data' => [
+                    'reply_message_id' => $replyMessage->id,
+                    'email_sent_to' => $visitorEmail,
+                    'original_message_status' => $message->fresh()->status
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'envoi de la réponse au visiteur', [
+                'error' => $e->getMessage(),
+                'message_id' => $message->id,
+                'admin_id' => $user->id
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'envoi de la réponse: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtenir les messages de visiteurs pour l'admin
+     */
+    public function getVisitorMessages(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (!$user || !$user->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Accès non autorisé'
+            ], 403);
+        }
+
+        $query = Message::where('type', 'contact')
+                       ->whereNotNull('metadata->sender_email')
+                       ->with('sender')
+                       ->latest();
+
+        // Filtres
+        if ($request->has('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('priority') && $request->priority !== 'all') {
+            $query->where('priority', $request->priority);
+        }
+
+        $messages = $query->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data' => $messages,
+            'statistics' => [
+                'total' => Message::where('type', 'contact')->count(),
+                'pending' => Message::where('type', 'contact')->where('status', 'unread')->count(),
+                'resolved' => Message::where('type', 'contact')->where('status', 'resolved')->count(),
+                'urgent' => Message::where('type', 'contact')->where('priority', 'high')->count()
+            ]
+        ]);
+    }
+
+    /**
+     * Créer un message de contact pour un visiteur (Route publique)
+     */
+    public function createVisitorMessage(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string|min:10|max:2000',
+            'reason' => 'required|in:mon_profil,mes_achats,mes_locations,mes_donnees,support_technique,partenariat,autre',
+            'priority' => 'nullable|in:low,normal,high,urgent'
+        ]);
+
+        try {
+            // Créer le message pour l'admin (user_id = 1)
+            $adminMessage = Message::create([
+                'user_id' => 1, // Admin user ID
+                'sender_id' => null, // Pas d'utilisateur connecté pour un visiteur
+                'type' => 'contact',
+                'subject' => $request->subject,
+                'content' => $request->message,
+                'status' => 'unread',
+                'priority' => $request->priority ?? 'normal',
+                'metadata' => [
+                    'sender_name' => $request->name,
+                    'sender_email' => $request->email,
+                    'sender_phone' => $request->phone,
+                    'contact_reason' => $request->reason,
+                    'visitor_message' => true,
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent()
+                ]
+            ]);
+
+            // Créer un message de confirmation pour le visiteur
+            $confirmationMessage = Message::create([
+                'user_id' => 1, // Admin
+                'sender_id' => 1, // Admin
+                'type' => 'visitor_confirmation',
+                'subject' => 'Confirmation de réception - ' . $request->subject,
+                'content' => "Votre message a été envoyé avec succès à l'administration.\n\nSujet: {$request->subject}\nMotif: " . ucfirst(str_replace('_', ' ', $request->reason)) . "\nPriorité: " . ucfirst($request->priority ?? 'normal') . "\nDate: " . now()->format('d/m/Y à H:i') . "\n\nMessage:\n{$request->message}\n\nRéférence: MSG-" . str_pad($adminMessage->id, 6, '0', STR_PAD_LEFT) . "\n\nNous vous répondrons dans les plus brefs délais.",
+                'status' => 'sent',
+                'priority' => 'normal',
+                'metadata' => [
+                    'original_message_id' => $adminMessage->id,
+                    'visitor_email' => $request->email,
+                    'visitor_name' => $request->name,
+                    'confirmation_type' => 'visitor_contact_received'
+                ]
+            ]);
+
+            // Log de l'action
+            Log::info('Nouveau message de contact de visiteur', [
+                'visitor_email' => $request->email,
+                'visitor_name' => $request->name,
+                'subject' => $request->subject,
+                'reason' => $request->reason,
+                'message_id' => $adminMessage->id,
+                'ip' => $request->ip()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
+                'data' => [
+                    'message_id' => $adminMessage->id,
+                    'reference' => 'MSG-' . str_pad($adminMessage->id, 6, '0', STR_PAD_LEFT),
+                    'estimated_response_time' => '24-48 heures'
+                ]
+            ], 201);
+
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la création du message de contact visiteur', [
+                'error' => $e->getMessage(),
+                'visitor_email' => $request->email,
+                'visitor_name' => $request->name
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de l\'envoi de votre message. Veuillez réessayer.'
+            ], 500);
+        }
     }
 }

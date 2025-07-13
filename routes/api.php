@@ -14,7 +14,6 @@ use App\Http\Controllers\RentalConstraintController;
 use App\Http\Controllers\StripePaymentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishlistController;
-use App\Http\Controllers\ContactController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NewsletterSubscriptionController;
 use Illuminate\Http\Request;
@@ -73,6 +72,9 @@ Route::get('/products-likes', [ProductLikeController::class, 'index'])->name('ap
 Route::get('/products/{product}/likes', [ProductLikeController::class, 'show'])->name('api.product-likes.show');
 Route::get('/products/{product}/likes/check', [ProductLikeController::class, 'check'])->name('api.product-likes.check');
 
+// Route publique pour les messages de contact des visiteurs
+Route::post('/contact', [MessageController::class, 'createVisitorMessage'])->name('api.contact.store');
+
 // Routes publiques pour les catégories de blog (consultation)
 Route::get('/blog/categories', [App\Http\Controllers\BlogCategoryController::class, 'index'])->name('api.blog.categories.index');
 Route::get('/blog/categories/{slug}', [App\Http\Controllers\BlogCategoryController::class, 'show'])->name('api.blog.categories.show');
@@ -115,6 +117,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/stock-alerts', [MessageController::class, 'getStockAlerts'])->name('stock-alerts');
         Route::post('/stock-alerts/mark-read', [MessageController::class, 'markStockAlertsAsRead'])->name('stock-alerts.mark-read');
         Route::get('/unread-count', [MessageController::class, 'getUnreadAlertsCount'])->name('unread-count');
+        
+        // Routes pour les messages de visiteurs (Admin seulement)
+        Route::get('/visitor-messages', [MessageController::class, 'getVisitorMessages'])->name('visitor-messages');
+        Route::post('/{message}/reply-to-visitor', [MessageController::class, 'replyToVisitor'])->name('reply-to-visitor');
+        
         Route::get('/{message}', [MessageController::class, 'show'])->name('show');
         Route::put('/{message}/read', [MessageController::class, 'markAsRead'])->name('mark-read');
         Route::put('/{message}/unread', [MessageController::class, 'markAsUnread'])->name('mark-unread');
@@ -312,18 +319,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::delete('/{cookie}', [CookieController::class, 'destroy'])->name('destroy');
         });
         
-        // Gestion des contacts (Admin seulement)
-        Route::prefix('admin/contacts')->name('api.admin.contacts.')->group(function () {
-            Route::get('/', [ContactController::class, 'index'])->name('index');
-            Route::get('/statistics', [ContactController::class, 'statistics'])->name('statistics');
-            Route::get('/{contact}', [ContactController::class, 'show'])->name('show');
-            Route::post('/{contact}/respond', [ContactController::class, 'respond'])->name('respond');
-            Route::patch('/{contact}/status', [ContactController::class, 'updateStatus'])->name('update-status');
-            Route::patch('/{contact}/priority', [ContactController::class, 'updatePriority'])->name('update-priority');
-            Route::delete('/{contact}', [ContactController::class, 'destroy'])->name('destroy');
-            Route::post('/mark-as-read', [ContactController::class, 'markAsRead'])->name('mark-as-read');
-        });
-        
         // Gestion des newsletters (Admin seulement)
         Route::prefix('admin/newsletters')->name('api.admin.newsletters.')->group(function () {
             Route::get('/', [NewsletterController::class, 'index'])->name('index');
@@ -489,9 +484,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         });
     });
 });
-
-// Route publique pour le formulaire de contact
-Route::post('/contact', [ContactController::class, 'store'])->name('api.contact.store');
 
 // Routes publiques pour newsletter (tracking et désabonnement)
 Route::get('/newsletter/track/open/{token}', [NewsletterSubscriptionController::class, 'trackOpen'])->name('api.newsletter.track-open');
