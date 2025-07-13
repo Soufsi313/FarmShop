@@ -78,42 +78,34 @@
                 Nos Catégories
             </h2>
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" @click="navigateToCategory('tracteurs')">
-                    <div class="h-48 bg-gradient-to-br from-farm-green-200 to-farm-green-300 flex items-center justify-center">
-                        <span class="text-6xl">🚜</span>
+                @forelse($categories as $index => $category)
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
+                     @click="navigateToCategory('{{ $category->slug }}')">
+                    <div class="h-48 bg-gradient-to-br {{ $index % 4 == 0 ? 'from-farm-green-200 to-farm-green-300' : ($index % 4 == 1 ? 'from-farm-orange-200 to-farm-orange-300' : ($index % 4 == 2 ? 'from-farm-green-200 to-farm-orange-200' : 'from-farm-orange-200 to-farm-green-200')) }} flex items-center justify-center">
+                        <span class="text-6xl">{{ $category->icon ?? '�' }}</span>
                     </div>
                     <div class="p-4">
-                        <h3 class="text-xl font-semibold text-farm-green-700">Tracteurs</h3>
-                        <p class="text-farm-orange-600 text-sm">Puissants et fiables</p>
+                        <h3 class="text-xl font-semibold {{ $index % 2 == 0 ? 'text-farm-green-700' : 'text-farm-orange-700' }}">
+                            {{ $category->name }}
+                        </h3>
+                        <p class="{{ $index % 2 == 0 ? 'text-farm-orange-600' : 'text-farm-green-600' }} text-sm">
+                            {{ $category->meta_description ?? 'Découvrez nos produits de qualité' }}
+                        </p>
+                        @if($category->food_type)
+                        <span class="inline-block mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                            {{ $category->food_type === 'alimentaire' ? '🍃 Alimentaire' : '🔧 Non-alimentaire' }}
+                        </span>
+                        @endif
                     </div>
                 </div>
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" @click="navigateToCategory('outils')">
-                    <div class="h-48 bg-gradient-to-br from-farm-orange-200 to-farm-orange-300 flex items-center justify-center">
-                        <span class="text-6xl">🔧</span>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-xl font-semibold text-farm-orange-700">Outils</h3>
-                        <p class="text-farm-green-600 text-sm">Précision et durabilité</p>
-                    </div>
+                @empty
+                <!-- Fallback si aucune catégorie en base -->
+                <div class="col-span-full text-center py-12">
+                    <div class="text-6xl mb-4">�</div>
+                    <h3 class="text-xl font-semibold text-farm-green-700 mb-2">Catégories en préparation</h3>
+                    <p class="text-farm-orange-600">Nos catégories de produits seront bientôt disponibles !</p>
                 </div>
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" @click="navigateToCategory('equipements')">
-                    <div class="h-48 bg-gradient-to-br from-farm-green-200 to-farm-orange-200 flex items-center justify-center">
-                        <span class="text-6xl">⚙️</span>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-xl font-semibold text-farm-green-700">Équipements</h3>
-                        <p class="text-farm-orange-600 text-sm">Solutions complètes</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" @click="navigateToCategory('accessoires')">
-                    <div class="h-48 bg-gradient-to-br from-farm-orange-200 to-farm-green-200 flex items-center justify-center">
-                        <span class="text-6xl">🔩</span>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-xl font-semibold text-farm-orange-700">Accessoires</h3>
-                        <p class="text-farm-green-600 text-sm">Pièces et compléments</p>
-                    </div>
-                </div>
+                @endforelse
             </div>
         </div>
     </section>

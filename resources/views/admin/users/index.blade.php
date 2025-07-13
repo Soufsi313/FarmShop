@@ -105,7 +105,7 @@
                                     </div>
                                     <div class="ml-3">
                                         <p class="text-sm font-medium text-gray-900">{{ $user->name ?: 'N/A' }}</p>
-                                        <p class="text-sm text-gray-500">@{{ $user->username }}</p>
+                                        <p class="text-sm text-gray-500">{{ $user->username }}</p>
                                     </div>
                                 </div>
                             </td>
@@ -127,12 +127,29 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $user->created_at->format('d/m/Y H:i') }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                <button class="text-blue-600 hover:text-blue-900">Voir</button>
-                                <button class="text-green-600 hover:text-green-900">Modifier</button>
-                                @if($user->id !== auth()->id())
-                                    <button class="text-red-600 hover:text-red-900">Supprimer</button>
-                                @endif
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex justify-end space-x-2">
+                                    <!-- Bouton Voir -->
+                                    <a href="{{ route('admin.users.show', $user) }}" 
+                                       class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-lg text-xs font-medium transition-colors">
+                                        Voir
+                                    </a>
+                                    
+                                    <!-- Bouton Modifier -->
+                                    <a href="{{ route('admin.users.edit', $user) }}" 
+                                       class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-3 py-1 rounded-lg text-xs font-medium transition-colors">
+                                        Modifier
+                                    </a>
+                                    
+                                    <!-- Bouton Supprimer -->
+                                    @if($user->id !== auth()->id())
+                                        <button type="button" 
+                                                onclick="confirmDelete({{ $user->id }})"
+                                                class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg text-xs font-medium transition-colors">
+                                            Supprimer
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -165,3 +182,34 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function confirmDelete(userId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.')) {
+        // Créer et soumettre un formulaire de suppression
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/users/${userId}`;
+        
+        // CSRF token
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = '{{ csrf_token() }}';
+        form.appendChild(csrfToken);
+        
+        // Method spoofing pour DELETE
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'DELETE';
+        form.appendChild(methodInput);
+        
+        // Ajouter au DOM et soumettre
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+@endpush

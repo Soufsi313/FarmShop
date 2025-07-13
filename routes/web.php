@@ -9,11 +9,10 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\SpecialOfferController as AdminSpecialOfferController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Test Tailwind CSS
 Route::get('/test-tailwind', function () {
@@ -87,12 +86,25 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Gestion des catégories
     Route::resource('categories', AdminCategoryController::class);
     
+    // Gestion des catégories de location
+    Route::get('/rental-categories', [DashboardController::class, 'rentalCategories'])->name('rental-categories.index');
+    Route::get('/rental-categories/create', [DashboardController::class, 'createRentalCategory'])->name('rental-categories.create');
+    Route::post('/rental-categories', [DashboardController::class, 'storeRentalCategory'])->name('rental-categories.store');
+    Route::get('/rental-categories/{rentalCategory}', [DashboardController::class, 'showRentalCategory'])->name('rental-categories.show');
+    Route::get('/rental-categories/{rentalCategory}/edit', [DashboardController::class, 'editRentalCategory'])->name('rental-categories.edit');
+    Route::put('/rental-categories/{rentalCategory}', [DashboardController::class, 'updateRentalCategory'])->name('rental-categories.update');
+    Route::delete('/rental-categories/{rentalCategory}', [DashboardController::class, 'destroyRentalCategory'])->name('rental-categories.destroy');
+    
     // Gestion des offres spéciales - CRUD complet avec contrôleur admin
     Route::resource('special-offers', AdminSpecialOfferController::class);
     Route::patch('/special-offers/{specialOffer}/toggle', [AdminSpecialOfferController::class, 'toggle'])->name('special-offers.toggle');
     
     // Sections du dashboard (pages existantes)
     Route::get('/users', [DashboardController::class, 'users'])->name('users.index');
+    Route::get('/users/{user}', [DashboardController::class, 'showUser'])->name('users.show');
+    Route::get('/users/{user}/edit', [DashboardController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{user}', [DashboardController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{user}', [DashboardController::class, 'destroyUser'])->name('users.destroy');
     Route::get('/orders', [DashboardController::class, 'orders'])->name('orders.index');
     Route::get('/settings', [DashboardController::class, 'settings'])->name('settings.index');
 });

@@ -21,6 +21,10 @@ class RentalCategory extends Model
         'description',
         'slug',
         'is_active',
+        'meta_title',
+        'meta_description',
+        'icon',
+        'display_order',
     ];
 
     /**
