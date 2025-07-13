@@ -220,6 +220,12 @@
                                  @click.away="userMenuOpen = false"
                                  class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
                                 <a href="{{ route('users.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mon profil</a>
+                                @if(auth()->user()->isAdmin())
+                                    <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 font-medium">
+                                        🛠️ Dashboard Admin
+                                    </a>
+                                    <div class="border-t border-gray-100 my-1"></div>
+                                @endif
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mes achats</a>
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mes locations</a>
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Wishlist</a>

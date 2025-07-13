@@ -23,6 +23,10 @@ class Category extends Model
         'is_active',
         'food_type',
         'is_returnable',
+        'meta_title',
+        'meta_description',
+        'icon',
+        'display_order',
     ];
 
     /**

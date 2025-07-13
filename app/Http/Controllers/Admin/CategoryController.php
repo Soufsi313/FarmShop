@@ -29,25 +29,22 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
             'description' => 'nullable|string',
-            'icon' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'food_type' => 'required|in:alimentaire,non_alimentaire',
             'is_active' => 'boolean',
-            'sort_order' => 'nullable|integer|min:0',
+            'is_returnable' => 'boolean',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
+            'icon' => 'nullable|string|max:10',
+            'display_order' => 'nullable|integer|min:0',
         ]);
 
         // Génération du slug
         $validated['slug'] = Str::slug($validated['name']);
 
-        // Upload de l'image si fournie
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('categories', 'public');
-        }
-
-        // Valeur par défaut
+        // Valeurs par défaut
         $validated['is_active'] = $request->has('is_active');
-        $validated['sort_order'] = $validated['sort_order'] ?? 0;
+        $validated['is_returnable'] = $request->has('is_returnable');
+        $validated['display_order'] = $validated['display_order'] ?? 0;
 
         Category::create($validated);
 
@@ -74,12 +71,13 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
             'description' => 'nullable|string',
-            'icon' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'food_type' => 'required|in:alimentaire,non_alimentaire',
             'is_active' => 'boolean',
-            'sort_order' => 'nullable|integer|min:0',
+            'is_returnable' => 'boolean',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
+            'icon' => 'nullable|string|max:10',
+            'display_order' => 'nullable|integer|min:0',
         ]);
 
         // Mise à jour du slug si le nom a changé
@@ -87,18 +85,10 @@ class CategoryController extends Controller
             $validated['slug'] = Str::slug($validated['name']);
         }
 
-        // Upload de la nouvelle image si fournie
-        if ($request->hasFile('image')) {
-            // Supprimer l'ancienne image
-            if ($category->image) {
-                Storage::disk('public')->delete($category->image);
-            }
-            $validated['image'] = $request->file('image')->store('categories', 'public');
-        }
-
-        // Valeur par défaut
+        // Valeurs par défaut
         $validated['is_active'] = $request->has('is_active');
-        $validated['sort_order'] = $validated['sort_order'] ?? $category->sort_order ?? 0;
+        $validated['is_returnable'] = $request->has('is_returnable');
+        $validated['display_order'] = $validated['display_order'] ?? $category->display_order ?? 0;
 
         $category->update($validated);
 
@@ -112,11 +102,6 @@ class CategoryController extends Controller
         if ($category->products()->count() > 0) {
             return redirect()->route('admin.categories.index')
                 ->with('error', 'Impossible de supprimer cette catégorie car elle contient des produits.');
-        }
-
-        // Supprimer l'image associée
-        if ($category->image) {
-            Storage::disk('public')->delete($category->image);
         }
 
         $category->delete();

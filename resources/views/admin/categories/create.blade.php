@@ -77,15 +77,15 @@
                             </div>
 
                             <div>
-                                <label for="sort_order" class="block text-sm font-medium text-gray-700 mb-1">Ordre d'affichage</label>
+                                <label for="display_order" class="block text-sm font-medium text-gray-700 mb-1">Ordre d'affichage</label>
                                 <input type="number" 
-                                       id="sort_order" 
-                                       name="sort_order" 
-                                       value="{{ old('sort_order', 0) }}"
+                                       id="display_order" 
+                                       name="display_order" 
+                                       value="{{ old('display_order', 0) }}"
                                        min="0"
-                                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('sort_order') border-red-500 @enderror">
+                                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('display_order') border-red-500 @enderror">
                                 <p class="mt-1 text-xs text-gray-500">0 = en premier, plus le nombre est élevé, plus la catégorie apparaît en bas</p>
-                                @error('sort_order')
+                                @error('display_order')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -130,6 +130,40 @@
 
             <!-- Colonne latérale -->
             <div class="space-y-6">
+                
+                <!-- Type de catégorie -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Type de catégorie</h3>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <input type="radio" 
+                                   id="food_type_alimentaire" 
+                                   name="food_type" 
+                                   value="alimentaire"
+                                   {{ old('food_type', 'alimentaire') === 'alimentaire' ? 'checked' : '' }}
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <label for="food_type_alimentaire" class="ml-2 block text-sm text-gray-900">
+                                🍎 Alimentaire
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" 
+                                   id="food_type_non_alimentaire" 
+                                   name="food_type" 
+                                   value="non_alimentaire"
+                                   {{ old('food_type') === 'non_alimentaire' ? 'checked' : '' }}
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <label for="food_type_non_alimentaire" class="ml-2 block text-sm text-gray-900">
+                                🔧 Non alimentaire
+                            </label>
+                        </div>
+                    </div>
+                    @error('food_type')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Statut -->
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Statut</h3>
