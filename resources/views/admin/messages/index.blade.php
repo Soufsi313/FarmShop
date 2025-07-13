@@ -3,196 +3,313 @@
 @section('title', 'Messages')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-4 py-6">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Messages reçus</h1>
+        <h1 class="text-2xl font-bold text-gray-800">Messages reçus</h1>
         <div class="text-sm text-gray-600">
             Total: {{ $messages->total() }} messages
         </div>
     </div>
 
-    <div class="grid gap-6">
-        @foreach($messages as $message)
-            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                <!-- En-tête du message avec informations de l'auteur -->
-                <div class="border-b border-gray-100 px-6 py-4 bg-gray-50">
-                    <div class="flex justify-between items-start">
-                        <div class="flex items-center space-x-4 flex-1">
-                            @if($message->sender)
-                                <!-- Avatar de l'utilisateur connecté -->
-                                <div class="h-12 w-12 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                                    {{ substr($message->sender->name ?: $message->sender->username, 0, 1) }}
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex items-center space-x-2 mb-1">
-                                        <h4 class="font-semibold text-gray-900 text-lg">
-                                            {{ $message->sender->name ?: $message->sender->username }}
-                                        </h4>
-                                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
-                                            Utilisateur inscrit
-                                        </span>
+    <!-- Filtres -->
+    <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        <form method="GET" action="{{ route('admin.messages.index') }}" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Filtre par auteur -->
+                <div>
+                    <label for="author" class="block text-sm font-medium text-gray-700 mb-1">Auteur</label>
+                    <input type="text" id="author" name="author" value="{{ request('author') }}" 
+                           placeholder="Nom ou email..."
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Filtre par raison -->
+                <div>
+                    <label for="reason" class="block text-sm font-medium text-gray-700 mb-1">Motif</label>
+                    <select id="reason" name="reason" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Tous les motifs</option>
+                        <option value="question" {{ request('reason') == 'question' ? 'selected' : '' }}>Question</option>
+                        <option value="support" {{ request('reason') == 'support' ? 'selected' : '' }}>Support</option>
+                        <option value="commande" {{ request('reason') == 'commande' ? 'selected' : '' }}>Commande</option>
+                        <option value="autre" {{ request('reason') == 'autre' ? 'selected' : '' }}>Autre</option>
+                    </select>
+                </div>
+
+                <!-- Filtre par priorité -->
+                <div>
+                    <label for="priority" class="block text-sm font-medium text-gray-700 mb-1">Priorité</label>
+                    <select id="priority" name="priority" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Toutes priorités</option>
+                        <option value="urgent" {{ request('priority') == 'urgent' ? 'selected' : '' }}>Urgent</option>
+                        <option value="high" {{ request('priority') == 'high' ? 'selected' : '' }}>Haute</option>
+                        <option value="normal" {{ request('priority') == 'normal' ? 'selected' : '' }}>Normale</option>
+                        <option value="low" {{ request('priority') == 'low' ? 'selected' : '' }}>Basse</option>
+                    </select>
+                </div>
+
+                <!-- Statut -->
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                    <select id="status" name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Tous statuts</option>
+                        <option value="new" {{ request('status') == 'new' ? 'selected' : '' }}>Nouveau</option>
+                        <option value="read" {{ request('status') == 'read' ? 'selected' : '' }}>Lu</option>
+                        <option value="responded" {{ request('status') == 'responded' ? 'selected' : '' }}>Répondu</option>
+                        <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>Archivé</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Date de début -->
+                <div>
+                    <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">Date de début</label>
+                    <input type="date" id="date_from" name="date_from" value="{{ request('date_from') }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Date de fin -->
+                <div>
+                    <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
+                    <input type="date" id="date_to" name="date_to" value="{{ request('date_to') }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Recherche -->
+                <div>
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Recherche</label>
+                    <input type="text" id="search" name="search" value="{{ request('search') }}" 
+                           placeholder="Rechercher dans le contenu..."
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3">
+                <a href="{{ route('admin.messages.index') }}" 
+                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                    Réinitialiser
+                </a>
+                <button type="submit" 
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">
+                    Filtrer
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Liste compacte des messages -->
+    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        @if($messages->count() > 0)
+            @foreach($messages as $message)
+                <div class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+                    <div class="p-4">
+                        <!-- Ligne principale desktop -->
+                        <div class="hidden md:flex items-center justify-between">
+                            <!-- Informations de l'auteur (compactes) -->
+                            <div class="flex items-center space-x-3 flex-1">
+                                @if($message->sender)
+                                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                                        {{ substr($message->sender->name ?: $message->sender->username, 0, 1) }}
                                     </div>
-                                    <p class="text-sm text-gray-600 mb-1">{{ $message->sender->email }}</p>
-                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                        <span class="flex items-center">
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                            {{ $message->created_at->format('d/m/Y à H:i') }}
-                                        </span>
-                                        @if($message->metadata && isset($message->metadata['contact_reason']))
-                                            <span class="flex items-center">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v14l-4-4z"/>
-                                                </svg>
-                                                Motif: {{ ucfirst($message->metadata['contact_reason']) }}
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center space-x-2">
+                                            <h4 class="font-medium text-gray-900 text-sm truncate">
+                                                {{ $message->sender->name ?: $message->sender->username }}
+                                            </h4>
+                                            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                                                Inscrit
                                             </span>
+                                        </div>
+                                        <p class="text-xs text-gray-600 truncate">{{ $message->sender->email }}</p>
+                                    </div>
+                                @elseif($message->metadata && isset($message->metadata['sender_name']))
+                                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-sm">
+                                        {{ substr($message->metadata['sender_name'], 0, 1) }}
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center space-x-2">
+                                            <h4 class="font-medium text-gray-900 text-sm truncate">{{ $message->metadata['sender_name'] }}</h4>
+                                            <span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full">
+                                                Visiteur
+                                            </span>
+                                            @if(isset($message->metadata['migrated_from_contacts']))
+                                                <span class="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">
+                                                    Migré
+                                                </span>
+                                            @endif
+                                        </div>
+                                        @if(isset($message->metadata['sender_email']))
+                                            <p class="text-xs text-gray-600 truncate">{{ $message->metadata['sender_email'] }}</p>
                                         @endif
                                     </div>
-                                </div>
-                            @elseif($message->metadata && isset($message->metadata['sender_name']))
-                                <!-- Avatar pour les contacts non-inscrits -->
-                                <div class="h-12 w-12 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                                    {{ substr($message->metadata['sender_name'], 0, 1) }}
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex items-center space-x-2 mb-1">
-                                        <h4 class="font-semibold text-gray-900 text-lg">{{ $message->metadata['sender_name'] }}</h4>
-                                        <span class="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full font-medium">
-                                            Visiteur
-                                        </span>
-                                        @if(isset($message->metadata['migrated_from_contacts']) && $message->metadata['migrated_from_contacts'])
-                                            <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
-                                                Migré
-                                            </span>
-                                        @endif
+                                @else
+                                    <div class="h-8 w-8 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold text-sm">
+                                        ?
                                     </div>
-                                    @if(isset($message->metadata['sender_email']))
-                                        <p class="text-sm text-gray-600 mb-1">{{ $message->metadata['sender_email'] }}</p>
-                                    @endif
-                                    @if(isset($message->metadata['sender_phone']))
-                                        <p class="text-sm text-gray-600 mb-1">📞 {{ $message->metadata['sender_phone'] }}</p>
-                                    @endif
-                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                        <span class="flex items-center">
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                            {{ $message->created_at->format('d/m/Y à H:i') }}
-                                        </span>
-                                        @if(isset($message->metadata['contact_reason']))
-                                            <span class="flex items-center">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v14l-4-4z"/>
-                                                </svg>
-                                                Motif: {{ ucfirst($message->metadata['contact_reason']) }}
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-                            @else
-                                <!-- Avatar pour les utilisateurs inconnus -->
-                                <div class="h-12 w-12 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                                    ?
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex items-center space-x-2 mb-1">
-                                        <h4 class="font-semibold text-gray-900 text-lg">Utilisateur inconnu</h4>
-                                        <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full font-medium">
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="font-medium text-gray-900 text-sm">Utilisateur inconnu</h4>
+                                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
                                             Anonyme
                                         </span>
                                     </div>
-                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                        <span class="flex items-center">
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                            {{ $message->created_at->format('d/m/Y à H:i') }}
-                                        </span>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                        
-                        <!-- Badges de statut et priorité -->
-                        <div class="flex flex-col items-end space-y-2">
-                            <div class="flex items-center space-x-2">
-                                @if(!$message->read_at)
-                                    <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full font-medium animate-pulse">
-                                        ● Nouveau
-                                    </span>
-                                @endif
-                                
-                                @if($message->is_important)
-                                    <span class="px-3 py-1 bg-red-100 text-red-800 text-sm rounded-full font-medium">
-                                        ⚠️ Important
-                                    </span>
                                 @endif
                             </div>
-                            
-                            @if($message->priority && $message->priority !== 'normal')
-                                <span class="px-3 py-1 text-sm rounded-full font-medium
-                                    {{ $message->priority === 'urgent' ? 'bg-red-500 text-white' : 
-                                       ($message->priority === 'high' ? 'bg-orange-500 text-white' : 
-                                       'bg-blue-500 text-white') }}">
-                                    @if($message->priority === 'urgent')
-                                        🚨 Urgent
-                                    @elseif($message->priority === 'high')
-                                        ⚡ Haute
-                                    @else
-                                        📌 {{ ucfirst($message->priority) }}
+
+                            <!-- Sujet et contenu (aperçu) -->
+                            <div class="flex-2 px-4 min-w-0">
+                                <h3 class="font-medium text-gray-900 text-sm mb-1 truncate">{{ $message->subject }}</h3>
+                                <p class="text-xs text-gray-600" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ Str::limit($message->content, 100) }}</p>
+                            </div>
+
+                            <!-- Métadonnées et actions -->
+                            <div class="flex items-center space-x-4">
+                                <!-- Date et motif -->
+                                <div class="text-right">
+                                    <div class="text-xs text-gray-500">{{ $message->created_at->format('d/m/Y') }}</div>
+                                    <div class="text-xs text-gray-500">{{ $message->created_at->format('H:i') }}</div>
+                                    @if($message->metadata && isset($message->metadata['contact_reason']))
+                                        <div class="text-xs text-blue-600 font-medium">
+                                            {{ ucfirst($message->metadata['contact_reason']) }}
+                                        </div>
                                     @endif
-                                </span>
-                            @endif
+                                </div>
+
+                                <!-- Badges de statut -->
+                                <div class="flex flex-col items-end space-y-1">
+                                    @if(!$message->read_at)
+                                        <span class="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">
+                                            Nouveau
+                                        </span>
+                                    @endif
+                                    
+                                    @if($message->is_important)
+                                        <span class="px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                                            Important
+                                        </span>
+                                    @endif
+
+                                    @if($message->priority && $message->priority !== 'normal')
+                                        <span class="px-2 py-0.5 text-xs rounded-full text-white
+                                            {{ $message->priority === 'urgent' ? 'bg-red-500' : 
+                                               ($message->priority === 'high' ? 'bg-orange-500' : 'bg-blue-500') }}">
+                                            {{ ucfirst($message->priority) }}
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="flex space-x-2">
+                                    <a href="{{ route('admin.messages.show', $message) }}" 
+                                       class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors">
+                                        Voir
+                                    </a>
+                                    
+                                    @if($message->type === 'contact' && !($message->metadata['admin_responded'] ?? false))
+                                        <button onclick="openResponseModal({{ $message->id }})" 
+                                                class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors">
+                                            Répondre
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- Contenu du message -->
-                <div class="px-6 py-4">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">{{ $message->subject }}</h3>
-                    
-                    <div class="text-gray-700 mb-4 leading-relaxed">
-                        {!! nl2br(e($message->content)) !!}
-                    </div>
-                    
-                    <!-- Actions -->
-                    <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <div class="flex items-center space-x-3">
-                            <span class="text-sm text-gray-500">
-                                Message {{ $message->type === 'contact' ? 'de contact' : 'système' }}
-                            </span>
-                            @if($message->metadata && isset($message->metadata['original_contact_id']))
-                                <span class="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded">
-                                    Réf: #{{ $message->metadata['original_contact_id'] }}
-                                </span>
-                            @endif
-                        </div>
-                        
-                        <div class="flex space-x-3">
-                            <a href="{{ route('admin.messages.show', $message) }}" 
-                               class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                </svg>
-                                Voir détails
-                            </a>
+
+                        <!-- Version mobile -->
+                        <div class="md:hidden">
+                            <div class="flex items-start space-x-3 mb-3">
+                                @if($message->sender)
+                                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                                        {{ substr($message->sender->name ?: $message->sender->username, 0, 1) }}
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center space-x-2 mb-1">
+                                            <h4 class="font-medium text-gray-900 text-sm">
+                                                {{ $message->sender->name ?: $message->sender->username }}
+                                            </h4>
+                                            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                                                Inscrit
+                                            </span>
+                                        </div>
+                                        <p class="text-xs text-gray-600">{{ $message->sender->email }}</p>
+                                    </div>
+                                @elseif($message->metadata && isset($message->metadata['sender_name']))
+                                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-sm">
+                                        {{ substr($message->metadata['sender_name'], 0, 1) }}
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center space-x-2 mb-1">
+                                            <h4 class="font-medium text-gray-900 text-sm">{{ $message->metadata['sender_name'] }}</h4>
+                                            <span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full">
+                                                Visiteur
+                                            </span>
+                                        </div>
+                                        @if(isset($message->metadata['sender_email']))
+                                            <p class="text-xs text-gray-600">{{ $message->metadata['sender_email'] }}</p>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold text-sm">
+                                        ?
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="font-medium text-gray-900 text-sm">Utilisateur inconnu</h4>
+                                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+                                            Anonyme
+                                        </span>
+                                    </div>
+                                @endif
+                                
+                                <div class="flex items-center space-x-1">
+                                    @if(!$message->read_at)
+                                        <span class="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">
+                                            Nouveau
+                                        </span>
+                                    @endif
+                                    @if($message->is_important)
+                                        <span class="px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                                            Important
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
                             
-                            @if($message->type === 'contact' && !($message->metadata['admin_responded'] ?? false))
-                                <button onclick="openResponseModal({{ $message->id }})" 
-                                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
-                                    </svg>
-                                    Répondre
-                                </button>
-                            @endif
+                            <div class="mb-3">
+                                <h3 class="font-medium text-gray-900 text-sm mb-1">{{ $message->subject }}</h3>
+                                <p class="text-xs text-gray-600">{{ Str::limit($message->content, 120) }}</p>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="text-xs text-gray-500">
+                                    {{ $message->created_at->format('d/m/Y à H:i') }}
+                                    @if($message->metadata && isset($message->metadata['contact_reason']))
+                                        • {{ ucfirst($message->metadata['contact_reason']) }}
+                                    @endif
+                                </div>
+                                
+                                <div class="flex space-x-2">
+                                    <a href="{{ route('admin.messages.show', $message) }}" 
+                                       class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs font-medium">
+                                        Voir
+                                    </a>
+                                    @if($message->type === 'contact' && !($message->metadata['admin_responded'] ?? false))
+                                        <button onclick="openResponseModal({{ $message->id }})" 
+                                                class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium">
+                                            Répondre
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+            @endforeach
+        @else
+            <div class="p-8 text-center text-gray-500">
+                <div class="text-4xl mb-4">📭</div>
+                <h3 class="text-lg font-medium mb-2">Aucun message trouvé</h3>
+                <p class="text-sm">Aucun message ne correspond aux critères de recherche.</p>
             </div>
-        @endforeach
+        @endif
     </div>
 
     <!-- Pagination -->

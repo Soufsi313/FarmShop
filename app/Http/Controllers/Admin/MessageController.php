@@ -47,6 +47,32 @@ class MessageController extends Controller
             $query->where('is_important', (bool) $request->is_important);
         }
 
+        // Filtre par auteur
+        if ($request->has('author') && !empty($request->author)) {
+            $author = $request->author;
+            $query->where(function($q) use ($author) {
+                $q->whereHas('sender', function($userQuery) use ($author) {
+                    $userQuery->where('name', 'like', "%{$author}%")
+                             ->orWhere('email', 'like', "%{$author}%");
+                })->orWhere('metadata->sender_name', 'like', "%{$author}%")
+                  ->orWhere('metadata->sender_email', 'like', "%{$author}%");
+            });
+        }
+
+        // Filtre par date
+        if ($request->has('date_from') && !empty($request->date_from)) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->has('date_to') && !empty($request->date_to)) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        // Filtre par raison/motif
+        if ($request->has('reason') && !empty($request->reason)) {
+            $query->where('metadata->contact_reason', $request->reason);
+        }
+
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
