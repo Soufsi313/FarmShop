@@ -4,10 +4,18 @@
 
 ### Variables d'environnement
 ```env
-STRIPE_KEY=pk_test_YOUR_STRIPE_PUBLISHABLE_KEY_HERE
-STRIPE_SECRET=sk_test_YOUR_STRIPE_SECRET_KEY_HERE
-STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET_HERE
+# Clé publique Stripe (commençant par pk_test_YOUR_STRIPE_PUBLISHABLE_KEY_HERE)
+STRIPE_KEY=pk_test_YOUR_STRIPE_PUBLISHABLE_KEY_HERE_STRIPE_PUBLISHABLE_KEY_HERE
+
+# Clé secrète Stripe (commençant par sk_test_YOUR_STRIPE_SECRET_KEY_HERE)
+STRIPE_SECRET=sk_test_YOUR_STRIPE_SECRET_KEY_HERE_STRIPE_SECRET_KEY_HERE
+
+# Secret webhook Stripe (commençant par whsec_YOUR_WEBHOOK_SECRET_HERE)
+STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET_HERE_WEBHOOK_SECRET_HERE
 ```
+
+> **Note**: Remplacez les valeurs ci-dessus par vos vraies clés de test Stripe. 
+> Ces clés se trouvent dans votre tableau de bord Stripe > Développeurs > Clés API.
 
 ## API Endpoints
 
