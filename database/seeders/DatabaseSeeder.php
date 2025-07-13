@@ -25,6 +25,9 @@ class DatabaseSeeder extends Seeder
         // Créer les produits
         $this->call(ProductSeeder::class);
         
+        // Créer les fruits biologiques
+        $this->call(FruitProductSeeder::class);
+        
         // Créer les catégories de location
         $this->call(RentalCategorySeeder::class);
         

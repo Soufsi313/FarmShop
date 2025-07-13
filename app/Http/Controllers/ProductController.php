@@ -776,4 +776,50 @@ class ProductController extends Controller
             'data' => $availability
         ]);
     }
+
+    /**
+     * Ajouter un produit au panier
+     */
+    public function addToCart(Request $request, Product $product): JsonResponse
+    {
+        if (!auth()->check()) {
+            return response()->json(['error' => 'Vous devez être connecté pour ajouter au panier'], 401);
+        }
+
+        $request->validate([
+            'quantity' => 'required|integer|min:1|max:' . $product->quantity
+        ]);
+
+        $user = auth()->user();
+        $quantity = $request->quantity;
+
+        // Vérifier la disponibilité du stock
+        if ($product->quantity < $quantity) {
+            return response()->json(['error' => 'Stock insuffisant'], 400);
+        }
+
+        // Vérifier si le produit est déjà dans le panier
+        $cartItem = $user->cartItems()->where('product_id', $product->id)->first();
+
+        if ($cartItem) {
+            $newQuantity = $cartItem->quantity + $quantity;
+            if ($newQuantity > $product->quantity) {
+                return response()->json(['error' => 'Quantité totale demandée supérieure au stock disponible'], 400);
+            }
+            $cartItem->update(['quantity' => $newQuantity]);
+        } else {
+            $user->cartItems()->create([
+                'product_id' => $product->id,
+                'quantity' => $quantity
+            ]);
+        }
+
+        $cartCount = $user->cartItems()->sum('quantity');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Produit ajouté au panier',
+            'cart_count' => $cartCount
+        ]);
+    }
 }

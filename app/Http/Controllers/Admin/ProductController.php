@@ -37,7 +37,7 @@ class ProductController extends Controller
             'deposit_amount' => 'nullable|numeric|min:0',
             'min_rental_days' => 'nullable|integer|min:1',
             'max_rental_days' => 'nullable|integer|min:1',
-            'type' => 'required|in:purchase,rental,both',
+            'type' => 'required|in:sale,rental,both',
             'quantity' => 'required|integer|min:0',
             'critical_threshold' => 'required|integer|min:0',
             'low_stock_threshold' => 'nullable|integer|min:0',
@@ -47,7 +47,8 @@ class ProductController extends Controller
             'dimensions' => 'nullable|string|max:255',
             'main_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'image_alt' => 'nullable|string|max:255',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'category_id' => 'required|exists:categories,id',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
@@ -77,6 +78,15 @@ class ProductController extends Controller
             }
         }
         $validated['gallery_images'] = $galleryImages;
+
+        // Upload des images supplémentaires
+        $additionalImages = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $additionalImages[] = $image->store('products/additional', 'public');
+            }
+        }
+        $validated['images'] = $additionalImages;
 
         // Valeurs par défaut
         $validated['is_active'] = $request->has('is_active');
@@ -111,7 +121,7 @@ class ProductController extends Controller
             'deposit_amount' => 'nullable|numeric|min:0',
             'min_rental_days' => 'nullable|integer|min:1',
             'max_rental_days' => 'nullable|integer|min:1',
-            'type' => 'required|in:purchase,rental,both',
+            'type' => 'required|in:sale,rental,both',
             'quantity' => 'required|integer|min:0',
             'critical_threshold' => 'required|integer|min:0',
             'low_stock_threshold' => 'nullable|integer|min:0',
@@ -119,9 +129,11 @@ class ProductController extends Controller
             'sku' => 'nullable|string|max:100|unique:products,sku,' . $product->id,
             'weight' => 'nullable|numeric|min:0',
             'dimensions' => 'nullable|string|max:255',
-            'main_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'image_alt' => 'nullable|string|max:255',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'main_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'remove_gallery_images' => 'nullable|array',
+            'remove_images' => 'nullable|array',
             'category_id' => 'required|exists:categories,id',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
@@ -139,21 +151,51 @@ class ProductController extends Controller
             $validated['main_image'] = $request->file('main_image')->store('products', 'public');
         }
 
-        // Upload des nouvelles images de galerie si fournies
-        if ($request->hasFile('gallery_images')) {
-            // Supprimer les anciennes images de galerie
-            if ($product->gallery_images) {
-                foreach ($product->gallery_images as $oldImage) {
-                    Storage::disk('public')->delete($oldImage);
+        // Gestion des images de galerie
+        $currentGalleryImages = $product->gallery_images ?? [];
+        
+        // Supprimer les images sélectionnées pour suppression
+        if ($request->has('remove_gallery_images')) {
+            foreach ($request->remove_gallery_images as $index) {
+                if (isset($currentGalleryImages[$index])) {
+                    Storage::disk('public')->delete($currentGalleryImages[$index]);
+                    unset($currentGalleryImages[$index]);
                 }
             }
-
-            $galleryImages = [];
-            foreach ($request->file('gallery_images') as $image) {
-                $galleryImages[] = $image->store('products/gallery', 'public');
-            }
-            $validated['gallery_images'] = $galleryImages;
+            $currentGalleryImages = array_values($currentGalleryImages); // Réindexer
         }
+
+        // Ajouter de nouvelles images de galerie
+        if ($request->hasFile('gallery_images')) {
+            foreach ($request->file('gallery_images') as $image) {
+                $currentGalleryImages[] = $image->store('products/gallery', 'public');
+            }
+        }
+        
+        $validated['gallery_images'] = $currentGalleryImages;
+
+        // Gestion des images supplémentaires
+        $currentImages = $product->images ?? [];
+        
+        // Supprimer les images supplémentaires sélectionnées pour suppression
+        if ($request->has('remove_images')) {
+            foreach ($request->remove_images as $index) {
+                if (isset($currentImages[$index])) {
+                    Storage::disk('public')->delete($currentImages[$index]);
+                    unset($currentImages[$index]);
+                }
+            }
+            $currentImages = array_values($currentImages); // Réindexer
+        }
+
+        // Ajouter de nouvelles images supplémentaires
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $currentImages[] = $image->store('products/additional', 'public');
+            }
+        }
+        
+        $validated['images'] = $currentImages;
 
         // Mise à jour du slug si le nom a changé
         if ($product->name !== $validated['name']) {
@@ -179,6 +221,12 @@ class ProductController extends Controller
 
         if ($product->gallery_images) {
             foreach ($product->gallery_images as $image) {
+                Storage::disk('public')->delete($image);
+            }
+        }
+
+        if ($product->images) {
+            foreach ($product->images as $image) {
                 Storage::disk('public')->delete($image);
             }
         }

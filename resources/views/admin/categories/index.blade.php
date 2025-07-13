@@ -23,13 +23,14 @@
     <!-- Grille des catégories -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         @forelse($categories ?? [] as $category)
-        <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden">
+        <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden cursor-pointer"
+             onclick="window.location.href='{{ route('admin.categories.show', $category) }}'">
             <!-- Image de la catégorie -->
             <div class="h-32 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center relative">
                 @if($category->image)
                     <img src="{{ asset('storage/' . $category->image) }}" 
                          alt="{{ $category->name }}" 
-                         class="w-full h-full object-cover">
+                         class="w-full h-full object-cover hover:scale-105 transition-transform">
                 @elseif($category->icon)
                     <div class="text-4xl">{{ $category->icon }}</div>
                 @else
@@ -55,7 +56,7 @@
             <!-- Contenu de la carte -->
             <div class="p-4">
                 <div class="flex justify-between items-start mb-2">
-                    <h3 class="text-lg font-semibold text-gray-900 truncate">{{ $category->name }}</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 truncate hover:text-blue-600 transition-colors">{{ $category->name }}</h3>
                     <span class="text-sm text-gray-500 ml-2">{{ $category->sort_order ?? 0 }}</span>
                 </div>
                 
@@ -70,7 +71,7 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between" onclick="event.stopPropagation()">
                     <div class="flex space-x-2">
                         <a href="{{ route('admin.categories.show', $category) }}" 
                            class="text-blue-600 hover:text-blue-800 transition-colors"

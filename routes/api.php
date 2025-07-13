@@ -130,6 +130,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('products')->name('api.products.')->group(function () {
         Route::post('/{product}/like', [ProductController::class, 'toggleLike'])->name('toggle-like');
         Route::post('/{product}/wishlist', [ProductController::class, 'toggleWishlist'])->name('toggle-wishlist');
+        Route::post('/{product}/add-to-cart', [ProductController::class, 'addToCart'])->name('add-to-cart');
         Route::get('/wishlist', [ProductController::class, 'getWishlist'])->name('wishlist');
         Route::get('/liked', [ProductController::class, 'getLikedProducts'])->name('liked');
     });

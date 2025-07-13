@@ -108,12 +108,13 @@
                     @if($category->products->count() > 0)
                         <div class="space-y-3">
                             @foreach($category->products as $product)
-                            <div class="flex items-center justify-between p-3 border rounded-lg">
+                            <div class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                                 onclick="window.location.href='{{ route('admin.products.show', $product) }}'">
                                 <div class="flex items-center space-x-3">
-                                    @if($product->image)
-                                        <img src="{{ asset('storage/' . $product->image) }}" 
+                                    @if($product->main_image)
+                                        <img src="{{ asset('storage/' . $product->main_image) }}" 
                                              alt="{{ $product->name }}" 
-                                             class="w-10 h-10 rounded object-cover">
+                                             class="w-10 h-10 rounded object-cover hover:scale-105 transition-transform">
                                     @else
                                         <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
                                             <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,11 +123,11 @@
                                         </div>
                                     @endif
                                     <div>
-                                        <p class="font-medium text-gray-900">{{ $product->name }}</p>
+                                        <p class="font-medium text-gray-900 hover:text-blue-600 transition-colors">{{ $product->name }}</p>
                                         <p class="text-sm text-gray-500">{{ number_format($product->price, 2) }}€</p>
                                     </div>
                                 </div>
-                                <div class="flex items-center space-x-2">
+                                <div class="flex items-center space-x-2" onclick="event.stopPropagation()">
                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                                         {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                         {{ $product->is_active ? 'Actif' : 'Inactif' }}

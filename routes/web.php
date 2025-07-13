@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\OrderLocationController as AdminOrderLocationController;
 use App\Http\Controllers\Admin\SpecialOfferController as AdminSpecialOfferController;
 use App\Http\Controllers\Admin\MessageController as AdminMessageController;
+use App\Http\Controllers\Web\ProductController as WebProductController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,10 +36,10 @@ Route::get('/gdpr-rights', function () {
     return view('legal.gdpr-rights');
 })->name('gdpr-rights');
 
-// Routes pour les produits (temporaires pour les liens de la landing page)
-Route::get('/products', function () {
-    return redirect('/')->with('message', 'Page produits en cours de développement');
-})->name('products.index');
+// Routes pour les produits publics
+Route::get('/products', [WebProductController::class, 'index'])->name('products.index');
+Route::get('/products/{product:slug}', [WebProductController::class, 'show'])->name('products.show');
+Route::post('/products/{product}/buy-now', [WebProductController::class, 'buyNow'])->name('products.buy-now')->middleware('auth');
 
 Route::get('/rentals', function () {
     return redirect('/')->with('message', 'Page locations en cours de développement');
