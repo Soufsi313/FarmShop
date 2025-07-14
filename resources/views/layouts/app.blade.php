@@ -113,7 +113,7 @@
                             </svg>
                             <span>Nos produits</span>
                         </a>
-                        <a href="#" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1">
+                        <a href="{{ route('rentals.index') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
@@ -264,7 +264,7 @@
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
                     <a href="/" class="text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Accueil</a>
                     <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Nos produits</a>
-                    <a href="#" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Nos locations</a>
+                    <a href="{{ route('rentals.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Nos locations</a>
                     <a href="#" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Blog</a>
                     
                     <!-- Sections visibles seulement si connecté -->

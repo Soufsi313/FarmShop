@@ -11,13 +11,63 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $query = Product::with(['category', 'rentalCategory']);
 
-        return view('admin.products.index', compact('products'));
+        // Filtrage par recherche
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('sku', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('short_description', 'like', "%{$search}%");
+            });
+        }
+
+        // Filtrage par catégorie
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Filtrage par type
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        // Filtrage par statut
+        if ($request->filled('status')) {
+            switch ($request->status) {
+                case 'active':
+                    $query->where('is_active', true);
+                    break;
+                case 'inactive':
+                    $query->where('is_active', false);
+                    break;
+                case 'featured':
+                    $query->where('is_featured', true);
+                    break;
+                case 'low_stock':
+                    $query->whereColumn('quantity', '<=', 'low_stock_threshold');
+                    break;
+                case 'out_of_stock':
+                    $query->whereColumn('quantity', '<=', 'out_of_stock_threshold');
+                    break;
+            }
+        }
+
+        $products = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        // Récupérer toutes les catégories pour les filtres
+        $categories = Category::orderBy('name')->get();
+
+        // Si c'est une requête AJAX, retourner seulement le contenu du tableau
+        if ($request->ajax()) {
+            return view('admin.products._table', compact('products'))->render();
+        }
+
+        return view('admin.products.index', compact('products', 'categories'));
     }
 
     public function create()

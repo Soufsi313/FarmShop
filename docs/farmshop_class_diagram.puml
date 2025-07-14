@@ -1,0 +1,457 @@
+@startuml FarmShop_ClassDiagram
+
+!theme plain
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+
+' Configuration des couleurs
+skinparam class {
+    BackgroundColor<<User>> #E3F2FD
+    BorderColor<<User>> #1976D2
+    BackgroundColor<<Product>> #FFF3E0
+    BorderColor<<Product>> #F57C00
+    BackgroundColor<<Order>> #E8F5E8
+    BorderColor<<Order>> #4CAF50
+    BackgroundColor<<Cart>> #FCE4EC
+    BorderColor<<Cart>> #E91E63
+    BackgroundColor<<Blog>> #F3E5F5
+    BorderColor<<Blog>> #9C27B0
+    BackgroundColor<<Newsletter>> #E0F2F1
+    BorderColor<<Newsletter>> #009688
+    BackgroundColor<<Other>> #F5F5F5
+    BorderColor<<Other>> #757575
+}
+
+skinparam arrow {
+    Color #2196F3
+    FontColor #1976D2
+}
+
+' ============================
+' UTILISATEURS & AUTHENTIFICATION
+' ============================
+
+class User <<User>> {
+  + id : Integer
+  + username : String
+  + name : String  
+  + email : String
+  + password : String
+  + role : Enum(Admin, User)
+  + newsletter_subscribed : Boolean
+  + phone : String
+  + address : String
+  + address_line_2 : String
+  + city : String
+  + postal_code : String
+  + country : String
+  + email_verified_at : DateTime
+  + remember_token : String
+  + created_at : DateTime
+  + updated_at : DateTime
+  + deleted_at : DateTime
+}
+
+' ============================
+' CATALOGUE PRODUITS
+' ============================
+
+class Category <<Product>> {
+  + id : Integer
+  + name : String
+  + slug : String
+  + description : Text
+  + is_active : Boolean
+  + meta_title : String
+  + meta_description : String
+  + meta_keywords : String
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class RentalCategory <<Product>> {
+  + id : Integer
+  + name : String
+  + slug : String
+  + description : Text
+  + is_active : Boolean
+  + meta_title : String
+  + meta_description : String
+  + meta_keywords : String
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class Product <<Product>> {
+  + id : Integer
+  + name : String
+  + slug : String
+  + description : Text
+  + short_description : String
+  + price : Decimal
+  + rental_price_per_day : Decimal
+  + deposit_amount : Decimal
+  + min_rental_days : Integer
+  + max_rental_days : Integer
+  + available_days : JSON
+  + type : Enum(purchase, rental, both)
+  + quantity : Integer
+  + critical_threshold : Integer
+  + low_stock_threshold : Integer
+  + out_of_stock_threshold : Integer
+  + unit_symbol : String
+  + sku : String
+  + weight : Decimal
+  + dimensions : String
+  + main_image : String
+  + image_alt : String
+  + gallery_images : JSON
+  + images : JSON
+  + is_active : Boolean
+  + is_featured : Boolean
+  + likes_count : Integer
+  + views_count : Integer
+  + category_id : Integer [FK]
+  + rental_category_id : Integer [FK]
+  + meta_title : String
+  + meta_description : String
+  + meta_keywords : String
+  + created_at : DateTime
+  + updated_at : DateTime
+  + deleted_at : DateTime
+}
+
+class SpecialOffer <<Product>> {
+  + id : Integer
+  + product_id : Integer [FK]
+  + name : String
+  + discount_type : Enum(percentage, fixed)
+  + discount_value : Decimal
+  + valid_from : DateTime
+  + valid_to : DateTime
+  + is_active : Boolean
+  + max_usage : Integer
+  + current_usage : Integer
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+' ============================
+' INTERACTIONS UTILISATEUR-PRODUIT
+' ============================
+
+class Wishlist <<Other>> {
+  + id : Integer
+  + user_id : Integer [FK]
+  + product_id : Integer [FK]
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class ProductLike <<Other>> {
+  + id : Integer
+  + user_id : Integer [FK]
+  + product_id : Integer [FK]
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+' ============================
+' PANIER & COMMANDES
+' ============================
+
+class Cart <<Cart>> {
+  + id : Integer
+  + user_id : Integer [FK]
+  + status : Enum(active, completed, abandoned)
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class CartItem <<Cart>> {
+  + id : Integer
+  + cart_id : Integer [FK]
+  + product_id : Integer [FK]
+  + quantity : Integer
+  + unit_price : Decimal
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class CartLocation <<Cart>> {
+  + id : Integer
+  + user_id : Integer [FK]
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class CartItemLocation <<Cart>> {
+  + id : Integer
+  + cart_location_id : Integer [FK]
+  + product_id : Integer [FK]
+  + rental_start_date : Date
+  + rental_end_date : Date
+  + rental_days : Integer
+  + rental_price : Decimal
+  + deposit_amount : Decimal
+  + total_price : Decimal
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class Order <<Order>> {
+  + id : Integer
+  + user_id : Integer [FK]
+  + order_number : String
+  + status : Enum(pending, confirmed, processing, shipped, delivered, cancelled)
+  + subtotal : Decimal
+  + tax_amount : Decimal
+  + total_amount : Decimal
+  + shipping_name : String
+  + shipping_address : String
+  + shipping_city : String
+  + shipping_postal_code : String
+  + shipping_country : String
+  + billing_name : String
+  + billing_address : String
+  + billing_city : String
+  + billing_postal_code : String
+  + billing_country : String
+  + notes : Text
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class OrderItem <<Order>> {
+  + id : Integer
+  + order_id : Integer [FK]
+  + product_id : Integer [FK]
+  + quantity : Integer
+  + unit_price : Decimal
+  + total_price : Decimal
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class OrderLocation <<Order>> {
+  + id : Integer
+  + user_id : Integer [FK]
+  + order_number : String
+  + status : Enum(pending, confirmed, active, returned, completed, cancelled)
+  + subtotal : Decimal
+  + tax_amount : Decimal
+  + total_amount : Decimal
+  + shipping_name : String
+  + shipping_address : String
+  + shipping_city : String
+  + shipping_postal_code : String
+  + shipping_country : String
+  + billing_name : String
+  + billing_address : String
+  + billing_city : String
+  + billing_postal_code : String
+  + billing_country : String
+  + notes : Text
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class OrderItemLocation <<Order>> {
+  + id : Integer
+  + order_location_id : Integer [FK]
+  + product_id : Integer [FK]
+  + rental_start_date : Date
+  + rental_end_date : Date
+  + rental_days : Integer
+  + rental_price_per_day : Decimal
+  + deposit_amount : Decimal
+  + total_rental_price : Decimal
+  + total_deposit : Decimal
+  + total_price : Decimal
+  + returned_at : DateTime
+  + condition_on_return : Text
+  + deposit_refunded : Decimal
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class OrderReturn <<Order>> {
+  + id : Integer
+  + order_location_id : Integer [FK]
+  + return_date : Date
+  + return_condition : Text
+  + total_deposit_refunded : Decimal
+  + notes : Text
+  + processed_by : Integer [FK]
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+' ============================
+' NEWSLETTER & COMMUNICATIONS
+' ============================
+
+class Newsletter <<Newsletter>> {
+  + id : Integer
+  + title : String
+  + content : Text
+  + status : Enum(draft, sent)
+  + sent_at : DateTime
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class NewsletterSubscription <<Newsletter>> {
+  + id : Integer
+  + user_id : Integer [FK]
+  + email : String
+  + is_active : Boolean
+  + source : String
+  + subscribed_at : DateTime
+  + unsubscribed_at : DateTime
+  + unsubscribe_reason : String
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class NewsletterSend <<Newsletter>> {
+  + id : Integer
+  + newsletter_id : Integer [FK]
+  + user_id : Integer [FK]
+  + sent_at : DateTime
+  + opened_at : DateTime
+  + clicked_at : DateTime
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class Message <<Other>> {
+  + id : Integer
+  + name : String
+  + email : String
+  + subject : String
+  + message : Text
+  + is_read : Boolean
+  + admin_reply : Text
+  + replied_at : DateTime
+  + replied_by : Integer [FK]
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+' ============================
+' BLOG
+' ============================
+
+class BlogCategory <<Blog>> {
+  + id : Integer
+  + name : String
+  + slug : String
+  + description : Text
+  + is_active : Boolean
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class BlogPost <<Blog>> {
+  + id : Integer
+  + blog_category_id : Integer [FK]
+  + title : String
+  + slug : String
+  + excerpt : Text
+  + content : Text
+  + featured_image : String
+  + is_published : Boolean
+  + published_at : DateTime
+  + meta_title : String
+  + meta_description : String
+  + meta_keywords : String
+  + views_count : Integer
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class BlogComment <<Blog>> {
+  + id : Integer
+  + blog_post_id : Integer [FK]
+  + user_id : Integer [FK]
+  + parent_id : Integer [FK]
+  + content : Text
+  + is_approved : Boolean
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class BlogCommentReport <<Blog>> {
+  + id : Integer
+  + blog_comment_id : Integer [FK]
+  + user_id : Integer [FK]
+  + reason : String
+  + description : Text
+  + status : Enum(pending, reviewed, resolved)
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+' ============================
+' AUTRES
+' ============================
+
+class Cookie <<Other>> {
+  + id : Integer
+  + name : String
+  + value : Text
+  + expires_at : DateTime
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+' ============================
+' RELATIONS AVEC CARDINALITÉS EN FRANÇAIS
+' =======================================
+
+' Relations Utilisateur (1:n)
+User ||--o{ Cart : "1..* possède"
+User ||--o{ CartLocation : "1..* possède"
+User ||--o{ Order : "1..* passe"
+User ||--o{ OrderLocation : "1..* passe"
+User ||--o{ Wishlist : "1..* désire"
+User ||--o{ ProductLike : "1..* aime"
+User ||--|| NewsletterSubscription : "1..1 s'abonne"
+User ||--o{ NewsletterSend : "1..* reçoit"
+User ||--o{ BlogComment : "1..* commente"
+User ||--o{ BlogCommentReport : "1..* signale"
+User ||--o{ Message : "0..* répond_à"
+User ||--o{ OrderReturn : "0..* traite"
+
+' Relations Produit
+Category ||--o{ Product : "1..* catégorise"
+RentalCategory ||--o{ Product : "0..* catégorise_pour_location"
+Product ||--o{ Wishlist : "1..* souhaité"
+Product ||--o{ ProductLike : "1..* aimé"
+Product ||--o{ SpecialOffer : "1..* a_des_offres"
+Product ||--o{ CartItem : "1..* dans_panier"
+Product ||--o{ CartItemLocation : "1..* dans_panier_location"
+Product ||--o{ OrderItem : "1..* commandé"
+Product ||--o{ OrderItemLocation : "1..* loué"
+
+' Relations Panier (1:n)
+Cart ||--o{ CartItem : "1..* contient"
+CartLocation ||--o{ CartItemLocation : "1..* contient"
+
+' Relations Commande (1:n)
+Order ||--o{ OrderItem : "1..* contient"
+OrderLocation ||--o{ OrderItemLocation : "1..* contient"
+OrderLocation ||--|| OrderReturn : "0..1 retourné"
+
+' Relations Blog
+BlogCategory ||--o{ BlogPost : "1..* catégorise"
+BlogPost ||--o{ BlogComment : "1..* a_des_commentaires"
+BlogComment ||--o{ BlogComment : "0..* parent_de"
+BlogComment ||--o{ BlogCommentReport : "0..* signalé"
+
+' Relations Newsletter (1:n)
+Newsletter ||--o{ NewsletterSend : "1..* envoyé_à"
+NewsletterSubscription ||--o{ NewsletterSend : "1..* suit"
+
+@enduml

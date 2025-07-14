@@ -9,6 +9,7 @@ use App\Http\Controllers\CookieController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductLikeController;
+use App\Http\Controllers\RentalController;
 use App\Http\Controllers\RentalCategoryController;
 use App\Http\Controllers\RentalConstraintController;
 use App\Http\Controllers\StripePaymentController;
@@ -196,6 +197,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/summary', [CartLocationController::class, 'summary'])->name('summary');
         Route::put('/default-dates', [CartLocationController::class, 'updateDefaultDates'])->name('update-default-dates');
         Route::get('/checkout/prepare', [CartLocationController::class, 'prepareForCheckout'])->name('prepare-checkout');
+    });
+    
+    // Routes API pour les fonctionnalités de location
+    Route::prefix('rentals')->name('api.rentals.')->group(function () {
+        Route::get('/{product}/constraints', [RentalController::class, 'getProductConstraints'])->name('constraints');
+        Route::post('/{product}/calculate-cost', [RentalController::class, 'calculateRentalCost'])->name('calculate-cost');
     });
     
     // Routes éléments de panier de location pour utilisateurs connectés

@@ -100,11 +100,11 @@ class UserController extends Controller
         $unreadCount = 0;
         
         if (Auth::id() === $user->id) {
-            // Messages de la table messages seulement
+            // Messages de la table messages avec pagination (10 par page)
             $messages = Message::where('user_id', $user->id)
                 ->with('sender')
                 ->orderBy('created_at', 'desc')
-                ->get();
+                ->paginate(10);
                 
             // Compter les messages non lus
             $unreadCount = Message::where('user_id', $user->id)

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RentalController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RentalCategoryController;
 use App\Http\Controllers\UserController;
@@ -41,9 +42,9 @@ Route::get('/products', [WebProductController::class, 'index'])->name('products.
 Route::get('/products/{product:slug}', [WebProductController::class, 'show'])->name('products.show');
 Route::post('/products/{product}/buy-now', [WebProductController::class, 'buyNow'])->name('products.buy-now')->middleware('auth');
 
-Route::get('/rentals', function () {
-    return redirect('/')->with('message', 'Page locations en cours de développement');
-})->name('rentals.index');
+// Routes pour les locations
+Route::get('/rentals', [RentalController::class, 'index'])->name('rentals.index');
+Route::get('/rentals/{product:slug}', [RentalController::class, 'show'])->name('rentals.show');
 
 // Routes d'authentification
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');

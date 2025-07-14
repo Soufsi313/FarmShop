@@ -22,206 +22,66 @@
 
     <!-- Filtres et recherche -->
     <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Recherche</label>
-                <input type="text" 
-                       x-model="searchTerm"
-                       @input="filterProducts"
-                       placeholder="Nom, SKU, description..."
-                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
-                <select x-model="selectedCategory" @change="filterProducts" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option value="">Toutes les catégories</option>
-                    @if(isset($products) && $products->count() > 0)
-                        @foreach($products->pluck('category')->unique()->filter() as $category)
+        <form id="filterForm">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Recherche</label>
+                    <input type="text" 
+                           name="search"
+                           x-model="searchTerm"
+                           placeholder="Nom, SKU, description..."
+                           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+                    <select name="category" x-model="selectedCategory" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Toutes les catégories</option>
+                        @foreach($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                         @endforeach
-                    @endif
-                </select>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                    <select name="status" x-model="selectedStatus" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Tous les statuts</option>
+                        <option value="active">✅ Actif</option>
+                        <option value="inactive">❌ Inactif</option>
+                        <option value="featured">⭐ En vedette</option>
+                        <option value="low_stock">⚠️ Stock faible</option>
+                        <option value="out_of_stock">🚫 Rupture de stock</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                    <select name="type" x-model="selectedType" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Tous les types</option>
+                        <option value="purchase">🛒 Achat</option>
+                        <option value="rental">📅 Location</option>
+                        <option value="both">🔄 Achat et Location</option>
+                    </select>
+                </div>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
-                <select x-model="selectedStatus" @change="filterProducts" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option value="">Tous les statuts</option>
-                    <option value="active">Actif</option>
-                    <option value="inactive">Inactif</option>
-                    <option value="featured">En vedette</option>
-                    <option value="low_stock">Stock faible</option>
-                    <option value="out_of_stock">Rupture de stock</option>
-                </select>
+            <div class="mt-4 flex items-center space-x-3">
+                <button type="button" @click="clearFilters()" class="text-gray-600 hover:text-gray-800 text-sm">
+                    🗑️ Effacer les filtres
+                </button>
+                <div x-show="loading" class="flex items-center text-green-600 text-sm">
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Filtrage en cours...
+                </div>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                <select x-model="selectedType" @change="filterProducts" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option value="">Tous les types</option>
-                    <option value="purchase">Achat</option>
-                    <option value="rental">Location</option>
-                    <option value="both">Achat et Location</option>
-                </select>
-            </div>
-        </div>
+        </form>
     </div>
 
     <!-- Tableau des produits -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catégorie</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($products ?? [] as $product)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="h-12 w-12 flex-shrink-0">
-                                    <a href="{{ route('admin.products.show', $product) }}" class="block hover:opacity-80 transition-opacity">
-                                        @if($product->main_image)
-                                            <img class="h-12 w-12 rounded-lg object-cover" src="{{ asset('storage/' . $product->main_image) }}" alt="{{ $product->name }}">
-                                        @else
-                                            <div class="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center">
-                                                <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                                </svg>
-                                            </div>
-                                        @endif
-                                    </a>
-                                </div>
-                                <div class="ml-4">
-                                    <a href="{{ route('admin.products.show', $product) }}" class="block hover:text-green-600 transition-colors">
-                                        <div class="text-sm font-medium text-gray-900">{{ $product->name }}</div>
-                                    </a>
-                                    <div class="text-sm text-gray-500">SKU: {{ $product->sku }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                {{ $product->category->name }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ number_format($product->price, 2) }} €</div>
-                            @if($product->rental_price_per_day)
-                                <div class="text-xs text-gray-500">{{ number_format($product->rental_price_per_day, 2) }} €/jour</div>
-                            @endif
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <span class="text-sm text-gray-900">{{ $product->quantity }}</span>
-                                @if($product->is_out_of_stock)
-                                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                        Rupture
-                                    </span>
-                                @elseif($product->is_critical_stock)
-                                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                                        Critique
-                                    </span>
-                                @elseif($product->is_low_stock)
-                                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                        Faible
-                                    </span>
-                                @endif
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            @if($product->type === 'purchase')
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Achat
-                                </span>
-                            @elseif($product->type === 'rental')
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                    Location
-                                </span>
-                            @else
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                    Mixte
-                                </span>
-                            @endif
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center space-x-2">
-                                @if($product->is_active)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Actif
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                        Inactif
-                                    </span>
-                                @endif
-                                @if($product->is_featured)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                        ⭐
-                                    </span>
-                                @endif
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div class="flex items-center space-x-2">
-                                <a href="{{ route('admin.products.show', $product) }}" 
-                                   class="text-blue-600 hover:text-blue-900 transition-colors"
-                                   title="Voir">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                    </svg>
-                                </a>
-                                <a href="{{ route('admin.products.edit', $product) }}" 
-                                   class="text-indigo-600 hover:text-indigo-900 transition-colors"
-                                   title="Modifier">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                    </svg>
-                                </a>
-                                <button @click="deleteProduct({{ $product->id }}, '{{ $product->name }}')" 
-                                        class="text-red-600 hover:text-red-900 transition-colors"
-                                        title="Supprimer">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" class="px-6 py-12 text-center">
-                            <div class="text-gray-500">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                                </svg>
-                                <p class="mt-4 text-lg font-medium">Aucun produit trouvé</p>
-                                <p class="text-sm">Commencez par ajouter votre premier produit.</p>
-                                <a href="{{ route('admin.products.create') }}" 
-                                   class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
-                                    Ajouter un produit
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+        <div id="productsTable">
+            @include('admin.products._table')
         </div>
-
-        <!-- Pagination -->
-        @if(isset($products) && $products->hasPages())
-        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-            {{ $products->links() }}
-        </div>
-        @endif
     </div>
 
     <!-- Modal de confirmation de suppression -->
@@ -280,10 +140,69 @@ document.addEventListener('alpine:init', () => {
         selectedType: '',
         showDeleteModal: false,
         productToDelete: {},
+        loading: false,
+        searchTimeout: null,
 
-        filterProducts() {
-            // Cette fonction pourrait être utilisée pour filtrer côté client
-            // Pour l'instant, nous utilisons la pagination Laravel côté serveur
+        init() {
+            // Écouter les changements sur tous les inputs et selects
+            this.$watch('searchTerm', () => this.debounceFilter());
+            this.$watch('selectedCategory', () => this.filterProducts());
+            this.$watch('selectedStatus', () => this.filterProducts());
+            this.$watch('selectedType', () => this.filterProducts());
+        },
+
+        debounceFilter() {
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                this.filterProducts();
+            }, 300); // Attendre 300ms après l'arrêt de frappe
+        },
+
+        async filterProducts() {
+            this.loading = true;
+            
+            try {
+                // Construire les paramètres de filtre
+                const formData = new FormData();
+                if (this.searchTerm) formData.append('search', this.searchTerm);
+                if (this.selectedCategory) formData.append('category', this.selectedCategory);
+                if (this.selectedStatus) formData.append('status', this.selectedStatus);
+                if (this.selectedType) formData.append('type', this.selectedType);
+
+                // Construire l'URL avec les paramètres
+                const params = new URLSearchParams(formData);
+                const url = '{{ route("admin.products.index") }}?' + params.toString();
+
+                // Faire la requête AJAX
+                const response = await fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                });
+
+                if (response.ok) {
+                    const html = await response.text();
+                    document.getElementById('productsTable').innerHTML = html;
+                    
+                    // Mettre à jour l'URL du navigateur sans recharger la page
+                    window.history.pushState({}, '', url);
+                } else {
+                    console.error('Erreur lors du filtrage:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Erreur lors du filtrage:', error);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        clearFilters() {
+            this.searchTerm = '';
+            this.selectedCategory = '';
+            this.selectedStatus = '';
+            this.selectedType = '';
+            this.filterProducts();
         },
 
         deleteProduct(id, name) {

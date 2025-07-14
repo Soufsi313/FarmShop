@@ -239,6 +239,60 @@ class Product extends Model
     }
 
     /**
+     * Vérifier si le produit est disponible à la location
+     */
+    public function isRentable(): bool
+    {
+        return in_array($this->type, ['rental', 'both']) 
+               && $this->is_active 
+               && $this->quantity > 0 
+               && !$this->is_out_of_stock;
+    }
+
+    /**
+     * Obtenir les contraintes de location
+     */
+    public function getRentalConstraints(): array
+    {
+        return [
+            'min_rental_days' => $this->min_rental_days ?? 1,
+            'max_rental_days' => $this->max_rental_days ?? 30,
+            'available_days' => $this->available_days ?? [1, 2, 3, 4, 5, 6, 7],
+            'daily_price' => $this->rental_price_per_day,
+            'deposit_amount' => $this->deposit_amount,
+        ];
+    }
+
+    /**
+     * Valider une période de location
+     */
+    public function validateRentalPeriod(\Carbon\Carbon $startDate, \Carbon\Carbon $endDate): array
+    {
+        $errors = [];
+        $days = $startDate->diffInDays($endDate) + 1;
+
+        // Vérifier les contraintes de durée
+        if ($days < ($this->min_rental_days ?? 1)) {
+            $errors[] = "Durée minimale de location : " . ($this->min_rental_days ?? 1) . " jour(s)";
+        }
+
+        if ($days > ($this->max_rental_days ?? 30)) {
+            $errors[] = "Durée maximale de location : " . ($this->max_rental_days ?? 30) . " jour(s)";
+        }
+
+        // Vérifier que la date de début n'est pas dans le passé
+        if ($startDate->lte(now()->startOfDay())) {
+            $errors[] = "La date de début doit être dans le futur";
+        }
+
+        return [
+            'valid' => empty($errors),
+            'errors' => $errors,
+            'duration_days' => $days
+        ];
+    }
+
+    /**
      * Méthodes utilitaires
      */
     public function incrementViews()

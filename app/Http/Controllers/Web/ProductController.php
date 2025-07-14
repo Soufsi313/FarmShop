@@ -16,7 +16,8 @@ class ProductController extends Controller
     public function index(Request $request): View
     {
         $query = Product::with(['category'])
-            ->where('is_active', true);
+            ->where('is_active', true)
+            ->whereIn('type', ['sale', 'both']); // Exclure les produits "rental" uniquement
 
         // Filtrage par recherche
         if ($request->filled('search')) {
@@ -31,11 +32,6 @@ class ProductController extends Controller
         // Filtrage par catégorie
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);
-        }
-
-        // Filtrage par type
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
         }
 
         // Filtrage par prix

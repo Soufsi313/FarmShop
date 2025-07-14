@@ -92,21 +92,6 @@
                             </select>
                         </div>
 
-                        <!-- Types -->
-                        <div class="mb-6">
-                            <label for="type" class="block text-sm font-medium text-gray-700 mb-2">
-                                Type
-                            </label>
-                            <select id="type" 
-                                    name="type" 
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                                <option value="">Tous les types</option>
-                                <option value="sale" {{ request('type') == 'sale' ? 'selected' : '' }}>Achat</option>
-                                <option value="rental" {{ request('type') == 'rental' ? 'selected' : '' }}>Location</option>
-                                <option value="both" {{ request('type') == 'both' ? 'selected' : '' }}>Achat et Location</option>
-                            </select>
-                        </div>
-
                         <!-- Prix -->
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -201,20 +186,6 @@
                                         @if($product->is_featured)
                                             <span class="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium">
                                                 ⭐ Vedette
-                                            </span>
-                                        @endif
-                                        
-                                        @if($product->type === 'sale')
-                                            <span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                                                Achat
-                                            </span>
-                                        @elseif($product->type === 'rental')
-                                            <span class="bg-purple-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                                                Location
-                                            </span>
-                                        @else
-                                            <span class="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                                                Mixte
                                             </span>
                                         @endif
                                     </div>

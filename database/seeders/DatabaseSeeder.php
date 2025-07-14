@@ -37,6 +37,9 @@ class DatabaseSeeder extends Seeder
         // Créer les contraintes de location
         $this->call(RentalConstraintsSeeder::class);
         
+        // Créer les produits de location agricoles
+        $this->call(RentalProductSeeder::class);
+        
         // Créer les messages (datafixture)
         $this->call(MessageSeeder::class);
         
