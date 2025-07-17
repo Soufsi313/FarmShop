@@ -1,0 +1,125 @@
+@startuml Activity_Diagram
+!theme amiga
+title Diagramme d'Activité - Processus Complet de Location
+
+|Utilisateur|
+start
+:Rechercher équipement;
+:Consulter liste résultats;
+:Sélectionner équipement;
+:Consulter fiche détaillée;
+
+|Système|
+:Charger contraintes location;
+:Afficher calendrier disponibilité;
+
+|Utilisateur|
+:Sélectionner dates début/fin;
+:Choisir quantité;
+
+|Système|
+if (Durée >= minimum requis?) then (non)
+  #Pink:Erreur: Durée minimale requise\n(ex: 1 jour pour outils, 2 jours pour machines);
+  |Utilisateur|
+  :Corriger durée;
+  -> Sélectionner dates;
+else (oui)
+  if (Durée <= maximum autorisé?) then (non)
+    #Pink:Erreur: Durée maximale dépassée\n(ex: 7 jours pour outils, 30 jours pour équipements);
+    |Utilisateur|
+    :Réduire durée;
+    -> Sélectionner dates;
+  else (oui)
+    if (Jours ouvrables valides?) then (non)
+      #Pink:Erreur: Jours non disponibles\n(ex: pas de location le dimanche);
+      |Utilisateur|
+      :Choisir autres dates;
+      -> Sélectionner dates;
+    else (oui)
+      if (Période saisonnière OK?) then (non)
+        #Pink:Erreur: Équipement saisonnier\n(ex: tondeuse en hiver, broyeur hors saison);
+        |Utilisateur|
+        :Choisir période adaptée;
+        -> Sélectionner dates;
+      else (oui)
+        :Calculer coûts totaux;
+        :Vérifier stock disponible;
+        
+        if (Stock suffisant?) then (non)
+          #Pink:Erreur: Stock insuffisant\n(ex: 2/5 unités disponibles);
+          |Utilisateur|
+          :Réduire quantité ou attendre;
+          -> Choisir quantité;
+        else (oui)
+          |Utilisateur|
+          :Confirmer ajout panier;
+          
+          |Système|
+          :Réserver stock temporairement;
+          :Ajouter au panier location;
+          
+          |Utilisateur|
+          if (Continuer shopping?) then (oui)
+            -> Rechercher équipement;
+          else (non)
+            :Procéder au checkout;
+            :Saisir informations livraison;
+            :Choisir méthode paiement;
+            
+            |Système|
+            :Calculer montant total\n(location + caution + TVA);
+            :Intégrer service paiement;
+            
+            if (Paiement autorisé?) then (non)
+              #Pink:Erreur: Paiement refusé\n(carte expirée, fonds insuffisants);
+              |Utilisateur|
+              :Retry ou changer méthode;
+              -> Choisir méthode paiement;
+            else (oui)
+              :Créer commande définitive;
+              :Confirmer réservation stock;
+              :Envoyer email confirmation;
+              :Programmer récupération équipement;
+              
+              |Client|
+              :Se déplacer pour récupérer;
+              :Récupérer équipement au dépôt;
+              
+              |Utilisateur|
+              :Utiliser équipement;
+              
+              |Client|
+              :Retourner équipement au dépôt;
+              
+              |Système|
+              :Inspecter état retour;
+              :Calculer jours de retard;
+              
+              if (Retour dans les délais?) then (non)
+                :Calculer frais de retard\n(ex: 10€/jour de retard);
+                if (État satisfaisant?) then (oui)
+                  :Rembourser caution moins frais retard;
+                else (non)
+                  :Calculer frais dommages + retard\n(rayures, casse, usure anormale);
+                  :Rembourser caution moins tous frais;
+                endif
+              else (oui)
+                if (État satisfaisant?) then (oui)
+                  :Rembourser caution intégrale;
+                else (non)
+                  :Calculer frais dommages uniquement\n(rayures, casse, usure anormale);
+                  :Rembourser caution moins frais dommages;
+                endif
+              endif
+              
+              :Libérer stock;
+              stop
+            endif
+          endif
+        endif
+      endif
+    endif
+  endif
+endif
+
+@enduml

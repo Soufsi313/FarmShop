@@ -1,0 +1,101 @@
+@startuml Sequence_Diagram
+!theme amiga
+title Diagramme de Séquence Système - Location Motoculteur
+
+actor Utilisateur as U
+participant "Interface Web" as WEB
+participant "RentalController" as RC
+participant "Product" as P
+participant "RentalConstraint" as RCT
+participant "CartLocation" as CL
+participant "OrderLocation" as OL
+participant "PaymentService" as PS
+participant "EmailService" as ES
+database "Base de Données" as DB
+
+== Phase 1: Recherche et Sélection ==
+U -> WEB : Naviguer vers /rentals
+WEB -> RC : index(filters)
+RC -> P : findRentableProducts()
+P -> DB : SELECT * FROM products WHERE type IN ('rental','both')
+DB --> P : Liste équipements
+P --> RC : Collection[Product]
+RC --> WEB : Vue avec produits
+WEB --> U : Affichage liste équipements
+
+U -> WEB : Cliquer "Motoculteur 7CV"
+WEB -> RC : show(productId)
+RC -> P : findOrFail(id)
+P -> DB : SELECT product + constraints
+DB --> P : Détails complets
+P --> RC : Product avec relations
+RC --> WEB : Vue détaillée
+WEB --> U : Fiche produit + contraintes
+
+== Phase 2: Validation Période ==
+U -> WEB : Sélectionner dates (15/07→18/07)
+WEB -> RCT : validateRentalPeriod(product, startDate, endDate)
+RCT -> P : getRentalConstraints()
+P --> RCT : Contraintes (min_days=1, max_days=30)
+RCT -> DB : Vérifier disponibilité calendrier
+DB --> RCT : Période libre
+RCT -> RCT : Valider jours de semaine
+RCT --> WEB : ValidationResult(valid=true, cost=270€)
+WEB --> U : Période confirmée + tarification
+
+== Phase 3: Ajout au Panier ==
+U -> WEB : Ajouter au panier (quantité=1)
+WEB -> CL : addProduct(product, quantity, dates)
+CL -> P : checkAvailability(quantity, period)
+P -> DB : Vérifier stock disponible
+DB --> P : Stock OK (5 unités)
+P --> CL : Disponibilité confirmée
+CL -> DB : INSERT cart_item_location
+CL -> P : reserveStock(quantity)
+P -> DB : UPDATE products SET quantity = quantity - 1
+DB --> P : Stock réservé
+CL --> WEB : CartItem créé
+WEB --> U : Produit ajouté (panier: 270€ + 180€ caution)
+
+== Phase 4: Checkout et Paiement ==
+U -> WEB : Procéder au checkout
+WEB -> OL : createFromCart(cartLocation)
+OL -> CL : calculateTotals()
+CL --> OL : Totaux (location: 270€, caution: 180€, total: 450€)
+OL --> WEB : Récapitulatif commande
+WEB --> U : Page checkout
+
+U -> WEB : Confirmer + payer par carte
+WEB -> PS : processPayment(450€, cardDetails)
+PS --> WEB : PaymentResult(success=true, transactionId)
+
+alt Paiement réussi
+    WEB -> OL : confirmOrder(paymentRef)
+    OL -> DB : INSERT order_location + order_item_locations
+    OL -> P : confirmReservation()
+    P -> DB : Finaliser réservation stock
+    DB --> P : Confirmation
+    OL -> ES : sendRentalConfirmation(order)
+    ES --> OL : Email envoyé
+    OL --> WEB : Commande confirmée (#LOC-2025-0001)
+    WEB --> U : Page confirmation + numéro suivi
+else Paiement échoué
+    WEB -> CL : releaseReservation()
+    CL -> P : restoreStock(quantity)
+    P -> DB : UPDATE products SET quantity = quantity + 1
+    WEB --> U : Erreur paiement, retry possible
+end
+
+== Phase 5: Notification et Suivi ==
+OL -> ES : scheduleDeliveryNotification(order, J-1)
+ES --> OL : Programmé
+OL -> ES : scheduleReturnReminder(order, fin_période)
+ES --> OL : Programmé
+
+note over U, DB
+  Commande créée avec succès
+  Stock réservé jusqu'à livraison
+  Workflow de suivi activé
+end note
+
+@enduml

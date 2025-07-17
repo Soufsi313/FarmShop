@@ -11,6 +11,8 @@
         "dompdf/dompdf": "^3.1",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
+        "phpoffice/phpspreadsheet": "^4.4",
+        "phpoffice/phpword": "^1.4",
         "stripe/stripe-php": "^17.4"
     },
     "require-dev": {

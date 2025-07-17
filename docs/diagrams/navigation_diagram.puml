@@ -1,0 +1,36 @@
+@startuml Navigation_Diagram
+!theme amiga
+title Diagramme de Navigation - Processus de Location d'Équipement
+
+start
+:Page d'Accueil;
+:Section Locations;
+:Liste des Équipements;
+:Fiche Produit;
+:Sélection Période;
+
+if (Contraintes valides ?) then (oui)
+  :Ajout au Panier;
+  :Panier de Location;
+  if (Continuer Shopping ?) then (oui)
+    :Retour Liste;
+    -> Équipements;
+  else (non)
+    :Checkout;
+    :Informations de Location;
+    :Paiement;
+    if (Paiement réussi ?) then (oui)
+      :Confirmation Commande;
+      :Suivi Commande;
+      stop
+    else (non)
+      #Pink:Erreur Paiement;
+      -> Paiement;
+    endif
+  endif
+else (non)
+  #Pink:Erreur Contraintes;
+  -> Sélection;
+endif
+
+@enduml

@@ -37,6 +37,57 @@ Route::get('/gdpr-rights', function () {
     return view('legal.gdpr-rights');
 })->name('gdpr-rights');
 
+// Nouvelles pages légales conformes
+Route::prefix('legal')->name('legal.')->group(function () {
+    Route::get('/mentions-legales', function () {
+        return view('legal.mentions');
+    })->name('mentions');
+    
+    Route::get('/conditions-generales-vente', function () {
+        return view('legal.cgv');
+    })->name('cgv');
+    
+    Route::get('/conditions-generales-utilisation', function () {
+        return view('legal.cgu');
+    })->name('cgu');
+    
+    Route::get('/conditions-generales-location', function () {
+        return view('legal.cgl');
+    })->name('cgl');
+    
+    Route::get('/politique-confidentialite', function () {
+        return view('legal.privacy');
+    })->name('privacy');
+    
+    Route::get('/droits-rgpd', function () {
+        return view('legal.gdpr-rights');
+    })->name('gdpr-rights');
+    
+    Route::get('/politique-cookies', function () {
+        return view('legal.cookies');
+    })->name('cookies');
+    
+    Route::get('/demande-donnees', function () {
+        return view('legal.data-request');
+    })->name('data-request');
+    
+    Route::get('/droit-retractation', function () {
+        return view('legal.returns');
+    })->name('returns');
+    
+    Route::get('/garanties-legales', function () {
+        return view('legal.warranties');
+    })->name('warranties');
+    
+    Route::get('/mediation', function () {
+        return view('legal.mediation');
+    })->name('mediation');
+    
+    Route::get('/assurance', function () {
+        return view('legal.insurance');
+    })->name('insurance');
+});
+
 // Routes pour les produits publics
 Route::get('/products', [WebProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product:slug}', [WebProductController::class, 'show'])->name('products.show');

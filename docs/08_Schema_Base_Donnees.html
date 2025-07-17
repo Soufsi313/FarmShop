@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>08 - Schéma de Base de Données - FarmShop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px;
+            background-color: #ffffff;
+            color: #333;
+            max-width: 210mm;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+        }
+
+        .institution {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .student-info {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+
+        h3 {
+            color: #34495e;
+            font-size: 20px;
+            font-weight: 500;
+            margin: 30px 0 15px 0;
+        }
+
+        .description {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            margin: 30px 0;
+        }
+
+        .relation-box {
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid;
+        }
+
+        .relation-box.primary {
+            background-color: #e3f2fd;
+            border-left-color: #2196f3;
+        }
+
+        .relation-box.interactions {
+            background-color: #fff8e1;
+            border-left-color: #ff9800;
+        }
+
+        .relation-box.products {
+            background-color: #e8f5e8;
+            border-left-color: #4caf50;
+        }
+
+        .relation-box.cart {
+            background-color: #fce4ec;
+            border-left-color: #e91e63;
+        }
+
+        .relation-box.orders {
+            background-color: #f3e5f5;
+            border-left-color: #9c27b0;
+        }
+
+        .relation-box.locations {
+            background-color: #e0f2f1;
+            border-left-color: #009688;
+        }
+
+        .relation-box.conversion {
+            background-color: #e1f5fe;
+            border-left-color: #00bcd4;
+        }
+
+        .relation-box.communication {
+            background-color: #f9fbe7;
+            border-left-color: #8bc34a;
+        }
+
+        .relation-box.content {
+            background-color: #fff3e0;
+            border-left-color: #ff5722;
+        }
+
+        .relation-box.security {
+            background-color: #ffebee;
+            border-left-color: #f44336;
+        }
+
+        .relation-box.permissions {
+            background-color: #fafafa;
+            border-left-color: #607d8b;
+        }
+
+        .table-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .table-section h4 {
+            color: #495057;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+        }
+
+        .table-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+
+        .table-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .notes-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 40px 0;
+        }
+
+        .notes-section h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        li:before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .strong-relation {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .cardinality {
+            font-weight: 700;
+            color: #e74c3c;
+            background-color: #fff5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        @media print {
+            body { 
+                margin: 20px;
+                padding: 0;
+            }
+            .header, .notes-section, .footer {
+                background: #f8f9fa !important;
+                color: #333 !important;
+                border: 2px solid #dee2e6;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Livrable 08 - Schéma de Base de Données</h1>
+        <div class="institution">
+            <strong>Communauté Française de Belgique</strong><br>
+            <strong>Institut des Carrières Commerciales</strong><br>
+            <strong>Ville de Bruxelles</strong><br>
+            Rue de la Fontaine 4<br>
+            1000 BRUXELLES
+        </div>
+        <hr style="border: 1px solid rgba(255,255,255,0.3); margin: 20px 0;">
+        <div style="font-style: italic; margin: 15px 0;">
+            Épreuve intégrée réalisée en vue de l'obtention du titre de<br>
+            « Bachelier en Informatique de gestion, orientation développement d'applications »
+        </div>
+        <div class="student-info">
+            <strong>MEFTAH Soufiane</strong><br>
+            2024 – 2025
+        </div>
+    </div>
+
+    <div class="description">
+        <h2 style="color: white; border: none; margin-top: 0;">🎯 Description du Schéma</h2>
+        <strong>FarmShop</strong> est une plateforme e-commerce innovante spécialisée dans la <strong>vente et la location d'équipements agricoles</strong>. Le système gère un double flux métier : les <strong>achats traditionnels</strong> et un <strong>système de location unique</strong> avec gestion sophistiquée des cautions, pénalités et contraintes temporelles.
+    </div>
+
+    <h2>👥 Relations Utilisateurs</h2>
+    
+    <h3>🔗 Relations Principales</h3>
+    <div class="relation-box primary">
+        <ul>
+            <li><span class="strong-relation">Un utilisateur peut créer plusieurs produits</span> - Un produit appartient à un utilisateur <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un utilisateur peut passer plusieurs commandes</span> - Une commande appartient à un utilisateur <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un utilisateur peut avoir plusieurs commandes de location</span> - Une commande de location appartient à un utilisateur <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un utilisateur peut avoir plusieurs locations actives</span> - Une location appartient à un utilisateur <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un utilisateur possède un panier d'achat</span> - Un panier appartient à un utilisateur <span class="cardinality">[1-1]</span></li>
+            <li><span class="strong-relation">Un utilisateur peut avoir plusieurs paniers de location</span> - Un panier de location appartient à un utilisateur <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h3>🤝 Relations Interactions</h3>
+    <div class="relation-box interactions">
+        <ul>
+            <li><span class="strong-relation">Un utilisateur peut envoyer plusieurs contacts</span> - Un contact appartient à un utilisateur <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un utilisateur peut aimer plusieurs produits</span> - Un produit peut être aimé par plusieurs utilisateurs <span class="cardinality">[*-*]</span></li>
+            <li><span class="strong-relation">Un utilisateur peut avoir plusieurs produits en wishlist</span> - Un produit peut être dans plusieurs wishlists <span class="cardinality">[*-*]</span></li>
+        </ul>
+    </div>
+
+    <h2>📦 Relations Produits & Catégories</h2>
+    
+    <h3>🏗️ Structure des Produits</h3>
+    <div class="relation-box products">
+        <ul>
+            <li><span class="strong-relation">Une catégorie contient plusieurs produits</span> - Un produit appartient à une catégorie <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un produit peut avoir plusieurs images</span> - Une image appartient à un produit <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un produit peut avoir plusieurs offres spéciales</span> - Une offre spéciale appartient à un produit <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h3>🔄 Interactions Utilisateurs-Produits</h3>
+    <div class="relation-box interactions">
+        <ul>
+            <li><span class="strong-relation">Un produit peut être aimé par plusieurs utilisateurs</span> - Un utilisateur peut aimer plusieurs produits <span class="cardinality">[*-*]</span></li>
+            <li><span class="strong-relation">Un produit peut être dans plusieurs wishlists</span> - Un utilisateur peut avoir plusieurs produits en wishlist <span class="cardinality">[*-*]</span></li>
+            <li><span class="strong-relation">Un produit peut être ajouté dans plusieurs paniers</span> - Un article de panier référence un produit <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un produit peut être loué dans plusieurs paniers de location</span> - Un article de location référence un produit <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h2>🛒 Relations Panier & Articles</h2>
+    
+    <h3>🛍️ Panier d'Achat Classique</h3>
+    <div class="relation-box cart">
+        <ul>
+            <li><span class="strong-relation">Un panier contient plusieurs articles</span> - Un article de panier appartient à un panier <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un utilisateur peut avoir plusieurs articles dans son panier</span> - Un article de panier appartient à un utilisateur <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un produit peut être dans plusieurs paniers</span> - Un article de panier référence un produit <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h3>🚜 Panier de Location</h3>
+    <div class="relation-box locations">
+        <ul>
+            <li><span class="strong-relation">Un panier de location contient plusieurs articles de location</span> - Un article de location appartient à un panier de location <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un produit peut être dans plusieurs paniers de location</span> - Un article de location référence un produit <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h2>📋 Relations Commandes & Articles</h2>
+    
+    <h3>💳 Commandes d'Achat</h3>
+    <div class="relation-box orders">
+        <ul>
+            <li><span class="strong-relation">Une commande contient plusieurs articles</span> - Un article de commande appartient à une commande <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un produit peut être commandé plusieurs fois</span> - Un article de commande référence un produit <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un article de commande peut avoir un retour</span> - Un retour appartient à un article de commande <span class="cardinality">[1-1]</span></li>
+            <li><span class="strong-relation">Une commande peut avoir plusieurs retours</span> - Un retour appartient à une commande <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h3>📅 Commandes de Location</h3>
+    <div class="relation-box locations">
+        <ul>
+            <li><span class="strong-relation">Une commande de location contient plusieurs articles</span> - Un article de location appartient à une commande de location <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un produit peut être loué plusieurs fois</span> - Un article de location référence un produit <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h2>🏠 Relations Locations & Gestion</h2>
+    
+    <h3>🔄 Gestion des Locations Actives</h3>
+    <div class="relation-box locations">
+        <ul>
+            <li><span class="strong-relation">Une location contient plusieurs articles</span> - Un article de location appartient à une location <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un produit peut être loué dans plusieurs locations</span> - Un article de location référence un produit <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h3>⚠️ Système de Pénalités</h3>
+    <div class="relation-box security">
+        <ul>
+            <li><span class="strong-relation">Un article de location peut générer plusieurs pénalités</span> - Une pénalité appartient à un article de location <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Une location peut avoir plusieurs pénalités</span> - Une pénalité appartient à une location <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h2>🔄 Relations de Conversion (Processus Métier)</h2>
+    
+    <h3>🔁 Transformation des Paniers en Commandes</h3>
+    <div class="relation-box conversion">
+        <ul>
+            <li><span class="strong-relation">Un panier de location se convertit en commande de location</span> - Une commande de location provient d'un panier de location <span class="cardinality">[1-1]</span></li>
+            <li><span class="strong-relation">Un article de panier de location se convertit en article de commande de location</span> - Un article de commande de location provient d'un article de panier <span class="cardinality">[1-1]</span></li>
+        </ul>
+    </div>
+
+    <h3>🎯 Transformation des Commandes en Locations</h3>
+    <div class="relation-box conversion">
+        <ul>
+            <li><span class="strong-relation">Une commande de location devient une location</span> - Une location provient d'une commande de location <span class="cardinality">[1-1]</span></li>
+        </ul>
+    </div>
+
+    <h2>💬 Relations Communication</h2>
+    
+    <h3>📧 Messages et Support</h3>
+    <div class="relation-box communication">
+        <ul>
+            <li><span class="strong-relation">Un utilisateur peut envoyer plusieurs messages admin</span> - Un message admin appartient à un utilisateur <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un message admin peut avoir plusieurs réponses</span> - Une réponse appartient à un message admin <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un utilisateur peut écrire plusieurs réponses</span> - Une réponse appartient à un utilisateur <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h3>📞 Gestion des Contacts</h3>
+    <div class="relation-box communication">
+        <ul>
+            <li><span class="strong-relation">Un admin peut être assigné à plusieurs contacts</span> - Un contact peut être assigné à un admin <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h2>📝 Relations Contenu</h2>
+    
+    <h3>📰 Gestion du Blog (Administration)</h3>
+    <div class="relation-box content">
+        <ul>
+            <li><span class="strong-relation">Un admin peut créer plusieurs articles de blog</span> - Un article de blog appartient à un admin <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un admin peut créer plusieurs newsletters</span> - Une newsletter appartient à un admin <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h3>💭 Interactions Utilisateurs avec le Contenu</h3>
+    <div class="relation-box content">
+        <ul>
+            <li><span class="strong-relation">Un blog peut recevoir plusieurs commentaires</span> - Un commentaire appartient à un blog <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un utilisateur peut écrire plusieurs commentaires</span> - Un commentaire appartient à un utilisateur <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un commentaire peut avoir plusieurs réponses</span> - Un commentaire peut répondre à un autre commentaire <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h3>🛡️ Système de Modération</h3>
+    <div class="relation-box security">
+        <ul>
+            <li><span class="strong-relation">Un commentaire peut être signalé plusieurs fois</span> - Un signalement appartient à un commentaire <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un utilisateur peut faire plusieurs signalements</span> - Un signalement appartient à un utilisateur <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un admin peut traiter plusieurs signalements</span> - Un signalement peut être traité par un admin <span class="cardinality">[1-*]</span></li>
+        </ul>
+    </div>
+
+    <h3>📨 Newsletter</h3>
+    <div class="relation-box content">
+        <ul>
+            <li><span class="strong-relation">Un utilisateur peut avoir un abonnement newsletter</span> - Un abonnement newsletter appartient à un utilisateur <span class="cardinality">[1-1]</span></li>
+        </ul>
+    </div>
+
+    <h2>🔒 Relations Confidentialité</h2>
+    
+    <h3>🍪 Gestion des Cookies et Consentements</h3>
+    <div class="relation-box security">
+        <ul>
+            <li><span class="strong-relation">Un utilisateur peut donner plusieurs consentements de cookies</span> - Un consentement appartient à un utilisateur <span class="cardinality">[1-*]</span></li>
+            <li><span class="strong-relation">Un cookie peut être consenti par plusieurs utilisateurs</span> - Un consentement peut concerner plusieurs cookies <span class="cardinality">[*-*]</span></li>
+        </ul>
+    </div>
+
+    <h2>🔐 Relations Permissions (Spatie Laravel-Permission)</h2>
+    
+    <h3>👤 Système de Rôles et Permissions</h3>
+    <div class="relation-box permissions">
+        <ul>
+            <li><span class="strong-relation">Un utilisateur peut avoir plusieurs rôles</span> - Un rôle peut être attribué à plusieurs utilisateurs <span class="cardinality">[*-*]</span></li>
+            <li><span class="strong-relation">Un utilisateur peut avoir plusieurs permissions</span> - Une permission peut être attribuée à plusieurs utilisateurs <span class="cardinality">[*-*]</span></li>
+            <li><span class="strong-relation">Un rôle peut avoir plusieurs permissions</span> - Une permission peut appartenir à plusieurs rôles <span class="cardinality">[*-*]</span></li>
+        </ul>
+    </div>
+
+    <h2>🗃️ Tables Principales Identifiées</h2>
+
+    <div class="table-section">
+        <h4>👥 Tables Utilisateurs et Authentification</h4>
+        <div class="table-list">
+            <div class="table-item">users</div>
+            <div class="table-item">roles</div>
+            <div class="table-item">permissions</div>
+            <div class="table-item">model_has_roles</div>
+            <div class="table-item">model_has_permissions</div>
+            <div class="table-item">role_has_permissions</div>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <h4>📦 Tables Produits et Catalogue</h4>
+        <div class="table-list">
+            <div class="table-item">categories</div>
+            <div class="table-item">products</div>
+            <div class="table-item">product_images</div>
+            <div class="table-item">special_offers</div>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <h4>🛒 Tables Panier et Navigation</h4>
+        <div class="table-list">
+            <div class="table-item">carts</div>
+            <div class="table-item">cart_items</div>
+            <div class="table-item">cart_locations</div>
+            <div class="table-item">cart_item_locations</div>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <h4>📋 Tables Commandes</h4>
+        <div class="table-list">
+            <div class="table-item">orders</div>
+            <div class="table-item">order_items</div>
+            <div class="table-item">order_returns</div>
+            <div class="table-item">order_locations</div>
+            <div class="table-item">order_item_locations</div>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <h4>🏠 Tables Locations</h4>
+        <div class="table-list">
+            <div class="table-item">rentals</div>
+            <div class="table-item">rental_items</div>
+            <div class="table-item">rental_penalties</div>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <h4>💬 Tables Communication</h4>
+        <div class="table-list">
+            <div class="table-item">contacts</div>
+            <div class="table-item">admin_messages</div>
+            <div class="table-item">admin_message_replies</div>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <h4>📝 Tables Contenu</h4>
+        <div class="table-list">
+            <div class="table-item">blogs</div>
+            <div class="table-item">blog_comments</div>
+            <div class="table-item">blog_comment_reports</div>
+            <div class="table-item">newsletters</div>
+            <div class="table-item">newsletter_subscriptions</div>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <h4>🤝 Tables Interactions</h4>
+        <div class="table-list">
+            <div class="table-item">product_likes</div>
+            <div class="table-item">wishlists</div>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <h4>🔒 Tables Confidentialité</h4>
+        <div class="table-list">
+            <div class="table-item">cookies</div>
+            <div class="table-item">cookie_consents</div>
+        </div>
+    </div>
+
+    <div class="notes-section">
+        <h2 style="color: white; border: none;">⚙️ Notes Techniques</h2>
+        
+        <h3>📋 Conventions de Nommage</h3>
+        <ul>
+            <li><strong>Clés primaires :</strong> id (BIGINT UNSIGNED)</li>
+            <li><strong>Clés étrangères :</strong> {table}_id (BIGINT UNSIGNED)</li>
+            <li><strong>Timestamps :</strong> created_at, updated_at</li>
+            <li><strong>Soft deletes :</strong> deleted_at (sur certaines tables sensibles)</li>
+        </ul>
+
+        <h3>🚀 Index et Contraintes</h3>
+        <ul>
+            <li>Contraintes de clés étrangères activées</li>
+            <li>Index sur les clés étrangères pour optimiser les performances</li>
+            <li>Index composites sur les relations many-to-many</li>
+            <li>Contraintes d'unicité sur les couples (user_id, product_id) pour likes et wishlists</li>
+        </ul>
+
+        <h3>🎯 Particularités Métier</h3>
+        <ul>
+            <li><strong>Système dual</strong> achat/location avec des flux séparés</li>
+            <li><strong>Gestion des cautions</strong> pour les locations</li>
+            <li><strong>Système de pénalités</strong> automatisé (10€/jour de retard)</li>
+            <li><strong>Conversion automatique</strong> panier → commande → location</li>
+            <li><strong>Gestion des retours</strong> pour les achats</li>
+            <li><strong>Système de notifications</strong> intégrées</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <strong>📊 Document généré le 15 juillet 2025</strong><br>
+        🎓 <strong>MEFTAH Soufiane</strong> - Bachelier en Informatique de gestion<br>
+        🏛️ <strong>Institut des Carrières Commerciales - Bruxelles</strong>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,304 @@
+@startuml FarmShop_Database_Schema
+!theme amiga
+title Schéma de Base de Données - FarmShop (Location Équipements Agricoles)
+
+skinparam linetype ortho
+skinparam backgroundColor #f8f9fa
+skinparam classBackgroundColor #ffffff
+skinparam classBorderColor #333333
+
+' === ENTITÉS PRINCIPALES ===
+
+entity "users" as users {
+  * id : BIGINT UNSIGNED
+  --
+  * name : VARCHAR(255)
+  * email : VARCHAR(255) UNIQUE
+  * email_verified_at : TIMESTAMP
+  * password : VARCHAR(255)
+  * phone : VARCHAR(20)
+  * address : TEXT
+  * city : VARCHAR(100)
+  * postal_code : VARCHAR(10)
+  * country : VARCHAR(100)
+  * profile_photo : VARCHAR(255)
+  * is_active : BOOLEAN
+  * remember_token : VARCHAR(100)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+  * deleted_at : TIMESTAMP
+}
+
+entity "categories" as categories {
+  * id : BIGINT UNSIGNED
+  --
+  * name : VARCHAR(255)
+  * description : TEXT
+  * image : VARCHAR(255)
+  * slug : VARCHAR(255) UNIQUE
+  * is_active : BOOLEAN
+  * sort_order : INT
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "equipments" as equipments {
+  * id : BIGINT UNSIGNED
+  --
+  * category_id : BIGINT UNSIGNED
+  * user_id : BIGINT UNSIGNED
+  * name : VARCHAR(255)
+  * description : TEXT
+  * brand : VARCHAR(100)
+  * model : VARCHAR(100)
+  * year : INT
+  * condition : ENUM('neuf', 'bon', 'moyen')
+  * daily_price : DECIMAL(8,2)
+  * deposit_amount : DECIMAL(8,2)
+  * is_available : BOOLEAN
+  * featured_image : VARCHAR(255)
+  * specifications : JSON
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+  * deleted_at : TIMESTAMP
+}
+
+entity "equipment_images" as equipment_images {
+  * id : BIGINT UNSIGNED
+  --
+  * equipment_id : BIGINT UNSIGNED
+  * image_path : VARCHAR(255)
+  * alt_text : VARCHAR(255)
+  * sort_order : INT
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "equipment_constraints" as equipment_constraints {
+  * id : BIGINT UNSIGNED
+  --
+  * equipment_id : BIGINT UNSIGNED
+  * min_rental_days : INT
+  * max_rental_days : INT
+  * seasonal_restriction : JSON
+  * business_days_only : BOOLEAN
+  * advance_booking_days : INT
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "equipment_stock" as equipment_stock {
+  * id : BIGINT UNSIGNED
+  --
+  * equipment_id : BIGINT UNSIGNED
+  * total_quantity : INT
+  * available_quantity : INT
+  * reserved_quantity : INT
+  * maintenance_quantity : INT
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "carts" as carts {
+  * id : BIGINT UNSIGNED
+  --
+  * user_id : BIGINT UNSIGNED
+  * session_id : VARCHAR(255)
+  * total_amount : DECIMAL(10,2)
+  * total_deposit : DECIMAL(10,2)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "cart_items" as cart_items {
+  * id : BIGINT UNSIGNED
+  --
+  * cart_id : BIGINT UNSIGNED
+  * equipment_id : BIGINT UNSIGNED
+  * quantity : INT
+  * start_date : DATE
+  * end_date : DATE
+  * daily_price : DECIMAL(8,2)
+  * total_price : DECIMAL(10,2)
+  * deposit_amount : DECIMAL(8,2)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "temporary_reservations" as temp_reservations {
+  * id : BIGINT UNSIGNED
+  --
+  * cart_item_id : BIGINT UNSIGNED
+  * equipment_id : BIGINT UNSIGNED
+  * quantity : INT
+  * reserved_until : TIMESTAMP
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "rental_orders" as rental_orders {
+  * id : BIGINT UNSIGNED
+  --
+  * user_id : BIGINT UNSIGNED
+  * cart_id : BIGINT UNSIGNED
+  * order_number : VARCHAR(50) UNIQUE
+  * status : ENUM('pending', 'confirmed', 'cancelled')
+  * total_amount : DECIMAL(10,2)
+  * total_deposit : DECIMAL(10,2)
+  * billing_address : JSON
+  * notes : TEXT
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "rental_order_items" as rental_order_items {
+  * id : BIGINT UNSIGNED
+  --
+  * rental_order_id : BIGINT UNSIGNED
+  * equipment_id : BIGINT UNSIGNED
+  * quantity : INT
+  * start_date : DATE
+  * end_date : DATE
+  * daily_price : DECIMAL(8,2)
+  * total_price : DECIMAL(10,2)
+  * deposit_amount : DECIMAL(8,2)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "payments" as payments {
+  * id : BIGINT UNSIGNED
+  --
+  * rental_order_id : BIGINT UNSIGNED
+  * payment_method : VARCHAR(50)
+  * transaction_id : VARCHAR(255)
+  * amount : DECIMAL(10,2)
+  * deposit : DECIMAL(10,2)
+  * status : ENUM('pending', 'completed', 'failed', 'refunded')
+  * processed_at : TIMESTAMP
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "active_rentals" as active_rentals {
+  * id : BIGINT UNSIGNED
+  --
+  * rental_order_id : BIGINT UNSIGNED
+  * user_id : BIGINT UNSIGNED
+  * rental_number : VARCHAR(50) UNIQUE
+  * status : ENUM('active', 'overdue', 'returned', 'completed')
+  * start_date : DATE
+  * expected_return_date : DATE
+  * actual_return_date : DATE
+  * pickup_confirmed_at : TIMESTAMP
+  * return_confirmed_at : TIMESTAMP
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "rental_items" as rental_items {
+  * id : BIGINT UNSIGNED
+  --
+  * active_rental_id : BIGINT UNSIGNED
+  * equipment_id : BIGINT UNSIGNED
+  * quantity : INT
+  * condition_at_pickup : TEXT
+  * condition_at_return : TEXT
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "rental_penalties" as rental_penalties {
+  * id : BIGINT UNSIGNED
+  --
+  * active_rental_id : BIGINT UNSIGNED
+  * rental_item_id : BIGINT UNSIGNED
+  * penalty_type : ENUM('late_return', 'damage', 'loss')
+  * description : TEXT
+  * amount : DECIMAL(8,2)
+  * days_overdue : INT
+  * daily_penalty_rate : DECIMAL(6,2)
+  * calculated_at : TIMESTAMP
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "rental_inspections" as rental_inspections {
+  * id : BIGINT UNSIGNED
+  --
+  * active_rental_id : BIGINT UNSIGNED
+  * inspector_id : BIGINT UNSIGNED
+  * inspection_type : ENUM('pickup', 'return')
+  * overall_condition : ENUM('excellent', 'good', 'fair', 'poor')
+  * notes : TEXT
+  * photos : JSON
+  * inspection_date : TIMESTAMP
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "equipment_damages" as equipment_damages {
+  * id : BIGINT UNSIGNED
+  --
+  * rental_inspection_id : BIGINT UNSIGNED
+  * rental_item_id : BIGINT UNSIGNED
+  * damage_type : ENUM('scratch', 'dent', 'break', 'wear', 'missing_part')
+  * severity : ENUM('minor', 'moderate', 'major')
+  * description : TEXT
+  * repair_cost : DECIMAL(8,2)
+  * photos : JSON
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "rental_deposits" as rental_deposits {
+  * id : BIGINT UNSIGNED
+  --
+  * active_rental_id : BIGINT UNSIGNED
+  * payment_id : BIGINT UNSIGNED
+  * deposit_amount : DECIMAL(10,2)
+  * refund_amount : DECIMAL(10,2)
+  * penalty_deduction : DECIMAL(8,2)
+  * damage_deduction : DECIMAL(8,2)
+  * refund_status : ENUM('held', 'partial_refund', 'full_refund', 'no_refund')
+  * refunded_at : TIMESTAMP
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+' === RELATIONS ===
+
+users ||--o{ equipments : "owns"
+users ||--|| carts : "has"
+users ||--o{ rental_orders : "places"
+users ||--o{ active_rentals : "rents"
+
+categories ||--o{ equipments : "contains"
+
+equipments ||--o{ equipment_images : "has"
+equipments ||--|| equipment_constraints : "has"
+equipments ||--|| equipment_stock : "has"
+equipments ||--o{ cart_items : "referenced_in"
+equipments ||--o{ rental_order_items : "referenced_in"
+equipments ||--o{ rental_items : "rented_as"
+
+carts ||--o{ cart_items : "contains"
+cart_items ||--|| temp_reservations : "reserves"
+
+carts ||--|| rental_orders : "converts_to"
+rental_orders ||--o{ rental_order_items : "contains"
+rental_orders ||--|| payments : "paid_by"
+rental_orders ||--|| active_rentals : "becomes"
+
+active_rentals ||--o{ rental_items : "contains"
+active_rentals ||--o{ rental_penalties : "may_have"
+active_rentals ||--o{ rental_inspections : "inspected_by"
+active_rentals ||--|| rental_deposits : "has"
+
+rental_inspections ||--o{ equipment_damages : "documents"
+rental_items ||--o{ equipment_damages : "may_have"
+rental_items ||--o{ rental_penalties : "may_incur"
+
+payments ||--|| rental_deposits : "includes"
+
+@enduml

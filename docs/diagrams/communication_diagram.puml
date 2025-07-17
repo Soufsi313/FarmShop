@@ -1,0 +1,205 @@
+@startuml Communication_Diagram
+!theme amiga
+title Diagramme de Communication - Scénario Location Équipement Agricole
+skinparam linetype ortho
+skinparam minlen 300
+skinparam nodesep 200
+skinparam ranksep 250
+skinparam padding 20
+
+' === OBJETS DU SYSTÈME ===
+
+object ":Client" as CLIENT
+
+
+object ":Interface" as WEB
+
+
+object ":Catalogue" as CAT
+
+
+object ":Contraintes" as CONST
+
+
+object ":Panier" as CART
+
+
+object ":Commande" as ORDER
+
+
+object ":Paiement" as PAY
+
+
+object ":Stock" as STOCK
+
+
+object ":Email" as MAIL
+
+' === LIENS ENTRE OBJETS ===
+
+CLIENT -right- WEB
+
+
+WEB -down- CAT
+
+WEB -down- CONST
+
+WEB -down- CART
+
+WEB -down- ORDER
+
+
+CAT -right- STOCK
+
+CART -right- STOCK
+
+ORDER -right- PAY
+
+ORDER -down- MAIL
+
+CONST -right- CAT
+
+' ===================================================
+' MESSAGES NUMÉROTÉS SUR LES LIENS
+' ===================================================
+
+' Messages Client <-> Interface
+
+CLIENT -right-> WEB : **1:** rechercher("motoculteur")
+
+
+WEB -left-> CLIENT : **1.5:** afficherListe()
+
+
+CLIENT -right-> WEB : **2:** sélectionnerÉquipement(id)
+
+
+WEB -left-> CLIENT : **2.3:** afficherFiche()
+
+
+CLIENT -right-> WEB : **3:** choisirPériode(dates)
+
+
+WEB -left-> CLIENT : **3.5:** périodeConfirmée()
+
+
+CLIENT -right-> WEB : **4:** ajouterAuPanier()
+
+
+WEB -left-> CLIENT : **4.5:** panierMisÀJour()
+
+
+CLIENT -right-> WEB : **5:** procéderCheckout()
+
+
+WEB -left-> CLIENT : **5.5:** pageCheckout()
+
+
+CLIENT -right-> WEB : **6:** payerMontant(total)
+
+
+WEB -left-> CLIENT : **6.7:** pageConfirmation()
+
+' ===================================================
+
+' Messages Interface <-> Catalogue
+
+WEB -down-> CAT : **1.1:** rechercherÉquipements(filtres)
+
+
+CAT -up-> WEB : **1.4:** résultatsRecherche
+
+
+WEB -down-> CAT : **2.1:** obtenirDétails(id)
+
+
+CAT -up-> WEB : **2.2:** ficheProduit
+
+' ===================================================
+
+' Messages Interface <-> Contraintes
+
+WEB -down-> CONST : **3.1:** validerPériode(équipement, dates)
+
+
+CONST -up-> WEB : **3.4:** résultatValidation
+
+' ===================================================
+
+' Messages Interface <-> Panier
+
+WEB -down-> CART : **4.1:** ajouterArticle(équipement, période)
+
+
+CART -up-> WEB : **4.4:** articleAjouté
+
+' ===================================================
+
+' Messages Interface <-> Commande
+
+WEB -down-> ORDER : **5.1:** créerCommande(panier)
+
+
+ORDER -up-> WEB : **5.4:** commandePrête
+
+
+WEB -down-> ORDER : **6.3:** finaliserCommande()
+
+
+ORDER -up-> WEB : **6.6:** commandeTerminée
+
+' ===================================================
+
+' Messages Catalogue <-> Stock
+
+CAT -right-> STOCK : **1.2:** vérifierDisponibilité()
+
+
+STOCK -left-> CAT : **1.3:** listeDisponible
+
+' ===================================================
+
+' Messages Contraintes <-> Catalogue
+
+CONST -right-> CAT : **3.2:** obtenirContraintes(équipement)
+
+
+CAT -left-> CONST : **3.3:** règlesMétier
+
+' ===================================================
+
+' Messages Panier <-> Stock
+
+CART -right-> STOCK : **4.2:** réserverTemporairement()
+
+
+STOCK -left-> CART : **4.3:** stockRéservé
+
+' ===================================================
+
+' Messages Commande <-> Panier
+
+ORDER -left-> CART : **5.2:** obtenirArticles()
+
+
+CART -right-> ORDER : **5.3:** donnéesPanier
+
+' ===================================================
+
+' Messages Commande <-> Paiement
+
+ORDER -right-> PAY : **6.1:** traiterPaiement(location + caution)
+
+
+PAY -left-> ORDER : **6.2:** paiementValidé
+
+' ===================================================
+
+' Messages Commande <-> Email
+
+ORDER -down-> MAIL : **6.4:** envoyerConfirmation()
+
+
+MAIL -up-> ORDER : **6.5:** emailEnvoyé
+
+@enduml

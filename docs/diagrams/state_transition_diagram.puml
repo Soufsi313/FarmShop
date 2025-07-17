@@ -1,0 +1,101 @@
+@startuml State_Transition_Diagram
+!theme amiga
+title Diagramme d'États-Transitions - Cycle de Vie Équipement Agricole
+skinparam linetype ortho
+skinparam minlen 150
+skinparam nodesep 100
+skinparam ranksep 120
+
+[*] --> Disponible
+
+' === FLUX PRINCIPAL VERTICAL (COLONNE CENTRALE) ===
+
+state Disponible {
+  Disponible : Équipement en stock
+  Disponible : Prêt à être loué
+}
+
+state "Dans Panier" as DansPanier {
+  DansPanier : Ajouté au panier
+  DansPanier : Stock temporairement réservé
+}
+
+state "Commande Payée" as CommandePayee {
+  CommandePayee : Paiement validé
+  CommandePayee : Location + caution reçues
+}
+
+state "Prêt Récupération" as PretRecuperation {
+  PretRecuperation : Équipement préparé
+  PretRecuperation : Attend récupération client
+}
+
+state "En Location" as EnLocation {
+  EnLocation : Chez le client
+  EnLocation : Période de location active
+}
+
+state "Retourné" as Retourne {
+  Retourne : Rendu par le client
+  Retourne : Inspection en cours
+}
+
+state "Inspection OK" as InspectionOK {
+  InspectionOK : État conforme
+  InspectionOK : Caution remboursée intégralement
+}
+
+' === ÉTATS D'EXCEPTION (COLONNES LATÉRALES) ===
+
+state "Retard Pénalité" as RetardPenalite {
+  RetardPenalite : Retour en retard
+  RetardPenalite : Pénalités 10€/jour
+}
+
+state "Avec Dommages" as AvecDommages {
+  AvecDommages : Dommages constatés
+  AvecDommages : Frais déduits de caution
+}
+
+state "Panier Abandonné" as PanierAbandonne {
+  PanierAbandonne : Timeout ou abandon
+  PanierAbandonne : Stock libéré automatiquement
+}
+
+state "Erreur Paiement" as ErreurPaiement {
+  ErreurPaiement : Paiement échoué
+  ErreurPaiement : Retry possible
+}
+
+' === FLUX PRINCIPAL MÉTIER ===
+
+Disponible -down-> DansPanier : **Client ajoute au panier**
+DansPanier -down-> CommandePayee : **Paiement réussi**\n(location + caution)
+CommandePayee -down-> PretRecuperation : **Équipement préparé**
+PretRecuperation -down-> EnLocation : **Client récupère**
+EnLocation -down-> Retourne : **Retour dans les délais**
+Retourne -down-> InspectionOK : **Inspection OK**\n(aucun dommage)
+InspectionOK -up-> Disponible : **Caution remboursée**\nStock libéré
+
+' === GESTION DES RETARDS ===
+
+EnLocation -right-> RetardPenalite : **Retard de retour**
+RetardPenalite -down-> Retourne : **Retour tardif effectué**
+
+' === GESTION DES DOMMAGES ===
+
+Retourne -right-> AvecDommages : **Dommages détectés**
+AvecDommages -left-> Disponible : **Réparation terminée**\nCaution partiellement remboursée
+
+' === GESTION DES ABANDONS ===
+
+DansPanier -left-> PanierAbandonne : **Timeout ou abandon client**
+PanierAbandonne -right-> Disponible : **Stock libéré**
+
+' === GESTION ERREURS PAIEMENT ===
+
+DansPanier -left-> ErreurPaiement : **Paiement échoué**
+ErreurPaiement -right-> DansPanier : **Retry paiement**
+ErreurPaiement -down-> PanierAbandonne : **Abandon définitif**
+
+@enduml
