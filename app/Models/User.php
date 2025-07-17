@@ -236,6 +236,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Relations avec les wishlists
+     */
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    /**
      * Relations avec les commandes de location
      */
     public function orderLocations()

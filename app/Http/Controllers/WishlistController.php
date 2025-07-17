@@ -445,4 +445,30 @@ class WishlistController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Afficher la page web de la wishlist
+     */
+    public function showPage(Request $request)
+    {
+        $user = Auth::user();
+        
+        $wishlist = $user->wishlists()
+            ->with(['product' => function ($query) {
+                $query->with('category')
+                      ->where('is_active', true);
+            }])
+            ->orderBy('created_at', 'desc')
+            ->paginate($request->get('per_page', 12));
+
+        // Filtrer les produits qui ne sont plus actifs
+        $wishlist->getCollection()->transform(function ($wishlistItem) {
+            if (!$wishlistItem->product || !$wishlistItem->product->is_active) {
+                return null;
+            }
+            return $wishlistItem;
+        })->filter();
+
+        return view('wishlist.index', compact('wishlist'));
+    }
 }

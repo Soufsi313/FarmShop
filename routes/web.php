@@ -4,6 +4,7 @@ use App\Http\Controllers\RentalController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RentalCategoryController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -118,6 +119,9 @@ Route::middleware(['auth'])->group(function () {
     // Profil utilisateur
     Route::get('/profile', [UserController::class, 'show'])->name('users.profile');
     Route::put('/profile', [UserController::class, 'update'])->name('users.update');
+    
+    // Wishlist
+    Route::get('/wishlist', [WishlistController::class, 'showPage'])->name('wishlist.index');
     
     // Gestion des messages
     Route::patch('/messages/{message}/read', [UserController::class, 'markMessageAsRead'])->name('messages.read');
