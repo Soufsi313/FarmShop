@@ -174,36 +174,47 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($products as $product)
                             <div class="rental-card bg-white rounded-lg shadow-md overflow-hidden">
-                                <!-- Image -->
-                                <div class="relative h-48 bg-gray-200">
-                                    @if($product->main_image)
-                                        <img src="{{ asset('storage/' . $product->main_image) }}" 
-                                             alt="{{ $product->image_alt ?? $product->name }}"
-                                             class="w-full h-full object-cover">
-                                    @else
-                                        <div class="w-full h-full flex items-center justify-center text-gray-400">
-                                            <span class="text-4xl">📦</span>
-                                        </div>
-                                    @endif
-                                    
-                                    <!-- Badge catégorie -->
-                                    @if($product->rentalCategory)
-                                        <div class="absolute top-2 left-2 bg-purple-600 text-white px-2 py-1 rounded-md text-xs font-medium">
-                                            {{ $product->rentalCategory->name }}
-                                        </div>
-                                    @endif
+                                <!-- Image cliquable -->
+                                <a href="{{ route('rentals.show', $product) }}" class="block">
+                                    <div class="relative h-48 bg-gray-200">
+                                        @if($product->main_image)
+                                            <img src="{{ asset('storage/' . $product->main_image) }}" 
+                                                 alt="{{ $product->image_alt ?? $product->name }}"
+                                                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-200">
+                                        @else
+                                            <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                                <span class="text-4xl">📦</span>
+                                            </div>
+                                        @endif
+                                        
+                                        <!-- Badge catégorie -->
+                                        @if($product->rentalCategory)
+                                            <div class="absolute top-2 left-2 bg-purple-600 text-white px-2 py-1 rounded-md text-xs font-medium">
+                                                {{ $product->rentalCategory->name }}
+                                            </div>
+                                        @endif
 
-                                    <!-- Badge stock -->
-                                    <div class="absolute top-2 right-2 px-2 py-1 rounded-md text-xs font-medium
-                                               {{ $product->quantity > 10 ? 'bg-green-100 text-green-800' : 
-                                                  ($product->quantity > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
-                                        Stock: {{ $product->quantity }}
+                                        <!-- Badge stock -->
+                                        <div class="absolute top-2 right-2 px-2 py-1 rounded-md text-xs font-medium
+                                                   {{ $product->quantity > 10 ? 'bg-green-100 text-green-800' : 
+                                                      ($product->quantity > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
+                                            Stock: {{ $product->quantity }}
+                                        </div>
+
+                                        <!-- Overlay "Voir détails" -->
+                                        <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
+                                            <span class="text-white font-semibold opacity-0 hover:opacity-100 transition-opacity duration-200">
+                                                👁️ Voir détails
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
+                                </a>
 
                                 <!-- Contenu -->
                                 <div class="p-4">
-                                    <h3 class="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">{{ $product->name }}</h3>
+                                    <a href="{{ route('rentals.show', $product) }}" class="block">
+                                        <h3 class="font-semibold text-lg text-gray-900 mb-2 line-clamp-2 hover:text-purple-600 transition-colors">{{ $product->name }}</h3>
+                                    </a>
                                     
                                     @if($product->short_description)
                                         <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ $product->short_description }}</p>
@@ -232,9 +243,30 @@
                                     </div>
 
                                     <!-- Actions -->
-                                    <div class="flex space-x-2">
+                                    <div class="space-y-3">
                                         @auth
-                                            <!-- Sélecteur de quantité -->
+                                            <!-- Boutons Like et Wishlist -->
+                                            <div class="flex justify-between">
+                                                <button id="like_btn_{{ $product->slug }}" 
+                                                        onclick="toggleLike('{{ $product->slug }}')" 
+                                                        class="flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors {{ $product->isLikedByUser() ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500' }}">
+                                                    <span class="text-lg">{{ $product->isLikedByUser() ? '❤️' : '🤍' }}</span>
+                                                    <span>{{ $product->isLikedByUser() ? 'Aimé' : 'Aimer' }}</span>
+                                                </button>
+                                                
+                                                <button id="wishlist_btn_{{ $product->slug }}" 
+                                                        onclick="toggleWishlist('{{ $product->slug }}')" 
+                                                        class="flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors {{ $product->isInUserWishlist() ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-600 hover:bg-yellow-50 hover:text-yellow-500' }}">
+                                                    <span class="text-lg">{{ $product->isInUserWishlist() ? '⭐' : '☆' }}</span>
+                                                    <span>{{ $product->isInUserWishlist() ? 'En favoris' : 'Favoris' }}</span>
+                                                </button>
+                                            </div>
+                                        @endauth
+
+                                        <!-- Boutons de location -->
+                                        <div class="flex space-x-2">
+                                            @auth
+                                                <!-- Sélecteur de quantité -->
                                             <div class="flex items-center space-x-1 border rounded-md">
                                                 <button type="button" 
                                                         class="quantity-btn minus px-2 py-1 text-gray-500 hover:text-gray-700" 
@@ -264,6 +296,7 @@
                                                 Se connecter pour louer
                                             </a>
                                         @endauth
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -633,5 +666,78 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 });
+
+// Fonctions Like et Wishlist
+function toggleLike(productSlug) {
+    fetch(`/web/likes/products/${productSlug}/toggle`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const button = document.getElementById(`like_btn_${productSlug}`);
+            const icon = button.querySelector('span:first-child');
+            const text = button.querySelector('span:last-child');
+            
+            if (data.is_liked || data.liked) {
+                button.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors bg-red-100 text-red-600';
+                icon.textContent = '❤️';
+                text.textContent = 'Aimé';
+            } else {
+                button.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500';
+                icon.textContent = '🤍';
+                text.textContent = 'Aimer';
+            }
+        } else {
+            alert(data.message || 'Erreur lors de la mise à jour');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert('Une erreur est survenue');
+    });
+}
+
+function toggleWishlist(productSlug) {
+    fetch(`/web/wishlist/products/${productSlug}/toggle`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const button = document.getElementById(`wishlist_btn_${productSlug}`);
+            const icon = button.querySelector('span:first-child');
+            const text = button.querySelector('span:last-child');
+            
+            if (data.in_wishlist || data.is_wishlisted) {
+                button.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors bg-yellow-100 text-yellow-600';
+                icon.textContent = '⭐';
+                text.textContent = 'En favoris';
+            } else {
+                button.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors bg-gray-100 text-gray-600 hover:bg-yellow-50 hover:text-yellow-500';
+                icon.textContent = '☆';
+                text.textContent = 'Favoris';
+            }
+        } else {
+            alert(data.message || 'Erreur lors de la mise à jour');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert('Une erreur est survenue');
+    });
+}
 </script>
 @endpush

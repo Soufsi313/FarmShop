@@ -144,7 +144,15 @@ class ProductLikeController extends Controller
      */
     public function toggle(Product $product): JsonResponse
     {
-        $user = Auth::user();
+        // Utiliser explicitement le guard web
+        $user = Auth::guard('web')->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous devez être connecté pour effectuer cette action'
+            ], 401);
+        }
 
         // Vérifier que le produit est actif
         if (!$product->is_active) {
@@ -180,7 +188,8 @@ class ProductLikeController extends Controller
             'success' => true,
             'message' => $message,
             'data' => [
-                'liked' => $liked,
+                'is_liked' => $liked,
+                'liked' => $liked, // Alias pour compatibilité
                 'likes_count' => $likesCount,
                 'product' => $product->load('category')
             ]

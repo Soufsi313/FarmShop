@@ -81,7 +81,7 @@
                     @if($product)
                         <div class="wishlist-item bg-white rounded-lg shadow-md overflow-hidden relative">
                             <!-- Bouton de suppression -->
-                            <button @click="removeFromWishlist({{ $product->id }})"
+                            <button @click="removeFromWishlist('{{ $product->slug }}')"
                                     class="remove-button absolute top-2 right-2 z-10 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -297,18 +297,20 @@ document.addEventListener('alpine:init', () => {
             }, 3000);
         },
 
-        async removeFromWishlist(productId) {
+        async removeFromWishlist(productSlug) {
             if (!confirm('Êtes-vous sûr de vouloir retirer ce produit de votre liste de souhaits ?')) {
                 return;
             }
 
             try {
-                const response = await fetch(`/api/wishlist/products/${productId}`, {
+                const response = await fetch(`/web/wishlist/products/${productSlug}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
+                    },
+                    credentials: 'same-origin'
                 });
 
                 const data = await response.json();
@@ -333,12 +335,14 @@ document.addEventListener('alpine:init', () => {
             }
 
             try {
-                const response = await fetch('/api/wishlist/clear', {
+                const response = await fetch('/web/wishlist/clear', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
+                    },
+                    credentials: 'same-origin'
                 });
 
                 const data = await response.json();

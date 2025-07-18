@@ -90,7 +90,14 @@ class WishlistController extends Controller
      */
     public function destroy(Product $product): JsonResponse
     {
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Utilisateur non authentifié'
+            ], 401);
+        }
 
         // Chercher l'élément dans la wishlist
         $wishlistItem = Wishlist::where('user_id', $user->id)
@@ -119,7 +126,15 @@ class WishlistController extends Controller
      */
     public function toggle(Product $product): JsonResponse
     {
-        $user = Auth::user();
+        // Utiliser explicitement le guard web
+        $user = Auth::guard('web')->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous devez être connecté pour effectuer cette action'
+            ], 401);
+        }
 
         // Vérifier que le produit est actif
         if (!$product->is_active) {
@@ -156,8 +171,10 @@ class WishlistController extends Controller
             'message' => $message,
             'data' => [
                 'in_wishlist' => $inWishlist,
+                'is_wishlisted' => $inWishlist, // Alias pour compatibilité
                 'wishlist_item' => $wishlistItem,
-                'total_items' => $user->wishlists()->count()
+                'total_items' => $user->wishlists()->count(),
+                'product' => $product->load('category')
             ]
         ]);
     }
@@ -167,7 +184,14 @@ class WishlistController extends Controller
      */
     public function clear(): JsonResponse
     {
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Utilisateur non authentifié'
+            ], 401);
+        }
         
         $deletedCount = $user->wishlists()->delete();
 

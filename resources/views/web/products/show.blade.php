@@ -278,23 +278,23 @@
                     @auth
                         <div class="flex space-x-4">
                             <!-- Like -->
-                            <button onclick="toggleLike({{ $product->id }})" 
-                                    id="like_btn"
+                            <button onclick="toggleLike('{{ $product->slug }}')" 
+                                    id="like_btn_{{ $product->slug }}"
                                     class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors {{ $isLiked ? 'text-red-500 border-red-300' : 'text-gray-700' }}">
-                                <svg class="w-5 h-5" fill="{{ $isLiked ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 {{ $isLiked ? 'text-red-500' : 'text-gray-400' }}" fill="{{ $isLiked ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                 </svg>
-                                <span id="like_text">{{ $isLiked ? 'Aimé' : 'Aimer' }}</span>
+                                <span>{{ $isLiked ? 'J\'aime' : 'Aimer' }}</span>
                             </button>
 
                             <!-- Wishlist -->
-                            <button onclick="toggleWishlist({{ $product->id }})" 
-                                    id="wishlist_btn"
+                            <button onclick="toggleWishlist('{{ $product->slug }}')" 
+                                    id="wishlist_btn_{{ $product->slug }}"
                                     class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors {{ $isInWishlist ? 'text-blue-500 border-blue-300' : 'text-gray-700' }}">
-                                <svg class="w-5 h-5" fill="{{ $isInWishlist ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 {{ $isInWishlist ? 'text-blue-500' : 'text-gray-400' }}" fill="{{ $isInWishlist ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
                                 </svg>
-                                <span id="wishlist_text">{{ $isInWishlist ? 'En wishlist' : 'Wishlist' }}</span>
+                                <span>{{ $isInWishlist ? 'Dans ma wishlist' : 'Ajouter à ma wishlist' }}</span>
                             </button>
                         </div>
                     @endauth
@@ -530,79 +530,137 @@ function buyNow(productId) {
     form.submit();
 }
 
-async function toggleLike(productId) {
+async function toggleLike(productSlug) {
+    // Debug: vérifier l'état d'authentification
+    console.log('Démarrage toggleLike pour:', productSlug);
+    console.log('Cookies présents:', document.cookie);
+    
     try {
-        const response = await fetch(`/api/products/${productId}/toggle-like`, {
+        const response = await fetch(`/web/likes/products/${productSlug}/toggle`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
         });
 
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+
+        // Vérifier si la réponse est ok
+        if (!response.ok) {
+            // Si c'est une erreur 401, rediriger vers la page de connexion
+            if (response.status === 401) {
+                showNotification('Vous devez être connecté pour effectuer cette action', 'error');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+                return;
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
+        console.log('Response data:', data);
         
         if (data.success) {
-            const btn = document.getElementById('like_btn');
+            const btn = document.getElementById(`like_btn_${productSlug}`);
             const icon = btn.querySelector('svg');
-            const text = document.getElementById('like_text');
+            const text = btn.querySelector('span');
             
-            if (data.is_liked) {
-                btn.classList.add('text-red-500', 'border-red-300');
-                btn.classList.remove('text-gray-700');
+            // Compatibilité avec les deux formats de réponse
+            const isLiked = data.data.is_liked || data.data.liked;
+            
+            if (isLiked) {
+                icon.classList.remove('text-gray-400');
+                icon.classList.add('text-red-500');
                 icon.setAttribute('fill', 'currentColor');
-                text.textContent = 'Aimé';
+                text.textContent = 'J\'aime';
             } else {
-                btn.classList.remove('text-red-500', 'border-red-300');
-                btn.classList.add('text-gray-700');
+                icon.classList.remove('text-red-500');
+                icon.classList.add('text-gray-400');
                 icon.setAttribute('fill', 'none');
                 text.textContent = 'Aimer';
-            }
-        } else {
-            showNotification(data.message || 'Erreur', 'error');
-        }
-    } catch (error) {
-        console.error('Erreur:', error);
-        showNotification('Erreur lors de l\'action', 'error');
-    }
-}
-
-async function toggleWishlist(productId) {
-    try {
-        const response = await fetch(`/api/products/${productId}/toggle-wishlist`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-            const btn = document.getElementById('wishlist_btn');
-            const icon = btn.querySelector('svg');
-            const text = document.getElementById('wishlist_text');
-            
-            if (data.is_in_wishlist) {
-                btn.classList.add('text-blue-500', 'border-blue-300');
-                btn.classList.remove('text-gray-700');
-                icon.setAttribute('fill', 'currentColor');
-                text.textContent = 'En wishlist';
-            } else {
-                btn.classList.remove('text-blue-500', 'border-blue-300');
-                btn.classList.add('text-gray-700');
-                icon.setAttribute('fill', 'none');
-                text.textContent = 'Wishlist';
             }
             
             showNotification(data.message, 'success');
         } else {
-            showNotification(data.message || 'Erreur', 'error');
+            showNotification(data.message || 'Erreur lors de l\'action', 'error');
         }
     } catch (error) {
-        console.error('Erreur:', error);
-        showNotification('Erreur lors de l\'action', 'error');
+        console.error('Erreur détaillée:', error);
+        
+        // Afficher une erreur plus spécifique
+        if (error.message.includes('404')) {
+            showNotification('Produit non trouvé', 'error');
+        } else if (error.message.includes('401')) {
+            showNotification('Vous devez être connecté pour effectuer cette action', 'error');
+        } else if (error.message.includes('500')) {
+            showNotification('Erreur serveur. Veuillez réessayer plus tard.', 'error');
+        } else {
+            showNotification('Erreur lors de l\'action. Vérifiez votre connexion.', 'error');
+        }
+    }
+}
+
+async function toggleWishlist(productSlug) {
+    try {
+        const response = await fetch(`/web/wishlist/products/${productSlug}/toggle`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+        });
+
+        // Vérifier si la réponse est ok
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            const btn = document.getElementById(`wishlist_btn_${productSlug}`);
+            const icon = btn.querySelector('svg');
+            const text = btn.querySelector('span');
+            
+            // Compatibilité avec les deux formats de réponse
+            const isWishlisted = data.data.is_wishlisted || data.data.in_wishlist;
+            
+            if (isWishlisted) {
+                icon.classList.remove('text-gray-400');
+                icon.classList.add('text-blue-500');
+                icon.setAttribute('fill', 'currentColor');
+                text.textContent = 'Dans ma wishlist';
+            } else {
+                icon.classList.remove('text-blue-500');
+                icon.classList.add('text-gray-400');
+                icon.setAttribute('fill', 'none');
+                text.textContent = 'Ajouter à ma wishlist';
+            }
+            
+            showNotification(data.message, 'success');
+        } else {
+            showNotification(data.message || 'Erreur lors de l\'action', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur détaillée:', error);
+        
+        // Afficher une erreur plus spécifique
+        if (error.message.includes('404')) {
+            showNotification('Produit non trouvé', 'error');
+        } else if (error.message.includes('401')) {
+            showNotification('Vous devez être connecté pour effectuer cette action', 'error');
+        } else if (error.message.includes('500')) {
+            showNotification('Erreur serveur. Veuillez réessayer plus tard.', 'error');
+        } else {
+            showNotification('Erreur lors de l\'action. Vérifiez votre connexion.', 'error');
+        }
     }
 }
 

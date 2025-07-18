@@ -316,6 +316,22 @@ class Product extends Model
     }
 
     /**
+     * Vérifier si le produit est aimé par l'utilisateur connecté
+     */
+    public function isLikedByUser()
+    {
+        return auth()->check() && $this->isLikedBy(auth()->user());
+    }
+
+    /**
+     * Vérifier si le produit est dans la wishlist de l'utilisateur connecté
+     */
+    public function isInUserWishlist()
+    {
+        return auth()->check() && $this->isInWishlistOf(auth()->user());
+    }
+
+    /**
      * Gestion du stock
      */
     public function decreaseStock($quantity)
@@ -543,5 +559,13 @@ class Product extends Model
             'in_stock' => static::inStock()->count(),
             'alerts' => static::getStockAlerts()->count()
         ];
+    }
+
+    /**
+     * Utiliser le slug comme clé de route
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
     }
 }

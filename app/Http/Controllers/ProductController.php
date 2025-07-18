@@ -198,8 +198,10 @@ class ProductController extends Controller
             'success' => true,
             'message' => $message,
             'data' => [
-                'liked' => $liked,
-                'likes_count' => $likesCount
+                'is_liked' => $liked,
+                'liked' => $liked, // Alias pour compatibilité
+                'likes_count' => $likesCount,
+                'product' => $product->load('category')
             ]
         ]);
     }
@@ -232,7 +234,10 @@ class ProductController extends Controller
             'success' => true,
             'message' => $message,
             'data' => [
-                'in_wishlist' => $inWishlist
+                'in_wishlist' => $inWishlist,
+                'is_wishlisted' => $inWishlist, // Alias pour compatibilité
+                'total_items' => $user->wishlists()->count(),
+                'product' => $product->load('category')
             ]
         ]);
     }

@@ -17,7 +17,21 @@
         height: 5px;
         border-radius: 5px;
         background: #ddd;
-        outline: none;
+                if (data.success) {
+            const btn = document.getElementById(`like_btn_${productId}`);
+            const icon = btn.querySelector('svg');
+            
+            if (data.data.liked) {
+                icon.classList.remove('text-gray-400');
+                icon.classList.add('text-red-500');
+                icon.setAttribute('fill', 'currentColor');
+            } else {
+                icon.classList.remove('text-red-500');
+                icon.classList.add('text-gray-400');
+                icon.setAttribute('fill', 'none');
+            }
+            
+            showNotification(data.message, 'success');
     }
     .price-range-slider::-webkit-slider-thumb {
         -webkit-appearance: none;
@@ -300,8 +314,8 @@
                                         @auth
                                             <div class="flex space-x-2">
                                                 <!-- Like -->
-                                                <button onclick="toggleLike({{ $product->id }})" 
-                                                        id="like_btn_{{ $product->id }}"
+                                                <button onclick="toggleLike('{{ $product->slug }}')" 
+                                                        id="like_btn_{{ $product->slug }}"
                                                         class="p-2 rounded-full hover:bg-gray-100 transition-colors"
                                                         title="Aimer">
                                                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -310,8 +324,8 @@
                                                 </button>
 
                                                 <!-- Wishlist -->
-                                                <button onclick="toggleWishlist({{ $product->id }})" 
-                                                        id="wishlist_btn_{{ $product->id }}"
+                                                <button onclick="toggleWishlist('{{ $product->slug }}')" 
+                                                        id="wishlist_btn_{{ $product->slug }}"
                                                         class="p-2 rounded-full hover:bg-gray-100 transition-colors"
                                                         title="Ajouter à la wishlist">
                                                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -441,23 +455,28 @@ function buyNow(productId) {
     form.submit();
 }
 
-async function toggleLike(productId) {
+async function toggleLike(productSlug) {
     try {
-        const response = await fetch(`/api/products/${productId}/toggle-like`, {
+        const response = await fetch(`/web/likes/products/${productSlug}/toggle`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
         });
 
         const data = await response.json();
         
         if (data.success) {
-            const btn = document.getElementById(`like_btn_${productId}`);
+            const btn = document.getElementById(`like_btn_${productSlug}`);
             const icon = btn.querySelector('svg');
             
-            if (data.is_liked) {
+            // Compatibilité avec les deux formats de réponse
+            const isLiked = data.data.is_liked || data.data.liked;
+            
+            if (isLiked) {
                 icon.classList.remove('text-gray-400');
                 icon.classList.add('text-red-500');
                 icon.setAttribute('fill', 'currentColor');
@@ -466,6 +485,7 @@ async function toggleLike(productId) {
                 icon.classList.add('text-gray-400');
                 icon.setAttribute('fill', 'none');
             }
+            showNotification(data.message, 'success');
         } else {
             showNotification(data.message || 'Erreur', 'error');
         }
@@ -475,23 +495,28 @@ async function toggleLike(productId) {
     }
 }
 
-async function toggleWishlist(productId) {
+async function toggleWishlist(productSlug) {
     try {
-        const response = await fetch(`/api/products/${productId}/toggle-wishlist`, {
+        const response = await fetch(`/web/wishlist/products/${productSlug}/toggle`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
         });
 
         const data = await response.json();
         
         if (data.success) {
-            const btn = document.getElementById(`wishlist_btn_${productId}`);
+            const btn = document.getElementById(`wishlist_btn_${productSlug}`);
             const icon = btn.querySelector('svg');
             
-            if (data.is_in_wishlist) {
+            // Compatibilité avec les deux formats de réponse
+            const isWishlisted = data.data.is_wishlisted || data.data.in_wishlist;
+            
+            if (isWishlisted) {
                 icon.classList.remove('text-gray-400');
                 icon.classList.add('text-blue-500');
                 icon.setAttribute('fill', 'currentColor');

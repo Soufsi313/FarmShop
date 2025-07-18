@@ -98,6 +98,37 @@
                     
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $product->name }}</h1>
                     
+                    <!-- Actions rapides (Like et Wishlist) -->
+                    @auth
+                        <div class="flex items-center space-x-3 mb-4">
+                            <button id="like_btn_{{ $product->slug }}" 
+                                    onclick="toggleLike('{{ $product->slug }}')"
+                                    class="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                                <svg class="w-5 h-5 {{ $product->isLikedByUser() ? 'text-red-500' : 'text-gray-400' }}" 
+                                     fill="{{ $product->isLikedByUser() ? 'currentColor' : 'none' }}" 
+                                     stroke="currentColor" 
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                                <span class="text-sm font-medium">{{ $product->isLikedByUser() ? 'J\'aime' : 'Aimer' }}</span>
+                            </button>
+
+                            <button id="wishlist_btn_{{ $product->slug }}" 
+                                    onclick="toggleWishlist('{{ $product->slug }}')"
+                                    class="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                                <svg class="w-5 h-5 {{ $product->isInUserWishlist() ? 'text-blue-500' : 'text-gray-400' }}" 
+                                     fill="{{ $product->isInUserWishlist() ? 'currentColor' : 'none' }}" 
+                                     stroke="currentColor" 
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                                </svg>
+                                <span class="text-sm font-medium">{{ $product->isInUserWishlist() ? 'Dans ma wishlist' : 'Ajouter à ma wishlist' }}</span>
+                            </button>
+                        </div>
+                    @endauth
+                    
                     @if($product->short_description)
                         <p class="text-lg text-gray-600">{{ $product->short_description }}</p>
                     @endif
@@ -600,5 +631,140 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 });
+
+// Fonctions Like et Wishlist
+async function toggleLike(productSlug) {
+    try {
+        const response = await fetch(`/web/likes/products/${productSlug}/toggle`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+        });
+
+        // Vérifier si la réponse est ok
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            const btn = document.getElementById(`like_btn_${productSlug}`);
+            const icon = btn.querySelector('svg');
+            const text = btn.querySelector('span');
+            
+            // Compatibilité avec les deux formats de réponse
+            const isLiked = data.data.is_liked || data.data.liked;
+            
+            if (isLiked) {
+                icon.classList.remove('text-gray-400');
+                icon.classList.add('text-red-500');
+                icon.setAttribute('fill', 'currentColor');
+                text.textContent = 'J\'aime';
+            } else {
+                icon.classList.remove('text-red-500');
+                icon.classList.add('text-gray-400');
+                icon.setAttribute('fill', 'none');
+                text.textContent = 'Aimer';
+            }
+            
+            showNotification(data.message, 'success');
+        } else {
+            showNotification(data.message || 'Erreur lors de l\'action', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur détaillée:', error);
+        
+        // Afficher une erreur plus spécifique
+        if (error.message.includes('404')) {
+            showNotification('Produit non trouvé', 'error');
+        } else if (error.message.includes('401')) {
+            showNotification('Vous devez être connecté pour effectuer cette action', 'error');
+        } else if (error.message.includes('500')) {
+            showNotification('Erreur serveur. Veuillez réessayer plus tard.', 'error');
+        } else {
+            showNotification('Erreur lors de l\'action. Vérifiez votre connexion.', 'error');
+        }
+    }
+}
+
+async function toggleWishlist(productSlug) {
+    try {
+        const response = await fetch(`/web/wishlist/products/${productSlug}/toggle`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+        });
+
+        // Vérifier si la réponse est ok
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            const btn = document.getElementById(`wishlist_btn_${productSlug}`);
+            const icon = btn.querySelector('svg');
+            const text = btn.querySelector('span');
+            
+            // Compatibilité avec les deux formats de réponse
+            const isWishlisted = data.data.is_wishlisted || data.data.in_wishlist;
+            
+            if (isWishlisted) {
+                icon.classList.remove('text-gray-400');
+                icon.classList.add('text-blue-500');
+                icon.setAttribute('fill', 'currentColor');
+                text.textContent = 'Dans ma wishlist';
+            } else {
+                icon.classList.remove('text-blue-500');
+                icon.classList.add('text-gray-400');
+                icon.setAttribute('fill', 'none');
+                text.textContent = 'Ajouter à ma wishlist';
+            }
+            
+            showNotification(data.message, 'success');
+        } else {
+            showNotification(data.message || 'Erreur lors de l\'action', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur détaillée:', error);
+        
+        // Afficher une erreur plus spécifique
+        if (error.message.includes('404')) {
+            showNotification('Produit non trouvé', 'error');
+        } else if (error.message.includes('401')) {
+            showNotification('Vous devez être connecté pour effectuer cette action', 'error');
+        } else if (error.message.includes('500')) {
+            showNotification('Erreur serveur. Veuillez réessayer plus tard.', 'error');
+        } else {
+            showNotification('Erreur lors de l\'action. Vérifiez votre connexion.', 'error');
+        }
+    }
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-md shadow-lg max-w-sm ${
+        type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
+        type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
+        'bg-blue-100 text-blue-800 border border-blue-200'
+    }`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
 </script>
 @endpush

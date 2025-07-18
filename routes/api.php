@@ -31,8 +31,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth:web')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+// Route de test pour l'authentification
+Route::middleware('auth:web')->get('/test-auth', function (Request $request) {
+    return response()->json([
+        'authenticated' => true,
+        'user' => $request->user(),
+        'session_id' => session()->getId(),
+        'csrf_token' => csrf_token()
+    ]);
 });
 
 // Routes publiques pour l'inscription
@@ -99,7 +109,7 @@ Route::post('/special-offers/calculate-discount', [App\Http\Controllers\SpecialO
 Route::post('/stripe/webhook', [StripePaymentController::class, 'webhook'])->name('api.stripe.webhook');
 
 // Routes protégées nécessitant une authentification
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:web'])->group(function () {
     
     // Routes utilisateur standard
     Route::get('/profile', [UserController::class, 'show'])->name('api.users.profile');
@@ -199,7 +209,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/checkout/prepare', [CartLocationController::class, 'prepareForCheckout'])->name('prepare-checkout');
     });
     
-    // Routes API pour les fonctionnalités de location
+    // Routes API pour les fonctionnalités de location (publiques)
     Route::prefix('rentals')->name('api.rentals.')->group(function () {
         Route::get('/{product}/constraints', [RentalController::class, 'getProductConstraints'])->name('constraints');
         Route::post('/{product}/calculate-cost', [RentalController::class, 'calculateRentalCost'])->name('calculate-cost');
@@ -388,7 +398,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         });
         
         // Routes pour le système de commandes
-        Route::middleware(['auth:sanctum'])->group(function () {
+        Route::middleware(['auth:web'])->group(function () {
             // Routes commandes pour les utilisateurs connectés
             Route::prefix('orders')->name('api.orders.')->group(function () {
                 Route::get('/', [App\Http\Controllers\OrderController::class, 'index'])->name('index');
@@ -515,4 +525,10 @@ Route::prefix('stripe')->name('api.stripe.')->group(function () {
     Route::post('/cancel-rental/{orderLocation}', [StripePaymentController::class, 'cancelRentalOrder'])->name('cancel-rental');
     Route::post('/rental/return/{orderLocation}', [StripePaymentController::class, 'markRentalAsReturned'])->name('rental.return');
     Route::get('/payment-info', [StripePaymentController::class, 'getPaymentInfo'])->name('payment-info');
+});
+
+// Routes pour les interactions web (likes, wishlist) avec authentification web
+Route::middleware(['auth:web'])->group(function () {
+    Route::post('/likes/products/{product}/toggle', [ProductLikeController::class, 'toggle'])->name('api.likes.web.toggle');
+    Route::post('/wishlist/products/{product}/toggle', [WishlistController::class, 'toggle'])->name('api.wishlist.web.toggle');
 });
