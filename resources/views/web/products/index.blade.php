@@ -310,15 +310,24 @@
                                             Voir le détail →
                                         </a>
 
+                                        <!-- Compteur de likes (visible par tous) -->
+                                        <div class="flex items-center space-x-1 text-sm text-gray-500 mt-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                            </svg>
+                                            <span id="likes_count_{{ $product->slug }}">{{ $product->getLikesCount() }}</span>
+                                            <span>{{ $product->getLikesCount() === 1 ? 'like' : 'likes' }}</span>
+                                        </div>
+
                                         <!-- Actions utilisateur -->
                                         @auth
                                             <div class="flex space-x-2">
                                                 <!-- Like -->
                                                 <button onclick="toggleLike('{{ $product->slug }}')" 
                                                         id="like_btn_{{ $product->slug }}"
-                                                        class="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                                                        title="Aimer">
-                                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        class="p-2 rounded-full hover:bg-gray-100 transition-colors {{ $product->isLikedByUser() ? 'text-red-500' : 'text-gray-400' }}"
+                                                        title="{{ $product->isLikedByUser() ? 'Ne plus aimer' : 'Aimer' }}">
+                                                    <svg class="w-5 h-5" fill="{{ $product->isLikedByUser() ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                                     </svg>
                                                 </button>
@@ -326,9 +335,9 @@
                                                 <!-- Wishlist -->
                                                 <button onclick="toggleWishlist('{{ $product->slug }}')" 
                                                         id="wishlist_btn_{{ $product->slug }}"
-                                                        class="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                                                        title="Ajouter à la wishlist">
-                                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        class="p-2 rounded-full hover:bg-gray-100 transition-colors {{ $product->isInUserWishlist() ? 'text-yellow-500' : 'text-gray-400' }}"
+                                                        title="{{ $product->isInUserWishlist() ? 'Retirer des favoris' : 'Ajouter aux favoris' }}">
+                                                    <svg class="w-5 h-5" fill="{{ $product->isInUserWishlist() ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
                                                     </svg>
                                                 </button>
@@ -472,19 +481,30 @@ async function toggleLike(productSlug) {
         if (data.success) {
             const btn = document.getElementById(`like_btn_${productSlug}`);
             const icon = btn.querySelector('svg');
+            const likesCountElement = document.getElementById(`likes_count_${productSlug}`);
             
             // Compatibilité avec les deux formats de réponse
             const isLiked = data.data.is_liked || data.data.liked;
+            const likesCount = data.data.likes_count || 0;
             
+            // Mettre à jour le bouton
             if (isLiked) {
-                icon.classList.remove('text-gray-400');
-                icon.classList.add('text-red-500');
+                btn.classList.remove('text-gray-400');
+                btn.classList.add('text-red-500');
                 icon.setAttribute('fill', 'currentColor');
+                btn.setAttribute('title', 'Ne plus aimer');
             } else {
-                icon.classList.remove('text-red-500');
-                icon.classList.add('text-gray-400');
+                btn.classList.remove('text-red-500');
+                btn.classList.add('text-gray-400');
                 icon.setAttribute('fill', 'none');
+                btn.setAttribute('title', 'Aimer');
             }
+            
+            // Mettre à jour le compteur
+            if (likesCountElement) {
+                likesCountElement.textContent = likesCount;
+            }
+            
             showNotification(data.message, 'success');
         } else {
             showNotification(data.message || 'Erreur', 'error');

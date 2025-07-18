@@ -97,6 +97,14 @@
                     @endif
                     
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $product->name }}</h1>
+                    <!-- Compteur de likes (visible par tous) -->
+                    <div class="flex items-center space-x-2 text-lg text-gray-600 mb-4">
+                        <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                        <span id="likes_count_{{ $product->slug }}" class="font-semibold">{{ $product->getLikesCount() }}</span>
+                        <span>{{ $product->getLikesCount() === 1 ? 'personne aime ce produit' : 'personnes aiment ce produit' }}</span>
+                    </div>
                     
                     <!-- Actions rapides (Like et Wishlist) -->
                     @auth
@@ -656,9 +664,11 @@ async function toggleLike(productSlug) {
             const btn = document.getElementById(`like_btn_${productSlug}`);
             const icon = btn.querySelector('svg');
             const text = btn.querySelector('span');
+            const likesCountElement = document.getElementById(`likes_count_${productSlug}`);
             
             // Compatibilité avec les deux formats de réponse
             const isLiked = data.data.is_liked || data.data.liked;
+            const likesCount = data.data.likes_count || 0;
             
             if (isLiked) {
                 icon.classList.remove('text-gray-400');
@@ -670,6 +680,11 @@ async function toggleLike(productSlug) {
                 icon.classList.add('text-gray-400');
                 icon.setAttribute('fill', 'none');
                 text.textContent = 'Aimer';
+            }
+            
+            // Mettre à jour le compteur
+            if (likesCountElement) {
+                likesCountElement.textContent = likesCount;
             }
             
             showNotification(data.message, 'success');

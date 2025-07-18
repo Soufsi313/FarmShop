@@ -324,6 +324,29 @@ class Product extends Model
     }
 
     /**
+     * Obtenir le nombre total de likes
+     */
+    public function getLikesCount(): int
+    {
+        return $this->likes_count ?? 0;
+    }
+
+    /**
+     * Obtenir le texte formaté pour le compteur de likes
+     */
+    public function getLikesCountText(): string
+    {
+        $count = $this->getLikesCount();
+        if ($count === 0) {
+            return '';
+        } elseif ($count === 1) {
+            return '1 like';
+        } else {
+            return $count . ' likes';
+        }
+    }
+
+    /**
      * Vérifier si le produit est dans la wishlist de l'utilisateur connecté
      */
     public function isInUserWishlist()

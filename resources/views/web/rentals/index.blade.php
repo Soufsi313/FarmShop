@@ -242,6 +242,15 @@
                                         @endif
                                     </div>
 
+                                    <!-- Compteur de likes (visible par tous) -->
+                                    <div class="flex items-center space-x-1 text-sm text-gray-500 mb-2">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                        </svg>
+                                        <span id="likes_count_{{ $product->slug }}">{{ $product->getLikesCount() }}</span>
+                                        <span>{{ $product->getLikesCount() === 1 ? 'like' : 'likes' }}</span>
+                                    </div>
+
                                     <!-- Actions -->
                                     <div class="space-y-3">
                                         @auth
@@ -684,8 +693,12 @@ function toggleLike(productSlug) {
             const button = document.getElementById(`like_btn_${productSlug}`);
             const icon = button.querySelector('span:first-child');
             const text = button.querySelector('span:last-child');
+            const likesCountElement = document.getElementById(`likes_count_${productSlug}`);
             
-            if (data.is_liked || data.liked) {
+            const isLiked = data.is_liked || data.liked;
+            const likesCount = data.data ? data.data.likes_count || 0 : 0;
+            
+            if (isLiked) {
                 button.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors bg-red-100 text-red-600';
                 icon.textContent = '❤️';
                 text.textContent = 'Aimé';
@@ -693,6 +706,11 @@ function toggleLike(productSlug) {
                 button.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500';
                 icon.textContent = '🤍';
                 text.textContent = 'Aimer';
+            }
+            
+            // Mettre à jour le compteur
+            if (likesCountElement) {
+                likesCountElement.textContent = likesCount;
             }
         } else {
             alert(data.message || 'Erreur lors de la mise à jour');

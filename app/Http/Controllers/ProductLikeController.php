@@ -182,7 +182,9 @@ class ProductLikeController extends Controller
             $liked = true;
         }
 
+        // Mettre à jour le compteur de likes dans la table products
         $likesCount = $product->likes()->count();
+        $product->update(['likes_count' => $likesCount]);
 
         return response()->json([
             'success' => true,
