@@ -523,26 +523,6 @@
                     </div>
                 </div>
 
-                <!-- Catégorie -->
-                <div class="bg-white shadow-sm rounded-lg">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900">Catégorie</h3>
-                    </div>
-                    <div class="p-6">
-                        <select name="blog_category_id" id="blog_category_id" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
-                            <option value="">Sélectionner une catégorie</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ old('blog_category_id') == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('blog_category_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
                 <!-- Image mise en avant -->
                 <div class="section-card">
                     <div class="section-header">

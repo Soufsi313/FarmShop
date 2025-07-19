@@ -43,6 +43,12 @@ class DatabaseSeeder extends Seeder
         // Créer les messages (datafixture)
         $this->call(MessageSeeder::class);
         
+        // Créer les catégories de blog
+        $this->call(BlogCategorySeeder::class);
+        
+        // Créer les articles de blog
+        $this->call(BlogPostSeeder::class);
+        
         // User::factory(10)->create();
 
         // User::factory()->create([

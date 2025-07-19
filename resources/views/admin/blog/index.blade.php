@@ -400,18 +400,31 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end space-x-2">
                                         @if($post->status === 'published')
-                                            <a href="/blog/{{ $post->slug }}" target="_blank" class="text-blue-600 hover:text-blue-900" title="Voir">
+                                            <a href="/blog/{{ $post->slug }}" target="_blank" 
+                                               class="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-50 transition-colors" 
+                                               title="Voir l'article">
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                                 </svg>
                                             </a>
                                         @endif
-                                        <span class="text-gray-400" title="Édition non disponible - utilisez l'API">
+                                        
+                                        <a href="{{ route('admin.blog.edit', $post) }}" 
+                                           class="text-green-600 hover:text-green-900 p-1 rounded-full hover:bg-green-50 transition-colors" 
+                                           title="Modifier l'article">
                                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                             </svg>
-                                        </span>
+                                        </a>
+                                        
+                                        <button @click="deletePost({{ $post->id }}, '{{ addslashes($post->title) }}')" 
+                                                class="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 transition-colors" 
+                                                title="Supprimer l'article">
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -466,6 +479,82 @@
             </div>
         </div>
     </div>
+    
+    <!-- Modal de confirmation de suppression -->
+    <div x-show="showDeleteModal" 
+         x-transition:enter="transition ease-out duration-300" 
+         x-transition:enter-start="opacity-0" 
+         x-transition:enter-end="opacity-100" 
+         x-transition:leave="transition ease-in duration-200" 
+         x-transition:leave-start="opacity-100" 
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4"
+         style="display: none;">
+        
+        <!-- Overlay -->
+        <div class="absolute inset-0 bg-black bg-opacity-50" @click="cancelDelete()"></div>
+        
+        <!-- Modal Content -->
+        <div x-transition:enter="transition ease-out duration-300" 
+             x-transition:enter-start="opacity-0 transform scale-95" 
+             x-transition:enter-end="opacity-100 transform scale-100" 
+             x-transition:leave="transition ease-in duration-200" 
+             x-transition:leave-start="opacity-100 transform scale-100" 
+             x-transition:leave-end="opacity-0 transform scale-95"
+             class="relative bg-white rounded-lg shadow-xl max-w-md w-full z-10"
+             @click.stop>
+            
+            <!-- En-tête -->
+            <div class="px-6 py-4 border-b">
+                <h3 class="text-lg font-medium text-gray-900">
+                    Confirmer la suppression
+                </h3>
+            </div>
+            
+            <!-- Contenu -->
+            <div class="px-6 py-4">
+                <div class="flex items-center mb-4">
+                    <div class="flex-shrink-0">
+                        <svg class="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-gray-700">
+                            Êtes-vous sûr de vouloir supprimer l'article <strong x-text="deletePostData.title"></strong> ?
+                        </p>
+                        <p class="text-sm text-gray-500 mt-1">
+                            Cette action est irréversible.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="px-6 py-4 bg-gray-50 border-t flex justify-end space-x-3">
+                <button @click="cancelDelete()" 
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+                    Annuler
+                </button>
+                <button @click="confirmDelete()" 
+                        :disabled="loading"
+                        class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    <span x-show="!loading">Supprimer</span>
+                    <span x-show="loading" class="flex items-center">
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Suppression...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -473,10 +562,89 @@
 document.addEventListener('alpine:init', () => {
     Alpine.data('blogManager', () => ({
         loading: false,
+        showDeleteModal: false,
+        deletePostData: {
+            id: null,
+            title: ''
+        },
         
         init() {
             // Initialisation du gestionnaire de blog
             console.log('Blog Manager initialized');
+        },
+        
+        // Fonction pour ouvrir la modal de suppression
+        deletePost(id, title) {
+            console.log('deletePost called with:', id, title);
+            this.deletePostData = { id, title };
+            this.showDeleteModal = true;
+        },
+        
+        // Fonction pour confirmer la suppression
+        async confirmDelete() {
+            if (!this.deletePostData.id) return;
+            
+            this.loading = true;
+            
+            try {
+                const response = await fetch(`/admin/blog/${this.deletePostData.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                // Vérifier le statut de la réponse
+                if (response.ok) {
+                    // Essayer de parser la réponse JSON
+                    let data;
+                    try {
+                        data = await response.json();
+                    } catch (jsonError) {
+                        // Si ce n'est pas du JSON valide, considérer comme succès
+                        console.log('Réponse non-JSON, mais suppression réussie');
+                        data = { success: true, message: 'Article supprimé avec succès!' };
+                    }
+                    
+                    // Fermer la modal immédiatement
+                    this.showDeleteModal = false;
+                    
+                    if (data.success !== false) {
+                        this.showNotification(data.message || 'Article supprimé avec succès!', 'success');
+                        // Recharger la page après 1.5 secondes pour voir la notification
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        throw new Error(data.message || 'Erreur lors de la suppression');
+                    }
+                } else {
+                    // Gérer les erreurs HTTP
+                    let errorMessage = 'Erreur lors de la suppression de l\'article';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.message || errorMessage;
+                    } catch (e) {
+                        errorMessage = `Erreur ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMessage);
+                }
+            } catch (error) {
+                console.error('Erreur complète:', error);
+                this.showNotification(error.message || 'Erreur lors de la suppression de l\'article', 'error');
+                // Ne pas fermer la modal en cas d'erreur pour permettre de réessayer
+            } finally {
+                this.loading = false;
+            }
+        },
+        
+        // Fermer la modal de suppression
+        cancelDelete() {
+            this.showDeleteModal = false;
+            this.deletePostData = { id: null, title: '' };
         },
         
         // Fonction pour prévisualiser un article
@@ -492,14 +660,33 @@ document.addEventListener('alpine:init', () => {
             });
         },
         
-        // Fonction pour afficher les notifications
-        showNotification(message, type = 'info') {
-            // Utilise le système de notification global de FarmShop
-            if (window.FarmShop && window.FarmShop.notification) {
-                window.FarmShop.notification.show(message, type);
-            } else {
-                alert(message);
-            }
+        // Fonction utilitaire pour afficher les notifications
+        showNotification(message, type = 'success') {
+            // Créer un élément de notification
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Animation d'entrée
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+                notification.style.opacity = '1';
+            }, 100);
+            
+            // Supprimer après 3 secondes
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
     }));
 });

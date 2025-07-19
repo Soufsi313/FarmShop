@@ -13,6 +13,17 @@ class BlogCategorySeeder extends Seeder
      */
     public function run(): void
     {
+        // Supprimer définitivement toutes les catégories existantes (y compris soft-deleted)
+        BlogCategory::withTrashed()->forceDelete();
+        
+        // Récupérer l'utilisateur admin
+        $admin = \App\Models\User::where('role', 'Admin')->first();
+        
+        if (!$admin) {
+            $this->command->error('Aucun utilisateur admin trouvé. Veuillez créer un admin d\'abord.');
+            return;
+        }
+
         $categories = [
             [
                 'name' => 'Le saviez-vous',
@@ -134,6 +145,7 @@ class BlogCategorySeeder extends Seeder
                 'is_active' => true,
                 'posts_count' => 0,
                 'views_count' => 0,
+                'created_by' => $admin->id,
             ]);
         }
 

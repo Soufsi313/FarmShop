@@ -550,7 +550,7 @@ class DashboardController extends Controller
 
         $blogPost = new BlogPost();
         $blogPost->title = $request->title;
-        $blogPost->slug = \Str::slug($request->title);
+        $blogPost->slug = $this->generateUniqueSlug($request->title);
         $blogPost->content = $request->content;
         $blogPost->excerpt = $request->excerpt;
         $blogPost->blog_category_id = $request->blog_category_id;
@@ -601,7 +601,7 @@ class DashboardController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'excerpt' => 'nullable|string|max:500',
-            'category_id' => 'required|exists:blog_categories,id',
+            'blog_category_id' => 'required|exists:blog_categories,id',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:draft,published,scheduled',
             'published_at' => 'nullable|date',
@@ -611,10 +611,10 @@ class DashboardController extends Controller
         ]);
 
         $blogPost->title = $request->title;
-        $blogPost->slug = \Str::slug($request->title);
+        $blogPost->slug = $this->generateUniqueSlug($request->title, $blogPost->id);
         $blogPost->content = $request->content;
         $blogPost->excerpt = $request->excerpt;
-        $blogPost->category_id = $request->category_id;
+        $blogPost->blog_category_id = $request->blog_category_id;
         $blogPost->status = $request->status;
         $blogPost->published_at = $request->status === 'published' ? now() : $request->published_at;
         $blogPost->meta_title = $request->meta_title;
@@ -654,7 +654,46 @@ class DashboardController extends Controller
 
         $blogPost->delete();
 
+        // Si c'est une requête AJAX, retourner une réponse JSON
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Article supprimé avec succès.'
+            ]);
+        }
+
         return redirect()->route('admin.blog.index')
                         ->with('success', 'Article supprimé avec succès.');
+    }
+
+    /**
+     * Générer un slug unique pour les articles de blog
+     */
+    private function generateUniqueSlug($title, $id = null)
+    {
+        $slug = \Str::slug($title);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        // Vérifier si le slug existe déjà
+        while (true) {
+            $query = BlogPost::where('slug', $slug);
+            
+            // Si on est en mode édition, exclure l'article actuel
+            if ($id) {
+                $query->where('id', '!=', $id);
+            }
+            
+            // Si le slug n'existe pas, on peut l'utiliser
+            if (!$query->exists()) {
+                break;
+            }
+            
+            // Sinon, ajouter un suffixe numérique
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }
