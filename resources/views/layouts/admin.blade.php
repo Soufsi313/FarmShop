@@ -28,6 +28,15 @@
         }
     </script>
     
+    <!-- TinyMCE Editor -->
+        <!-- Quill.js -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    
+    <!-- Chart.js pour les graphiques -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+    
     <!-- Alpine.js pour l'interactivité -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
@@ -41,215 +50,256 @@
 </head>
 <body class="h-full bg-gray-100" x-data="{ sidebarOpen: false }">
     <div class="flex h-full">
-        <!-- Sidebar -->
-        <div class="hidden md:flex md:w-64 md:flex-col">
-            <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-blue-800">
-                <!-- Logo -->
-                <div class="flex items-center flex-shrink-0 px-4">
-                    <svg class="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-                    </svg>
-                    <h2 class="ml-3 text-lg font-semibold text-white">FarmShop Admin</h2>
+        <!-- Sidebar Moderne -->
+        <div class="hidden md:flex md:w-72 md:flex-col">
+            <div class="flex flex-col flex-grow bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl">
+                <!-- Logo Section -->
+                <div class="flex items-center flex-shrink-0 px-6 py-6 border-b border-slate-700/50">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <svg class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-white">FarmShop</h2>
+                            <p class="text-xs text-slate-400 font-medium">Administration</p>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Navigation -->
-                <nav class="mt-8 flex-1">
-                    <div class="px-2 space-y-1">
+                <nav class="flex-1 px-4 py-6 overflow-y-auto">
+                    <div class="space-y-2">
                         <!-- Dashboard principal -->
                         <a href="{{ route('admin.dashboard') }}" 
-                           class="@if(request()->routeIs('admin.dashboard*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-3 text-sm font-medium rounded-md transition-colors">
-                            <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                            </svg>
-                            Tableau de bord
+                           class="@if(request()->routeIs('admin.dashboard*')) bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                            <div class="@if(request()->routeIs('admin.dashboard*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                            </div>
+                            <span>Tableau de bord</span>
                         </a>
+                    </div>
 
-                        <!-- Section Gestion des Utilisateurs -->
-                        <div class="mt-6">
-                            <h3 class="px-3 text-xs font-semibold text-blue-200 uppercase tracking-wider">CRUD Utilisateurs</h3>
-                            <div class="mt-1 space-y-1">
-                                <a href="{{ route('admin.users.index') }}" 
-                                   class="@if(request()->routeIs('admin.users*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Section Gestion des Utilisateurs -->
+                    <div class="mt-8">
+                        <div class="flex items-center px-4 mb-4">
+                            <div class="w-8 h-0.5 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"></div>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Utilisateurs</h3>
+                        </div>
+                        <div class="space-y-2">
+                            <a href="{{ route('admin.users.index') }}" 
+                               class="@if(request()->routeIs('admin.users*')) bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.users*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
                                     </svg>
-                                    Utilisateurs
-                                </a>
-                            </div>
+                                </div>
+                                <span>Gestion Utilisateurs</span>
+                            </a>
                         </div>
+                    </div>
 
-                        <!-- Section Gestion du Catalogue -->
-                        <div class="mt-6">
-                            <h3 class="px-3 text-xs font-semibold text-blue-200 uppercase tracking-wider">CRUD Catalogue</h3>
-                            <div class="mt-1 space-y-1">
-                                <a href="{{ route('admin.products.index') }}" 
-                                   class="@if(request()->routeIs('admin.products*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Section Gestion du Catalogue -->
+                    <div class="mt-8">
+                        <div class="flex items-center px-4 mb-4">
+                            <div class="w-8 h-0.5 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full"></div>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Catalogue</h3>
+                        </div>
+                        <div class="space-y-2">
+                            <a href="{{ route('admin.products.index') }}" 
+                               class="@if(request()->routeIs('admin.products*')) bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.products*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                                     </svg>
-                                    Produits
-                                </a>
-                                
-                                <a href="{{ route('admin.categories.index') }}" 
-                                   class="@if(request()->routeIs('admin.categories*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                </div>
+                                <span>Produits</span>
+                            </a>
+                            
+                            <a href="{{ route('admin.categories.index') }}" 
+                               class="@if(request()->routeIs('admin.categories*')) bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.categories*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                     </svg>
-                                    Catégories Produits
-                                </a>
+                                </div>
+                                <span>Catégories</span>
+                            </a>
 
-                                <a href="{{ route('admin.special-offers.index') }}" 
-                                   class="@if(request()->routeIs('admin.special-offers*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                            <a href="{{ route('admin.special-offers.index') }}" 
+                               class="@if(request()->routeIs('admin.special-offers*')) bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.special-offers*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
                                     </svg>
-                                    Offres Spéciales
-                                </a>
+                                </div>
+                                <span>Offres Spéciales</span>
+                            </a>
 
-                                <a href="{{ route('admin.rental-categories.index') }}" 
-                                   class="@if(request()->routeIs('admin.rental-categories*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <a href="{{ route('admin.rental-categories.index') }}" 
+                               class="@if(request()->routeIs('admin.rental-categories*')) bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.rental-categories*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                                     </svg>
-                                    Catégories Location
-                                </a>
-                            </div>
+                                </div>
+                                <span>Locations</span>
+                            </a>
                         </div>
+                    </div>
 
-                        <!-- Section Gestion des Commandes -->
-                        <div class="mt-6">
-                            <h3 class="px-3 text-xs font-semibold text-blue-200 uppercase tracking-wider">CRUD Commandes</h3>
-                            <div class="mt-1 space-y-1">
-                                <a href="{{ route('admin.orders.index') }}" 
-                                   class="@if(request()->routeIs('admin.orders*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Section Gestion des Commandes -->
+                    <div class="mt-8">
+                        <div class="flex items-center px-4 mb-4">
+                            <div class="w-8 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"></div>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Commandes</h3>
+                        </div>
+                        <div class="space-y-2">
+                            <a href="{{ route('admin.orders.index') }}" 
+                               class="@if(request()->routeIs('admin.orders*')) bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.orders*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                                     </svg>
-                                    Commandes Achat
-                                </a>
+                                </div>
+                                <span>Commandes Achat</span>
+                            </a>
 
-                                <a href="{{ route('admin.order-locations.index') }}" 
-                                   class="@if(request()->routeIs('admin.order-locations*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <a href="{{ route('admin.order-locations.index') }}" 
+                               class="@if(request()->routeIs('admin.order-locations*')) bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.order-locations*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
-                                    Commandes Location
-                                </a>
+                                </div>
+                                <span>Commandes Location</span>
+                            </a>
 
-                                <a href="#" onclick="alert('Module retours en développement')" 
-                                   class="text-blue-100 hover:bg-blue-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <a href="#" onclick="alert('Module retours en développement')" 
+                               class="text-slate-300 hover:bg-slate-700/50 hover:text-white group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="bg-slate-600 group-hover:bg-slate-500 p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                     </svg>
-                                    Retours
-                                </a>
-                            </div>
+                                </div>
+                                <span>Retours</span>
+                                <span class="ml-auto px-2 py-1 text-xs bg-yellow-500/20 text-yellow-400 rounded-full">Bientôt</span>
+                            </a>
                         </div>
+                    </div>
 
-                        <!-- Section Gestion du Contenu -->
-                        <div class="mt-6">
-                            <h3 class="px-3 text-xs font-semibold text-blue-200 uppercase tracking-wider">CRUD Contenu</h3>
-                            <div class="mt-1 space-y-1">
-                                <a href="{{ route('admin.blog.index') }}" 
-                                   class="@if(request()->routeIs('admin.blog*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Section Gestion du Contenu -->
+                    <div class="mt-8">
+                        <div class="flex items-center px-4 mb-4">
+                            <div class="w-8 h-0.5 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full"></div>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Contenu</h3>
+                        </div>
+                        <div class="space-y-2">
+                            <a href="{{ route('admin.blog.index') }}" 
+                               class="@if(request()->routeIs('admin.blog*')) bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.blog*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H14"/>
                                     </svg>
-                                    Articles Blog
-                                </a>
+                                </div>
+                                <span>Articles Blog</span>
+                            </a>
 
-                                <a href="{{ route('admin.blog-categories.index') }}" 
-                                   class="@if(request()->routeIs('admin.blog-categories*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <a href="{{ route('admin.blog-categories.index') }}" 
+                               class="@if(request()->routeIs('admin.blog-categories*')) bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.blog-categories*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                     </svg>
-                                    Catégories Blog
-                                </a>
+                                </div>
+                                <span>Catégories Blog</span>
+                            </a>
 
-                                <a href="#" onclick="alert('Module newsletter en développement')" 
-                                   class="text-blue-100 hover:bg-blue-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <a href="#" onclick="alert('Module newsletter en développement')" 
+                               class="text-slate-300 hover:bg-slate-700/50 hover:text-white group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="bg-slate-600 group-hover:bg-slate-500 p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                     </svg>
-                                    Newsletter
-                                </a>
-                            </div>
+                                </div>
+                                <span>Newsletter</span>
+                                <span class="ml-auto px-2 py-1 text-xs bg-yellow-500/20 text-yellow-400 rounded-full">Bientôt</span>
+                            </a>
                         </div>
+                    </div>
 
-                        <!-- Section Messages Contact -->
-                        <div class="mt-6">
-                            <h3 class="px-3 text-xs font-semibold text-blue-200 uppercase tracking-wider">Communication</h3>
-                            <div class="mt-1 space-y-1">
-                                <a href="{{ route('admin.messages.index') }}" 
-                                   class="@if(request()->routeIs('admin.messages*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Section Messages Contact -->
+                    <div class="mt-8">
+                        <div class="flex items-center px-4 mb-4">
+                            <div class="w-8 h-0.5 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full"></div>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Communication</h3>
+                        </div>
+                        <div class="space-y-2">
+                            <a href="{{ route('admin.messages.index') }}" 
+                               class="@if(request()->routeIs('admin.messages*')) bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.messages*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                     </svg>
-                                    Messages Contact
-                                </a>
-                            </div>
+                                </div>
+                                <span>Messages Contact</span>
+                            </a>
                         </div>
+                    </div>
 
-                        <!-- Section Outils et Statistiques -->
-                        <div class="mt-6">
-                            <h3 class="px-3 text-xs font-semibold text-blue-200 uppercase tracking-wider">Outils Admin</h3>
-                            <div class="mt-1 space-y-1">
-                                <a href="#" onclick="alert('Module contraintes location en développement')" 
-                                   class="text-blue-100 hover:bg-blue-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    Contraintes Location
-                                </a>
-
-                                <a href="#" onclick="alert('Module gestion stock en développement')" 
-                                   class="text-blue-100 hover:bg-blue-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
-                                    </svg>
-                                    Gestion Stock
-                                </a>
-
-                                <a href="#" onclick="alert('Module statistiques en développement')" 
-                                   class="text-blue-100 hover:bg-blue-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Section Outils et Statistiques -->
+                    <div class="mt-8">
+                        <div class="flex items-center px-4 mb-4">
+                            <div class="w-8 h-0.5 bg-gradient-to-r from-rose-400 to-rose-600 rounded-full"></div>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Outils & Analytics</h3>
+                        </div>
+                        <div class="space-y-2">
+                            <a href="{{ route('admin.statistics') }}" 
+                               class="@if(request()->routeIs('admin.statistics*')) bg-gradient-to-r from-rose-500 to-rose-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.statistics*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                                     </svg>
-                                    Statistiques
-                                </a>
+                                </div>
+                                <span>Statistiques</span>
+                                <span class="ml-auto w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                            </a>
 
-                                <a href="#" onclick="alert('Module cookies/RGPD en développement')" 
-                                   class="text-blue-100 hover:bg-blue-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                    </svg>
-                                    Cookies & RGPD
-                                </a>
-
-                                <!-- Paramètres -->
-                                <a href="{{ route('admin.settings.index') }}" 
-                                   class="@if(request()->routeIs('admin.settings*')) bg-blue-900 text-white @else text-blue-100 hover:bg-blue-700 hover:text-white @endif group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                                    <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <a href="{{ route('admin.settings.index') }}" 
+                               class="@if(request()->routeIs('admin.settings*')) bg-gradient-to-r from-slate-500 to-slate-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.settings*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     </svg>
-                                    Paramètres
-                                </a>
-                            </div>
+                                </div>
+                                <span>Paramètres</span>
+                            </a>
                         </div>
                     </div>
                 </nav>
 
                 <!-- User Info -->
-                <div class="flex-shrink-0 flex border-t border-blue-700 p-4">
-                    <div class="flex items-center">
-                        <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">
-                            {{ substr(auth()->user()->name, 0, 1) }}
+                <div class="flex-shrink-0 border-t border-slate-700/50 p-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center">
+                            <span class="text-white font-semibold text-sm">{{ substr(Auth::user()->name, 0, 1) }}</span>
                         </div>
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-white">{{ auth()->user()->name }}</p>
-                            <p class="text-xs text-blue-200">Administrateur</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-white truncate">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-slate-400 truncate">Administrateur</p>
                         </div>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -258,8 +308,16 @@
         <!-- Mobile sidebar -->
         <div x-show="sidebarOpen" class="md:hidden fixed inset-0 z-40 flex">
             <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-600 bg-opacity-75"></div>
-            <div x-show="sidebarOpen" x-transition:enter="transition ease-in-out duration-300 transform" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in-out duration-300 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="relative flex-1 flex flex-col max-w-xs w-full bg-blue-800">
-                <!-- Contenu identique à la sidebar desktop -->
+            <div x-show="sidebarOpen" x-transition:enter="transition ease-in-out duration-300 transform" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in-out duration-300 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="relative flex-1 flex flex-col max-w-xs w-full bg-slate-900">
+                <!-- Contenu mobile simplifié -->
+                <div class="p-4">
+                    <h2 class="text-white font-bold">FarmShop Admin</h2>
+                </div>
+                <nav class="flex-1 px-4">
+                    <a href="{{ route('admin.dashboard') }}" class="block py-2 text-white">Dashboard</a>
+                    <a href="{{ route('admin.statistics') }}" class="block py-2 text-white">Statistiques</a>
+                    <!-- Autres liens... -->
+                </nav>
             </div>
         </div>
 
@@ -267,7 +325,7 @@
         <div class="flex flex-col flex-1 overflow-hidden">
             <!-- Top navigation -->
             <header class="bg-white shadow-sm border-b border-gray-200">
-                <div class="flex items-center justify-between px-4 py-4">
+                <div class="flex items-center justify-between px-6 py-4">
                     <div class="flex items-center">
                         <button @click="sidebarOpen = !sidebarOpen" class="md:hidden text-gray-500 hover:text-gray-700">
                             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,8 +336,11 @@
                     </div>
                     
                     <div class="flex items-center space-x-4">
-                        <a href="{{ url('/') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            ← Retour au site
+                        <a href="{{ url('/') }}" class="text-emerald-600 hover:text-emerald-800 text-sm font-medium flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                            Retour au site
                         </a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -292,7 +353,7 @@
             </header>
 
             <!-- Page content -->
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
                 @yield('content')
             </main>
         </div>

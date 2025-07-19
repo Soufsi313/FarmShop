@@ -309,17 +309,17 @@
                                 </svg>
                                 Contenu complet de l'article *
                             </label>
+                            <div id="quill-editor" style="height: 400px;" class="border border-gray-300 rounded-lg bg-white"></div>
                             <textarea name="content" 
                                       id="content"
-                                      rows="20"
                                       required
-                                      placeholder="Rédigez ici le contenu complet de votre article. Vous pouvez utiliser du Markdown pour la mise en forme..."
-                                      class="form-textarea form-textarea-large w-full @error('content') border-red-300 @enderror">{{ old('content') }}</textarea>
+                                      style="display: none;"
+                                      class="@error('content') border-red-300 @enderror">{{ old('content') }}</textarea>
                             <p class="text-xs text-gray-500 flex items-center">
                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                Vous pouvez utiliser du Markdown pour structurer votre contenu
+                                Utilisez l'éditeur riche pour formater votre contenu (gras, italique, listes, liens, images...)
                             </p>
                             @error('content')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -739,6 +739,45 @@ function toggleScheduledField() {
         document.getElementById('scheduled_for').required = false;
     }
 }
+
+// Configuration de Quill.js
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser Quill
+    var quill = new Quill('#quill-editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'align': [] }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                ['blockquote', 'code-block'],
+                ['link', 'image'],
+                ['clean']
+            ]
+        },
+        placeholder: 'Rédigez ici le contenu complet de votre article avec l\'éditeur riche...',
+        readOnly: false
+    });
+
+    // Charger le contenu existant si disponible
+    var hiddenTextarea = document.getElementById('content');
+    if (hiddenTextarea.value) {
+        quill.root.innerHTML = hiddenTextarea.value;
+    }
+
+    // Synchroniser le contenu avec le textarea caché lors de la saisie
+    quill.on('text-change', function() {
+        hiddenTextarea.value = quill.root.innerHTML;
+    });
+
+    // S'assurer que le contenu est synchronisé avant soumission
+    document.querySelector('form').addEventListener('submit', function() {
+        hiddenTextarea.value = quill.root.innerHTML;
+    });
+});
 </script>
 @endpush
 @endsection

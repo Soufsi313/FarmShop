@@ -90,11 +90,12 @@
                         <!-- Contenu -->
                         <div>
                             <label for="content" class="block text-sm font-medium text-gray-700">Contenu *</label>
+                            <div id="quill-editor" style="height: 400px;" class="mt-1 border border-gray-300 rounded-lg bg-white"></div>
                             <textarea name="content" 
                                       id="content"
-                                      rows="20"
                                       required
-                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 @error('content') border-red-300 @enderror">{{ old('content', $blogPost->content) }}</textarea>
+                                      style="display: none;"
+                                      class="@error('content') border-red-300 @enderror">{{ old('content', $blogPost->content) }}</textarea>
                             @error('content')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -347,6 +348,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     statusField.addEventListener('change', toggleScheduledField);
+    
+    // Configuration de Quill.js
+    var quill = new Quill('#quill-editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'align': [] }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                ['blockquote', 'code-block'],
+                ['link', 'image'],
+                ['clean']
+            ]
+        },
+        placeholder: 'Rédigez ici le contenu complet de votre article avec l\'éditeur riche...',
+        readOnly: false
+    });
+
+    // Charger le contenu existant
+    var hiddenTextarea = document.getElementById('content');
+    if (hiddenTextarea.value) {
+        quill.root.innerHTML = hiddenTextarea.value;
+    }
+
+    // Synchroniser le contenu avec le textarea caché lors de la saisie
+    quill.on('text-change', function() {
+        hiddenTextarea.value = quill.root.innerHTML;
+    });
+
+    // S'assurer que le contenu est synchronisé avant soumission
+    document.querySelector('form').addEventListener('submit', function() {
+        hiddenTextarea.value = quill.root.innerHTML;
+    });
 });
 </script>
 @endpush

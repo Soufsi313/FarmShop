@@ -145,6 +145,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
     
+    // Page de statistiques avancées
+    Route::get('/statistics', [DashboardController::class, 'statistics'])->name('statistics');
+    
     // Gestion des produits
     Route::resource('products', AdminProductController::class);
     

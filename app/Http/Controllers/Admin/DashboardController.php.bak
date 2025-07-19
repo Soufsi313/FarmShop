@@ -1,6 +1,6 @@
+
 <?php
 
-namespace App\Http\Controllers\Admin;
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -710,10 +710,11 @@ class DashboardController extends Controller
             'visitors' => 1247, // À remplacer par les vraies données depuis Google Analytics ou un système de tracking
             'product_views' => 3842,
             'blog_views' => 892,
-            'interactions' => 156, // Seulement les likes sur produits + commentaires blog
+            'interactions' => 234,
             'product_likes' => 156,
-            'comments' => 23, // Commentaires sur le blog
-            'shares' => 0, // Pas encore implémenté
+            'blog_likes' => 78,
+            'comments' => 45,
+            'shares' => 23,
         ];
 
         // Top produits les plus consultés (données factices pour l'instant)
@@ -726,7 +727,7 @@ class DashboardController extends Controller
         ];
 
         // Top articles les plus lus
-        $topArticles = BlogPost::select('title', 'views_count')
+        $topArticles = BlogPost::select('title', 'views_count', 'likes_count')
             ->orderBy('views_count', 'desc')
             ->take(5)
             ->get()
@@ -734,18 +735,18 @@ class DashboardController extends Controller
                 return [
                     'title' => $article->title,
                     'views' => $article->views_count ?? rand(100, 500),
-                    'comments' => rand(0, 15), // Commentaires factices pour l'instant
+                    'likes' => $article->likes_count ?? 0,
                 ];
             });
 
         // Si pas d'articles, utiliser des données factices
         if ($topArticles->isEmpty()) {
             $topArticles = collect([
-                ['title' => 'Guide complet du potager bio', 'views' => 456, 'comments' => 8],
-                ['title' => 'Les légumes de saison en automne', 'views' => 387, 'comments' => 5],
-                ['title' => 'Comment conserver vos légumes plus longtemps', 'views' => 298, 'comments' => 12],
-                ['title' => 'Recettes avec des légumes oubliés', 'views' => 234, 'comments' => 3],
-                ['title' => 'Agriculture durable et environnement', 'views' => 187, 'comments' => 7],
+                ['title' => 'Guide complet du potager bio', 'views' => 456, 'likes' => 23],
+                ['title' => 'Les légumes de saison en automne', 'views' => 387, 'likes' => 19],
+                ['title' => 'Comment conserver vos légumes plus longtemps', 'views' => 298, 'likes' => 31],
+                ['title' => 'Recettes avec des légumes oubliés', 'views' => 234, 'likes' => 15],
+                ['title' => 'Agriculture durable et environnement', 'views' => 187, 'likes' => 8],
             ]);
         }
 
