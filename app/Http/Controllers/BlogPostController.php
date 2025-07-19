@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
 use App\Models\BlogCategory;
 use Illuminate\Http\Request;
@@ -13,8 +14,9 @@ class BlogPostController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum');
-        $this->middleware('admin')->except(['index', 'show']);
+        // Pas de middleware d'authentification pour les méthodes publiques
+        // $this->middleware('auth:sanctum');
+        // $this->middleware('admin')->except(['index', 'show']);
     }
 
     /**
@@ -25,8 +27,8 @@ class BlogPostController extends Controller
         $query = BlogPost::with(['category', 'author']);
 
         // Filtrage par statut pour les utilisateurs non-admin
-        if (!Auth::user() || Auth::user()->role !== 'admin') {
-            $query->published();
+        if (!Auth::check() || !Auth::user()->isAdmin()) {
+            $query->where('status', 'published');
         }
 
         // Recherche
@@ -48,16 +50,16 @@ class BlogPostController extends Controller
         }
 
         // Filtrage par statut (admin seulement)
-        if ($request->filled('status') && Auth::user()->role === 'admin') {
+        if ($request->filled('status') && Auth::check() && Auth::user()->isAdmin()) {
             switch ($request->status) {
                 case 'published':
-                    $query->published();
+                    $query->where('status', 'published');
                     break;
                 case 'draft':
-                    $query->draft();
+                    $query->where('status', 'draft');
                     break;
                 case 'scheduled':
-                    $query->scheduled();
+                    $query->where('status', 'scheduled');
                     break;
             }
         }
@@ -90,15 +92,23 @@ class BlogPostController extends Controller
 
         $posts = $query->paginate(12);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $posts,
-            'meta' => [
-                'total_posts' => BlogPost::count(),
-                'published_posts' => BlogPost::published()->count(),
-                'draft_posts' => BlogPost::draft()->count(),
-            ]
-        ]);
+        // Si c'est une requête web, retourner une vue
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $posts,
+                'meta' => [
+                    'total_posts' => BlogPost::count(),
+                    'published_posts' => BlogPost::where('status', 'published')->count(),
+                    'draft_posts' => BlogPost::where('status', 'draft')->count(),
+                ]
+            ]);
+        }
+
+        // Pour les requêtes web, retourner la vue
+        $categories = BlogCategory::where('is_active', true)->orderBy('name')->get();
+        
+        return view('blog.index', compact('posts', 'categories'));
     }
 
     /**
@@ -111,22 +121,25 @@ class BlogPostController extends Controller
             ->firstOrFail();
 
         // Vérifier si l'article est publié pour les non-admin
-        if ((!Auth::user() || Auth::user()->role !== 'admin') && !$post->is_published) {
+        if ((!Auth::check() || !Auth::user()->isAdmin()) && $post->status !== 'published') {
             abort(404);
         }
 
         // Incrémenter le compteur de vues
-        $post->incrementViewsCount();
+        $post->increment('views_count');
 
         // Charger les commentaires approuvés
-        $comments = $post->topLevelComments()
-            ->approved()
-            ->with(['user', 'approvedReplies.user'])
+        $comments = $post->comments()
+            ->where('status', 'approved')
+            ->whereNull('parent_id')
+            ->with(['user', 'replies' => function($query) {
+                $query->where('status', 'approved')->with('user');
+            }])
             ->latest()
             ->paginate(10);
 
         // Articles similaires
-        $relatedPosts = BlogPost::published()
+        $relatedPosts = BlogPost::where('status', 'published')
             ->where('id', '!=', $post->id)
             ->where('blog_category_id', $post->blog_category_id)
             ->latest('published_at')
@@ -144,10 +157,56 @@ class BlogPostController extends Controller
     }
 
     /**
+     * Afficher un article spécifique pour le web
+     */
+    public function showWeb(Request $request, $slug)
+    {
+        $post = BlogPost::where('slug', $slug)
+            ->with(['category', 'author', 'lastEditor'])
+            ->firstOrFail();
+
+        // Vérifier si l'article est publié pour les non-admin
+        if ((!Auth::check() || !Auth::user()->isAdmin()) && $post->status !== 'published') {
+            abort(404);
+        }
+
+        // Incrémenter le compteur de vues
+        $post->increment('views_count');
+
+        // Charger les commentaires approuvés
+        $comments = $post->comments()
+            ->where('status', 'approved')
+            ->whereNull('parent_id')
+            ->with(['user', 'replies' => function($query) {
+                $query->where('status', 'approved')->with('user');
+            }])
+            ->latest()
+            ->paginate(10);
+
+        // Articles similaires
+        $relatedPosts = BlogPost::where('status', 'published')
+            ->where('id', '!=', $post->id)
+            ->where('blog_category_id', $post->blog_category_id)
+            ->latest('published_at')
+            ->take(4)
+            ->get();
+
+        return view('blog.show', compact('post', 'comments', 'relatedPosts'));
+    }
+
+    /**
      * Créer un nouvel article (Admin seulement)
      */
     public function store(Request $request)
     {
+        // Vérification des permissions
+        if (!Auth::check() || !Auth::user()->isAdmin()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Accès non autorisé'
+            ], 403);
+        }
+
         $validated = $request->validate([
             'blog_category_id' => 'required|exists:blog_categories,id',
             'title' => 'required|string|max:255',
@@ -211,6 +270,14 @@ class BlogPostController extends Controller
      */
     public function update(Request $request, BlogPost $blogPost)
     {
+        // Vérification des permissions
+        if (!Auth::check() || !Auth::user()->isAdmin()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Accès non autorisé'
+            ], 403);
+        }
+
         $validated = $request->validate([
             'blog_category_id' => 'required|exists:blog_categories,id',
             'title' => 'required|string|max:255',
@@ -273,6 +340,14 @@ class BlogPostController extends Controller
      */
     public function destroy(BlogPost $blogPost)
     {
+        // Vérification des permissions
+        if (!Auth::check() || !Auth::user()->isAdmin()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Accès non autorisé'
+            ], 403);
+        }
+
         // Supprimer les images
         if ($blogPost->featured_image) {
             Storage::disk('public')->delete($blogPost->featured_image);

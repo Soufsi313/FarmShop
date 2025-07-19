@@ -117,7 +117,7 @@
                             </svg>
                             <span>Nos locations</span>
                         </a>
-                        <a href="#" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1">
+                        <a href="{{ route('blog.index') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
                             </svg>
@@ -270,7 +270,7 @@
                     <a href="/" class="text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Accueil</a>
                     <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Nos produits</a>
                     <a href="{{ route('rentals.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Nos locations</a>
-                    <a href="#" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Blog</a>
+                    <a href="{{ route('blog.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Blog</a>
                     
                     <!-- Sections visibles seulement si connecté -->
                     @auth
@@ -488,5 +488,103 @@
     </button>
 
     @stack('scripts')
+
+    <!-- Scripts globaux -->
+    <script>
+        // Objet global FarmShop
+        window.FarmShop = {
+            // Système de notifications
+            notification: {
+                show: function(message, type = 'info', duration = 5000) {
+                    const notification = document.createElement('div');
+                    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transition-all duration-300 transform translate-x-full`;
+                    
+                    // Classes selon le type
+                    switch(type) {
+                        case 'success':
+                            notification.classList.add('bg-green-100', 'border-l-4', 'border-green-500', 'text-green-700');
+                            break;
+                        case 'error':
+                            notification.classList.add('bg-red-100', 'border-l-4', 'border-red-500', 'text-red-700');
+                            break;
+                        case 'warning':
+                            notification.classList.add('bg-yellow-100', 'border-l-4', 'border-yellow-500', 'text-yellow-700');
+                            break;
+                        default:
+                            notification.classList.add('bg-blue-100', 'border-l-4', 'border-blue-500', 'text-blue-700');
+                    }
+                    
+                    notification.innerHTML = `
+                        <div class="flex">
+                            <div class="flex-1">
+                                <p class="font-medium">${message}</p>
+                            </div>
+                            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-gray-400 hover:text-gray-600">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(notification);
+                    
+                    // Animation d'entrée
+                    setTimeout(() => {
+                        notification.classList.remove('translate-x-full');
+                    }, 100);
+                    
+                    // Suppression automatique
+                    setTimeout(() => {
+                        notification.classList.add('translate-x-full');
+                        setTimeout(() => {
+                            if (notification.parentElement) {
+                                notification.remove();
+                            }
+                        }, 300);
+                    }, duration);
+                }
+            },
+
+            // Interface utilisateur
+            ui: {
+                scrollToTop: function() {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                }
+            },
+
+            // Gestion des cookies
+            cookieConsent: {
+                accept: function() {
+                    localStorage.setItem('cookieConsent', 'accepted');
+                    document.getElementById('cookie-banner').style.display = 'none';
+                },
+                decline: function() {
+                    localStorage.setItem('cookieConsent', 'declined');
+                    document.getElementById('cookie-banner').style.display = 'none';
+                },
+                check: function() {
+                    const consent = localStorage.getItem('cookieConsent');
+                    if (!consent) {
+                        document.getElementById('cookie-banner').classList.remove('hidden');
+                    }
+                }
+            }
+        };
+
+        // Fonction globale pour les notifications (alias)
+        function showNotification(message, type = 'info', duration = 5000) {
+            FarmShop.notification.show(message, type, duration);
+        }
+
+        // Initialisation au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier le consentement des cookies
+            FarmShop.cookieConsent.check();
+        });
+    </script>
 </body>
 </html>

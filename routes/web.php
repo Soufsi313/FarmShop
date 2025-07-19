@@ -191,6 +191,19 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/messages/{message}/archive', [AdminMessageController::class, 'archive'])->name('messages.archive');
     Route::delete('/messages/{message}', [AdminMessageController::class, 'destroy'])->name('messages.destroy');
     
+    // Gestion du Blog
+    Route::get('/blog', [DashboardController::class, 'blog'])->name('blog.index');
+    Route::get('/blog/create', [DashboardController::class, 'createBlogPost'])->name('blog.create');
+    Route::post('/blog', [DashboardController::class, 'storeBlogPost'])->name('blog.store');
+    Route::get('/blog/{blogPost}/edit', [DashboardController::class, 'editBlogPost'])->name('blog.edit');
+    Route::put('/blog/{blogPost}', [DashboardController::class, 'updateBlogPost'])->name('blog.update');
+    Route::delete('/blog/{blogPost}', [DashboardController::class, 'destroyBlogPost'])->name('blog.destroy');
+    
+    Route::get('/blog-categories', [DashboardController::class, 'blogCategories'])->name('blog-categories.index');
+    Route::post('/blog-categories', [DashboardController::class, 'storeBlogCategory'])->name('blog-categories.store');
+    Route::put('/blog-categories/{blogCategory}', [DashboardController::class, 'updateBlogCategory'])->name('blog-categories.update');
+    Route::delete('/blog-categories/{blogCategory}', [DashboardController::class, 'destroyBlogCategory'])->name('blog-categories.destroy');
+    
     Route::get('/settings', [DashboardController::class, 'settings'])->name('settings.index');
 });
 
@@ -200,4 +213,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/web/wishlist/products/{product}/toggle', [\App\Http\Controllers\WishlistController::class, 'toggle'])->name('web.wishlist.toggle');
     Route::delete('/web/wishlist/products/{product}', [\App\Http\Controllers\WishlistController::class, 'destroy'])->name('web.wishlist.destroy');
     Route::delete('/web/wishlist/clear', [\App\Http\Controllers\WishlistController::class, 'clear'])->name('web.wishlist.clear');
+});
+
+// Routes Blog public
+Route::prefix('blog')->name('blog.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\BlogPostController::class, 'index'])->name('index');
+    Route::get('/{slug}', [\App\Http\Controllers\BlogPostController::class, 'showWeb'])->name('show');
 });
