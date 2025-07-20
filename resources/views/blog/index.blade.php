@@ -67,75 +67,75 @@
                 @if($posts->count() > 0)
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                         @foreach($posts as $post)
-                            <article class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                                <!-- Image -->
-                                @if($post->featured_image)
-                                    <div class="aspect-video bg-gray-200">
-                                        <img src="{{ Storage::url($post->featured_image) }}" 
-                                             alt="{{ $post->title }}"
-                                             class="w-full h-full object-cover">
-                                    </div>
-                                @else
-                                    <div class="aspect-video bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                                        <svg class="w-16 h-16 text-white opacity-50" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                        </svg>
-                                    </div>
-                                @endif
-
-                                <div class="p-6">
-                                    <!-- Catégorie et date -->
-                                    <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
-                                        @if($post->category)
-                                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                                                {{ $post->category->name }}
-                                            </span>
-                                        @endif
-                                        <time datetime="{{ $post->published_at->format('Y-m-d') }}">
-                                            {{ $post->published_at->format('d M Y') }}
-                                        </time>
-                                    </div>
-
-                                    <!-- Titre -->
-                                    <h2 class="text-xl font-semibold text-gray-900 mb-3 line-clamp-2">
-                                        <a href="{{ route('blog.show', $post->slug) }}" class="hover:text-green-600 transition-colors">
-                                            {{ $post->title }}
-                                        </a>
-                                    </h2>
-
-                                    <!-- Extrait -->
-                                    @if($post->excerpt)
-                                        <p class="text-gray-600 mb-4 line-clamp-3">{{ $post->excerpt }}</p>
+                            <article class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group">
+                                <a href="{{ route('blog.show', $post->slug) }}" class="block">
+                                    <!-- Image -->
+                                    @if($post->featured_image)
+                                        <div class="aspect-video bg-gray-200 overflow-hidden">
+                                            <img src="{{ Storage::url($post->featured_image) }}" 
+                                                 alt="{{ $post->title }}"
+                                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                        </div>
+                                    @else
+                                        <div class="aspect-video bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+                                            <svg class="w-16 h-16 text-white opacity-50 group-hover:opacity-70 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                            </svg>
+                                        </div>
                                     @endif
 
-                                    <!-- Métadonnées -->
-                                    <div class="flex items-center justify-between text-sm text-gray-500">
-                                        <div class="flex items-center space-x-4">
-                                            <span class="flex items-center">
-                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                    <path fill-rule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z"/>
-                                                </svg>
-                                                {{ $post->views_count }}
-                                            </span>
-                                            <span class="flex items-center">
-                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                                </svg>
-                                                {{ $post->likes_count }}
-                                            </span>
-                                            <span class="flex items-center">
-                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path fill-rule="evenodd" d="M4.848 2.771A49.144 49.144 0 0112 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 01-3.476.383.39.39 0 00-.297.17l-2.755 4.133a.75.75 0 01-1.248 0l-2.755-4.133a.39.39 0 00-.297-.17 48.9 48.9 0 01-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.678 3.348-3.97z"/>
-                                                </svg>
-                                                {{ $post->comments_count }}
-                                            </span>
+                                    <div class="p-6">
+                                        <!-- Catégorie et date -->
+                                        <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
+                                            @if($post->category)
+                                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                                                    {{ $post->category->name }}
+                                                </span>
+                                            @endif
+                                            <time datetime="{{ $post->published_at->format('Y-m-d') }}">
+                                                {{ $post->published_at->format('d M Y') }}
+                                            </time>
                                         </div>
-                                        @if($post->reading_time)
-                                            <span>{{ $post->reading_time }} min de lecture</span>
+
+                                        <!-- Titre -->
+                                        <h2 class="text-xl font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-green-600 transition-colors">
+                                            {{ $post->title }}
+                                        </h2>
+
+                                        <!-- Extrait -->
+                                        @if($post->excerpt)
+                                            <p class="text-gray-600 mb-4 line-clamp-3">{{ $post->excerpt }}</p>
                                         @endif
+
+                                        <!-- Métadonnées -->
+                                        <div class="flex items-center justify-between text-sm text-gray-500">
+                                            <div class="flex items-center space-x-4">
+                                                <span class="flex items-center">
+                                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        <path fill-rule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z"/>
+                                                    </svg>
+                                                    {{ $post->views_count }}
+                                                </span>
+                                                <span class="flex items-center">
+                                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                                    </svg>
+                                                    {{ $post->likes_count }}
+                                                </span>
+                                                <span class="flex items-center">
+                                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path fill-rule="evenodd" d="M4.848 2.771A49.144 49.144 0 0112 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 01-3.476.383.39.39 0 00-.297.17l-2.755 4.133a.75.75 0 01-1.248 0l-2.755-4.133a.39.39 0 00-.297-.17 48.9 48.9 0 01-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.678 3.348-3.97z"/>
+                                                    </svg>
+                                                    {{ $post->comments_count }}
+                                                </span>
+                                            </div>
+                                            @if($post->reading_time)
+                                                <span>{{ $post->reading_time }} min de lecture</span>
+                                            @endif
+                                        </div>
                                     </div>
-                                </div>
+                                </a>
                             </article>
                         @endforeach
                     </div>
