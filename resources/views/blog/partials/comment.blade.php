@@ -216,7 +216,7 @@ async function submitEdit(event, commentId) {
     
     try {
         const response = await fetch(`/api/blog/comments/${commentId}`, {
-            method: 'POST', // Laravel va interpréter comme PATCH grâce à @method
+            method: 'POST', // Laravel va interpréter comme PATCH grâce à la directive method
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 'Accept': 'application/json'

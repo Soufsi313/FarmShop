@@ -379,6 +379,7 @@ Route::middleware(['auth:web'])->group(function () {
         Route::prefix('admin/blog/comments')->name('api.admin.blog.comments.')->group(function () {
             Route::get('/', [App\Http\Controllers\BlogCommentController::class, 'index'])->name('index');
             Route::get('/statistics', [App\Http\Controllers\BlogCommentController::class, 'statistics'])->name('statistics');
+            Route::get('/{blogComment}', [App\Http\Controllers\BlogCommentController::class, 'showComment'])->name('show');
             Route::post('/{blogComment}/moderate', [App\Http\Controllers\BlogCommentController::class, 'moderate'])->name('moderate');
             Route::patch('/{blogComment}/toggle-pin', [App\Http\Controllers\BlogCommentController::class, 'togglePin'])->name('toggle-pin');
             Route::delete('/{blogComment}', [App\Http\Controllers\BlogCommentController::class, 'destroy'])->name('destroy');
@@ -389,6 +390,7 @@ Route::middleware(['auth:web'])->group(function () {
             Route::get('/', [App\Http\Controllers\BlogCommentReportController::class, 'index'])->name('index');
             Route::get('/statistics', [App\Http\Controllers\BlogCommentReportController::class, 'statistics'])->name('statistics');
             Route::get('/{blogCommentReport}', [App\Http\Controllers\BlogCommentReportController::class, 'show'])->name('show');
+            Route::patch('/{blogCommentReport}/process', [App\Http\Controllers\BlogCommentReportController::class, 'process'])->name('process');
             Route::post('/{blogCommentReport}/review', [App\Http\Controllers\BlogCommentReportController::class, 'review'])->name('review');
             Route::post('/{blogCommentReport}/resolve', [App\Http\Controllers\BlogCommentReportController::class, 'resolve'])->name('resolve');
             Route::post('/{blogCommentReport}/dismiss', [App\Http\Controllers\BlogCommentReportController::class, 'dismiss'])->name('dismiss');

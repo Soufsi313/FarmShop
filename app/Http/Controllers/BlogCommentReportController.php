@@ -326,4 +326,70 @@ class BlogCommentReportController extends Controller
             'data' => ['processed_count' => $processedCount]
         ]);
     }
+
+    /**
+     * Traiter un signalement (résoudre ou rejeter)
+     */
+    public function process(Request $request, BlogCommentReport $blogCommentReport)
+    {
+        $request->validate([
+            'action' => 'required|in:resolve,dismiss',
+            'comment_action' => 'nullable|in:delete,reject,keep',
+            'admin_notes' => 'nullable|string|max:1000'
+        ]);
+
+        $action = $request->action;
+        $commentAction = $request->comment_action;
+        $adminNotes = $request->admin_notes;
+
+        // Vérifier que le signalement peut être traité
+        if ($blogCommentReport->status !== 'pending') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ce signalement a déjà été traité'
+            ], 400);
+        }
+
+        // Traiter le signalement
+        if ($action === 'resolve') {
+            $blogCommentReport->status = 'resolved';
+            $message = 'Signalement résolu avec succès';
+
+            // Actions sur le commentaire si spécifiées
+            if ($commentAction && $blogCommentReport->comment) {
+                switch ($commentAction) {
+                    case 'delete':
+                        $blogCommentReport->comment->delete();
+                        break;
+                    case 'reject':
+                        $blogCommentReport->comment->update([
+                            'status' => 'rejected',
+                            'moderated_by' => Auth::id(),
+                            'moderated_at' => now()
+                        ]);
+                        break;
+                    case 'keep':
+                        // Ne rien faire, garder le commentaire tel quel
+                        break;
+                }
+            }
+        } else {
+            $blogCommentReport->status = 'dismissed';
+            $message = 'Signalement rejeté avec succès';
+        }
+
+        // Mettre à jour le signalement
+        $blogCommentReport->update([
+            'status' => $blogCommentReport->status,
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+            'admin_notes' => $adminNotes
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $message,
+            'data' => $blogCommentReport->fresh(['comment.post', 'comment.user', 'reporter', 'reviewer'])
+        ]);
+    }
 }

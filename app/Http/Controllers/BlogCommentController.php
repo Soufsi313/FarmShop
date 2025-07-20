@@ -105,6 +105,19 @@ class BlogCommentController extends Controller
     }
 
     /**
+     * Afficher les détails d'un commentaire spécifique (Admin seulement)
+     */
+    public function showComment(BlogComment $blogComment)
+    {
+        $comment = $blogComment->load(['post', 'user', 'moderator', 'reports.reporter']);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $comment
+        ]);
+    }
+
+    /**
      * Créer un nouveau commentaire
      */
     public function store(Request $request, BlogPost $blogPost)

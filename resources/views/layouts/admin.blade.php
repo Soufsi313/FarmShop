@@ -218,6 +218,26 @@
                                 <span>Catégories Blog</span>
                             </a>
 
+                            <a href="{{ route('admin.blog-comments.index') }}" 
+                               class="@if(request()->routeIs('admin.blog-comments*')) bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.blog-comments*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                    </svg>
+                                </div>
+                                <span>Commentaires Blog</span>
+                            </a>
+
+                            <a href="{{ route('admin.blog-comment-reports.index') }}" 
+                               class="@if(request()->routeIs('admin.blog-comment-reports*')) bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.blog-comment-reports*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                                    </svg>
+                                </div>
+                                <span>Signalements</span>
+                            </a>
+
                             <a href="#" onclick="alert('Module newsletter en développement')" 
                                class="text-slate-300 hover:bg-slate-700/50 hover:text-white group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
                                 <div class="bg-slate-600 group-hover:bg-slate-500 p-2 rounded-lg mr-4 transition-colors">
@@ -358,6 +378,109 @@
             </main>
         </div>
     </div>
+
+    <!-- Toast Notifications -->
+    <div x-data="toastManager()" class="fixed top-4 right-4 z-50 space-y-2">
+        <!-- Toast Template -->
+        <template x-for="toast in toasts" :key="toast.id">
+            <div 
+                x-show="true"
+                x-transition:enter="transform ease-out duration-300 transition"
+                x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+                x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                :class="getToastClass(toast.type)"
+                class="max-w-sm w-full border rounded-lg shadow-lg pointer-events-auto">
+                <div class="p-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <!-- Success Icon -->
+                            <svg x-show="toast.type === 'success'" :class="getIconClass(toast.type)" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <!-- Error Icon -->
+                            <svg x-show="toast.type === 'error'" :class="getIconClass(toast.type)" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <!-- Warning Icon -->
+                            <svg x-show="toast.type === 'warning'" :class="getIconClass(toast.type)" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <!-- Info Icon -->
+                            <svg x-show="toast.type === 'info'" :class="getIconClass(toast.type)" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-3 w-0 flex-1 pt-0.5">
+                            <p class="text-sm font-medium" x-text="toast.message"></p>
+                        </div>
+                        <div class="ml-4 flex-shrink-0 flex">
+                            <button @click="remove(toast.id)" class="inline-flex text-gray-400 hover:text-gray-600">
+                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <script>
+        // Global Toast Manager
+        function toastManager() {
+            return {
+                toasts: [],
+                
+                add(message, type = 'info', duration = 5000) {
+                    const id = Date.now();
+                    const toast = { id, message, type, duration };
+                    this.toasts.push(toast);
+                    
+                    if (duration > 0) {
+                        setTimeout(() => this.remove(id), duration);
+                    }
+                },
+                
+                remove(id) {
+                    this.toasts = this.toasts.filter(toast => toast.id !== id);
+                },
+                
+                getToastClass(type) {
+                    const classes = {
+                        'success': 'bg-green-50 border-green-200 text-green-800',
+                        'error': 'bg-red-50 border-red-200 text-red-800',
+                        'warning': 'bg-yellow-50 border-yellow-200 text-yellow-800',
+                        'info': 'bg-blue-50 border-blue-200 text-blue-800'
+                    };
+                    return classes[type] || classes['info'];
+                },
+                
+                getIconClass(type) {
+                    const classes = {
+                        'success': 'text-green-400',
+                        'error': 'text-red-400',
+                        'warning': 'text-yellow-400',
+                        'info': 'text-blue-400'
+                    };
+                    return classes[type] || classes['info'];
+                }
+            }
+        }
+        
+        // Global function to show toasts
+        window.showToast = function(message, type = 'info', duration = 5000) {
+            const container = document.querySelector('[x-data*="toastManager"]');
+            if (container && container.__x) {
+                container.__x.$data.add(message, type, duration);
+            } else {
+                console.log(`${type}: ${message}`);
+            }
+        }
+    </script>
 
     @stack('scripts')
 </body>

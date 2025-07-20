@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -11,6 +10,8 @@ use App\Models\RentalCategory;
 use App\Models\Order;
 use App\Models\BlogPost;
 use App\Models\BlogCategory;
+use App\Models\BlogComment;
+use App\Models\BlogCommentReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -40,6 +41,10 @@ class DashboardController extends Controller
             'orders' => Order::count() ?? 0,
             'blog_posts' => BlogPost::count() ?? 0,
             'blog_categories' => BlogCategory::count() ?? 0,
+            'blog_comments' => BlogComment::count() ?? 0,
+            'pending_comments' => BlogComment::where('status', 'pending')->count() ?? 0,
+            'comment_reports' => BlogCommentReport::count() ?? 0,
+            'pending_reports' => BlogCommentReport::where('status', 'pending')->count() ?? 0,
             'recent_users' => User::latest()->take(5)->get(),
             'recent_blog_posts' => BlogPost::with('category')->latest()->take(5)->get(),
         ];
@@ -750,5 +755,183 @@ class DashboardController extends Controller
         }
 
         return view('admin.statistics', compact('stats', 'topProducts', 'topArticles'));
+    }
+
+    /**
+     * Gestion des commentaires de blog
+     */
+    public function blogComments(Request $request)
+    {
+        $this->checkAdminAccess();
+        
+        // Si c'est une requête AJAX pour récupérer les données
+        if ($request->ajax() || $request->wantsJson()) {
+            $query = BlogComment::with(['post', 'user', 'moderator']);
+
+            // Recherche
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('content', 'like', "%{$search}%")
+                      ->orWhere('guest_name', 'like', "%{$search}%")
+                      ->orWhere('guest_email', 'like', "%{$search}%")
+                      ->orWhereHas('user', function($userQuery) use ($search) {
+                          $userQuery->where('name', 'like', "%{$search}%")
+                                   ->orWhere('email', 'like', "%{$search}%");
+                      })
+                      ->orWhereHas('post', function($postQuery) use ($search) {
+                          $postQuery->where('title', 'like', "%{$search}%");
+                      });
+                });
+            }
+
+            // Filtrage par statut
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            // Filtrage par article
+            if ($request->filled('post_id')) {
+                $query->where('blog_post_id', $request->post_id);
+            }
+
+            // Filtrage par utilisateur
+            if ($request->filled('user_id')) {
+                $query->where('user_id', $request->user_id);
+            }
+
+            // Filtrage par signalements
+            if ($request->filled('reported') && $request->reported === 'true') {
+                $query->where('is_reported', true);
+            }
+
+            // Tri
+            $sortBy = $request->get('sort_by', 'recent');
+            switch ($sortBy) {
+                case 'popular':
+                    $query->orderBy('likes_count', 'desc');
+                    break;
+                case 'reports':
+                    $query->orderBy('reports_count', 'desc');
+                    break;
+                default:
+                    $query->latest();
+            }
+
+            $comments = $query->paginate(20);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $comments,
+                'meta' => [
+                    'total_comments' => BlogComment::count(),
+                    'pending_comments' => BlogComment::where('status', 'pending')->count(),
+                    'approved_comments' => BlogComment::where('status', 'approved')->count(),
+                    'reported_comments' => BlogComment::where('is_reported', true)->count(),
+                ]
+            ]);
+        }
+        
+        // Statistiques des commentaires pour la vue
+        $stats = [
+            'total_comments' => BlogComment::count(),
+            'pending_comments' => BlogComment::where('status', 'pending')->count(),
+            'approved_comments' => BlogComment::where('status', 'approved')->count(),
+            'rejected_comments' => BlogComment::where('status', 'rejected')->count(),
+            'today_comments' => BlogComment::whereDate('created_at', today())->count(),
+            'total_reports' => BlogCommentReport::count(),
+            'pending_reports' => BlogCommentReport::where('status', 'pending')->count(),
+            'resolved_reports' => BlogCommentReport::where('status', 'resolved')->count(),
+        ];
+
+        return view('admin.blog.comments.index', compact('stats'));
+    }
+
+    /**
+     * Gestion des signalements de commentaires
+     */
+    public function blogCommentReports(Request $request)
+    {
+        $this->checkAdminAccess();
+        
+        // Si c'est une requête AJAX pour récupérer les données
+        if ($request->ajax() || $request->wantsJson()) {
+            $query = BlogCommentReport::with(['comment.post', 'comment.user', 'reporter', 'reviewer']);
+
+            // Recherche
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('reason', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhereHas('reporter', function($userQuery) use ($search) {
+                          $userQuery->where('name', 'like', "%{$search}%")
+                                   ->orWhere('email', 'like', "%{$search}%");
+                      })
+                      ->orWhereHas('comment', function($commentQuery) use ($search) {
+                          $commentQuery->where('content', 'like', "%{$search}%");
+                      });
+                });
+            }
+
+            // Filtrage par statut
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            // Filtrage par raison
+            if ($request->filled('reason')) {
+                $query->where('reason', $request->reason);
+            }
+
+            // Filtrage par priorité
+            if ($request->filled('priority')) {
+                $query->where('priority', $request->priority);
+            }
+
+            // Tri
+            $sortBy = $request->get('sort_by', 'recent');
+            switch ($sortBy) {
+                case 'priority':
+                    $query->orderBy('priority', 'desc');
+                    break;
+                case 'oldest':
+                    $query->oldest();
+                    break;
+                default:
+                    $query->latest();
+            }
+
+            $reports = $query->paginate(20);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $reports,
+                'meta' => [
+                    'total_reports' => BlogCommentReport::count(),
+                    'pending_reports' => BlogCommentReport::where('status', 'pending')->count(),
+                    'resolved_reports' => BlogCommentReport::where('status', 'resolved')->count(),
+                    'dismissed_reports' => BlogCommentReport::where('status', 'dismissed')->count(),
+                ]
+            ]);
+        }
+        
+        // Statistiques des signalements
+        $stats = [
+            'total_reports' => BlogCommentReport::count(),
+            'pending_reports' => BlogCommentReport::where('status', 'pending')->count(),
+            'resolved_reports' => BlogCommentReport::where('status', 'resolved')->count(),
+            'dismissed_reports' => BlogCommentReport::where('status', 'dismissed')->count(),
+            'today_reports' => BlogCommentReport::whereDate('created_at', today())->count(),
+            'high_priority_reports' => BlogCommentReport::where('priority', 'high')->where('status', 'pending')->count(),
+        ];
+
+        // Répartition par type de raison
+        $reportsByReason = BlogCommentReport::selectRaw('reason, COUNT(*) as count')
+            ->groupBy('reason')
+            ->pluck('count', 'reason')
+            ->toArray();
+
+        return view('admin.blog.comments.reports', compact('stats', 'reportsByReason'));
     }
 }

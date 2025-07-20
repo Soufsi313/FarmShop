@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\OrderLocationController as AdminOrderLocationController;
 use App\Http\Controllers\Admin\SpecialOfferController as AdminSpecialOfferController;
 use App\Http\Controllers\Admin\MessageController as AdminMessageController;
+use App\Http\Controllers\Admin\BlogCommentController as AdminBlogCommentController;
 use App\Http\Controllers\Web\ProductController as WebProductController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
@@ -206,6 +207,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/blog-categories', [DashboardController::class, 'storeBlogCategory'])->name('blog-categories.store');
     Route::put('/blog-categories/{blogCategory}', [DashboardController::class, 'updateBlogCategory'])->name('blog-categories.update');
     Route::delete('/blog-categories/{blogCategory}', [DashboardController::class, 'destroyBlogCategory'])->name('blog-categories.destroy');
+    
+    // Gestion des commentaires de blog
+    Route::get('/blog-comments', [AdminBlogCommentController::class, 'index'])->name('blog-comments.index');
+    Route::get('/blog-comments/{comment}', [AdminBlogCommentController::class, 'show'])->name('blog-comments.show');
+    Route::put('/blog-comments/{comment}', [AdminBlogCommentController::class, 'update'])->name('blog-comments.update');
+    Route::delete('/blog-comments/{comment}', [AdminBlogCommentController::class, 'destroy'])->name('blog-comments.destroy');
+    Route::post('/blog-comments/bulk-action', [AdminBlogCommentController::class, 'bulkAction'])->name('blog-comments.bulk-action');
+    
+    // Gestion des signalements de commentaires
+    Route::get('/blog-comment-reports', [AdminBlogCommentController::class, 'reports'])->name('blog-comment-reports.index');
+    Route::put('/blog-comment-reports/{report}', [AdminBlogCommentController::class, 'updateReport'])->name('blog-comment-reports.update');
+    Route::delete('/blog-comment-reports/{report}', [AdminBlogCommentController::class, 'destroyReport'])->name('blog-comment-reports.destroy');
     
     Route::get('/settings', [DashboardController::class, 'settings'])->name('settings.index');
 });

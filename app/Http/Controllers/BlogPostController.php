@@ -24,7 +24,8 @@ class BlogPostController extends Controller
      */
     public function index(Request $request)
     {
-        $query = BlogPost::with(['category', 'author']);
+        $query = BlogPost::with(['category', 'author'])
+            ->withCount(['approvedComments as comments_count']);
 
         // Filtrage par statut pour les utilisateurs non-admin
         if (!Auth::check() || !Auth::user()->isAdmin()) {
@@ -118,6 +119,7 @@ class BlogPostController extends Controller
     {
         $post = BlogPost::where('slug', $slug)
             ->with(['category', 'author', 'lastEditor'])
+            ->withCount(['approvedComments as comments_count'])
             ->firstOrFail();
 
         // Vérifier si l'article est publié pour les non-admin
