@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Models\User;
+use App\Mail\VisitorMessageReply;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class MessageController extends Controller
 {
@@ -179,6 +181,12 @@ class MessageController extends Controller
                 ], 422);
             }
 
+            // Si c'est un message de visiteur (type contact), utiliser le système d'email
+            if ($message->type === 'contact' && isset($message->metadata['sender_email'])) {
+                return $this->replyToVisitorFromAdmin($request, $message);
+            }
+
+            // Sinon, traitement normal pour les utilisateurs connectés
             // Créer un nouveau message de réponse pour l'utilisateur
             $responseMessage = Message::create([
                 'user_id' => $message->user_id ?: $this->getUserIdFromMetadata($message),
@@ -410,5 +418,86 @@ class MessageController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Répondre à un message de visiteur par email depuis l'interface admin
+     */
+    private function replyToVisitorFromAdmin(Request $request, Message $message): JsonResponse
+    {
+        try {
+            $user = auth()->user();
+            
+            // Créer la réponse dans la table messages
+            $replyMessage = Message::create([
+                'user_id' => $message->user_id, // Admin qui répond
+                'sender_id' => $user->id,
+                'type' => 'admin_reply',
+                'subject' => 'Re: ' . $message->subject,
+                'content' => $request->response,
+                'status' => 'read',
+                'priority' => $message->priority,
+                'metadata' => [
+                    'original_message_id' => $message->id,
+                    'visitor_email' => $message->metadata['sender_email'],
+                    'visitor_name' => $message->metadata['sender_name'] ?? 'Visiteur',
+                    'reply_type' => 'visitor_email_response'
+                ]
+            ]);
+
+            // Envoyer l'email au visiteur
+            $visitorEmail = $message->metadata['sender_email'];
+            $adminName = $user->first_name . ' ' . $user->last_name;
+            
+            Mail::to($visitorEmail)->send(new VisitorMessageReply(
+                $message, 
+                $request->response, 
+                $adminName
+            ));
+
+            // Marquer le message original comme traité
+            $message->update([
+                'status' => 'read',
+                'read_at' => now(),
+                'metadata' => array_merge($message->metadata ?? [], [
+                    'resolved_at' => now()->toISOString(),
+                    'resolved_by' => $user->id,
+                    'admin_response_sent' => true,
+                    'admin_responded' => true,
+                    'responded_at' => now()->toISOString(),
+                    'responded_by' => $user->id
+                ])
+            ]);
+
+            // Log de l'action
+            Log::info('Réponse envoyée à un visiteur depuis l\'admin', [
+                'admin_id' => $user->id,
+                'original_message_id' => $message->id,
+                'visitor_email' => $visitorEmail,
+                'reply_message_id' => $replyMessage->id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Réponse envoyée par email à ' . $visitorEmail,
+                'data' => [
+                    'reply_message_id' => $replyMessage->id,
+                    'email_sent_to' => $visitorEmail,
+                    'original_message_status' => $message->fresh()->status
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'envoi de la réponse au visiteur depuis l\'admin', [
+                'error' => $e->getMessage(),
+                'message_id' => $message->id,
+                'admin_id' => auth()->id()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'envoi de l\'email de réponse'
+            ], 500);
+        }
     }
 }

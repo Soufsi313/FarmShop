@@ -357,6 +357,17 @@ document.getElementById('responseForm').addEventListener('submit', async functio
     const messageId = document.getElementById('messageId').value;
     const response = document.getElementById('response').value;
     
+    // Validation côté client
+    if (!response || response.trim().length < 10) {
+        alert('La réponse doit contenir au moins 10 caractères.');
+        return;
+    }
+    
+    if (response.length > 5000) {
+        alert('La réponse ne peut pas dépasser 5000 caractères.');
+        return;
+    }
+    
     try {
         const result = await fetch(`/admin/messages/${messageId}/respond`, {
             method: 'POST',
@@ -375,7 +386,14 @@ document.getElementById('responseForm').addEventListener('submit', async functio
             closeResponseModal();
             location.reload();
         } else {
-            alert('Erreur: ' + data.message);
+            let errorMessage = 'Erreur: ' + data.message;
+            if (data.errors) {
+                errorMessage += '\n\nDétails:';
+                for (let field in data.errors) {
+                    errorMessage += '\n- ' + data.errors[field].join(', ');
+                }
+            }
+            alert(errorMessage);
         }
     } catch (error) {
         alert('Erreur lors de l\'envoi de la réponse');

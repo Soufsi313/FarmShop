@@ -6,6 +6,7 @@ use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\VisitorMessageReply;
+use App\Mail\VisitorContactConfirmation;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
@@ -461,7 +462,7 @@ class MessageController extends Controller
                 'type' => 'admin_reply',
                 'subject' => 'Re: ' . $message->subject,
                 'content' => $request->reply_content,
-                'status' => 'sent',
+                'status' => 'read',
                 'priority' => $message->priority,
                 'metadata' => [
                     'original_message_id' => $message->id,
@@ -484,7 +485,7 @@ class MessageController extends Controller
             // Marquer le message original comme traité si demandé
             if ($request->mark_as_resolved) {
                 $message->update([
-                    'status' => 'resolved',
+                    'status' => 'read',
                     'metadata' => array_merge($message->metadata ?? [], [
                         'resolved_at' => now()->toISOString(),
                         'resolved_by' => $user->id,
@@ -603,22 +604,11 @@ class MessageController extends Controller
                 ]
             ]);
 
-            // Créer un message de confirmation pour le visiteur
-            $confirmationMessage = Message::create([
-                'user_id' => 1, // Admin
-                'sender_id' => 1, // Admin
-                'type' => 'visitor_confirmation',
-                'subject' => 'Confirmation de réception - ' . $request->subject,
-                'content' => "Votre message a été envoyé avec succès à l'administration.\n\nSujet: {$request->subject}\nMotif: " . ucfirst(str_replace('_', ' ', $request->reason)) . "\nPriorité: " . ucfirst($request->priority ?? 'normal') . "\nDate: " . now()->format('d/m/Y à H:i') . "\n\nMessage:\n{$request->message}\n\nRéférence: MSG-" . str_pad($adminMessage->id, 6, '0', STR_PAD_LEFT) . "\n\nNous vous répondrons dans les plus brefs délais.",
-                'status' => 'sent',
-                'priority' => 'normal',
-                'metadata' => [
-                    'original_message_id' => $adminMessage->id,
-                    'visitor_email' => $request->email,
-                    'visitor_name' => $request->name,
-                    'confirmation_type' => 'visitor_contact_received'
-                ]
-            ]);
+            // Référence pour la réponse
+            $reference = 'MSG-' . str_pad($adminMessage->id, 6, '0', STR_PAD_LEFT);
+            
+            // Note: Message de confirmation désactivé temporairement
+            // pour éviter les problèmes de base de données
 
             // Log de l'action
             Log::info('Nouveau message de contact de visiteur', [
@@ -630,12 +620,39 @@ class MessageController extends Controller
                 'ip' => $request->ip()
             ]);
 
+            // Envoyer l'email de confirmation au visiteur
+            try {
+                Mail::to($request->email)->send(new VisitorContactConfirmation([
+                    'visitor_name' => $request->name,
+                    'visitor_email' => $request->email,
+                    'subject' => $request->subject,
+                    'message' => $request->message,
+                    'reason' => $request->reason,
+                    'priority' => $request->priority ?? 'normal',
+                    'reference' => $reference,
+                    'message_id' => $adminMessage->id
+                ]));
+
+                Log::info('Email de confirmation envoyé au visiteur', [
+                    'visitor_email' => $request->email,
+                    'reference' => $reference
+                ]);
+
+            } catch (\Exception $e) {
+                Log::error('Erreur lors de l\'envoi de l\'email de confirmation', [
+                    'error' => $e->getMessage(),
+                    'visitor_email' => $request->email,
+                    'reference' => $reference
+                ]);
+                // On continue même si l'email n'a pas pu être envoyé
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
                 'data' => [
                     'message_id' => $adminMessage->id,
-                    'reference' => 'MSG-' . str_pad($adminMessage->id, 6, '0', STR_PAD_LEFT),
+                    'reference' => $reference,
                     'estimated_response_time' => '24-48 heures'
                 ]
             ], 201);

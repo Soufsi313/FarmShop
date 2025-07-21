@@ -21,6 +21,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Page Contact
+Route::get('/contact', function () {
+    return view('contact');
+})->name('contact');
+
+// Page de confirmation contact
+Route::get('/contact/confirmation', function () {
+    return view('contact.confirmation');
+})->name('contact.confirmation');
+
 // Test Tailwind CSS
 Route::get('/test-tailwind', function () {
     return view('test-tailwind');
