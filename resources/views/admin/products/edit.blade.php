@@ -71,12 +71,12 @@
                         @if($product->gallery_images && count($product->gallery_images) > 0)
                             <div class="grid grid-cols-4 gap-4 mb-4">
                                 @foreach($product->gallery_images as $index => $image)
-                                    <div class="relative">
+                                    <div class="relative gallery-image-{{ $index }}">
                                         <img src="{{ asset('storage/' . $image) }}" 
                                              alt="Image galerie {{ $index + 1 }}" 
                                              class="w-24 h-24 object-cover rounded-lg border">
                                         <button type="button" 
-                                                x-on:click="removeGalleryImage({{ $index }})"
+                                                x-on:click="removeGalleryImage('{{ $image }}')"
                                                 class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600">
                                             ×
                                         </button>
@@ -104,12 +104,12 @@
                         @if($product->images && count($product->images) > 0)
                             <div class="grid grid-cols-4 gap-4 mb-4">
                                 @foreach($product->images as $index => $image)
-                                    <div class="relative">
+                                    <div class="relative additional-image-{{ $index }}">
                                         <img src="{{ asset('storage/' . $image) }}" 
                                              alt="Image supplémentaire {{ $index + 1 }}" 
                                              class="w-24 h-24 object-cover rounded-lg border">
                                         <button type="button" 
-                                                x-on:click="removeImage({{ $index }})"
+                                                x-on:click="removeImage('{{ $image }}')"
                                                 class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600">
                                             ×
                                         </button>
@@ -481,9 +481,8 @@ document.addEventListener('alpine:init', () => {
             additional: []
         },
 
-        removeGalleryImage(index) {
+        removeGalleryImage(imagePath) {
             if (confirm('Êtes-vous sûr de vouloir supprimer cette image de la galerie ?')) {
-                this.imagesToRemove.gallery.push(index);
                 // Masquer l'image visuellement
                 event.target.closest('.relative').style.display = 'none';
                 
@@ -492,14 +491,13 @@ document.addEventListener('alpine:init', () => {
                 const input = document.createElement('input');
                 input.type = 'hidden';
                 input.name = 'remove_gallery_images[]';
-                input.value = index;
+                input.value = imagePath;
                 form.appendChild(input);
             }
         },
 
-        removeImage(index) {
+        removeImage(imagePath) {
             if (confirm('Êtes-vous sûr de vouloir supprimer cette image supplémentaire ?')) {
-                this.imagesToRemove.additional.push(index);
                 // Masquer l'image visuellement
                 event.target.closest('.relative').style.display = 'none';
                 
@@ -508,7 +506,7 @@ document.addEventListener('alpine:init', () => {
                 const input = document.createElement('input');
                 input.type = 'hidden';
                 input.name = 'remove_images[]';
-                input.value = index;
+                input.value = imagePath;
                 form.appendChild(input);
             }
         },

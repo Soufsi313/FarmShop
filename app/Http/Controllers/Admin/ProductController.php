@@ -183,7 +183,9 @@ class ProductController extends Controller
             'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'remove_gallery_images' => 'nullable|array',
+            'remove_gallery_images.*' => 'nullable|string',
             'remove_images' => 'nullable|array',
+            'remove_images.*' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
@@ -206,9 +208,15 @@ class ProductController extends Controller
         
         // Supprimer les images sélectionnées pour suppression
         if ($request->has('remove_gallery_images')) {
-            foreach ($request->remove_gallery_images as $index) {
-                if (isset($currentGalleryImages[$index])) {
-                    Storage::disk('public')->delete($currentGalleryImages[$index]);
+            foreach ($request->remove_gallery_images as $imagePath) {
+                // Chercher l'image dans le tableau
+                $index = array_search($imagePath, $currentGalleryImages);
+                
+                if ($index !== false) {
+                    // Vérifier si le fichier existe avant de le supprimer
+                    if (Storage::disk('public')->exists($imagePath)) {
+                        Storage::disk('public')->delete($imagePath);
+                    }
                     unset($currentGalleryImages[$index]);
                 }
             }
@@ -229,9 +237,11 @@ class ProductController extends Controller
         
         // Supprimer les images supplémentaires sélectionnées pour suppression
         if ($request->has('remove_images')) {
-            foreach ($request->remove_images as $index) {
-                if (isset($currentImages[$index])) {
-                    Storage::disk('public')->delete($currentImages[$index]);
+            foreach ($request->remove_images as $imagePath) {
+                // Chercher l'image dans le tableau
+                $index = array_search($imagePath, $currentImages);
+                if ($index !== false) {
+                    Storage::disk('public')->delete($imagePath);
                     unset($currentImages[$index]);
                 }
             }
@@ -264,27 +274,53 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        // Supprimer les images associées
-        if ($product->main_image) {
-            Storage::disk('public')->delete($product->main_image);
-        }
-
-        if ($product->gallery_images) {
-            foreach ($product->gallery_images as $image) {
-                Storage::disk('public')->delete($image);
+        try {
+            // Supprimer les images associées
+            if ($product->main_image) {
+                Storage::disk('public')->delete($product->main_image);
             }
-        }
 
-        if ($product->images) {
-            foreach ($product->images as $image) {
-                Storage::disk('public')->delete($image);
+            if ($product->gallery_images) {
+                foreach ($product->gallery_images as $image) {
+                    Storage::disk('public')->delete($image);
+                }
             }
+
+            if ($product->images) {
+                foreach ($product->images as $image) {
+                    Storage::disk('public')->delete($image);
+                }
+            }
+
+            $product->delete();
+
+            // Si c'est une requête AJAX, retourner JSON
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Produit supprimé avec succès.'
+                ]);
+            }
+
+            // Sinon, redirection normale
+            return redirect()->route('admin.products.index')
+                ->with('success', 'Produit supprimé avec succès.');
+                
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de la suppression du produit ID ' . $product->id . ': ' . $e->getMessage());
+            
+            // Si c'est une requête AJAX, retourner une erreur JSON
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreur lors de la suppression du produit.'
+                ], 500);
+            }
+
+            // Sinon, redirection avec erreur
+            return redirect()->route('admin.products.index')
+                ->with('error', 'Erreur lors de la suppression du produit.');
         }
-
-        $product->delete();
-
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Produit supprimé avec succès.');
     }
 
     /**

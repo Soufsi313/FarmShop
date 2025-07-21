@@ -57,15 +57,27 @@
                     @endif
                 </div>
 
-                <!-- Images secondaires -->
-                @if($product->images && count($product->images) > 0)
+                <!-- Galerie d'images miniatures -->
+                @if($product->gallery_images && count($product->gallery_images) > 0)
                     <div class="grid grid-cols-4 gap-2">
-                        @foreach($product->images as $image)
-                            <div class="aspect-square bg-gray-200 rounded-md overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
+                        <!-- Image principale en miniature -->
+                        @if($product->main_image)
+                            <button onclick="changeMainImage('{{ asset('storage/' . $product->main_image) }}')"
+                                    class="aspect-square bg-white rounded-lg shadow overflow-hidden border-2 border-purple-500">
+                                <img src="{{ asset('storage/' . $product->main_image) }}" 
+                                     alt="{{ $product->name }}"
+                                     class="w-full h-full object-cover">
+                            </button>
+                        @endif
+                        
+                        <!-- Images de la galerie -->
+                        @foreach($product->gallery_images as $image)
+                            <button onclick="changeMainImage('{{ asset('storage/' . $image) }}')"
+                                    class="aspect-square bg-white rounded-lg shadow overflow-hidden border-2 border-transparent hover:border-purple-500 transition-colors">
                                 <img src="{{ asset('storage/' . $image) }}" 
                                      alt="{{ $product->name }}"
                                      class="w-full h-full object-cover">
-                            </div>
+                            </button>
                         @endforeach
                     </div>
                 @endif
@@ -780,6 +792,27 @@ function showNotification(message, type = 'info') {
     setTimeout(() => {
         notification.remove();
     }, 5000);
+}
+
+// Fonction pour changer l'image principale
+function changeMainImage(newImageSrc) {
+    const mainImage = document.querySelector('.product-image');
+    if (mainImage) {
+        mainImage.src = newImageSrc;
+        
+        // Mettre à jour les bordures des miniatures
+        const thumbnails = document.querySelectorAll('button[onclick*="changeMainImage"]');
+        thumbnails.forEach(thumb => {
+            const img = thumb.querySelector('img');
+            if (img && img.src === newImageSrc) {
+                thumb.classList.remove('border-transparent');
+                thumb.classList.add('border-purple-500');
+            } else {
+                thumb.classList.remove('border-purple-500');
+                thumb.classList.add('border-transparent');
+            }
+        });
+    }
 }
 </script>
 @endpush
