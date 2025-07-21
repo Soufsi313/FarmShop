@@ -65,8 +65,11 @@ class ProductController extends Controller
 
         $products = $query->paginate(12)->appends($request->all());
         
-        // Récupérer les catégories pour les filtres
-        $categories = Category::orderBy('name')->get();
+        // Récupérer les catégories pour les filtres (seulement celles qui ont des produits de vente)
+        $categories = Category::whereHas('products', function($query) {
+            $query->where('is_active', true)
+                  ->whereIn('type', ['sale', 'both']);
+        })->orderBy('name')->get();
 
         // Récupérer les prix min et max pour les filtres
         $priceRange = Product::where('is_active', true)

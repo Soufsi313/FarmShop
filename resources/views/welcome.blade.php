@@ -5,7 +5,7 @@
 @section('content')
 <div x-data="farmShopHome">
     <!-- Hero Section -->
-    <section class="hero-bg bg-gradient-to-br from-white via-farm-green-50 to-farm-orange-100 py-20">
+    <section class="hero-bg bg-gradient-to-br from-orange-200 via-green-100 to-orange-300 py-20">
         <div class="container mx-auto px-6 text-center">
             <h1 class="text-5xl md:text-6xl font-bold text-farm-green-800 mb-6">
                 🌾 Bienvenue chez FarmShop
@@ -40,7 +40,7 @@
     </section>
 
     <!-- Features Section -->
-    <section class="py-16 bg-white">
+    <section class="py-16 bg-gradient-to-r from-green-100 via-orange-50 to-green-100">
         <div class="container mx-auto px-6">
             <h2 class="text-4xl font-bold text-center text-farm-green-800 mb-12">
                 Pourquoi choisir FarmShop ?
@@ -72,46 +72,243 @@
     </section>
 
     <!-- Categories Section -->
-    <section class="py-16 bg-gradient-to-r from-farm-green-50 via-white to-farm-orange-50">
+    <section class="py-16 bg-gradient-to-br from-orange-100 via-green-50 to-orange-200">
         <div class="container mx-auto px-6">
-            <h2 class="text-4xl font-bold text-center text-farm-green-800 mb-12">
-                Nos Catégories
+            <h2 class="text-4xl font-bold text-center text-farm-green-800 mb-4">
+                🌱 Les produits que nous vous proposons
             </h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                @forelse($categories as $index => $category)
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
-                     @click="navigateToCategory('{{ $category->slug }}')">
-                    <div class="h-48 bg-gradient-to-br {{ $index % 4 == 0 ? 'from-farm-green-200 to-farm-green-300' : ($index % 4 == 1 ? 'from-farm-orange-200 to-farm-orange-300' : ($index % 4 == 2 ? 'from-farm-green-200 to-farm-orange-200' : 'from-farm-orange-200 to-farm-green-200')) }} flex items-center justify-center">
-                        <span class="text-6xl">{{ $category->icon ?? '�' }}</span>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-xl font-semibold {{ $index % 2 == 0 ? 'text-farm-green-700' : 'text-farm-orange-700' }}">
-                            {{ $category->name }}
-                        </h3>
-                        <p class="{{ $index % 2 == 0 ? 'text-farm-orange-600' : 'text-farm-green-600' }} text-sm">
-                            {{ $category->meta_description ?? 'Découvrez nos produits de qualité' }}
-                        </p>
-                        @if($category->food_type)
-                        <span class="inline-block mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                            {{ $category->food_type === 'alimentaire' ? '🍃 Alimentaire' : '🔧 Non-alimentaire' }}
-                        </span>
-                        @endif
+            <p class="text-center text-farm-orange-600 mb-12 text-lg">
+                Découvrez notre sélection de produits fermiers de qualité
+            </p>
+            @if($randomProducts->count() > 0)
+            <!-- Carrousel de produits -->
+            <div class="relative max-w-6xl mx-auto">
+                <div class="overflow-hidden rounded-lg">
+                    <div id="productCarousel" class="flex transition-transform duration-500 ease-in-out">
+                        @foreach($randomProducts as $index => $product)
+                        <div class="w-full flex-shrink-0">
+                            <div class="bg-white rounded-lg shadow-lg overflow-hidden mx-4">
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <!-- Image du produit -->
+                                    <div class="h-64 md:h-80 bg-gradient-to-br from-farm-green-100 to-farm-orange-100 flex items-center justify-center relative">
+                                        @if($product->main_image)
+                                            <img src="{{ Storage::url($product->main_image) }}" 
+                                                 alt="{{ $product->image_alt ?? $product->name }}" 
+                                                 class="w-full h-full object-cover">
+                                        @else
+                                            <div class="text-8xl text-farm-green-400">🌱</div>
+                                        @endif
+                                        
+                                        <!-- Badge catégorie -->
+                                        <span class="absolute top-4 left-4 bg-farm-green-600 text-white text-sm px-3 py-1 rounded-full font-medium">
+                                            {{ $product->category->name }}
+                                        </span>
+                                        
+                                        <!-- Badge type (achat/location) -->
+                                        <span class="absolute top-4 right-4 text-white text-sm px-3 py-1 rounded-full font-medium
+                                            @if($product->type === 'sale') bg-blue-600
+                                            @elseif($product->type === 'rental') bg-purple-600  
+                                            @else bg-indigo-600 @endif">
+                                            @if($product->type === 'sale') 
+                                                🛒 Achat
+                                            @elseif($product->type === 'rental')
+                                                📅 Location
+                                            @else 
+                                                🔄 Achat/Location
+                                            @endif
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- Contenu du produit -->
+                                    <div class="p-6 flex flex-col justify-center">
+                                        <h3 class="text-2xl font-bold text-farm-green-700 mb-3">
+                                            {{ $product->name }}
+                                        </h3>
+                                        <p class="text-farm-orange-600 text-lg mb-4 line-clamp-3">
+                                            {{ $product->short_description }}
+                                        </p>
+                                        
+                                        <!-- Prix et unité -->
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div class="text-3xl font-bold text-farm-green-600">
+                                                @if($product->type === 'rental')
+                                                    {{ number_format($product->rental_price_per_day ?? 0, 2) }}€
+                                                @elseif($product->type === 'both')
+                                                    {{ number_format($product->price, 2) }}€
+                                                @else
+                                                    {{ number_format($product->price, 2) }}€
+                                                @endif
+                                            </div>
+                                            <div class="text-lg text-gray-500">
+                                                @if($product->type === 'rental')
+                                                    / jour
+                                                @elseif($product->type === 'both')
+                                                    / {{ $product->unit_symbol }}
+                                                @else
+                                                    / {{ $product->unit_symbol }}
+                                                @endif
+                                            </div>
+                                        </div>
+                                        
+                                        @if($product->type === 'rental' && $product->deposit_amount)
+                                        <!-- Caution pour les locations -->
+                                        <div class="text-sm text-gray-600 mb-3">
+                                            💳 Caution: {{ number_format($product->deposit_amount, 2) }}€
+                                        </div>
+                                        @endif
+                                        
+                                        <!-- Stock -->
+                                        <div class="flex items-center mb-6">
+                                            @if($product->quantity > $product->low_stock_threshold)
+                                                <span class="inline-flex items-center text-sm text-green-700 bg-green-100 px-3 py-1 rounded-full">
+                                                    ✅ En stock ({{ $product->quantity }})
+                                                </span>
+                                            @elseif($product->quantity > $product->out_of_stock_threshold)
+                                                <span class="inline-flex items-center text-sm text-orange-700 bg-orange-100 px-3 py-1 rounded-full">
+                                                    ⚠️ Stock limité ({{ $product->quantity }})
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center text-sm text-red-700 bg-red-100 px-3 py-1 rounded-full">
+                                                    ❌ Stock faible ({{ $product->quantity }})
+                                                </span>
+                                            @endif
+                                        </div>
+                                        
+                                        <!-- Bouton voir le produit -->
+                                        <a href="{{ route('products.show', $product) }}" 
+                                           class="inline-flex items-center justify-center bg-farm-green-600 hover:bg-farm-green-700 text-white px-6 py-3 rounded-lg text-lg font-semibold transition-colors">
+                                            @if($product->type === 'sale')
+                                                🛒 Acheter ce produit
+                                            @elseif($product->type === 'rental')
+                                                📅 Louer ce produit
+                                            @else
+                                                🔍 Voir les options
+                                            @endif
+                                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
                 </div>
-                @empty
-                <!-- Fallback si aucune catégorie en base -->
-                <div class="col-span-full text-center py-12">
-                    <div class="text-6xl mb-4">�</div>
-                    <h3 class="text-xl font-semibold text-farm-green-700 mb-2">Catégories en préparation</h3>
-                    <p class="text-farm-orange-600">Nos catégories de produits seront bientôt disponibles !</p>
+                
+                <!-- Indicateurs de carrousel -->
+                <div class="flex justify-center mt-6 space-x-2">
+                    @foreach($randomProducts as $index => $product)
+                    <button class="carousel-indicator w-3 h-3 rounded-full transition-colors duration-300" 
+                            data-slide="{{ $index }}"
+                            data-product-name="{{ $product->name }}"></button>
+                    @endforeach
                 </div>
-                @endforelse
             </div>
+            
+            <!-- Bouton pour voir tous les produits -->
+            <div class="text-center mt-12">
+                <a href="{{ route('products.index') }}" 
+                   class="inline-flex items-center bg-farm-green-700 hover:bg-farm-green-800 text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors shadow-lg hover:shadow-xl border-2 border-white">
+                    <span class="text-white font-bold">📖 Accéder au catalogue</span>
+                    <svg class="w-5 h-5 ml-2 text-white" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+            
+            @else
+            <!-- Fallback si aucun produit -->
+            <div class="text-center py-12">
+                <div class="text-6xl mb-4">🌱</div>
+                <h3 class="text-xl font-semibold text-farm-green-700 mb-2">Produits en préparation</h3>
+                <p class="text-farm-orange-600">Nos produits seront bientôt disponibles !</p>
+                <a href="{{ route('products.index') }}" 
+                   class="inline-block mt-4 bg-farm-green-600 hover:bg-farm-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    Voir tous nos produits
+                </a>
+            </div>
+            @endif
         </div>
+        
+        <!-- JavaScript pour le carrousel automatique -->
+        @if($randomProducts->count() > 0)
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const carousel = document.getElementById('productCarousel');
+                const indicators = document.querySelectorAll('.carousel-indicator');
+                const totalSlides = {{ $randomProducts->count() }};
+                let currentSlide = 0;
+                let autoplayInterval;
+
+                // Mettre à jour les indicateurs
+                function updateIndicators() {
+                    indicators.forEach((indicator, index) => {
+                        if (index === currentSlide) {
+                            indicator.classList.remove('bg-gray-300');
+                            indicator.classList.add('bg-farm-orange-500');
+                        } else {
+                            indicator.classList.remove('bg-farm-orange-500');
+                            indicator.classList.add('bg-gray-300');
+                        }
+                    });
+                }
+
+                // Aller à un slide spécifique
+                function goToSlide(slideIndex) {
+                    currentSlide = slideIndex;
+                    const translateValue = -currentSlide * 100;
+                    carousel.style.transform = `translateX(${translateValue}%)`;
+                    updateIndicators();
+                }
+
+                // Slide suivant
+                function nextSlide() {
+                    currentSlide = (currentSlide + 1) % totalSlides;
+                    goToSlide(currentSlide);
+                }
+
+                // Démarrer l'autoplay
+                function startAutoplay() {
+                    autoplayInterval = setInterval(nextSlide, 3500); // Change toutes les 3.5 secondes
+                }
+
+                // Arrêter l'autoplay
+                function stopAutoplay() {
+                    clearInterval(autoplayInterval);
+                }
+
+                // Initialiser les indicateurs
+                updateIndicators();
+
+                // Event listeners pour les indicateurs
+                indicators.forEach((indicator, index) => {
+                    indicator.addEventListener('click', () => {
+                        stopAutoplay();
+                        goToSlide(index);
+                        setTimeout(startAutoplay, 3000); // Reprendre après 3 secondes
+                    });
+
+                    // Tooltip au survol
+                    indicator.addEventListener('mouseenter', () => {
+                        const productName = indicator.getAttribute('data-product-name');
+                        indicator.setAttribute('title', productName);
+                    });
+                });
+
+                // Pause au survol du carrousel
+                carousel.addEventListener('mouseenter', stopAutoplay);
+                carousel.addEventListener('mouseleave', startAutoplay);
+
+                // Démarrer l'autoplay
+                startAutoplay();
+            });
+        </script>
+        @endif
     </section>
 
     <!-- CTA Section -->
-    <section class="py-16 bg-gradient-to-r from-farm-green-600 to-farm-orange-600 text-white">
+    <section class="py-16 bg-gradient-to-r from-orange-600 via-green-600 to-orange-700 text-white">
         <div class="container mx-auto px-6 text-center">
             <h2 class="text-4xl font-bold mb-6">
                 Prêt à moderniser votre exploitation ? 🚀
@@ -131,7 +328,7 @@
     </section>
 
     <!-- Stats Section -->
-    <section class="py-16 bg-white">
+    <section class="py-16 bg-gradient-to-r from-green-50 via-orange-100 to-green-50">
         <div class="container mx-auto px-6">
             <div class="grid md:grid-cols-4 gap-8 text-center">
                 <div>
@@ -155,7 +352,7 @@
     </section>
 
     <!-- Testimonials Section -->
-    <section class="py-16 bg-gradient-to-r from-farm-orange-50 via-white to-farm-green-50">
+    <section class="py-16 bg-gradient-to-br from-orange-100 via-green-50 to-orange-100">
         <div class="container mx-auto px-6">
             <h2 class="text-4xl font-bold text-center text-farm-green-800 mb-12">
                 Ce que disent nos clients
