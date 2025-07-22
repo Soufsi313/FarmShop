@@ -641,6 +641,109 @@ class Product extends Model
     }
 
     /**
+     * Get the main image URL for the product.
+     */
+    public function getImageUrlAttribute(): string
+    {
+        // Si une image principale est définie
+        if (!empty($this->main_image)) {
+            // Si c'est un chemin relatif, ajouter le préfixe storage avec URL relative
+            if (!str_starts_with($this->main_image, 'http') && !str_starts_with($this->main_image, '/')) {
+                return '/storage/' . $this->main_image;
+            }
+            return $this->main_image;
+        }
+
+        // Sinon, essayer les images de galerie
+        if (!empty($this->gallery_images) && is_array($this->gallery_images) && count($this->gallery_images) > 0) {
+            $firstImage = $this->gallery_images[0];
+            if (!str_starts_with($firstImage, 'http') && !str_starts_with($firstImage, '/')) {
+                return '/storage/' . $firstImage;
+            }
+            return $firstImage;
+        }
+
+        // Sinon, essayer le champ images
+        if (!empty($this->images) && is_array($this->images) && count($this->images) > 0) {
+            $firstImage = $this->images[0];
+            if (!str_starts_with($firstImage, 'http') && !str_starts_with($firstImage, '/')) {
+                return '/storage/' . $firstImage;
+            }
+            return $firstImage;
+        }
+
+        // Image par défaut basée sur la catégorie
+        return $this->getDefaultImageUrl();
+    }
+
+    /**
+     * Get default image URL based on category.
+     */
+    public function getDefaultImageUrl(): string
+    {
+        $categoryName = $this->category?->name ?? 'default';
+        
+        // Images par défaut selon la catégorie
+        $defaultImages = [
+            'Légumes' => '/images/default-vegetable.jpg',
+            'Fruits' => '/images/default-fruit.jpg',
+            'Herbes aromatiques' => '/images/default-herbs.jpg',
+            'Légumineuses' => '/images/default-legumes.jpg',
+            'Céréales' => '/images/default-cereals.jpg',
+            'Plantes médicinales' => '/images/default-medicinal.jpg',
+            'Équipements' => '/images/default-equipment.jpg',
+            'Outils' => '/images/default-tools.jpg',
+        ];
+
+        return $defaultImages[$categoryName] ?? '/images/placeholder-product.jpg';
+    }
+
+    /**
+     * Get all available images for the product.
+     */
+    public function getAllImagesAttribute(): array
+    {
+        $images = [];
+
+        // Ajouter l'image principale
+        if (!empty($this->main_image)) {
+            $images[] = $this->image_url;
+        }
+
+        // Ajouter les images de galerie
+        if (!empty($this->gallery_images) && is_array($this->gallery_images)) {
+            foreach ($this->gallery_images as $image) {
+                if (!str_starts_with($image, 'http') && !str_starts_with($image, '/')) {
+                    $images[] = '/storage/' . $image;
+                } else {
+                    $images[] = $image;
+                }
+            }
+        }
+
+        // Ajouter les autres images
+        if (!empty($this->images) && is_array($this->images)) {
+            foreach ($this->images as $image) {
+                if (!str_starts_with($image, 'http') && !str_starts_with($image, '/')) {
+                    $images[] = '/storage/' . $image;
+                } else {
+                    $images[] = $image;
+                }
+            }
+        }
+
+        // Supprimer les doublons
+        $images = array_unique($images);
+
+        // Si aucune image, utiliser l'image par défaut
+        if (empty($images)) {
+            $images[] = $this->getDefaultImageUrl();
+        }
+
+        return $images;
+    }
+
+    /**
      * Utiliser le slug comme clé de route
      */
     public function getRouteKeyName()

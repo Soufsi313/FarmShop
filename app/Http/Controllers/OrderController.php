@@ -12,14 +12,102 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
-    public function __construct()
+    /**
+     * Afficher la page de checkout pour l'interface web
+     */
+    public function showCheckout()
     {
-        $this->middleware('auth:sanctum');
-        $this->middleware('admin')->only(['adminIndex', 'adminShow', 'adminStats', 'updateStatus']);
+        $user = Auth::user();
+        $cart = $user->getOrCreateActiveCart();
+        $cart->load(['items.product.category']);
+
+        if (!$cart || $cart->items->isEmpty()) {
+            return redirect()->route('cart.index')->with('error', 'Votre panier est vide');
+        }
+
+        $cartSummary = $cart->getCompleteCartSummary();
+
+        return view('checkout.index', [
+            'cart' => $cart,
+            'cartSummary' => $cartSummary,
+            'user' => $user
+        ]);
     }
 
     /**
-     * Afficher les commandes de l'utilisateur connecté
+     * Afficher la page des commandes utilisateur pour l'interface web
+     */
+    public function webIndex(Request $request)
+    {
+        $query = Auth::user()->orders()->with(['items.product']);
+
+        // Filtrage par statut
+        if ($request->filled('status')) {
+            switch ($request->status) {
+                case 'pending':
+                    $query->pending();
+                    break;
+                case 'confirmed':
+                    $query->confirmed();
+                    break;
+                case 'shipped':
+                    $query->shipped();
+                    break;
+                case 'delivered':
+                    $query->delivered();
+                    break;
+                case 'cancelled':
+                    $query->cancelled();
+                    break;
+            }
+        }
+
+        // Tri
+        $sortBy = $request->get('sort_by', 'recent');
+        switch ($sortBy) {
+            case 'oldest':
+                $query->oldest();
+                break;
+            case 'total_asc':
+                $query->orderBy('total_amount', 'asc');
+                break;
+            case 'total_desc':
+                $query->orderBy('total_amount', 'desc');
+                break;
+            default:
+                $query->latest();
+        }
+
+        $orders = $query->paginate(10);
+
+        return view('orders.index', [
+            'orders' => $orders,
+            'currentStatus' => $request->get('status'),
+            'currentSort' => $sortBy
+        ]);
+    }
+
+    /**
+     * Afficher une commande spécifique pour l'interface web
+     */
+    public function webShow(Order $order)
+    {
+        // Vérifier que la commande appartient à l'utilisateur connecté
+        if ($order->user_id !== Auth::id() && Auth::user()->role !== 'admin') {
+            abort(403, 'Accès non autorisé à cette commande');
+        }
+
+        $order->load([
+            'items.product.category',
+            'items.returns',
+            'returns'
+        ]);
+
+        return view('orders.show', ['order' => $order]);
+    }
+
+    /**
+     * Afficher les commandes de l'utilisateur connecté (API)
      */
     public function index(Request $request)
     {
@@ -119,29 +207,35 @@ class OrderController extends Controller
         ]);
 
         // Récupérer le panier de l'utilisateur
-        $cart = Auth::user()->cart()->with(['items.product.category'])->first();
+        $cart = Auth::user()->getOrCreateActiveCart();
+        $cart->load(['items.product.category']);
 
         if (!$cart || $cart->items->isEmpty()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Votre panier est vide'
-            ], 422);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Votre panier est vide'
+                ], 422);
+            }
+            return redirect()->route('cart.index')->with('error', 'Votre panier est vide');
         }
 
         // Vérifier la disponibilité des produits
         foreach ($cart->items as $item) {
             if (!$item->product->is_active) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => "Le produit '{$item->product->name}' n'est plus disponible"
-                ], 422);
+                $errorMsg = "Le produit '{$item->product->name}' n'est plus disponible";
+                if ($request->expectsJson()) {
+                    return response()->json(['status' => 'error', 'message' => $errorMsg], 422);
+                }
+                return redirect()->route('checkout.index')->with('error', $errorMsg);
             }
 
             if ($item->product->stock < $item->quantity) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => "Stock insuffisant pour le produit '{$item->product->name}'"
-                ], 422);
+                $errorMsg = "Stock insuffisant pour le produit '{$item->product->name}'";
+                if ($request->expectsJson()) {
+                    return response()->json(['status' => 'error', 'message' => $errorMsg], 422);
+                }
+                return redirect()->route('checkout.index')->with('error', $errorMsg);
             }
         }
 
@@ -175,21 +269,32 @@ class OrderController extends Controller
 
             // Vider le panier
             $cart->items()->delete();
+            $cart->calculateTotal();
 
             DB::commit();
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Commande créée avec succès',
-                'data' => $order->load(['items.product'])
-            ], 201);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Commande créée avec succès',
+                    'data' => $order->load(['items.product'])
+                ], 201);
+            }
+
+            // Redirection vers la page de confirmation de commande
+            return redirect()->route('orders.show', $order)->with('success', 'Commande créée avec succès !');
 
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Erreur lors de la création de la commande: ' . $e->getMessage()
-            ], 500);
+            
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Erreur lors de la création de la commande: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()->route('checkout.index')->with('error', 'Erreur lors de la création de la commande: ' . $e->getMessage());
         }
     }
 

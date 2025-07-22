@@ -462,8 +462,8 @@ class Order extends Model
         $subtotal = $cart->subtotal;
         $taxAmount = $cart->tax_amount;
         
-        // 🚚 FRAIS DE LIVRAISON AUTOMATIQUES : < 25€ = 2.50€ | ≥ 25€ = gratuit
-        $shippingCost = $cart->calculateShippingCost($subtotal);
+        // Utiliser la méthode du panier pour calculer les frais de livraison
+        $shippingCost = $cart->getShippingCost();
         $totalAmount = $subtotal + $taxAmount + $shippingCost;
 
         // Créer la commande
@@ -483,20 +483,20 @@ class Order extends Model
         foreach ($cart->items as $cartItem) {
             $order->items()->create([
                 'product_id' => $cartItem->product_id,
-                'product_name' => $cartItem->product->name,
-                'product_sku' => $cartItem->product->sku,
-                'product_description' => $cartItem->product->description,
-                'product_image' => $cartItem->product->featured_image,
+                'product_name' => $cartItem->product_name,
+                'product_sku' => $cartItem->product->sku ?? null,
+                'product_description' => $cartItem->product->description ?? $cartItem->product->short_description,
+                'product_image' => $cartItem->product->main_image ?? null,
                 'product_category' => [
-                    'id' => $cartItem->product->category->id,
-                    'name' => $cartItem->product->category->name,
-                    'food_type' => $cartItem->product->category->food_type,
-                    'is_returnable' => $cartItem->product->category->is_returnable
+                    'id' => $cartItem->product->category->id ?? null,
+                    'name' => $cartItem->product_category,
+                    'food_type' => $cartItem->product->category->food_type ?? 'non_alimentaire',
+                    'is_returnable' => $cartItem->product->category->is_returnable ?? false
                 ],
                 'quantity' => $cartItem->quantity,
-                'unit_price' => $cartItem->product->price,
-                'total_price' => $cartItem->quantity * $cartItem->product->price,
-                'is_returnable' => $cartItem->product->category->is_returnable
+                'unit_price' => $cartItem->unit_price * (1 + ($cartItem->tax_rate / 100)), // Prix TTC unitaire
+                'total_price' => $cartItem->total,
+                'is_returnable' => $cartItem->product->category->is_returnable ?? false
             ]);
         }
 

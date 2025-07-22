@@ -1,0 +1,11 @@
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#f0fdf4"/>
+  <text x="100" y="170" font-family="Arial, sans-serif" font-size="14" fill="#166534" text-anchor="middle">Herbes</text>
+  <g transform="translate(100,100)">
+    <path d="M0 0 L-5 -30 M0 0 L5 -30 M0 0 L-10 -25 M0 0 L10 -25" stroke="#059669" stroke-width="2"/>
+    <path d="M-5 -30 Q-8 -35 -5 -40 Q-2 -35 -5 -30" fill="#10b981"/>
+    <path d="M5 -30 Q8 -35 5 -40 Q2 -35 5 -30" fill="#10b981"/>
+    <path d="M-10 -25 Q-13 -30 -10 -35 Q-7 -30 -10 -25" fill="#10b981"/>
+    <path d="M10 -25 Q13 -30 10 -35 Q7 -30 10 -25" fill="#10b981"/>
+  </g>
+</svg>

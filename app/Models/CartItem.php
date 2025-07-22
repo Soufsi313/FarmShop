@@ -135,8 +135,19 @@ class CartItem extends Model
      */
     public function getProductImageAttribute(): string
     {
+        // Toujours récupérer depuis le produit s'il existe pour avoir l'URL la plus à jour
+        if ($this->product) {
+            return $this->product->image_url;
+        }
+        
+        // Sinon, essayer depuis les métadonnées
         $metadata = $this->product_metadata ?? [];
-        return $metadata['image'] ?? '/images/placeholder-product.jpg';
+        if (!empty($metadata['image'])) {
+            return $metadata['image'];
+        }
+        
+        // Image par défaut
+        return '/images/placeholder-product.jpg';
     }
 
     /**
@@ -190,7 +201,7 @@ class CartItem extends Model
         // Mettre à jour les métadonnées
         $this->product_metadata = [
             'slug' => $product->slug,
-            'image' => $product->image_url,
+            'image' => $product->image_url, // Utiliser la nouvelle méthode
             'description' => $product->short_description,
             'category_id' => $product->category_id,
             'is_active' => $product->is_active,
@@ -233,7 +244,7 @@ class CartItem extends Model
             'total' => $total, // Total TTC
             'product_metadata' => [
                 'slug' => $product->slug,
-                'image' => $product->image_url,
+                'image' => $product->image_url, // Utiliser la nouvelle méthode
                 'description' => $product->short_description,
                 'category_id' => $product->category_id,
                 'food_type' => $product->category->food_type ?? 'non_alimentaire',
@@ -260,7 +271,6 @@ class CartItem extends Model
             'product_id' => $this->product_id,
             'product_name' => $this->product_name,
             'product_category' => $this->product_category,
-            'product_emoji' => $this->product_emoji,
             'product_image' => $this->product_image,
             'product_slug' => $this->product_slug,
             'quantity' => $this->quantity,

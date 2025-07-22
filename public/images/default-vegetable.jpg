@@ -1,0 +1,7 @@
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#dcfce7"/>
+  <text x="100" y="170" font-family="Arial, sans-serif" font-size="14" fill="#166534" text-anchor="middle">Légumes</text>
+  <circle cx="100" cy="100" r="40" fill="#22c55e"/>
+  <path d="M80 100 Q100 80 120 100 Q100 120 80 100" fill="#16a34a"/>
+  <path d="M95 85 Q105 75 115 85" stroke="#15803d" stroke-width="2" fill="none"/>
+</svg>

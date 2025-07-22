@@ -115,7 +115,7 @@ Route::get('/rentals/{product:slug}', [RentalController::class, 'show'])->name('
 Route::middleware('auth')->group(function () {
     // Routes du panier (nécessitent une authentification)
     Route::get('/cart', function () {
-        return view('cart.index-progressive');
+        return view('cart.simple');
     })->name('cart.index');
     
     // Route AJAX pour récupérer les données du panier
@@ -124,30 +124,63 @@ Route::middleware('auth')->group(function () {
         $cart = $user->getOrCreateActiveCart();
         $cartSummary = $cart->getCompleteCartSummary();
         
+        // Calculer les détails TVA par taux
+        $tvaTaxDetails = [];
+        $items = $cart->items;
+        
+        foreach ($items as $item) {
+            $taxRate = $item->tax_rate;
+            if (!isset($tvaTaxDetails[$taxRate])) {
+                $tvaTaxDetails[$taxRate] = [
+                    'rate' => $taxRate,
+                    'subtotal_ht' => 0,
+                    'tax_amount' => 0
+                ];
+            }
+            $tvaTaxDetails[$taxRate]['subtotal_ht'] += $item->subtotal;
+            $tvaTaxDetails[$taxRate]['tax_amount'] += $item->tax_amount;
+        }
+        
         return response()->json([
             'success' => true,
-            'cart' => [
-                'id' => $cart->id,
-                'items' => $cart->items->map(function($item) {
-                    return $item->toDisplayArray();
-                }),
-                'subtotal_ht' => $cartSummary['subtotal_ht'],
-                'tax_amount' => $cartSummary['tax_amount'],
-                'total_ttc' => $cartSummary['total_ttc'],
-                'shipping_cost' => $cartSummary['shipping_cost'],
-                'total_with_shipping' => $cartSummary['total_with_shipping'],
-                'is_free_shipping' => $cartSummary['is_free_shipping'],
-                'remaining_for_free_shipping' => $cartSummary['remaining_for_free_shipping'],
-                'total_items' => $cartSummary['total_items'],
-                'subtotal_ht_formatted' => $cartSummary['formatted']['subtotal_ht'],
-                'tax_amount_formatted' => $cartSummary['formatted']['tax_amount'],
-                'total_ttc_formatted' => $cartSummary['formatted']['total_ttc'],
-                'shipping_cost_formatted' => $cartSummary['formatted']['shipping_cost'],
-                'total_with_shipping_formatted' => $cartSummary['formatted']['total_with_shipping'],
-                'remaining_for_free_shipping_formatted' => $cartSummary['formatted']['remaining_for_free_shipping']
-            ]
+            'items' => $cart->items->map(function($item) {
+                return $item->toDisplayArray();
+            }),
+            'subtotal' => $cartSummary['formatted']['subtotal_ht'],
+            'tva_details' => $tvaTaxDetails,
+            'tva_amount' => $cartSummary['formatted']['tax_amount'],
+            'total' => $cartSummary['formatted']['total_ttc'],
+            'shipping_cost' => $cartSummary['formatted']['shipping_cost'],
+            'total_with_shipping' => $cartSummary['formatted']['total_with_shipping'],
+            'is_free_shipping' => $cartSummary['is_free_shipping'],
+            'remaining_for_free_shipping' => $cartSummary['formatted']['remaining_for_free_shipping'],
+            'total_items' => $cartSummary['total_items']
         ]);
     })->name('cart.data');
+    
+    // Route de debug temporaire
+    Route::get('/cart/debug', function () {
+        $user = auth()->user();
+        $cart = $user->getOrCreateActiveCart();
+        
+        return response()->json([
+            'user_id' => $user->id,
+            'cart_id' => $cart->id,
+            'cart_items_count' => $cart->items()->count(),
+            'cart_items' => $cart->items->map(function($item) {
+                return [
+                    'id' => $item->id,
+                    'product_id' => $item->product_id,
+                    'product_name' => $item->product->name,
+                    'quantity' => $item->quantity,
+                    'unit_price' => $item->unit_price,
+                    'product_image' => $item->product_image,
+                    'toDisplayArray' => $item->toDisplayArray()
+                ];
+            })
+        ]);
+    });
+    
     
     // Route AJAX pour ajouter un produit au panier
     Route::post('/cart/add-product/{id}', function ($id, Request $request) {
@@ -196,6 +229,44 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('cart.clear');
     
+    // Route pour mettre à jour la quantité (format simple)
+    Route::post('/cart/update', function (Request $request) {
+        $request->validate([
+            'cart_item_id' => 'required|integer',
+            'quantity' => 'required|integer|min:1|max:100'
+        ]);
+        
+        $user = auth()->user();
+        $cart = $user->getOrCreateActiveCart();
+        
+        $item = $cart->items()->where('id', $request->cart_item_id)->firstOrFail();
+        $item->updateQuantity($request->quantity);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Quantité mise à jour'
+        ]);
+    })->name('cart.update');
+    
+    // Route pour supprimer un article
+    Route::post('/cart/remove', function (Request $request) {
+        $request->validate([
+            'cart_item_id' => 'required|integer'
+        ]);
+        
+        $user = auth()->user();
+        $cart = $user->getOrCreateActiveCart();
+        
+        $item = $cart->items()->where('id', $request->cart_item_id)->firstOrFail();
+        $item->delete();
+        $cart->calculateTotal();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Article supprimé'
+        ]);
+    })->name('cart.remove');
+    
     // Route pour mettre à jour la quantité d'un article
     Route::put('/cart/items/{itemId}/quantity', function ($itemId, Request $request) {
         $request->validate([
@@ -230,6 +301,16 @@ Route::middleware('auth')->group(function () {
             'message' => 'Article supprimé du panier'
         ]);
     })->name('cart.remove-item');
+    
+    // Routes de checkout
+    Route::get('/checkout', [\App\Http\Controllers\OrderController::class, 'showCheckout'])->name('checkout.index');
+    
+    Route::post('/checkout/create-order', [\App\Http\Controllers\OrderController::class, 'store'])->name('checkout.create-order');
+    
+    // Routes pour les commandes utilisateur
+    Route::get('/orders', [\App\Http\Controllers\OrderController::class, 'webIndex'])->name('orders.index');
+    Route::get('/orders/{order}', [\App\Http\Controllers\OrderController::class, 'webShow'])->name('orders.show');
+    Route::post('/orders/{order}/cancel', [\App\Http\Controllers\OrderController::class, 'cancel'])->name('orders.cancel');
 });// Routes d'authentification
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);

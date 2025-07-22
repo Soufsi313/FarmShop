@@ -1,0 +1,7 @@
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#fef3c7"/>
+  <text x="100" y="170" font-family="Arial, sans-serif" font-size="14" fill="#92400e" text-anchor="middle">Fruits</text>
+  <circle cx="100" cy="100" r="35" fill="#f59e0b"/>
+  <circle cx="100" cy="95" r="30" fill="#fbbf24"/>
+  <path d="M95 75 Q105 65 115 75" stroke="#d97706" stroke-width="2" fill="none"/>
+</svg>
