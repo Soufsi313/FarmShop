@@ -131,7 +131,7 @@
                                     </p>
                                 @endif
 
-                                <!-- Prix -->
+                                <!-- Prix et stock -->
                                 <div class="flex items-center justify-between mb-4">
                                     <div class="flex flex-col">
                                         @if($product->type === 'rental' || $product->type === 'both')
@@ -148,6 +148,9 @@
                                                 {{ number_format($product->price, 2) }} €
                                             </span>
                                         @endif
+                                        <span class="text-sm text-gray-500 mt-1">
+                                            Stock: {{ $product->quantity }} {{ $product->unit_symbol ?? 'unité' }}{{ $product->quantity > 1 ? 's' : '' }}
+                                        </span>
                                     </div>
                                     
                                     <!-- Statut stock -->
@@ -162,6 +165,31 @@
                                     @endif
                                 </div>
 
+                                @if($product->quantity > 0)
+                                    <!-- Contrôles de quantité -->
+                                    <div class="flex items-center space-x-2 mb-3">
+                                        <label class="text-sm font-medium text-gray-700">Quantité :</label>
+                                        <div class="flex items-center">
+                                            <button type="button" 
+                                                    onclick="decreaseQuantity({{ $product->id }})"
+                                                    class="px-2 py-1 border border-gray-300 rounded-l-md hover:bg-gray-50">
+                                                -
+                                            </button>
+                                            <input type="number" 
+                                                   id="quantity_{{ $product->id }}" 
+                                                   value="1" 
+                                                   min="1" 
+                                                   max="{{ $product->quantity }}"
+                                                   class="w-16 px-2 py-1 border-t border-b border-gray-300 text-center focus:outline-none">
+                                            <button type="button" 
+                                                    onclick="increaseQuantity({{ $product->id }})"
+                                                    class="px-2 py-1 border border-gray-300 rounded-r-md hover:bg-gray-50">
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endif
+
                                 <!-- Actions -->
                                 <div class="flex flex-col space-y-2">
                                     @if($product->quantity > 0)
@@ -170,16 +198,28 @@
                                                     class="add-to-cart-button w-full bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
                                                 Ajouter au panier location
                                             </button>
-                                        @elseif($product->type === 'purchase')
-                                            <button @click="addToCart({{ $product->id }})"
-                                                    class="add-to-cart-button w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
-                                                Ajouter au panier
-                                            </button>
-                                        @else
-                                            <button @click="addToCart({{ $product->id }})"
-                                                    class="add-to-cart-button w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
-                                                Ajouter au panier
-                                            </button>
+                                        @elseif($product->type === 'sale')
+                                            <div class="flex space-x-2">
+                                                <button onclick="addToCartFromWishlist({{ $product->id }})" 
+                                                        class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
+                                                    Ajouter au panier
+                                                </button>
+                                                <button onclick="buyNowFromWishlist({{ $product->id }})" 
+                                                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
+                                                    Acheter
+                                                </button>
+                                            </div>
+                                        @elseif($product->type === 'both')
+                                            <div class="flex space-x-2">
+                                                <button onclick="addToCartFromWishlist({{ $product->id }})" 
+                                                        class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
+                                                    Ajouter au panier
+                                                </button>
+                                                <button onclick="buyNowFromWishlist({{ $product->id }})" 
+                                                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
+                                                    Acheter
+                                                </button>
+                                            </div>
                                             <button @click="addToRentalCart({{ $product->id }})"
                                                     class="add-to-cart-button w-full bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
                                                 Louer
@@ -362,7 +402,7 @@ document.addEventListener('alpine:init', () => {
 
         async addToCart(productId) {
             try {
-                const response = await fetch(`/api/products/${productId}/add-to-cart`, {
+                const response = await fetch(`/cart/add-product/${productId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -378,9 +418,10 @@ document.addEventListener('alpine:init', () => {
                 if (data.success) {
                     this.showToast('Produit ajouté au panier', 'success');
                 } else {
-                    this.showToast(data.message, 'error');
+                    this.showToast(data.message || 'Erreur lors de l\'ajout au panier', 'error');
                 }
             } catch (error) {
+                console.error('Erreur addToCart:', error);
                 this.showToast('Erreur lors de l\'ajout au panier', 'error');
             }
         },
@@ -422,5 +463,130 @@ document.addEventListener('alpine:init', () => {
         }
     }))
 })
+
+// Fonctions utilitaires pour les contrôles de quantité
+window.increaseQuantity = function(productId) {
+    const input = document.getElementById(`quantity_${productId}`);
+    const currentValue = parseInt(input.value);
+    const maxValue = parseInt(input.getAttribute('max'));
+    
+    if (currentValue < maxValue) {
+        input.value = currentValue + 1;
+    }
+}
+
+window.decreaseQuantity = function(productId) {
+    const input = document.getElementById(`quantity_${productId}`);
+    const currentValue = parseInt(input.value);
+    
+    if (currentValue > 1) {
+        input.value = currentValue - 1;
+    }
+}
+
+// Fonctions d'ajout au panier avec quantité depuis la wishlist
+window.addToCartFromWishlist = async function(productId) {
+    const quantity = document.getElementById(`quantity_${productId}`).value;
+    
+    try {
+        const response = await fetch(`/cart/add-product/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ quantity: parseInt(quantity) })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Response error:', errorText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Mettre à jour le compteur du panier dans l'en-tête
+            updateCartCount(data.cart_count);
+            
+            // Afficher message de succès
+            showNotification('Produit ajouté au panier !', 'success');
+        } else {
+            showNotification(data.message || 'Erreur lors de l\'ajout au panier', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showNotification('Erreur lors de l\'ajout au panier', 'error');
+    }
+}
+
+window.buyNowFromWishlist = async function(productId) {
+    try {
+        // Ajouter le produit au panier avec quantité 1
+        const response = await fetch(`/cart/add-product/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ quantity: 1 })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Response error:', errorText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Mettre à jour le compteur du panier dans l'en-tête
+            updateCartCount(data.cart_count);
+            
+            // Rediriger vers le panier
+            window.location.href = '/cart';
+        } else {
+            showNotification(data.message || 'Erreur lors de l\'ajout au panier', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showNotification('Erreur lors de l\'ajout au panier', 'error');
+    }
+}
+
+// Fonctions utilitaires
+window.updateCartCount = function(count) {
+    const cartCountElement = document.querySelector('.cart-count');
+    if (cartCountElement) {
+        cartCountElement.textContent = count;
+        cartCountElement.style.display = count > 0 ? 'inline' : 'none';
+    }
+}
+
+window.showNotification = function(message, type = 'info') {
+    // Créer une notification toast
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 ${
+        type === 'success' ? 'bg-green-500 text-white' : 
+        type === 'error' ? 'bg-red-500 text-white' : 
+        'bg-blue-500 text-white'
+    }`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Supprimer après 3 secondes
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
 </script>
 @endsection

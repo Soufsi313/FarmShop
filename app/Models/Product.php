@@ -585,6 +585,62 @@ class Product extends Model
     }
 
     /**
+     * Get the tax rate for this product based on its category
+     */
+    public function getTaxRate(): float
+    {
+        // Si la catégorie est alimentaire, TVA réduite de 6%
+        if ($this->category && $this->category->food_type === 'alimentaire') {
+            return 6.00;
+        }
+        
+        // Sinon, TVA normale de 21%
+        return 21.00;
+    }
+
+    /**
+     * Get the price excluding tax (HT)
+     */
+    public function getPriceExcludingTax(): float
+    {
+        $taxRate = $this->getTaxRate();
+        return round($this->price / (1 + ($taxRate / 100)), 2);
+    }
+
+    /**
+     * Get the tax amount for this product
+     */
+    public function getTaxAmount(): float
+    {
+        $priceHT = $this->getPriceExcludingTax();
+        $taxRate = $this->getTaxRate();
+        return round($priceHT * ($taxRate / 100), 2);
+    }
+
+    /**
+     * Get formatted prices with tax details
+     */
+    public function getPriceDetails(): array
+    {
+        $priceHT = $this->getPriceExcludingTax();
+        $taxAmount = $this->getTaxAmount();
+        $taxRate = $this->getTaxRate();
+        
+        return [
+            'price_ht' => $priceHT,
+            'tax_amount' => $taxAmount,
+            'price_ttc' => $this->price,
+            'tax_rate' => $taxRate,
+            'formatted' => [
+                'price_ht' => number_format($priceHT, 2) . ' €',
+                'tax_amount' => number_format($taxAmount, 2) . ' €',
+                'price_ttc' => number_format($this->price, 2) . ' €',
+                'tax_rate' => number_format($taxRate, 1) . '%'
+            ]
+        ];
+    }
+
+    /**
      * Utiliser le slug comme clé de route
      */
     public function getRouteKeyName()

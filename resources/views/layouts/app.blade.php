@@ -147,17 +147,19 @@
                                      x-transition:leave-end="transform opacity-0 scale-95"
                                      @click.away="cartDropdownOpen = false"
                                      class="absolute left-0 z-10 mt-2 w-48 origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
-                                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                    <a href="{{ route('cart.index') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <svg class="h-4 w-4 mr-3 text-farm-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                                         </svg>
                                         <span>Panier Achat</span>
+                                        <span id="cart-count" class="ml-2 bg-green-600 text-white text-xs rounded-full px-2 py-1 hidden">0</span>
                                     </a>
                                     <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <svg class="h-4 w-4 mr-3 text-farm-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                         <span>Panier Location</span>
+                                        <span class="ml-2 bg-orange-500 text-white text-xs rounded-full px-2 py-1 opacity-50">Bientôt</span>
                                     </a>
                                 </div>
                             </div>

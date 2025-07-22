@@ -412,14 +412,23 @@ async function addToCart(productId) {
     const quantity = document.getElementById(`quantity_${productId}`).value;
     
     try {
-        const response = await fetch(`/api/products/${productId}/add-to-cart`, {
+        const response = await fetch(`/cart/add-product/${productId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             },
+            credentials: 'same-origin',
             body: JSON.stringify({ quantity: parseInt(quantity) })
         });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Response error:', errorText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
 
         const data = await response.json();
         
@@ -438,30 +447,42 @@ async function addToCart(productId) {
     }
 }
 
-function buyNow(productId) {
-    const quantity = document.getElementById(`quantity_${productId}`).value;
-    
-    // Créer un formulaire pour envoyer les données
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/products/${productId}/buy-now`;
-    
-    // Token CSRF
-    const csrfToken = document.createElement('input');
-    csrfToken.type = 'hidden';
-    csrfToken.name = '_token';
-    csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    form.appendChild(csrfToken);
-    
-    // Quantité
-    const quantityInput = document.createElement('input');
-    quantityInput.type = 'hidden';
-    quantityInput.name = 'quantity';
-    quantityInput.value = quantity;
-    form.appendChild(quantityInput);
-    
-    document.body.appendChild(form);
-    form.submit();
+async function buyNow(productId) {
+    try {
+        // Ajouter le produit au panier avec quantité 1
+        const response = await fetch(`/cart/add-product/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ quantity: 1 })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Response error:', errorText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Mettre à jour le compteur du panier dans l'en-tête
+            updateCartCount(data.cart_count);
+            
+            // Rediriger vers le panier
+            window.location.href = '/cart';
+        } else {
+            showNotification(data.message || 'Erreur lors de l\'ajout au panier', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showNotification('Erreur lors de l\'ajout au panier', 'error');
+    }
 }
 
 async function toggleLike(productSlug) {

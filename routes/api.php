@@ -178,7 +178,8 @@ Route::middleware(['auth:web'])->group(function () {
         Route::post('/products/{product}', [CartController::class, 'addProduct'])->middleware('check.product.availability')->name('add-product');
         Route::put('/products/{product}', [CartController::class, 'updateQuantity'])->middleware('check.product.availability')->name('update-quantity');
         Route::delete('/products/{product}', [CartController::class, 'removeProduct'])->name('remove-product');
-        Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
+        Route::post('/clear', [CartController::class, 'clear'])->name('clear');
+        Route::delete('/clear', [CartController::class, 'clear'])->name('clear-delete'); // Alternative DELETE
         Route::get('/availability', [CartController::class, 'checkAvailability'])->name('check-availability');
         Route::get('/summary', [CartController::class, 'summary'])->name('summary');
         Route::get('/checkout/prepare', [CartController::class, 'prepareForCheckout'])->name('prepare-checkout');
