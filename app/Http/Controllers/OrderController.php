@@ -230,7 +230,7 @@ class OrderController extends Controller
                 return redirect()->route('checkout.index')->with('error', $errorMsg);
             }
 
-            if ($item->product->stock < $item->quantity) {
+            if ($item->product->quantity < $item->quantity) {
                 $errorMsg = "Stock insuffisant pour le produit '{$item->product->name}'";
                 if ($request->expectsJson()) {
                     return response()->json(['status' => 'error', 'message' => $errorMsg], 422);
@@ -262,10 +262,8 @@ class OrderController extends Controller
                 $validated['payment_method']
             );
 
-            // Décrémenter le stock des produits
-            foreach ($cart->items as $item) {
-                $item->product->decrement('stock', $item->quantity);
-            }
+            // Note: Le stock sera décrémenter seulement après validation du paiement
+            // Voir StripeService::handleSuccessfulPayment()
 
             // Vider le panier
             $cart->items()->delete();
@@ -281,8 +279,8 @@ class OrderController extends Controller
                 ], 201);
             }
 
-            // Redirection vers la page de confirmation de commande
-            return redirect()->route('orders.show', $order)->with('success', 'Commande créée avec succès !');
+            // Redirection vers la page de paiement Stripe
+            return redirect()->route('payment.stripe', $order)->with('success', 'Commande créée avec succès ! Procédez au paiement.');
 
         } catch (\Exception $e) {
             DB::rollback();
@@ -309,10 +307,13 @@ class OrderController extends Controller
         }
 
         if (!$order->can_be_cancelled_now) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Cette commande ne peut plus être annulée'
-            ], 422);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cette commande ne peut plus être annulée'
+                ], 422);
+            }
+            return redirect()->back()->with('error', 'Cette commande ne peut plus être annulée');
         }
 
         $validated = $request->validate([
@@ -324,20 +325,28 @@ class OrderController extends Controller
 
             // Restaurer le stock des produits
             foreach ($order->items as $item) {
-                $item->product->increment('stock', $item->quantity);
+                $item->product->increment('quantity', $item->quantity);
             }
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Commande annulée avec succès',
-                'data' => $order->fresh()
-            ]);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Commande annulée avec succès',
+                    'data' => $order->fresh()
+                ]);
+            }
+
+            // Rediriger vers une page de confirmation d'annulation
+            return redirect()->route('orders.cancelled', $order)->with('success', 'Votre commande a été annulée avec succès');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ], 422);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage()
+                ], 422);
+            }
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
@@ -648,5 +657,60 @@ class OrderController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Demander un retour de commande
+     */
+    public function requestReturn(Order $order, Request $request)
+    {
+        // Vérifier que la commande appartient à l'utilisateur connecté
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Accès non autorisé à cette commande');
+        }
+
+        // Vérifier que la commande est livrée
+        if ($order->status !== 'delivered') {
+            return redirect()->back()->with('error', 'Seules les commandes livrées peuvent être retournées.');
+        }
+
+        // Vérifier que la commande peut être retournée (moins de 14 jours)
+        if (!$order->can_be_returned) {
+            return redirect()->back()->with('error', 'La période de retour de 14 jours est dépassée.');
+        }
+
+        // Valider la demande
+        $request->validate([
+            'reason' => 'required|string|max:500',
+        ]);
+
+        // Mettre à jour le statut de la commande
+        $order->update([
+            'status' => 'return_requested',
+            'return_reason' => $request->reason,
+            'return_requested_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Votre demande de retour a été envoyée. Nous vous recontacterons sous 48h.');
+    }
+
+    /**
+     * Afficher la page de confirmation d'annulation
+     */
+    public function showCancelled(Order $order)
+    {
+        // Vérifier que la commande appartient à l'utilisateur connecté
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Accès non autorisé à cette commande');
+        }
+
+        // Vérifier que la commande est bien annulée
+        if ($order->status !== 'cancelled') {
+            return redirect()->route('orders.show', $order);
+        }
+
+        $order->load(['items.product', 'user']);
+
+        return view('orders.cancelled', compact('order'));
     }
 }

@@ -43,6 +43,15 @@ class StripePaymentController extends Controller
 
             $paymentIntent = $this->stripeService->createPaymentIntentForOrder($order);
 
+            // Pour les tests : confirmer automatiquement le paiement
+            if (app()->environment('local')) {
+                $confirmedPaymentIntent = \Stripe\PaymentIntent::retrieve($paymentIntent->id);
+                $confirmedPaymentIntent->confirm([
+                    'payment_method' => 'pm_card_visa', // Carte de test Stripe
+                    'return_url' => url('/orders/' . $order->id . '/confirmation'), // URL de redirection obligatoire
+                ]);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Intention de paiement créée avec succès',
@@ -143,17 +152,20 @@ class StripePaymentController extends Controller
         ]);
 
         try {
-            $success = $this->stripeService->handleSuccessfulPayment($request->payment_intent_id);
+            $result = $this->stripeService->handleSuccessfulPayment($request->payment_intent_id);
 
-            if ($success) {
+            if ($result['success']) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Paiement confirmé avec succès'
+                    'message' => 'Paiement confirmé avec succès',
+                    'redirect_url' => $result['redirect_url'],
+                    'order_id' => $result['order_id'],
+                    'order_number' => $result['order_number'] ?? null
                 ]);
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Erreur lors de la confirmation du paiement'
+                    'message' => $result['error'] ?? 'Erreur lors de la confirmation du paiement'
                 ], 500);
             }
 
@@ -178,6 +190,13 @@ class StripePaymentController extends Controller
         $payload = $request->getContent();
         $signature = $request->header('Stripe-Signature');
 
+        // Log pour debug
+        Log::info('🎯 Webhook reçu', [
+            'has_signature' => !empty($signature),
+            'payload_length' => strlen($payload),
+            'signature_preview' => substr($signature, 0, 50) . '...'
+        ]);
+
         if (!$signature) {
             Log::warning('Webhook Stripe sans signature');
             return response()->json(['error' => 'No signature'], 400);
@@ -186,8 +205,10 @@ class StripePaymentController extends Controller
         $success = $this->stripeService->handleWebhook($payload, $signature);
 
         if ($success) {
+            Log::info('✅ Webhook traité avec succès');
             return response()->json(['status' => 'success']);
         } else {
+            Log::error('❌ Échec traitement webhook');
             return response()->json(['error' => 'Webhook handling failed'], 400);
         }
     }

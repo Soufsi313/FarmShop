@@ -73,11 +73,11 @@
         <div class="content">
             <p>Bonjour <strong>{{ $order->user->name }}</strong>,</p>
             
-            <p>Parfait ! Votre commande <strong>{{ $order->order_number }}</strong> a été livrée avec succès le {{ $order->delivered_at->format('d/m/Y à H:i') }}.</p>
+            <p>Parfait ! Votre commande <strong>{{ $order->order_number }}</strong> a été livrée avec succès{{ $order->delivered_at ? ' le ' . $order->delivered_at->format('d/m/Y à H:i') : '' }}.</p>
             
             <div class="order-info">
                 <h3>✅ Livraison confirmée</h3>
-                <p><strong>Date de livraison :</strong> {{ $order->delivered_at->format('d/m/Y à H:i') }}</p>
+                <p><strong>Date de livraison :</strong> {{ $order->delivered_at ? $order->delivered_at->format('d/m/Y à H:i') : 'En cours de traitement' }}</p>
                 <p><strong>Adresse de livraison :</strong></p>
                 <p>
                     {{ $order->shipping_address['name'] }}<br>

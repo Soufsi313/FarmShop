@@ -39,6 +39,8 @@ class Order extends Model
         'cancellation_reason',
         'has_returnable_items',
         'return_deadline',
+        'return_reason',
+        'return_requested_at',
         'invoice_number',
         'invoice_generated_at',
         'email_notifications_sent',
@@ -66,6 +68,7 @@ class Order extends Model
         'can_be_returned' => 'boolean',
         'has_returnable_items' => 'boolean',
         'return_deadline' => 'datetime',
+        'return_requested_at' => 'datetime',
         'invoice_generated_at' => 'datetime',
         'email_notifications_sent' => 'array',
         'last_notification_sent_at' => 'datetime',
@@ -314,13 +317,13 @@ class Order extends Model
         ]);
 
         // Mettre à jour le statut des items
-        $this->items()->update([
-            'status' => 'delivered',
-            'delivered_at' => $deliveredAt,
-            'return_deadline' => function($item) use ($deliveredAt) {
-                return $item->is_returnable ? $deliveredAt->addDays(14) : null;
-            }
-        ]);
+        foreach ($this->items as $item) {
+            $item->update([
+                'status' => 'delivered',
+                'delivered_at' => $deliveredAt,
+                'return_deadline' => $item->is_returnable ? $deliveredAt->addDays(14) : null
+            ]);
+        }
     }
 
     public function cancel($reason = null)
@@ -442,18 +445,38 @@ class Order extends Model
     public static function generateOrderNumber()
     {
         $prefix = 'ORD-' . date('Y') . date('m');
-        $lastOrder = static::where('order_number', 'like', $prefix . '%')
-            ->orderBy('id', 'desc')
-            ->first();
+        $maxRetries = 10;
+        
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            // Utiliser une transaction avec verrouillage pour éviter les conditions de course
+            $orderNumber = \DB::transaction(function () use ($prefix) {
+                // Verrouiller la table pour éviter les lectures concurrentes
+                $lastOrder = static::where('order_number', 'like', $prefix . '%')
+                    ->lockForUpdate()
+                    ->orderBy('order_number', 'desc')
+                    ->first();
 
-        if ($lastOrder) {
-            $lastNumber = intval(substr($lastOrder->order_number, -4));
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
+                if ($lastOrder) {
+                    $lastNumber = intval(substr($lastOrder->order_number, -4));
+                    $newNumber = $lastNumber + 1;
+                } else {
+                    $newNumber = 1;
+                }
+
+                return $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+            });
+            
+            // Vérifier que ce numéro n'existe pas déjà (double vérification)
+            if (!static::where('order_number', $orderNumber)->exists()) {
+                return $orderNumber;
+            }
+            
+            // Si le numéro existe déjà, attendre un peu et réessayer
+            usleep(100000); // 100ms
         }
-
-        return $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        
+        // Si toutes les tentatives échouent, utiliser un UUID comme fallback
+        return $prefix . '-' . \Str::random(8);
     }
 
     public static function createFromCart($cart, $billingAddress, $shippingAddress, $paymentMethod)
@@ -466,44 +489,64 @@ class Order extends Model
         $shippingCost = $cart->getShippingCost();
         $totalAmount = $subtotal + $taxAmount + $shippingCost;
 
-        // Créer la commande
-        $order = static::create([
-            'order_number' => static::generateOrderNumber(),
-            'user_id' => $cart->user_id,
-            'billing_address' => $billingAddress,
-            'shipping_address' => $shippingAddress,
-            'subtotal' => $subtotal,
-            'tax_amount' => $taxAmount,
-            'shipping_cost' => $shippingCost,
-            'total_amount' => $totalAmount,
-            'payment_method' => $paymentMethod,
-        ]);
+        $maxRetries = 5;
+        $lastException = null;
 
-        // Créer les items de commande
-        foreach ($cart->items as $cartItem) {
-            $order->items()->create([
-                'product_id' => $cartItem->product_id,
-                'product_name' => $cartItem->product_name,
-                'product_sku' => $cartItem->product->sku ?? null,
-                'product_description' => $cartItem->product->description ?? $cartItem->product->short_description,
-                'product_image' => $cartItem->product->main_image ?? null,
-                'product_category' => [
-                    'id' => $cartItem->product->category->id ?? null,
-                    'name' => $cartItem->product_category,
-                    'food_type' => $cartItem->product->category->food_type ?? 'non_alimentaire',
-                    'is_returnable' => $cartItem->product->category->is_returnable ?? false
-                ],
-                'quantity' => $cartItem->quantity,
-                'unit_price' => $cartItem->unit_price * (1 + ($cartItem->tax_rate / 100)), // Prix TTC unitaire
-                'total_price' => $cartItem->total,
-                'is_returnable' => $cartItem->product->category->is_returnable ?? false
-            ]);
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                // Créer la commande avec retry logic (order_number sera généré automatiquement par boot())
+                $order = static::create([
+                    'user_id' => $cart->user_id,
+                    'billing_address' => $billingAddress,
+                    'shipping_address' => $shippingAddress,
+                    'subtotal' => $subtotal,
+                    'tax_amount' => $taxAmount,
+                    'shipping_cost' => $shippingCost,
+                    'total_amount' => $totalAmount,
+                    'payment_method' => $paymentMethod,
+                ]);
+
+                // Créer les items de commande
+                foreach ($cart->items as $cartItem) {
+                    $order->items()->create([
+                        'product_id' => $cartItem->product_id,
+                        'product_name' => $cartItem->product_name,
+                        'product_sku' => $cartItem->product->sku ?? null,
+                        'product_description' => $cartItem->product->description ?? $cartItem->product->short_description,
+                        'product_image' => $cartItem->product->main_image ?? null,
+                        'product_category' => [
+                            'id' => $cartItem->product->category->id ?? null,
+                            'name' => $cartItem->product_category,
+                            'food_type' => $cartItem->product->category->food_type ?? 'non_alimentaire',
+                            'is_returnable' => $cartItem->product->category->is_returnable ?? false
+                        ],
+                        'quantity' => $cartItem->quantity,
+                        'unit_price' => $cartItem->unit_price * (1 + ($cartItem->tax_rate / 100)), // Prix TTC unitaire
+                        'total_price' => $cartItem->total,
+                        'is_returnable' => $cartItem->product->category->is_returnable ?? false
+                    ]);
+                }
+
+                // Si on arrive ici, la création a réussi
+                return $order;
+
+            } catch (\Illuminate\Database\QueryException $e) {
+                $lastException = $e;
+                
+                // Vérifier si c'est une violation de contrainte unique pour order_number
+                if (strpos($e->getMessage(), 'orders_order_number_unique') !== false) {
+                    // Attendre un peu avant de réessayer
+                    usleep(200000); // 200ms
+                    continue;
+                }
+                
+                // Si c'est une autre erreur, la relancer immédiatement
+                throw $e;
+            }
         }
 
-        // Vérifier s'il y a des items retournables
-        $order->checkReturnableItems();
-
-        return $order;
+        // Si toutes les tentatives ont échoué, relancer la dernière exception
+        throw $lastException;
     }
 
     // Événements

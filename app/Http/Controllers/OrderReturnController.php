@@ -305,7 +305,7 @@ class OrderReturnController extends Controller
         ]);
 
         // Restaurer le stock du produit
-        $return->orderItem->product->increment('stock', $return->quantity);
+        $return->orderItem->product->increment('quantity', $return->quantity);
 
         return response()->json([
             'status' => 'success',

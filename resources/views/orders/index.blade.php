@@ -111,21 +111,39 @@
 
                     <!-- Actions -->
                     <div class="flex justify-between items-center">
-                        <div class="flex space-x-3">
+                        <div class="flex flex-wrap gap-2">
+                            <!-- Voir les détails -->
                             <a href="{{ route('orders.show', $order) }}" 
-                               class="text-green-600 hover:text-green-800 text-sm font-medium">
-                                Voir les détails
+                               class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                👁️ Voir les détails
                             </a>
                             
-                            @if($order->can_be_cancelled && in_array($order->status, ['pending', 'confirmed']))
+                            <!-- Télécharger la facture (si payée) -->
+                            @if($order->payment_status === 'paid' && $order->invoice_number)
+                            <a href="{{ route('orders.invoice', $order) }}" 
+                               class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                📄 Télécharger la facture
+                            </a>
+                            @endif
+
+                            <!-- Annuler la commande (si pas encore expédiée) -->
+                            @if($order->can_be_cancelled && in_array($order->status, ['pending', 'confirmed', 'preparing']))
                             <form method="POST" action="{{ route('orders.cancel', $order) }}" 
                                   onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')"
                                   class="inline">
                                 @csrf
-                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">
-                                    Annuler
+                                <button type="submit" class="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                    ❌ Annuler
                                 </button>
                             </form>
+                            @endif
+
+                            <!-- Retourner la commande (si livrée et dans les 14 jours) -->
+                            @if($order->status === 'delivered' && $order->can_be_returned)
+                            <button onclick="openReturnModal('{{ $order->id }}')" 
+                                    class="bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                🔄 Retourner
+                            </button>
                             @endif
                         </div>
                         
@@ -176,6 +194,39 @@
     </div>
 </div>
 
+<!-- Modal de retour -->
+<div id="returnModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 text-center mb-4">
+                Demander un retour
+            </h3>
+            <form id="returnForm" method="POST" action="">
+                @csrf
+                <div class="mb-4">
+                    <label for="return_reason" class="block text-sm font-medium text-gray-700 mb-2">
+                        Raison du retour *
+                    </label>
+                    <textarea name="reason" id="return_reason" rows="4" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                              placeholder="Expliquez pourquoi vous souhaitez retourner cette commande..."
+                              required></textarea>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeReturnModal()" 
+                            class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                        Annuler
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700">
+                        Demander le retour
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 function filterByStatus(status) {
     const url = new URL(window.location);
@@ -192,6 +243,33 @@ function sortBy(sort) {
     url.searchParams.set('sort_by', sort);
     window.location = url.toString();
 }
+
+// Fonctions pour la modal de retour
+function openReturnModal(orderId) {
+    const modal = document.getElementById('returnModal');
+    const form = document.getElementById('returnForm');
+    
+    // Mettre à jour l'action du formulaire
+    form.action = `/orders/${orderId}/return`;
+    
+    // Afficher la modal
+    modal.classList.remove('hidden');
+}
+
+function closeReturnModal() {
+    const modal = document.getElementById('returnModal');
+    modal.classList.add('hidden');
+    
+    // Réinitialiser le formulaire
+    document.getElementById('return_reason').value = '';
+}
+
+// Fermer la modal en cliquant à l'extérieur
+document.getElementById('returnModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeReturnModal();
+    }
+});
 </script>
 
 @endsection

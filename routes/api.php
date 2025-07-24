@@ -520,8 +520,8 @@ Route::prefix('blog')->name('api.blog.')->group(function () {
 });
 
 // Routes Stripe pour les paiements
-Route::prefix('stripe')->name('api.stripe.')->group(function () {
-    Route::post('/payment-intent/purchase', [StripePaymentController::class, 'createPaymentIntentForPurchase'])->name('payment-intent.purchase');
+Route::middleware(['auth:web'])->prefix('stripe')->name('api.stripe.')->group(function () {
+    Route::post('/payment-intent/purchase/{order}', [StripePaymentController::class, 'createPaymentIntentForPurchase'])->name('payment-intent.purchase');
     Route::post('/payment-intent/rental', [StripePaymentController::class, 'createPaymentIntentForRental'])->name('payment-intent.rental');
     Route::post('/confirm-payment', [StripePaymentController::class, 'confirmPayment'])->name('confirm-payment');
     Route::post('/cancel-purchase/{order}', [StripePaymentController::class, 'cancelPurchaseOrder'])->name('cancel-purchase');

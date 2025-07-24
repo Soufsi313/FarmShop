@@ -19,9 +19,11 @@ class UpdateOrderStatusJob implements ShouldQueue
         try {
             Log::info('Début de la mise à jour automatique des statuts de commandes');
 
-            // Mettre à jour les commandes en attente de confirmation (après 5 minutes)
+            // DÉSACTIVÉ : Les commandes sont confirmées par le webhook Stripe uniquement
+            // Mettre à jour les commandes en attente de confirmation (après 45 secondes)
+            /* 
             $pendingOrders = Order::where('status', 'pending')
-                ->where('created_at', '<=', now()->subMinutes(5))
+                ->where('created_at', '<=', now()->subSeconds(45))
                 ->get();
 
             foreach ($pendingOrders as $order) {
@@ -30,10 +32,11 @@ class UpdateOrderStatusJob implements ShouldQueue
                     Log::info("Commande {$order->order_number} confirmée automatiquement");
                 }
             }
+            */
 
-            // Mettre à jour les commandes confirmées vers préparation (après 2 heures)
+            // Mettre à jour les commandes confirmées vers préparation (après 45 secondes)
             $confirmedOrders = Order::where('status', 'confirmed')
-                ->where('status_updated_at', '<=', now()->subHours(2))
+                ->where('status_updated_at', '<=', now()->subSeconds(45))
                 ->get();
 
             foreach ($confirmedOrders as $order) {
@@ -41,9 +44,9 @@ class UpdateOrderStatusJob implements ShouldQueue
                 Log::info("Commande {$order->order_number} passée en préparation automatiquement");
             }
 
-            // Mettre à jour les commandes en préparation vers expédition (après 24 heures)
+            // Mettre à jour les commandes en préparation vers expédition (après 45 secondes)
             $preparingOrders = Order::where('status', 'preparing')
-                ->where('status_updated_at', '<=', now()->subHours(24))
+                ->where('status_updated_at', '<=', now()->subSeconds(45))
                 ->get();
 
             foreach ($preparingOrders as $order) {
@@ -51,9 +54,9 @@ class UpdateOrderStatusJob implements ShouldQueue
                 Log::info("Commande {$order->order_number} expédiée automatiquement");
             }
 
-            // Mettre à jour les commandes expédiées vers livraison (après 3 jours)
+            // Mettre à jour les commandes expédiées vers livraison (après 45 secondes)
             $shippedOrders = Order::where('status', 'shipped')
-                ->where('status_updated_at', '<=', now()->subDays(3))
+                ->where('status_updated_at', '<=', now()->subSeconds(45))
                 ->get();
 
             foreach ($shippedOrders as $order) {

@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Product;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class StripeService
 {
@@ -83,25 +84,43 @@ class StripeService
     /**
      * Gérer un paiement réussi
      */
-    public function handleSuccessfulPayment(string $paymentIntentId): bool
+    public function handleSuccessfulPayment(string $paymentIntentId): array
     {
         try {
             $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
             $metadata = $paymentIntent->metadata->toArray();
 
             if ($metadata['order_type'] === 'purchase') {
-                $this->processSuccessfulPurchase((int)$metadata['order_id'], $paymentIntent);
+                $orderId = (int)$metadata['order_id'];
+                $this->processSuccessfulPurchase($orderId, $paymentIntent);
+                
+                $order = \App\Models\Order::find($orderId);
+                return [
+                    'success' => true,
+                    'order_type' => 'purchase',
+                    'order_id' => $orderId,
+                    'order_number' => $order?->order_number,
+                    'redirect_url' => route('orders.confirmation', $orderId)
+                ];
             } elseif ($metadata['order_type'] === 'rental') {
-                $this->processSuccessfulRental((int)$metadata['order_id'], $paymentIntent);
+                $orderLocationId = (int)$metadata['order_id'];
+                $this->processSuccessfulRental($orderLocationId, $paymentIntent);
+                
+                return [
+                    'success' => true,
+                    'order_type' => 'rental',
+                    'order_id' => $orderLocationId,
+                    'redirect_url' => route('rentals.confirmation', $orderLocationId)
+                ];
             }
 
-            return true;
+            return ['success' => false, 'error' => 'Type de commande inconnu'];
         } catch (\Exception $e) {
             Log::error('Erreur lors du traitement d\'un paiement réussi', [
                 'payment_intent_id' => $paymentIntentId,
                 'error' => $e->getMessage()
             ]);
-            return false;
+            return ['success' => false, 'error' => $e->getMessage()];
         }
     }
 
@@ -112,10 +131,9 @@ class StripeService
     {
         $order = Order::findOrFail($orderId);
         
-        // Mettre à jour le statut de paiement
+        // Mettre à jour les informations de paiement
         $order->update([
             'payment_status' => 'paid',
-            'status' => 'confirmed',
             'paid_at' => now(),
             'stripe_payment_intent_id' => $paymentIntent->id,
             'payment_method' => 'stripe',
@@ -126,6 +144,48 @@ class StripeService
                 'paid_at' => now()->toISOString()
             ]
         ]);
+
+        // Version avec délais de 15 secondes entre chaque changement de statut
+        try {
+            Log::info("DÉBUT progression pour commande {$order->order_number}");
+            
+            // Étape 1: Confirmation
+            $order->updateStatus('confirmed');
+            Log::info("Confirmation OK");
+            
+            sleep(15); // 15 secondes
+            
+            // Étape 2: Préparation
+            $order = $order->fresh();
+            if ($order->status !== 'cancelled') {
+                $order->updateStatus('preparing');
+                Log::info("Préparation OK");
+                
+                sleep(15); // 15 secondes
+                
+                // Étape 3: Expédition
+                $order = $order->fresh();
+                if ($order->status !== 'cancelled') {
+                    $order->updateStatus('shipped');
+                    Log::info("Expédition OK");
+                    
+                    sleep(15); // 15 secondes
+                    
+                    // Étape 4: Livraison
+                    $order = $order->fresh();
+                    if ($order->status !== 'cancelled') {
+                        $order->updateStatus('delivered');
+                        Log::info("Livraison OK");
+                    }
+                }
+            }
+            
+            Log::info("FIN progression pour commande {$order->order_number}");
+            
+        } catch (\Exception $e) {
+            Log::error("ERREUR progression: " . $e->getMessage());
+            Log::error("Ligne: " . $e->getLine() . " - Fichier: " . $e->getFile());
+        }
 
         // Décrémenter le stock des produits
         foreach ($order->items as $item) {
@@ -307,27 +367,34 @@ class StripeService
             $event = Webhook::constructEvent(
                 $payload,
                 $signature,
-                config('services.stripe.webhook_secret')
+                config('services.stripe.webhook.secret')
             );
+
+            // Log de TOUS les événements reçus
+            error_log("🎯 WEBHOOK REÇU: " . $event->type . " - ID: " . $event->id);
 
             switch ($event->type) {
                 case 'payment_intent.succeeded':
+                    error_log("💰 TRAITEMENT payment_intent.succeeded - ID: " . $event->data->object->id);
                     $this->handleSuccessfulPayment($event->data->object->id);
                     break;
                 
                 case 'payment_intent.payment_failed':
+                    error_log("❌ TRAITEMENT payment_intent.payment_failed");
                     $this->handleFailedPayment($event->data->object->id);
                     break;
                 
+                case 'payment_intent.created':
+                    error_log("📝 TRAITEMENT payment_intent.created - PAS D'ACTION");
+                    break;
+                
                 default:
-                    Log::info('Webhook Stripe non géré', ['type' => $event->type]);
+                    error_log("❓ WEBHOOK NON GÉRÉ: " . $event->type);
             }
 
             return true;
         } catch (\Exception $e) {
-            Log::error('Erreur lors du traitement du webhook Stripe', [
-                'error' => $e->getMessage()
-            ]);
+            error_log("💥 ERREUR WEBHOOK: " . $e->getMessage());
             return false;
         }
     }

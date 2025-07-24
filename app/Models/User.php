@@ -252,6 +252,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Relations avec les commandes d'achat
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
      * Commandes de location par statut
      */
     public function activeRentalOrders()

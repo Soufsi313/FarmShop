@@ -30,6 +30,9 @@ Artisan::command('rentals:auto-update', function () {
 })->purpose('Mise à jour automatique intelligente des statuts de location');
 
 // ⏰ PROGRAMMATION AUTOMATIQUE
+// Vérifier les statuts de commande toutes les 45 secondes
+Schedule::command('orders:update-status')->everyMinute()->withoutOverlapping();
+
 // Vérifier les statuts de location toutes les heures
 Schedule::command('rentals:auto-update')->hourly()->withoutOverlapping();
 

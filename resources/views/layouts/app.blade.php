@@ -163,7 +163,7 @@
                                     </a>
                                 </div>
                             </div>
-                            <a href="#" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1">
+                            <a href="{{ route('orders.index') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                                 </svg>
@@ -226,7 +226,7 @@
                                     </a>
                                     <div class="border-t border-gray-100 my-1"></div>
                                 @endif
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mes achats</a>
+                                <a href="{{ route('orders.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mes achats</a>
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mes locations</a>
                                 <a href="{{ route('wishlist.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     <div class="flex items-center">
@@ -282,7 +282,7 @@
                             </svg>
                             Wishlist
                         </a>
-                        <a href="#" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Mes achats</a>
+                        <a href="{{ route('orders.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Mes achats</a>
                         <a href="#" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Mes locations</a>
                         <a href="{{ route('users.profile') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Mon profil</a>
                     @endauth

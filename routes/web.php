@@ -19,6 +19,7 @@ use App\Http\Controllers\Web\ProductController as WebProductController;
 use App\Http\Controllers\HomeController;
 use App\Models\Product;
 use App\Models\CartItem;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -307,10 +308,75 @@ Route::middleware('auth')->group(function () {
     
     Route::post('/checkout/create-order', [\App\Http\Controllers\OrderController::class, 'store'])->name('checkout.create-order');
     
+    // Route pour la page de paiement Stripe
+    Route::get('/payment/{order}', function (Order $order) {
+        // Debug - vérifier l'utilisateur connecté
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Vous devez être connecté pour accéder à cette page');
+        }
+        
+        // Vérifier que la commande appartient à l'utilisateur connecté
+        if ($order->user_id !== auth()->id()) {
+            abort(403, 'Commande non autorisée');
+        }
+        
+        // Vérifier que la commande est en attente de paiement
+        if ($order->status !== 'pending') {
+            return redirect()->route('orders.show', $order)
+                ->with('error', 'Cette commande ne peut plus être payée');
+        }
+        
+        // Charger les items de la commande avec les produits
+        $order->load(['items.product']);
+        
+        return view('payment.stripe', compact('order'));
+    })->name('payment.stripe');
+    
+    // Route POST pour traiter le paiement Stripe
+    Route::post('/payment/{order}/stripe', [\App\Http\Controllers\StripePaymentController::class, 'createPaymentIntentForPurchase'])
+        ->name('payment.stripe.process');
+    
+    // Route de test pour simuler le décrément de stock
+    Route::get('/test-webhook/{order}', function(\App\Models\Order $order) {
+        $order->update(['status' => 'confirmed', 'payment_status' => 'paid']);
+        
+        // Décrémenter le stock manuellement
+        foreach ($order->items as $item) {
+            $product = $item->product;
+            if ($product && $product->quantity >= $item->quantity) {
+                $newQuantity = $product->quantity - $item->quantity;
+                $product->update(['quantity' => $newQuantity]);
+                
+                echo "Stock du produit {$product->name} : {$product->quantity} → {$newQuantity}<br>";
+            }
+        }
+        
+        return "Test terminé ! Stock décrémenté pour la commande {$order->order_number}";
+    })->name('test.webhook');
+    
+    // Route pour vérifier le stock d'un produit
+    Route::get('/check-stock/{product}', function(\App\Models\Product $product) {
+        return "Produit: {$product->name} - Stock actuel: {$product->quantity}";
+    })->name('check.stock');
+    
     // Routes pour les commandes utilisateur
     Route::get('/orders', [\App\Http\Controllers\OrderController::class, 'webIndex'])->name('orders.index');
     Route::get('/orders/{order}', [\App\Http\Controllers\OrderController::class, 'webShow'])->name('orders.show');
+    Route::get('/orders/{order}/confirmation', function(\App\Models\Order $order) {
+        // Vérifier que l'utilisateur peut voir cette commande
+        if ($order->user_id !== auth()->id()) {
+            abort(403, 'Commande non autorisée');
+        }
+        
+        // Charger les items de la commande
+        $order->load('items');
+        
+        return view('orders.confirmation', compact('order'));
+    })->name('orders.confirmation');
     Route::post('/orders/{order}/cancel', [\App\Http\Controllers\OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::get('/orders/{order}/cancelled', [\App\Http\Controllers\OrderController::class, 'showCancelled'])->name('orders.cancelled');
+    Route::get('/orders/{order}/invoice', [\App\Http\Controllers\OrderController::class, 'downloadInvoice'])->name('orders.invoice');
+    Route::post('/orders/{order}/return', [\App\Http\Controllers\OrderController::class, 'requestReturn'])->name('orders.return');
 });// Routes d'authentification
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);

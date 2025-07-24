@@ -13,16 +13,12 @@ class OrderObserver
      */
     public function created(Order $order): void
     {
+        // DÉSACTIVÉ : Email envoyé seulement après paiement confirmé
+        // L'email de confirmation sera envoyé dans updated() quand status = 'confirmed'
         try {
-            // Envoyer email de confirmation de commande
-            Mail::send('emails.order.created', ['order' => $order], function ($message) use ($order) {
-                $message->to($order->user->email, $order->user->name)
-                        ->subject("Confirmation de votre commande #{$order->order_number}");
-            });
-
-            Log::info("Email de confirmation envoyé pour la commande {$order->order_number}");
+            Log::info("Commande créée {$order->order_number} - Email sera envoyé après paiement");
         } catch (\Exception $e) {
-            Log::error("Erreur envoi email création commande {$order->order_number}: " . $e->getMessage());
+            Log::error("Erreur log création commande {$order->order_number}: " . $e->getMessage());
         }
     }
 
@@ -88,10 +84,8 @@ class OrderObserver
             try {
                 switch ($newPaymentStatus) {
                     case 'paid':
-                        Mail::send('emails.order.payment-confirmed', ['order' => $order], function ($message) use ($order) {
-                            $message->to($order->user->email, $order->user->name)
-                                    ->subject("Paiement confirmé pour votre commande #{$order->order_number}");
-                        });
+                        // Pas d'email ici - l'email de confirmation sera envoyé avec le changement de statut
+                        Log::info("Paiement confirmé pour la commande {$order->order_number} - Email sera envoyé avec la confirmation de commande");
                         break;
 
                     case 'failed':
@@ -99,10 +93,9 @@ class OrderObserver
                             $message->to($order->user->email, $order->user->name)
                                     ->subject("Problème de paiement pour votre commande #{$order->order_number}");
                         });
+                        Log::info("Email de paiement '{$newPaymentStatus}' envoyé pour la commande {$order->order_number}");
                         break;
                 }
-
-                Log::info("Email de paiement '{$newPaymentStatus}' envoyé pour la commande {$order->order_number}");
             } catch (\Exception $e) {
                 Log::error("Erreur envoi email paiement commande {$order->order_number}: " . $e->getMessage());
             }
@@ -116,7 +109,7 @@ class OrderObserver
     {
         // Restaurer le stock des produits si la commande est supprimée
         foreach ($order->items as $item) {
-            $item->product->increment('stock', $item->quantity);
+            $item->product->increment('quantity', $item->quantity);
         }
 
         Log::info("Stock restauré pour la commande supprimée {$order->order_number}");
@@ -129,7 +122,7 @@ class OrderObserver
     {
         // Décrémenter à nouveau le stock si la commande est restaurée
         foreach ($order->items as $item) {
-            $item->product->decrement('stock', $item->quantity);
+            $item->product->decrement('quantity', $item->quantity);
         }
 
         Log::info("Stock mis à jour pour la commande restaurée {$order->order_number}");
@@ -142,7 +135,7 @@ class OrderObserver
     {
         // Restaurer le stock des produits si la commande est définitivement supprimée
         foreach ($order->items as $item) {
-            $item->product->increment('stock', $item->quantity);
+            $item->product->increment('quantity', $item->quantity);
         }
 
         Log::info("Stock restauré pour la commande définitivement supprimée {$order->order_number}");
