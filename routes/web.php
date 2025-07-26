@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\OrderLocationController as AdminOrderLocationCont
 use App\Http\Controllers\Admin\SpecialOfferController as AdminSpecialOfferController;
 use App\Http\Controllers\Admin\MessageController as AdminMessageController;
 use App\Http\Controllers\Admin\BlogCommentController as AdminBlogCommentController;
+use App\Http\Controllers\Admin\StockController as AdminStockController;
 use App\Http\Controllers\Web\ProductController as WebProductController;
 use App\Http\Controllers\HomeController;
 use App\Models\Product;
@@ -434,6 +435,25 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // Gestion des produits
     Route::resource('products', AdminProductController::class);
+    
+    // Gestion de Stock - Section dédiée
+    Route::prefix('stock')->name('stock.')->group(function () {
+        Route::get('/', [AdminStockController::class, 'index'])->name('index');
+        Route::get('/alerts', [AdminStockController::class, 'alerts'])->name('alerts');
+        Route::get('/restock', [AdminStockController::class, 'restock'])->name('restock');
+        Route::get('/reports', [AdminStockController::class, 'reports'])->name('reports');
+    });
+    
+    // Routes pour la gestion des stocks (API-like)
+    Route::post('/stock/restock-suggestions', [DashboardController::class, 'getRestockSuggestions'])->name('stock.restock-suggestions');
+    Route::post('/products/{product}/restock', [DashboardController::class, 'restockProduct'])->name('products.restock');
+    Route::post('/products/{product}/restock-suggestion', [DashboardController::class, 'getProductRestockSuggestion'])->name('products.restock-suggestion');
+    Route::post('/stock/apply-all-restock', [DashboardController::class, 'applyAllRestock'])->name('stock.apply-all-restock');
+    Route::post('/stock/bulk-restock', [DashboardController::class, 'bulkRestock'])->name('stock.bulk-restock');
+    Route::post('/stock/bulk-update', [DashboardController::class, 'bulkUpdateStock'])->name('stock.bulk-update');
+    Route::post('/stock/weekly-report', [DashboardController::class, 'generateWeeklyReport'])->name('stock.weekly-report');
+    Route::post('/stock/export', [DashboardController::class, 'exportStockData'])->name('stock.export');
+    Route::post('/stock/optimize', [DashboardController::class, 'optimizeStock'])->name('stock.optimize');
     
     // Gestion des catégories
     Route::resource('categories', AdminCategoryController::class);

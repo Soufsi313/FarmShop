@@ -34,6 +34,9 @@ class DashboardController extends Controller
     {
         $this->checkAdminAccess();
         
+        // Statistiques de stock critique
+        $stockStats = $this->getStockStatistics();
+        
         $stats = [
             'users' => User::count(),
             'products' => Product::count() ?? 0,
@@ -47,6 +50,8 @@ class DashboardController extends Controller
             'pending_reports' => BlogCommentReport::where('status', 'pending')->count() ?? 0,
             'recent_users' => User::latest()->take(5)->get(),
             'recent_blog_posts' => BlogPost::with('category')->latest()->take(5)->get(),
+            // Statistiques de stock
+            'stock' => $stockStats
         ];
 
         return view('admin.dashboard', compact('stats'));
@@ -942,5 +947,546 @@ class DashboardController extends Controller
             ->toArray();
 
         return view('admin.blog.comments.reports', compact('stats', 'reportsByReason'));
+    }
+
+    /**
+     * Calculer les statistiques de stock
+     */
+    private function getStockStatistics()
+    {
+        // Produits par statut de stock
+        $outOfStock = Product::where('quantity', 0)->count();
+        $criticalStock = Product::whereColumn('quantity', '<=', 'critical_threshold')
+                                ->where('quantity', '>', 0)
+                                ->count();
+        $lowStock = Product::whereRaw('quantity <= low_stock_threshold AND quantity > critical_threshold')
+                           ->count();
+        $normalStock = Product::whereRaw('quantity > low_stock_threshold')
+                              ->count();
+
+        // Produits nécessitant une attention
+        $criticalProducts = Product::with('category')
+                                  ->whereColumn('quantity', '<=', 'critical_threshold')
+                                  ->orderBy('quantity', 'asc')
+                                  ->take(10)
+                                  ->get();
+
+        // Produits en rupture de stock
+        $outOfStockProducts = Product::with('category')
+                                    ->where('quantity', 0)
+                                    ->orderBy('updated_at', 'desc')
+                                    ->take(10)
+                                    ->get();
+
+        // Statistiques des alertes récentes
+        $recentAlerts = \App\Models\Message::where('type', 'system')
+                                          ->where('subject', 'like', '%stock%')
+                                          ->where('created_at', '>=', now()->subDays(7))
+                                          ->orderBy('created_at', 'desc')
+                                          ->take(5)
+                                          ->get();
+
+        // Valeur totale du stock
+        $totalStockValue = Product::selectRaw('SUM(quantity * price) as total_value')
+                                 ->value('total_value') ?? 0;
+
+        // Valeur du stock critique
+        $criticalStockValue = Product::whereColumn('quantity', '<=', 'critical_threshold')
+                                    ->selectRaw('SUM(quantity * price) as critical_value')
+                                    ->value('critical_value') ?? 0;
+
+        return [
+            'out_of_stock' => $outOfStock,
+            'critical_stock' => $criticalStock,
+            'low_stock' => $lowStock,
+            'normal_stock' => $normalStock,
+            'total_products' => Product::count(),
+            'critical_products' => $criticalProducts,
+            'out_of_stock_products' => $outOfStockProducts,
+            'recent_alerts' => $recentAlerts,
+            'total_stock_value' => $totalStockValue,
+            'critical_stock_value' => $criticalStockValue,
+            'needs_attention' => $outOfStock + $criticalStock,
+        ];
+    }
+
+    /**
+     * Générer des suggestions de réapprovisionnement
+     */
+    public function getRestockSuggestions()
+    {
+        $this->checkAdminAccess();
+        
+        // Récupérer les produits en stock critique
+        $criticalProducts = Product::with('category')
+                                  ->whereColumn('quantity', '<=', 'critical_threshold')
+                                  ->get();
+        
+        $suggestions = [];
+        
+        foreach ($criticalProducts as $product) {
+            // Calculer les ventes moyennes mensuelles (simulation - à adapter selon vos données de ventes)
+            $monthlySales = $this->calculateMonthlySales($product);
+            
+            // Stock recommandé = 2 mois de ventes + stock de sécurité
+            $securityStock = max($product->critical_threshold * 2, 10);
+            $recommendedStock = ($monthlySales * 2) + $securityStock;
+            
+            // Quantité à commander
+            $quantityToOrder = max(0, $recommendedStock - $product->quantity);
+            
+            if ($quantityToOrder > 0) {
+                $suggestions[] = [
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'current_stock' => $product->quantity,
+                    'monthly_sales' => $monthlySales,
+                    'recommended_stock' => $recommendedStock,
+                    'quantity_to_order' => $quantityToOrder,
+                    'estimated_cost' => number_format($quantityToOrder * $product->price, 2),
+                    'priority' => $product->quantity == 0 ? 'urgent' : 'high'
+                ];
+            }
+        }
+        
+        // Trier par priorité (urgent en premier)
+        usort($suggestions, function($a, $b) {
+            if ($a['priority'] === 'urgent' && $b['priority'] !== 'urgent') return -1;
+            if ($b['priority'] === 'urgent' && $a['priority'] !== 'urgent') return 1;
+            return $a['current_stock'] - $b['current_stock'];
+        });
+        
+        return response()->json([
+            'success' => true,
+            'suggestions' => $suggestions
+        ]);
+    }
+
+    /**
+     * Calculer les ventes mensuelles moyennes d'un produit
+     * (Simulation - à adapter selon votre modèle de données)
+     */
+    private function calculateMonthlySales($product)
+    {
+        // Simulation basée sur la popularité du produit
+        // Dans un vrai système, vous calculeriez à partir des OrderItems
+        $baselineSales = 10; // Ventes de base par mois
+        
+        // Facteurs d'ajustement
+        $popularityFactor = $product->views_count > 100 ? 1.5 : 1.0;
+        $likeFactor = $product->likes_count > 10 ? 1.3 : 1.0;
+        $priceFactor = $product->price < 10 ? 1.4 : ($product->price > 50 ? 0.7 : 1.0);
+        
+        return round($baselineSales * $popularityFactor * $likeFactor * $priceFactor);
+    }
+
+    /**
+     * Appliquer le réapprovisionnement d'un produit
+     */
+    public function restockProduct(Request $request, Product $product)
+    {
+        $this->checkAdminAccess();
+        
+        $request->validate([
+            'quantity' => 'required|integer|min:1'
+        ]);
+        
+        $newQuantity = $product->quantity + $request->quantity;
+        $product->update(['quantity' => $newQuantity]);
+        
+        // Créer un message d'alerte de réapprovisionnement
+        \App\Models\Message::createSystemMessage(
+            1, // ID admin (à adapter)
+            "✅ Réapprovisionnement effectué",
+            "Le produit \"{$product->name}\" a été réapprovisionné. Quantité ajoutée: {$request->quantity}. Nouveau stock: {$newQuantity}.",
+            [
+                'product_id' => $product->id,
+                'quantity_added' => $request->quantity,
+                'new_stock' => $newQuantity,
+                'action_type' => 'restock'
+            ],
+            'normal',
+            false,
+            route('admin.products.edit', $product),
+            'Voir le produit'
+        );
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Stock mis à jour avec succès',
+            'new_quantity' => $newQuantity
+        ]);
+    }
+
+    /**
+     * Appliquer toutes les suggestions de réapprovisionnement
+     */
+    public function applyAllRestock()
+    {
+        $this->checkAdminAccess();
+        
+        // Récupérer les suggestions
+        $response = $this->getRestockSuggestions();
+        $suggestions = $response->getData()->suggestions;
+        
+        $updatedProducts = 0;
+        $totalCost = 0;
+        
+        foreach ($suggestions as $suggestion) {
+            $product = Product::find($suggestion->product_id);
+            if ($product) {
+                $newQuantity = $product->quantity + $suggestion->quantity_to_order;
+                $product->update(['quantity' => $newQuantity]);
+                
+                $updatedProducts++;
+                $totalCost += floatval($suggestion->estimated_cost);
+                
+                // Créer une alerte pour chaque produit réapprovisionné
+                \App\Models\Message::createSystemMessage(
+                    1, // ID admin (à adapter)
+                    "🔄 Réapprovisionnement automatique",
+                    "Le produit \"{$product->name}\" a été réapprovisionné automatiquement. Quantité ajoutée: {$suggestion->quantity_to_order}. Nouveau stock: {$newQuantity}.",
+                    [
+                        'product_id' => $product->id,
+                        'quantity_added' => $suggestion->quantity_to_order,
+                        'new_stock' => $newQuantity,
+                        'action_type' => 'auto_restock'
+                    ],
+                    'normal',
+                    false,
+                    route('admin.products.edit', $product),
+                    'Voir le produit'
+                );
+            }
+        }
+        
+        // Message de synthèse
+        if ($updatedProducts > 0) {
+            \App\Models\Message::createSystemMessage(
+                1, // ID admin (à adapter)
+                "📊 Réapprovisionnement automatique terminé",
+                "Réapprovisionnement automatique terminé avec succès. {$updatedProducts} produits mis à jour. Coût total estimé: " . number_format($totalCost, 2) . "€.",
+                [
+                    'products_updated' => $updatedProducts,
+                    'total_cost' => $totalCost,
+                    'action_type' => 'bulk_restock'
+                ],
+                'high',
+                true
+            );
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Réapprovisionnement automatique terminé',
+            'updated_products' => $updatedProducts,
+            'total_cost' => number_format($totalCost, 2)
+        ]);
+    }
+
+    /**
+     * Obtenir une suggestion de réapprovisionnement pour un produit spécifique
+     */
+    public function getProductRestockSuggestion(Product $product)
+    {
+        $this->checkAdminAccess();
+        
+        // Calculer les ventes moyennes mensuelles
+        $monthlySales = $this->calculateMonthlySales($product);
+        
+        // Stock recommandé = 2 mois de ventes + stock de sécurité
+        $securityStock = max($product->critical_threshold * 2, 10);
+        $recommendedStock = ($monthlySales * 2) + $securityStock;
+        
+        // Quantité à commander
+        $quantityToOrder = max(0, $recommendedStock - $product->quantity);
+        
+        $suggestion = [
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'current_stock' => $product->quantity,
+            'monthly_sales' => $monthlySales,
+            'recommended_stock' => $recommendedStock,
+            'quantity_to_order' => $quantityToOrder,
+            'estimated_cost' => number_format($quantityToOrder * $product->price, 2),
+            'priority' => $product->quantity == 0 ? 'urgent' : ($product->quantity <= $product->critical_threshold ? 'high' : 'medium')
+        ];
+        
+        return response()->json([
+            'success' => true,
+            'suggestion' => $suggestion
+        ]);
+    }
+
+    /**
+     * Réapprovisionnement en masse
+     */
+    public function bulkRestock(Request $request)
+    {
+        $this->checkAdminAccess();
+        
+        $updates = $request->input('updates', []);
+        $updatedCount = 0;
+        $totalCost = 0;
+        
+        foreach ($updates as $update) {
+            $product = Product::find($update['product_id']);
+            if ($product) {
+                $quantity = intval($update['quantity']);
+                $newQuantity = $product->quantity + $quantity;
+                $product->update(['quantity' => $newQuantity]);
+                
+                $updatedCount++;
+                $totalCost += $quantity * $product->price;
+                
+                // Créer un message pour chaque produit
+                \App\Models\Message::createSystemMessage(
+                    1, // ID admin
+                    "🔄 Réapprovisionnement en masse",
+                    "Le produit \"{$product->name}\" a été réapprovisionné. Quantité ajoutée: {$quantity}. Nouveau stock: {$newQuantity}.",
+                    [
+                        'product_id' => $product->id,
+                        'quantity_added' => $quantity,
+                        'new_stock' => $newQuantity,
+                        'action_type' => 'bulk_restock'
+                    ]
+                );
+            }
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Réapprovisionnement en masse terminé',
+            'updated_count' => $updatedCount,
+            'total_cost' => number_format($totalCost, 2)
+        ]);
+    }
+
+    /**
+     * Mise à jour en masse des stocks via fichier
+     */
+    public function bulkUpdateStock(Request $request)
+    {
+        $this->checkAdminAccess();
+        
+        $request->validate([
+            'file' => 'required|file|mimes:csv,xlsx,xls'
+        ]);
+        
+        try {
+            $file = $request->file('file');
+            $updatedCount = 0;
+            
+            // Traitement du fichier CSV/Excel (simulation)
+            // Dans un cas réel, vous utiliseriez une bibliothèque comme Laravel Excel
+            $data = [];
+            if ($file->getClientOriginalExtension() === 'csv') {
+                $handle = fopen($file->getPathname(), 'r');
+                while (($row = fgetcsv($handle)) !== false) {
+                    if (count($row) >= 2) {
+                        $data[] = [
+                            'sku_or_name' => $row[0],
+                            'quantity' => intval($row[1])
+                        ];
+                    }
+                }
+                fclose($handle);
+            }
+            
+            foreach ($data as $item) {
+                $product = Product::where('name', 'like', '%' . $item['sku_or_name'] . '%')
+                                ->orWhere('slug', $item['sku_or_name'])
+                                ->first();
+                
+                if ($product && $item['quantity'] > 0) {
+                    $product->update(['quantity' => $item['quantity']]);
+                    $updatedCount++;
+                }
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Import terminé avec succès',
+                'updated_count' => $updatedCount
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'import: ' . $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Générer un rapport hebdomadaire de stock
+     */
+    public function generateWeeklyReport()
+    {
+        $this->checkAdminAccess();
+        
+        try {
+            // Données pour le rapport
+            $stockStats = $this->getStockStatistics();
+            $products = Product::with('category')->get();
+            
+            // Générer le contenu du rapport
+            $reportContent = $this->generateReportContent($stockStats, $products);
+            
+            // Créer un fichier PDF (simulation)
+            $filename = 'rapport-stock-' . date('Y-m-d') . '.pdf';
+            
+            // Dans un cas réel, vous utiliseriez une bibliothèque comme DomPDF
+            $headers = [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+            ];
+            
+            return response($reportContent, 200, $headers);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la génération du rapport: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Exporter les données de stock
+     */
+    public function exportStockData()
+    {
+        $this->checkAdminAccess();
+        
+        try {
+            $products = Product::with('category')->get();
+            
+            // Générer un fichier Excel (simulation)
+            $data = [];
+            $data[] = ['Nom', 'Catégorie', 'Stock Actuel', 'Seuil Critique', 'Seuil Stock Bas', 'Prix', 'Statut'];
+            
+            foreach ($products as $product) {
+                $status = 'Normal';
+                if ($product->quantity == 0) {
+                    $status = 'Rupture';
+                } elseif ($product->quantity <= $product->critical_threshold) {
+                    $status = 'Critique';
+                } elseif ($product->quantity <= $product->low_stock_threshold) {
+                    $status = 'Bas';
+                }
+                
+                $data[] = [
+                    $product->name,
+                    $product->category->name ?? 'Sans catégorie',
+                    $product->quantity,
+                    $product->critical_threshold,
+                    $product->low_stock_threshold ?? '',
+                    number_format($product->price, 2),
+                    $status
+                ];
+            }
+            
+            // Convertir en CSV
+            $filename = 'export-stock-' . date('Y-m-d') . '.csv';
+            $output = fopen('php://temp', 'w');
+            
+            foreach ($data as $row) {
+                fputcsv($output, $row);
+            }
+            
+            rewind($output);
+            $csv = stream_get_contents($output);
+            fclose($output);
+            
+            return response($csv, 200, [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'export: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Optimiser automatiquement les stocks
+     */
+    public function optimizeStock()
+    {
+        $this->checkAdminAccess();
+        
+        try {
+            $optimizedProducts = 0;
+            $products = Product::all();
+            
+            foreach ($products as $product) {
+                $monthlySales = $this->calculateMonthlySales($product);
+                
+                // Optimiser les seuils en fonction des ventes
+                $newCriticalThreshold = max(5, intval($monthlySales * 0.5)); // 15 jours de ventes
+                $newLowStockThreshold = max(10, intval($monthlySales * 1)); // 30 jours de ventes
+                
+                if ($product->critical_threshold != $newCriticalThreshold || 
+                    $product->low_stock_threshold != $newLowStockThreshold) {
+                    
+                    $product->update([
+                        'critical_threshold' => $newCriticalThreshold,
+                        'low_stock_threshold' => $newLowStockThreshold
+                    ]);
+                    
+                    $optimizedProducts++;
+                }
+            }
+            
+            // Créer un message de synthèse
+            \App\Models\Message::createSystemMessage(
+                1, // ID admin
+                "⚡ Optimisation automatique des stocks",
+                "Optimisation terminée avec succès. {$optimizedProducts} produits ont eu leurs seuils optimisés en fonction des données de ventes.",
+                [
+                    'optimized_products' => $optimizedProducts,
+                    'action_type' => 'stock_optimization'
+                ],
+                'normal',
+                true
+            );
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Optimisation terminée avec succès',
+                'optimized_products' => $optimizedProducts
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'optimisation: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Générer le contenu du rapport
+     */
+    private function generateReportContent($stockStats, $products)
+    {
+        $content = "RAPPORT HEBDOMADAIRE DE STOCK - " . date('d/m/Y') . "\n\n";
+        $content .= "RÉSUMÉ GÉNÉRAL:\n";
+        $content .= "- Produits en rupture: " . $stockStats['out_of_stock'] . "\n";
+        $content .= "- Produits en stock critique: " . $stockStats['critical_stock'] . "\n";
+        $content .= "- Produits en stock bas: " . $stockStats['low_stock'] . "\n";
+        $content .= "- Produits avec stock normal: " . $stockStats['normal_stock'] . "\n";
+        $content .= "- Valeur totale du stock: " . number_format($stockStats['total_stock_value'], 2) . "€\n\n";
+        
+        $content .= "PRODUITS NÉCESSITANT UNE ATTENTION:\n";
+        foreach ($stockStats['critical_products'] as $product) {
+            $content .= "- " . $product->name . " (Stock: " . $product->quantity . ", Seuil: " . $product->critical_threshold . ")\n";
+        }
+        
+        return $content;
     }
 }

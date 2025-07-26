@@ -151,6 +151,60 @@
                         </div>
                     </div>
 
+                    <!-- Section Gestion de Stock -->
+                    <div class="mt-8">
+                        <div class="flex items-center px-4 mb-4">
+                            <div class="w-8 h-0.5 bg-gradient-to-r from-red-400 to-red-600 rounded-full"></div>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Gestion de Stock</h3>
+                        </div>
+                        <div class="space-y-2">
+                            <a href="{{ route('admin.stock.index') }}" 
+                               class="@if(request()->routeIs('admin.stock*')) bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.stock*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                    </svg>
+                                </div>
+                                <span>Vue d'ensemble</span>
+                                @if(isset($stockStats) && ($stockStats['out_of_stock'] > 0 || $stockStats['critical_stock'] > 0))
+                                    <span class="ml-auto px-2 py-1 text-xs bg-red-500/20 text-red-400 rounded-full">
+                                        {{ $stockStats['out_of_stock'] + $stockStats['critical_stock'] }}
+                                    </span>
+                                @endif
+                            </a>
+
+                            <a href="{{ route('admin.stock.alerts') }}" 
+                               class="@if(request()->routeIs('admin.stock.alerts*')) bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.stock.alerts*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                                    </svg>
+                                </div>
+                                <span>Alertes & Seuils</span>
+                            </a>
+
+                            <a href="{{ route('admin.stock.restock') }}" 
+                               class="@if(request()->routeIs('admin.stock.restock*')) bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.stock.restock*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                    </svg>
+                                </div>
+                                <span>Réapprovisionnement</span>
+                            </a>
+
+                            <a href="{{ route('admin.stock.reports') }}" 
+                               class="@if(request()->routeIs('admin.stock.reports*')) bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.stock.reports*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                    </svg>
+                                </div>
+                                <span>Rapports & Analyses</span>
+                            </a>
+                        </div>
+                    </div>
+
                     <!-- Section Gestion des Commandes -->
                     <div class="mt-8">
                         <div class="flex items-center px-4 mb-4">

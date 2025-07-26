@@ -5,6 +5,12 @@
 @section('page-title', 'Détails du message')
 
 @section('content')
+@php
+    // Décoder les métadonnées JSON une seule fois au début
+    $metadata = is_string($message->metadata) ? json_decode($message->metadata, true) : $message->metadata;
+    $metadata = $metadata ?? [];
+@endphp
+
 <div class="container mx-auto px-4 py-8">
     <!-- Bouton retour -->
     <div class="mb-6">
@@ -24,44 +30,67 @@
             <div class="flex justify-between items-start">
                 <div class="flex items-center space-x-6">
                     @if($message->sender)
-                        <!-- Avatar de l'utilisateur connecté -->
-                        <div class="h-16 w-16 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                            {{ substr($message->sender->name ?: $message->sender->username, 0, 1) }}
-                        </div>
-                        <div>
-                            <div class="flex items-center space-x-3 mb-2">
-                                <h2 class="text-2xl font-bold text-gray-900">
-                                    {{ $message->sender->name ?: $message->sender->username }}
-                                </h2>
-                                <span class="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full font-medium">
-                                    Utilisateur inscrit
-                                </span>
+                        @php
+                            // Vérifier si c'est Mr Clank (utilisateur système)
+                            $isSystemMessage = $message->sender->email === 'system@farmshop.local' || 
+                                             ($metadata && isset($metadata['system_sender']) && $metadata['system_sender']);
+                        @endphp
+                        
+                        @if($isSystemMessage)
+                            <!-- Avatar pour Mr Clank (système) -->
+                            <div class="h-16 w-16 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                                🤖
                             </div>
-                            <p class="text-gray-600 mb-1">{{ $message->sender->email }}</p>
-                            <p class="text-sm text-gray-500">Membre depuis le {{ $message->sender->created_at->format('d/m/Y') }}</p>
-                        </div>
-                    @elseif($message->metadata && isset($message->metadata['sender_name']))
+                            <div>
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <h2 class="text-2xl font-bold text-gray-900">{{ $message->sender->name }}</h2>
+                                    <span class="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full font-medium">
+                                        Système Automatique
+                                    </span>
+                                </div>
+                                <p class="text-gray-600 mb-1">🔔 Message automatique du système</p>
+                                <p class="text-sm text-gray-500">Généré le {{ $message->created_at->format('d/m/Y à H:i') }}</p>
+                            </div>
+                        @else
+                            <!-- Avatar de l'utilisateur connecté normal -->
+                            <div class="h-16 w-16 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                                {{ substr($message->sender->name ?: $message->sender->username, 0, 1) }}
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <h2 class="text-2xl font-bold text-gray-900">
+                                        {{ $message->sender->name ?: $message->sender->username }}
+                                    </h2>
+                                    <span class="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full font-medium">
+                                        Utilisateur inscrit
+                                    </span>
+                                </div>
+                                <p class="text-gray-600 mb-1">{{ $message->sender->email }}</p>
+                                <p class="text-sm text-gray-500">Membre depuis le {{ $message->sender->created_at->format('d/m/Y') }}</p>
+                            </div>
+                        @endif
+                    @elseif($metadata && isset($metadata['sender_name']))
                         <!-- Avatar pour les contacts non-inscrits -->
                         <div class="h-16 w-16 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                            {{ substr($message->metadata['sender_name'], 0, 1) }}
+                            {{ substr($metadata['sender_name'], 0, 1) }}
                         </div>
                         <div>
                             <div class="flex items-center space-x-3 mb-2">
-                                <h2 class="text-2xl font-bold text-gray-900">{{ $message->metadata['sender_name'] }}</h2>
+                                <h2 class="text-2xl font-bold text-gray-900">{{ $metadata['sender_name'] }}</h2>
                                 <span class="px-3 py-1 bg-orange-100 text-orange-700 text-sm rounded-full font-medium">
                                     Visiteur
                                 </span>
-                                @if(isset($message->metadata['migrated_from_contacts']) && $message->metadata['migrated_from_contacts'])
+                                @if(isset($metadata['migrated_from_contacts']) && $metadata['migrated_from_contacts'])
                                     <span class="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full font-medium">
                                         Migré depuis contacts
                                     </span>
                                 @endif
                             </div>
-                            @if(isset($message->metadata['sender_email']))
-                                <p class="text-gray-600 mb-1">📧 {{ $message->metadata['sender_email'] }}</p>
+                            @if(isset($metadata['sender_email']))
+                                <p class="text-gray-600 mb-1">📧 {{ $metadata['sender_email'] }}</p>
                             @endif
-                            @if(isset($message->metadata['sender_phone']))
-                                <p class="text-gray-600 mb-1">📞 {{ $message->metadata['sender_phone'] }}</p>
+                            @if(isset($metadata['sender_phone']))
+                                <p class="text-gray-600 mb-1">📞 {{ $metadata['sender_phone'] }}</p>
                             @endif
                         </div>
                     @else
@@ -129,11 +158,11 @@
                     </p>
                 </div>
                 
-                @if($message->metadata && isset($message->metadata['contact_reason']))
+                @if($metadata && isset($metadata['contact_reason']))
                     <div class="bg-blue-50 rounded-lg p-4">
                         <h3 class="text-sm font-medium text-gray-500 mb-1">Motif du contact</h3>
                         <p class="text-lg font-semibold text-blue-900">
-                            {{ ucfirst($message->metadata['contact_reason']) }}
+                            {{ ucfirst($metadata['contact_reason']) }}
                         </p>
                     </div>
                 @endif
@@ -143,9 +172,9 @@
                     <p class="text-lg font-semibold text-purple-900">
                         {{ $message->type === 'contact' ? 'Message de contact' : 'Message système' }}
                     </p>
-                    @if($message->metadata && isset($message->metadata['original_contact_id']))
+                    @if($metadata && isset($metadata['original_contact_id']))
                         <p class="text-sm text-purple-600">
-                            Réf: #{{ $message->metadata['original_contact_id'] }}
+                            Réf: #{{ $metadata['original_contact_id'] }}
                         </p>
                     @endif
                 </div>
@@ -164,12 +193,12 @@
             </div>
             
             <!-- Métadonnées supplémentaires -->
-            @if($message->metadata && count($message->metadata) > 0)
+            @if($metadata && is_array($metadata) && count($metadata) > 0)
                 <div class="mb-8">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Informations supplémentaires</h3>
                     <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                         <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            @foreach($message->metadata as $key => $value)
+                            @foreach($metadata as $key => $value)
                                 @if($key !== 'contact_reason' && $key !== 'sender_name' && $key !== 'sender_email' && $key !== 'sender_phone')
                                     <div>
                                         <dt class="text-sm font-medium text-gray-500">{{ ucfirst(str_replace('_', ' ', $key)) }}</dt>
@@ -196,7 +225,7 @@
                             </button>
                         @endif
                         
-                        @if($message->type === 'contact' && !($message->metadata['admin_responded'] ?? false))
+                        @if($message->type === 'contact' && !($metadata['admin_responded'] ?? false))
                             <button onclick="openResponseModal({{ $message->id }})" 
                                     class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

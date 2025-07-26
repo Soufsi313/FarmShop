@@ -82,11 +82,17 @@ class OrderController extends Controller
         $stats = [
             'total_orders' => Order::count(),
             'pending_orders' => Order::where('status', 'pending')->count(),
+            'confirmed' => Order::where('status', 'confirmed')->count(),
+            'processing' => Order::where('status', 'processing')->count(),
+            'delivered' => Order::where('status', 'delivered')->count(),
+            'cancelled' => Order::where('status', 'cancelled')->count(),
             'revenue_today' => Order::whereDate('created_at', today())
                                    ->where('payment_status', 'paid')
                                    ->sum('total_amount'),
             'revenue_month' => Order::whereMonth('created_at', now()->month)
                                    ->where('payment_status', 'paid')
+                                   ->sum('total_amount'),
+            'total_revenue' => Order::where('payment_status', 'paid')
                                    ->sum('total_amount'),
         ];
 
