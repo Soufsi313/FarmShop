@@ -436,12 +436,14 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Gestion des produits
     Route::resource('products', AdminProductController::class);
     
-    // Gestion de Stock - Section dédiée
+    // Gestion de stock
     Route::prefix('stock')->name('stock.')->group(function () {
         Route::get('/', [AdminStockController::class, 'index'])->name('index');
         Route::get('/alerts', [AdminStockController::class, 'alerts'])->name('alerts');
-        Route::get('/restock', [AdminStockController::class, 'restock'])->name('restock');
         Route::get('/reports', [AdminStockController::class, 'reports'])->name('reports');
+        Route::get('/restock', [AdminStockController::class, 'restock'])->name('restock');
+        Route::put('/products/{product}/update', [AdminStockController::class, 'updateStock'])->name('update');
+        Route::get('/api/alerts', [AdminStockController::class, 'getStockAlerts'])->name('api.alerts');
     });
     
     // Routes pour la gestion des stocks (API-like)
@@ -523,6 +525,20 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/blog-comment-reports', [AdminBlogCommentController::class, 'reports'])->name('blog-comment-reports.index');
     Route::put('/blog-comment-reports/{report}', [AdminBlogCommentController::class, 'updateReport'])->name('blog-comment-reports.update');
     Route::delete('/blog-comment-reports/{report}', [AdminBlogCommentController::class, 'destroyReport'])->name('blog-comment-reports.destroy');
+    
+    // Gestion des cookies
+    Route::get('/cookies', [App\Http\Controllers\Admin\CookieController::class, 'index'])->name('cookies.index');
+    
+    // API admin cookies (avec auth web)
+    Route::prefix('api/cookies')->name('api.cookies.')->group(function () {
+        Route::get('/stats', [App\Http\Controllers\Admin\CookieController::class, 'stats'])->name('stats');
+        Route::get('/list', [App\Http\Controllers\Admin\CookieController::class, 'list'])->name('list');
+        Route::get('/export', [App\Http\Controllers\Admin\CookieController::class, 'export'])->name('export');
+        Route::get('/{cookie}', [App\Http\Controllers\Admin\CookieController::class, 'show'])->name('show');
+        Route::put('/{cookie}/status', [App\Http\Controllers\Admin\CookieController::class, 'updateStatus'])->name('update-status');
+        Route::delete('/{cookie}', [App\Http\Controllers\Admin\CookieController::class, 'destroy'])->name('destroy');
+        Route::delete('/cleanup/all', [App\Http\Controllers\Admin\CookieController::class, 'cleanup'])->name('cleanup');
+    });
     
     Route::get('/settings', [DashboardController::class, 'settings'])->name('settings.index');
 });

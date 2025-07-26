@@ -59,6 +59,278 @@
     <!-- Alpine.js pour l'interactivité -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
+    <!-- Script FarmShop principal -->
+    <script>
+        // Fonctions globales pour FarmShop
+        window.FarmShop = {
+            // Gestion des cookies de consentement
+            cookieConsent: {
+                // Vérifier si le consentement est déjà donné localement
+                hasLocalConsent() {
+                    return localStorage.getItem('cookie_consent_given') === 'true';
+                },
+
+                // Marquer le consentement comme donné localement
+                setLocalConsent() {
+                    localStorage.setItem('cookie_consent_given', 'true');
+                    localStorage.setItem('cookie_consent_date', new Date().toISOString());
+                },
+
+                // Afficher l'overlay de blocage
+                showOverlay() {
+                    const overlay = document.getElementById('cookie-overlay');
+                    if (overlay) {
+                        overlay.classList.remove('hidden');
+                        // Désactiver le scroll de la page
+                        document.body.style.overflow = 'hidden';
+                    }
+                },
+
+                // Masquer l'overlay de blocage
+                hideOverlay() {
+                    const overlay = document.getElementById('cookie-overlay');
+                    if (overlay) {
+                        overlay.classList.add('hidden');
+                        // Réactiver le scroll de la page
+                        document.body.style.overflow = '';
+                    }
+                },
+
+                // Masquer la bannière et l'overlay
+                hideBanner() {
+                    const banner = document.getElementById('cookie-banner');
+                    if (banner) {
+                        banner.classList.add('hidden');
+                    }
+                    this.hideOverlay();
+                    this.setLocalConsent();
+                },
+
+                async show() {
+                    console.log('🍪 Démarrage vérification consentement cookies...');
+                    
+                    // Vérifier d'abord le consentement local
+                    if (this.hasLocalConsent()) {
+                        console.log('🍪 Consentement déjà donné localement - pas d\'affichage');
+                        return;
+                    }
+
+                    const banner = document.getElementById('cookie-banner');
+                    console.log('🍪 Élément banner trouvé:', banner ? 'OUI' : 'NON');
+                    
+                    if (banner) {
+                        try {
+                            console.log('🍪 Appel API /api/cookies/preferences...');
+                            // Vérifier l'état du consentement via l'API
+                            const response = await this.checkConsentStatus();
+                            console.log('🍪 Réponse API:', response);
+                            
+                            if (response.data && response.data.consent_required) {
+                                console.log('🍪 Consentement requis = TRUE -> Affichage du bandeau et overlay');
+                                this.showOverlay();
+                                banner.classList.remove('hidden');
+                            } else {
+                                console.log('🍪 Consentement requis = FALSE -> Pas d\'affichage');
+                                this.setLocalConsent(); // Marquer comme accepté côté serveur
+                            }
+                        } catch (error) {
+                            console.error('🍪 Erreur lors de la vérification du consentement:', error);
+                            // Afficher le banner et overlay par défaut en cas d'erreur
+                            console.log('🍪 Affichage du bandeau et overlay par défaut suite à l\'erreur');
+                            this.showOverlay();
+                            banner.classList.remove('hidden');
+                        }
+                    } else {
+                        console.error('🍪 ERREUR: Élément #cookie-banner non trouvé dans le DOM !');
+                    }
+                },
+                
+                async accept() {
+                    try {
+                        console.log('🍪 Acceptation de tous les cookies...');
+                        const response = await fetch('/api/cookies/accept-all', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('🍪 Cookies acceptés avec succès:', data);
+                            this.hideBanner();
+                            this.enableAnalytics();
+                            this.showNotification('Préférences de cookies sauvegardées', 'success');
+                        } else {
+                            throw new Error('Erreur lors de l\'acceptation des cookies');
+                        }
+                    } catch (error) {
+                        console.error('🍪 Erreur lors de l\'acceptation:', error);
+                        // Masquer quand même pour éviter de bloquer l'utilisateur
+                        this.hideBanner();
+                        this.showNotification('Erreur lors de la sauvegarde', 'error');
+                    }
+                },
+                
+                async decline() {
+                    try {
+                        console.log('🍪 Refus de tous les cookies...');
+                        const response = await fetch('/api/cookies/reject-all', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('🍪 Cookies refusés avec succès:', data);
+                            this.hideBanner();
+                            this.showNotification('Seuls les cookies essentiels sont activés', 'info');
+                        } else {
+                            throw new Error('Erreur lors du rejet des cookies');
+                        }
+                    } catch (error) {
+                        console.error('🍪 Erreur lors du refus:', error);
+                        // Masquer quand même pour éviter de bloquer l'utilisateur
+                        this.hideBanner();
+                        this.showNotification('Erreur lors de la sauvegarde', 'error');
+                    }
+                },
+                
+                // Fonction utilitaire pour les tests - effacer le consentement local
+                clearLocalConsent() {
+                    localStorage.removeItem('cookie_consent_given');
+                    localStorage.removeItem('cookie_consent_date');
+                    console.log('🍪 Consentement local effacé');
+                },
+
+                async checkConsentStatus() {
+                    const response = await fetch('/api/cookies/preferences', {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    return await response.json();
+                },
+                
+                async updatePreferences(preferences) {
+                    try {
+                        const response = await fetch('/api/cookies/preferences', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                            },
+                            body: JSON.stringify(preferences)
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('Préférences mises à jour:', data);
+                            this.showNotification('Préférences sauvegardées avec succès', 'success');
+                            return data;
+                        } else {
+                            throw new Error('Erreur lors de la mise à jour');
+                        }
+                    } catch (error) {
+                        console.error('Erreur:', error);
+                        this.showNotification('Erreur lors de la sauvegarde', 'error');
+                        throw error;
+                    }
+                },
+                
+                showCookieSettings() {
+                    // Ouvrir la modale de préférences détaillées
+                    if (window.cookieSettingsModal) {
+                        window.cookieSettingsModal.show();
+                    }
+                },
+                
+                enableAnalytics() {
+                    // Activer Google Analytics ou autres trackers si autorisés
+                    console.log('Analytics enabled - ready for GA4 integration');
+                },
+                
+                showNotification(message, type = 'info') {
+                    if (window.FarmShop && window.FarmShop.notification) {
+                        window.FarmShop.notification.show(message, type);
+                    } else {
+                        console.log(`${type.toUpperCase()}: ${message}`);
+                    }
+                }
+            },
+
+            // Système de notifications
+            notification: {
+                show: function(message, type = 'info', duration = 5000) {
+                    const notification = document.createElement('div');
+                    notification.className = `fixed top-4 right-4 max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300`;
+                    
+                    const bgColor = type === 'success' ? 'bg-green-500' : 
+                                   type === 'error' ? 'bg-red-500' : 
+                                   type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
+                    
+                    notification.innerHTML = `
+                        <div class="flex items-center p-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full ${bgColor} flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        ${type === 'success' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>' :
+                                          type === 'error' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>' :
+                                          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>'}
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <p class="text-sm font-medium text-gray-900">${message}</p>
+                            </div>
+                            <div class="ml-4 flex-shrink-0">
+                                <button class="inline-flex text-gray-400 hover:text-gray-500" onclick="this.parentElement.parentElement.parentElement.remove()">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(notification);
+                    
+                    // Animation d'entrée
+                    setTimeout(() => {
+                        notification.classList.remove('translate-x-full');
+                    }, 100);
+                    
+                    // Suppression automatique
+                    setTimeout(() => {
+                        notification.classList.add('translate-x-full');
+                        setTimeout(() => {
+                            if (notification.parentElement) {
+                                notification.remove();
+                            }
+                        }, 300);
+                    }, duration);
+                }
+            },
+
+            // Interface utilisateur
+            ui: {
+                scrollToTop: function() {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        };
+    </script>
+    
     <!-- Styles CSS personnalisés -->
     <style>
         @keyframes float {
@@ -464,19 +736,180 @@
         </div>
     </footer>
 
-    <!-- Banner de consentement des cookies -->
-    <div id="cookie-banner" class="hidden fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-4 z-50">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="text-sm">
-                <p>🍪 Ce site utilise des cookies pour améliorer votre expérience. En continuant à naviguer, vous acceptez notre politique de cookies.</p>
+    <!-- Overlay de blocage pour consentement cookies -->
+    <div id="cookie-overlay" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-40 backdrop-blur-sm">
+        <div class="flex items-center justify-center h-full">
+            <div class="text-white text-center p-6">
+                <svg class="w-16 h-16 mx-auto mb-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                <p class="text-lg font-medium">Veuillez accepter ou refuser les cookies pour continuer</p>
             </div>
-            <div class="flex gap-3">
-                <button onclick="FarmShop.cookieConsent.decline()" class="px-4 py-2 text-sm border border-gray-600 rounded hover:bg-gray-800 transition-colors">
+        </div>
+    </div>
+
+    <!-- Banner de consentement des cookies -->
+    <div id="cookie-banner" class="hidden fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-4 z-50 shadow-2xl">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-sm flex-1">
+                <p class="mb-2">🍪 <strong>Ce site utilise des cookies</strong></p>
+                <p class="text-gray-300">Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser le contenu. Vous pouvez choisir quels cookies accepter.</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 min-w-fit">
+                <button onclick="FarmShop.cookieConsent.showCookieSettings()" 
+                        class="px-4 py-2 text-sm border border-gray-600 rounded hover:bg-gray-800 transition-colors whitespace-nowrap">
+                    ⚙️ Personnaliser
+                </button>
+                <button onclick="FarmShop.cookieConsent.decline()" 
+                        class="px-4 py-2 text-sm border border-gray-600 rounded hover:bg-gray-800 transition-colors whitespace-nowrap">
                     Refuser
                 </button>
-                <button onclick="FarmShop.cookieConsent.accept()" class="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 rounded transition-colors">
-                    Accepter
+                <button onclick="FarmShop.cookieConsent.accept()" 
+                        class="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 rounded transition-colors whitespace-nowrap">
+                    Tout accepter
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale de préférences de cookies -->
+    <div id="cookie-settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white p-6 rounded-t-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold">🍪 Préférences de cookies</h2>
+                        <p class="text-green-100 mt-2">Choisissez quels cookies vous souhaitez autoriser</p>
+                    </div>
+                    <button onclick="closeCookieSettings()" class="text-white hover:text-gray-200 text-2xl">
+                        ✕
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenu -->
+            <div class="p-6 space-y-6">
+                <!-- Cookies essentiels -->
+                <div class="border border-green-200 rounded-lg p-4 bg-green-50">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">🔧</span>
+                            <div>
+                                <h3 class="text-lg font-semibold text-green-800">Cookies essentiels</h3>
+                                <p class="text-sm text-green-600">Nécessaires au fonctionnement du site</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                Toujours actifs
+                            </span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-green-700">
+                        Ces cookies sont indispensables pour assurer le bon fonctionnement du site, la sécurité des transactions et mémoriser votre panier.
+                    </p>
+                </div>
+
+                <!-- Cookies analytiques -->
+                <div class="border border-blue-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">📊</span>
+                            <div>
+                                <h3 class="text-lg font-semibold text-blue-800">Cookies analytiques</h3>
+                                <p class="text-sm text-blue-600">Analyse et amélioration du site</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="analytics-toggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    <p class="text-sm text-gray-700">
+                        Ces cookies nous aident à comprendre comment vous utilisez notre site pour l'améliorer.
+                    </p>
+                </div>
+
+                <!-- Cookies marketing -->
+                <div class="border border-purple-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">🎯</span>
+                            <div>
+                                <h3 class="text-lg font-semibold text-purple-800">Cookies marketing</h3>
+                                <p class="text-sm text-purple-600">Publicité personnalisée</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="marketing-toggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                        </label>
+                    </div>
+                    <p class="text-sm text-gray-700">
+                        Ces cookies permettent de vous proposer des publicités adaptées à vos centres d'intérêt.
+                    </p>
+                </div>
+
+                <!-- Cookies préférences -->
+                <div class="border border-orange-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">⚙️</span>
+                            <div>
+                                <h3 class="text-lg font-semibold text-orange-800">Cookies de préférences</h3>
+                                <p class="text-sm text-orange-600">Personnalisation de l'expérience</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="preferences-toggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                        </label>
+                    </div>
+                    <p class="text-sm text-gray-700">
+                        Ces cookies mémorisent vos préférences (langue, région, etc.) pour personnaliser votre expérience.
+                    </p>
+                </div>
+
+                <!-- Cookies réseaux sociaux -->
+                <div class="border border-pink-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">📱</span>
+                            <div>
+                                <h3 class="text-lg font-semibold text-pink-800">Cookies réseaux sociaux</h3>
+                                <p class="text-sm text-pink-600">Partage et intégrations sociales</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="social-toggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600"></div>
+                        </label>
+                    </div>
+                    <p class="text-sm text-gray-700">
+                        Ces cookies permettent le partage sur les réseaux sociaux et l'affichage de contenu social.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer avec boutons -->
+            <div class="bg-gray-50 px-6 py-4 rounded-b-lg flex flex-col sm:flex-row gap-3 justify-between">
+                <div class="flex gap-3">
+                    <a href="{{ route('legal.cookies') }}" target="_blank" 
+                       class="text-sm text-blue-600 hover:text-blue-800 underline">
+                        📄 En savoir plus sur les cookies
+                    </a>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="rejectAllCookies()" 
+                            class="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-100 transition-colors">
+                        Tout refuser
+                    </button>
+                    <button onclick="saveCookiePreferences()" 
+                            class="px-6 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded transition-colors font-medium">
+                        Sauvegarder mes choix
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -491,90 +924,91 @@
 
     @stack('scripts')
 
-    <!-- Scripts globaux -->
+    <!-- Fonctions globales pour la modale de cookies -->
     <script>
-        // Objet global FarmShop
-        window.FarmShop = {
-            // Système de notifications
-            notification: {
-                show: function(message, type = 'info', duration = 5000) {
-                    const notification = document.createElement('div');
-                    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transition-all duration-300 transform translate-x-full`;
-                    
-                    // Classes selon le type
-                    switch(type) {
-                        case 'success':
-                            notification.classList.add('bg-green-100', 'border-l-4', 'border-green-500', 'text-green-700');
-                            break;
-                        case 'error':
-                            notification.classList.add('bg-red-100', 'border-l-4', 'border-red-500', 'text-red-700');
-                            break;
-                        case 'warning':
-                            notification.classList.add('bg-yellow-100', 'border-l-4', 'border-yellow-500', 'text-yellow-700');
-                            break;
-                        default:
-                            notification.classList.add('bg-blue-100', 'border-l-4', 'border-blue-500', 'text-blue-700');
+        // Fonctions globales pour la modale de cookies
+        window.cookieSettingsModal = {
+            show: async function() {
+                const modal = document.getElementById('cookie-settings-modal');
+                if (modal) {
+                    // Charger les préférences actuelles
+                    try {
+                        const response = await fetch('/api/cookies/preferences');
+                        const data = await response.json();
+                        
+                        if (data.success && data.data.preferences) {
+                            const prefs = data.data.preferences.preferences;
+                            document.getElementById('analytics-toggle').checked = prefs.analytics || false;
+                            document.getElementById('marketing-toggle').checked = prefs.marketing || false;
+                            document.getElementById('preferences-toggle').checked = prefs.preferences || false;
+                            document.getElementById('social-toggle').checked = prefs.social_media || false;
+                        }
+                    } catch (error) {
+                        console.error('Erreur lors du chargement des préférences:', error);
                     }
                     
-                    notification.innerHTML = `
-                        <div class="flex">
-                            <div class="flex-1">
-                                <p class="font-medium">${message}</p>
-                            </div>
-                            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-gray-400 hover:text-gray-600">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    `;
-                    
-                    document.body.appendChild(notification);
-                    
-                    // Animation d'entrée
-                    setTimeout(() => {
-                        notification.classList.remove('translate-x-full');
-                    }, 100);
-                    
-                    // Suppression automatique
-                    setTimeout(() => {
-                        notification.classList.add('translate-x-full');
-                        setTimeout(() => {
-                            if (notification.parentElement) {
-                                notification.remove();
-                            }
-                        }, 300);
-                    }, duration);
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
                 }
             },
-
-            // Interface utilisateur
-            ui: {
-                scrollToTop: function() {
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                }
-            },
-
-            // Gestion des cookies
-            cookieConsent: {
-                accept: function() {
-                    localStorage.setItem('cookieConsent', 'accepted');
-                    document.getElementById('cookie-banner').style.display = 'none';
-                },
-                decline: function() {
-                    localStorage.setItem('cookieConsent', 'declined');
-                    document.getElementById('cookie-banner').style.display = 'none';
-                },
-                check: function() {
-                    const consent = localStorage.getItem('cookieConsent');
-                    if (!consent) {
-                        document.getElementById('cookie-banner').classList.remove('hidden');
-                    }
+            
+            hide: function() {
+                const modal = document.getElementById('cookie-settings-modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
                 }
             }
+        };
+
+        // Fonctions globales pour les boutons de la modale
+        function closeCookieSettings() {
+            window.cookieSettingsModal.hide();
+        }
+
+        async function saveCookiePreferences() {
+            const preferences = {
+                necessary: true, // Toujours vrai
+                analytics: document.getElementById('analytics-toggle').checked,
+                marketing: document.getElementById('marketing-toggle').checked,
+                preferences: document.getElementById('preferences-toggle').checked,
+                social_media: document.getElementById('social-toggle').checked
+            };
+
+            try {
+                await FarmShop.cookieConsent.updatePreferences(preferences);
+                window.cookieSettingsModal.hide();
+                FarmShop.cookieConsent.hideBanner(); // Utiliser la nouvelle méthode
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde:', error);
+                // Masquer quand même pour éviter de bloquer l'utilisateur
+                FarmShop.cookieConsent.hideBanner();
+            }
+        }
+
+        async function rejectAllCookies() {
+            const preferences = {
+                necessary: true,
+                analytics: false,
+                marketing: false,
+                preferences: false,
+                social_media: false
+            };
+
+            try {
+                await FarmShop.cookieConsent.updatePreferences(preferences);
+                window.cookieSettingsModal.hide();
+                FarmShop.cookieConsent.hideBanner(); // Utiliser la nouvelle méthode
+                window.cookieSettingsModal.hide();
+                document.getElementById('cookie-banner').classList.add('hidden');
+            } catch (error) {
+                console.error('Erreur lors du rejet:', error);
+            }
+        }
+
+        // Connecter la fonction au cookieConsent
+        FarmShop.cookieConsent.showCookieSettings = function() {
+            window.cookieSettingsModal.show();
         };
 
         // Fonction globale pour les notifications (alias)
@@ -584,8 +1018,16 @@
 
         // Initialisation au chargement de la page
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🍪 DOM chargé - Initialisation du système de cookies...');
+            console.log('🔍 FarmShop object:', window.FarmShop);
+            console.log('🔍 cookieConsent object:', window.FarmShop?.cookieConsent);
+            console.log('🔍 show function:', typeof window.FarmShop?.cookieConsent?.show);
             // Vérifier le consentement des cookies
-            FarmShop.cookieConsent.check();
+            if (window.FarmShop && window.FarmShop.cookieConsent && typeof window.FarmShop.cookieConsent.show === 'function') {
+                FarmShop.cookieConsent.show();
+            } else {
+                console.error('❌ FarmShop.cookieConsent.show n\'est pas une fonction');
+            }
         });
     </script>
 </body>

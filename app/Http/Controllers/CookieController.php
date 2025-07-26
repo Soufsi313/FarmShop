@@ -7,10 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Carbon\Carbon;
 
 class CookieController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Obtenir les préférences de cookies pour le visiteur/utilisateur
      */
@@ -336,5 +339,163 @@ class CookieController extends Controller
         if (stripos($userAgent, 'edge') !== false) return 'Edge';
         if (stripos($userAgent, 'opera') !== false) return 'Opera';
         return 'Unknown';
+    }
+
+    /**
+     * Obtenir les statistiques des cookies pour l'admin
+     */
+    public function getAdminStats(): JsonResponse
+    {
+        $this->authorize('viewAny', Cookie::class);
+
+        $stats = [
+            'total_consents' => Cookie::count(),
+            'accepted_consents' => Cookie::where('status', 'accepted')->count(),
+            'rejected_consents' => Cookie::where('status', 'rejected')->count(),
+            'pending_consents' => Cookie::where('status', 'pending')->count(),
+            'necessary_count' => Cookie::where('necessary', true)->count(),
+            'analytics_count' => Cookie::where('analytics', true)->count(),
+            'marketing_count' => Cookie::where('marketing', true)->count(),
+            'preferences_count' => Cookie::where('preferences', true)->count(),
+            'social_media_count' => Cookie::where('social_media', true)->count(),
+        ];
+
+        // Statistiques des 7 derniers jours
+        $dailyStats = Cookie::selectRaw('DATE(created_at) as date, status, COUNT(*) as count')
+            ->where('created_at', '>=', Carbon::now()->subDays(7))
+            ->groupBy('date', 'status')
+            ->orderBy('date')
+            ->get()
+            ->groupBy('date');
+
+        $dailyConsents = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i)->format('Y-m-d');
+            $dayStats = $dailyStats->get($date, collect());
+            
+            $dailyConsents[] = [
+                'date' => $date,
+                'accepted' => $dayStats->where('status', 'accepted')->sum('count'),
+                'rejected' => $dayStats->where('status', 'rejected')->sum('count'),
+                'pending' => $dayStats->where('status', 'pending')->sum('count'),
+            ];
+        }
+
+        $stats['daily_consents'] = $dailyConsents;
+
+        return response()->json([
+            'success' => true,
+            'data' => $stats
+        ]);
+    }
+
+    /**
+     * Lister tous les cookies pour l'admin
+     */
+    public function getAdminIndex(Request $request): JsonResponse
+    {
+        $this->authorize('viewAny', Cookie::class);
+
+        $query = Cookie::with('user')
+            ->orderBy('updated_at', 'desc');
+
+        // Filtres
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('ip_address', 'like', "%{$search}%")
+                  ->orWhere('session_id', 'like', "%{$search}%")
+                  ->orWhereHas('user', function ($userQuery) use ($search) {
+                      $userQuery->where('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $perPage = $request->get('per_page', 10);
+        $cookies = $query->paginate($perPage);
+
+        return response()->json([
+            'success' => true,
+            'data' => $cookies
+        ]);
+    }
+
+    /**
+     * Supprimer un consentement (admin seulement)
+     */
+    public function destroyConsent($id): JsonResponse
+    {
+        $cookie = Cookie::findOrFail($id);
+        $this->authorize('delete', $cookie);
+
+        $cookie->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Consentement supprimé avec succès'
+        ]);
+    }
+
+    /**
+     * Exporter les données de cookies
+     */
+    public function exportCookies(): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $this->authorize('viewAny', Cookie::class);
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="cookies-export-' . date('Y-m-d') . '.csv"',
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+            
+            // Headers CSV
+            fputcsv($file, [
+                'ID',
+                'Utilisateur',
+                'Session ID',
+                'IP Address',
+                'Status',
+                'Essentiels',
+                'Analytics',
+                'Marketing',
+                'Préférences',
+                'Réseaux sociaux',
+                'Date création',
+                'Dernière modification',
+                'User Agent'
+            ]);
+
+            // Données
+            Cookie::with('user')->chunk(1000, function ($cookies) use ($file) {
+                foreach ($cookies as $cookie) {
+                    fputcsv($file, [
+                        $cookie->id,
+                        $cookie->user ? $cookie->user->email : 'Visiteur',
+                        $cookie->session_id,
+                        $cookie->ip_address,
+                        $cookie->status,
+                        $cookie->necessary ? 'Oui' : 'Non',
+                        $cookie->analytics ? 'Oui' : 'Non',
+                        $cookie->marketing ? 'Oui' : 'Non',
+                        $cookie->preferences ? 'Oui' : 'Non',
+                        $cookie->social_media ? 'Oui' : 'Non',
+                        $cookie->created_at?->format('Y-m-d H:i:s'),
+                        $cookie->updated_at?->format('Y-m-d H:i:s'),
+                        $cookie->user_agent
+                    ]);
+                }
+            });
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

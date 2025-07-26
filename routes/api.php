@@ -332,14 +332,6 @@ Route::middleware(['auth:web'])->group(function () {
             Route::patch('/{specialOffer}/toggle-status', [App\Http\Controllers\SpecialOfferController::class, 'toggleStatus'])->name('toggle-status');
         });
         
-        // Gestion des cookies (Admin seulement)
-        Route::prefix('admin/cookies')->name('api.admin.cookies.')->group(function () {
-            Route::get('/', [CookieController::class, 'index'])->name('index');
-            Route::get('/stats', [CookieController::class, 'getGlobalStats'])->name('stats');
-            Route::get('/{cookie}', [CookieController::class, 'show'])->name('show');
-            Route::delete('/{cookie}', [CookieController::class, 'destroy'])->name('destroy');
-        });
-        
         // Gestion des newsletters (Admin seulement)
         Route::prefix('admin/newsletters')->name('api.admin.newsletters.')->group(function () {
             Route::get('/', [NewsletterController::class, 'index'])->name('index');
@@ -354,6 +346,14 @@ Route::middleware(['auth:web'])->group(function () {
             Route::post('/{newsletter}/cancel', [NewsletterController::class, 'cancel'])->name('cancel');
             Route::post('/{newsletter}/duplicate-template', [NewsletterController::class, 'duplicateAsTemplate'])->name('duplicate-template');
             Route::post('/templates/{template}/create', [NewsletterController::class, 'createFromTemplate'])->name('create-from-template');
+        });
+        
+        // Gestion des cookies (Admin seulement)
+        Route::prefix('admin/cookies')->name('api.admin.cookies.')->group(function () {
+            Route::get('/', [CookieController::class, 'getAdminIndex'])->name('index');
+            Route::get('/stats', [CookieController::class, 'getAdminStats'])->name('stats');
+            Route::get('/export', [CookieController::class, 'exportCookies'])->name('export');
+            Route::delete('/{cookie}', [CookieController::class, 'destroyConsent'])->name('destroy');
         });
         
         // Gestion des catégories de blog (Admin seulement)

@@ -330,37 +330,28 @@ class OrderController extends Controller
         ]);
 
         try {
-            // Annuler la commande
             $order->cancel($validated['reason'] ?? null);
 
-            // CORRECTION CRITIQUE: Restaurer le stock TOUJOURS si la commande avait décrémenté le stock
-            // Cela arrive dès que payment_status était 'paid' à un moment donné
-            if (in_array($order->payment_status, ['paid', 'refunded']) || $order->paid_at) {
+            // Restaurer le stock des produits SEULEMENT si la commande était payée
+            // (c'est-à-dire si le stock avait été décrémenté)
+            if ($order->payment_status === 'paid') {
                 foreach ($order->items as $item) {
-                    if ($item->product) {
-                        $oldQuantity = $item->product->quantity;
-                        $item->product->increment('quantity', $item->quantity);
-                        
-                        Log::info('Stock restauré après annulation', [
-                            'product_id' => $item->product->id,
-                            'product_name' => $item->product->name,
-                            'previous_quantity' => $oldQuantity,
-                            'new_quantity' => $item->product->fresh()->quantity,
-                            'quantity_restored' => $item->quantity,
-                            'order_id' => $order->id,
-                            'order_number' => $order->order_number,
-                            'payment_status' => $order->payment_status,
-                            'had_special_offer' => $item->special_offer_id ? true : false
-                        ]);
-                    }
+                    $item->product->increment('quantity', $item->quantity);
+                    
+                    Log::info('Stock restauré après annulation', [
+                        'product_id' => $item->product->id,
+                        'product_name' => $item->product->name,
+                        'quantity_restored' => $item->quantity,
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number
+                    ]);
                 }
-                Log::info('Stock restauré pour commande annulée', [
+                Log::info('Stock restauré pour commande annulée payée', [
                     'order_id' => $order->id,
-                    'order_number' => $order->order_number,
-                    'payment_status' => $order->payment_status
+                    'order_number' => $order->order_number
                 ]);
             } else {
-                Log::info('Pas de restauration de stock - commande jamais payée', [
+                Log::info('Stock non restauré car commande non payée', [
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,
                     'payment_status' => $order->payment_status

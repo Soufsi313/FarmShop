@@ -65,6 +65,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Vérifier si l'utilisateur a un rôle spécifique
+     */
+    public function hasRole(string $role): bool
+    {
+        return strtolower($this->role) === strtolower($role);
+    }
+
+    /**
      * Vérifier si l'utilisateur est un User
      */
     public function isUser(): bool

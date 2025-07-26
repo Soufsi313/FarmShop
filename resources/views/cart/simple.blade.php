@@ -80,15 +80,14 @@ function displayCart(data) {
                                     <div class="text-xs text-gray-500 mt-1">
                                         ${item.special_offer ? `
                                             <div class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs mb-1">
-                                                <span class="font-semibold">🔥 ${item.special_offer.title || 'Offre spéciale'}</span>
-                                                <span class="block text-xs">${item.special_offer.discount_percentage}% de réduction (-${item.special_offer.discount_amount_ttc_formatted} par unité)</span>
+                                                <span class="font-semibold">🔥 ${item.special_offer.title}</span>
+                                                <span class="block text-xs">${item.special_offer.discount_percentage}% de réduction</span>
                                             </div>
                                             <div class="space-y-1">
                                                 <div class="flex items-center gap-2">
                                                     <span class="line-through text-red-500">Prix normal TTC: ${item.special_offer.original_price_ttc_formatted}</span>
                                                 </div>
                                                 <div class="text-green-600 font-medium">Prix réduit TTC: ${item.price_per_unit_ttc_formatted}</div>
-                                                <div class="text-xs text-green-600">Économie unitaire: ${item.special_offer.discount_amount_ttc_formatted}</div>
                                                 <div class="text-xs">Prix unitaire HT: ${item.price_per_unit_ht_formatted}</div>
                                                 <div class="text-xs">TVA ${item.tax_rate_formatted}: ${(item.price_per_unit_ttc - item.price_per_unit_ht).toFixed(2)} €</div>
                                             </div>
@@ -112,10 +111,8 @@ function displayCart(data) {
                                             <div>Sous-total HT: ${item.subtotal_formatted}</div>
                                             <div>TVA: ${item.tax_amount_formatted}</div>
                                             ${item.special_offer ? `
-                                                <div class="text-green-600 font-medium bg-green-50 px-1 py-0.5 rounded mt-1">
-                                                    <div class="text-xs">Économie unitaire: ${item.special_offer.discount_amount_ttc_formatted}</div>
-                                                    <div class="text-xs">Économie totale: ${item.special_offer.savings_total_ttc_formatted}</div>
-                                                    <div class="text-xs">(${item.quantity} × ${item.special_offer.discount_amount_ttc_formatted})</div>
+                                                <div class="text-green-600 font-medium">
+                                                    Économie: ${item.special_offer.savings_total_ttc_formatted}
                                                 </div>
                                             ` : ''}
                                         </div>

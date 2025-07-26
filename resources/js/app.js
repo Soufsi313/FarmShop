@@ -11,32 +11,128 @@ Alpine.start()
 window.FarmShop = {
     // Gestion des cookies de consentement
     cookieConsent: {
-        show() {
+        async show() {
             const banner = document.getElementById('cookie-banner');
-            if (banner && !this.hasConsent()) {
-                banner.classList.remove('hidden');
+            if (banner) {
+                try {
+                    // Vérifier l'état du consentement via l'API
+                    const response = await this.checkConsentStatus();
+                    if (response.consent_required) {
+                        banner.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error('Erreur lors de la vérification du consentement:', error);
+                    // Afficher le banner par défaut en cas d'erreur
+                    banner.classList.remove('hidden');
+                }
             }
         },
         
-        accept() {
-            localStorage.setItem('farmshop_cookie_consent', 'accepted');
-            document.getElementById('cookie-banner').classList.add('hidden');
-            // Activer les cookies analytiques/marketing ici
-            this.enableAnalytics();
+        async accept() {
+            try {
+                const response = await fetch('/api/cookies/accept-all', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Cookies acceptés:', data);
+                    document.getElementById('cookie-banner').classList.add('hidden');
+                    this.enableAnalytics();
+                    this.showNotification('Préférences de cookies sauvegardées', 'success');
+                } else {
+                    throw new Error('Erreur lors de l\'acceptation des cookies');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                this.showNotification('Erreur lors de la sauvegarde', 'error');
+            }
         },
         
-        decline() {
-            localStorage.setItem('farmshop_cookie_consent', 'declined');
-            document.getElementById('cookie-banner').classList.add('hidden');
+        async decline() {
+            try {
+                const response = await fetch('/api/cookies/reject-all', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Cookies rejetés:', data);
+                    document.getElementById('cookie-banner').classList.add('hidden');
+                    this.showNotification('Préférences de cookies sauvegardées', 'success');
+                } else {
+                    throw new Error('Erreur lors du rejet des cookies');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                this.showNotification('Erreur lors de la sauvegarde', 'error');
+            }
         },
         
-        hasConsent() {
-            return localStorage.getItem('farmshop_cookie_consent') !== null;
+        async checkConsentStatus() {
+            const response = await fetch('/api/cookies/preferences', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            return await response.json();
+        },
+        
+        async updatePreferences(preferences) {
+            try {
+                const response = await fetch('/api/cookies/preferences', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: JSON.stringify(preferences)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Préférences mises à jour:', data);
+                    this.showNotification('Préférences sauvegardées avec succès', 'success');
+                    return data;
+                } else {
+                    throw new Error('Erreur lors de la mise à jour');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                this.showNotification('Erreur lors de la sauvegarde', 'error');
+                throw error;
+            }
+        },
+        
+        showCookieSettings() {
+            // Ouvrir la modale de préférences détaillées
+            if (window.cookieSettingsModal) {
+                window.cookieSettingsModal.show();
+            }
         },
         
         enableAnalytics() {
-            // Intégration future avec Google Analytics ou autres
-            console.log('Analytics enabled');
+            // Activer Google Analytics ou autres trackers si autorisés
+            console.log('Analytics enabled - ready for GA4 integration');
+        },
+        
+        showNotification(message, type = 'info') {
+            if (window.FarmShop && window.FarmShop.notification) {
+                window.FarmShop.notification.show(message, type);
+            } else {
+                console.log(`${type.toUpperCase()}: ${message}`);
+            }
         }
     },
     

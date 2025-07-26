@@ -342,6 +342,16 @@
                                 <span class="ml-auto w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
                             </a>
 
+                            <a href="{{ route('admin.cookies.index') }}" 
+                               class="@if(request()->routeIs('admin.cookies*')) bg-gradient-to-r from-yellow-500 to-yellow-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                                <div class="@if(request()->routeIs('admin.cookies*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <span>Gestion Cookies</span>
+                            </a>
+
                             <a href="{{ route('admin.settings.index') }}" 
                                class="@if(request()->routeIs('admin.settings*')) bg-gradient-to-r from-slate-500 to-slate-600 text-white shadow-lg @else text-slate-300 hover:bg-slate-700/50 hover:text-white @endif group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
                                 <div class="@if(request()->routeIs('admin.settings*')) bg-white/20 @else bg-slate-600 group-hover:bg-slate-500 @endif p-2 rounded-lg mr-4 transition-colors">

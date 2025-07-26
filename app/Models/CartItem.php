@@ -379,12 +379,8 @@ class CartItem extends Model
             $originalPriceTTC = $this->original_unit_price ? 
                 $this->original_unit_price * (1 + ($this->tax_rate / 100)) : null;
             
-            $specialOffer = $this->specialOffer; // Récupérer l'offre spéciale
-            
             $data['special_offer'] = [
                 'id' => $this->special_offer_id,
-                'title' => $specialOffer ? $specialOffer->title : 'Offre spéciale',
-                'description' => $specialOffer ? $specialOffer->description : null,
                 'discount_percentage' => $this->discount_percentage,
                 'discount_amount_ht' => $this->discount_amount,
                 'discount_amount_ttc' => $this->discount_amount * (1 + ($this->tax_rate / 100)),
