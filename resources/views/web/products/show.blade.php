@@ -176,11 +176,71 @@
                 </div>
 
                 <!-- Prix -->
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <div class="text-3xl font-bold text-green-600 mb-2">
-                        {{ number_format($product->price, 2) }}€
+                <div class="bg-gray-50 rounded-lg p-4" x-data="productPricing">
+                    @php
+                        // Chercher s'il y a une offre spéciale disponible (même si pas encore applicable)
+                        $availableOffer = $product->specialOffers()
+                            ->where('is_active', true)
+                            ->where('start_date', '<=', now())
+                            ->where('end_date', '>=', now())
+                            ->where(function($query) {
+                                $query->whereNull('usage_limit')
+                                      ->orWhereColumn('usage_count', '<', 'usage_limit');
+                            })
+                            ->orderBy('discount_percentage', 'desc')
+                            ->first();
+                        $hasSpecialOffer = $availableOffer !== null;
+                        $specialOffer = $availableOffer;
+                    @endphp
+                    
+                    @if($hasSpecialOffer)
+                        <!-- Badge offre spéciale -->
+                        <div class="mb-3">
+                            <span class="bg-red-500 text-white px-3 py-2 rounded-lg text-sm font-bold">
+                                🔥 Offre Spéciale: -{{ $specialOffer->discount_percentage }}%
+                            </span>
+                        </div>
+                        
+                        <!-- Prix avec réduction -->
+                        <div class="flex items-center space-x-3 mb-2">
+                            <div class="text-3xl font-bold" :class="hasDiscount ? 'text-red-600' : 'text-green-600'">
+                                <span x-text="formatPrice(finalPrice)"></span>
+                            </div>
+                            <div class="text-2xl text-gray-500 line-through" x-show="hasDiscount">
+                                <span x-text="formatPrice(originalPrice)"></span>
+                            </div>
+                        </div>
                         <span class="text-lg font-normal text-gray-500">/ {{ $product->unit_symbol }}</span>
-                    </div>
+                        
+                        <!-- Détails de l'offre -->
+                        <div class="mt-2 p-3 bg-red-50 rounded-lg border border-red-200">
+                            <div class="text-sm text-red-800">
+                                <strong>{{ $specialOffer->name }}</strong>
+                            </div>
+                            <div class="text-sm text-red-700">
+                                {{ $specialOffer->description }}
+                            </div>
+                            <div class="text-xs text-red-600 mt-1">
+                                Quantité minimum: {{ $specialOffer->minimum_quantity }} {{ $product->unit_symbol }}
+                                @if($specialOffer->end_date)
+                                    - Valide jusqu'au {{ $specialOffer->end_date->format('d/m/Y') }}
+                                @endif
+                            </div>
+                            <!-- Indicateur de déclenchement de l'offre -->
+                            <div x-show="!hasDiscount && quantity < {{ $specialOffer->minimum_quantity }}" class="text-xs text-orange-600 mt-1 font-semibold">
+                                Ajoutez <span x-text="{{ $specialOffer->minimum_quantity }} - quantity"></span> {{ $product->unit_symbol }} de plus pour bénéficier de l'offre !
+                            </div>
+                            <div x-show="hasDiscount" class="text-xs text-green-600 mt-1 font-semibold">
+                                ✓ Offre spéciale appliquée !
+                            </div>
+                        </div>
+                    @else
+                        <!-- Prix normal -->
+                        <div class="text-3xl font-bold text-green-600 mb-2">
+                            <span x-text="formatPrice(finalPrice)"></span>
+                            <span class="text-lg font-normal text-gray-500">/ {{ $product->unit_symbol }}</span>
+                        </div>
+                    @endif
                     
                     @if($product->rental_price_per_day && ($product->type === 'rental' || $product->type === 'both'))
                         <div class="text-lg text-gray-600">
@@ -247,7 +307,10 @@
                         <div class="mb-4 p-3 bg-gray-50 rounded-lg">
                             <div class="flex justify-between items-center">
                                 <span class="text-sm font-medium text-gray-700">Total</span>
-                                <span class="text-lg font-bold text-green-600" x-text="formatPrice(quantity * {{ $product->price }})"></span>
+                                <span class="text-lg font-bold text-green-600" x-text="formatPrice(finalPrice)"></span>
+                            </div>
+                            <div x-show="hasDiscount" class="text-xs text-gray-600 mt-1">
+                                Économie: <span class="text-red-600 font-semibold" x-text="formatPrice(originalPrice - finalPrice)"></span>
                             </div>
                         </div>
 
@@ -447,6 +510,61 @@ document.addEventListener('alpine:init', () => {
                 style: 'currency',
                 currency: 'EUR'
             }).format(price);
+        },
+
+        getPriceForQuantity(quantity) {
+            @if($hasSpecialOffer)
+                const basePrice = {{ $product->price }} * quantity;
+                const minQuantity = {{ $specialOffer->minimum_quantity }};
+                const discountPercentage = {{ $specialOffer->discount_percentage }};
+                
+                if (quantity >= minQuantity) {
+                    const discount = (basePrice * discountPercentage) / 100;
+                    return basePrice - discount;
+                }
+                return basePrice;
+            @else
+                return {{ $product->price }} * quantity;
+            @endif
+        }
+    }))
+
+    Alpine.data('productPricing', () => ({
+        quantity: 1,
+        
+        get hasDiscount() {
+            @if($hasSpecialOffer)
+                return this.quantity >= {{ $specialOffer->minimum_quantity }};
+            @else
+                return false;
+            @endif
+        },
+
+        get originalPrice() {
+            return this.quantity * {{ $product->price }};
+        },
+
+        get finalPrice() {
+            @if($hasSpecialOffer)
+                const basePrice = this.quantity * {{ $product->price }};
+                const minQuantity = {{ $specialOffer->minimum_quantity }};
+                const discountPercentage = {{ $specialOffer->discount_percentage }};
+                
+                if (this.quantity >= minQuantity) {
+                    const discount = (basePrice * discountPercentage) / 100;
+                    return basePrice - discount;
+                }
+                return basePrice;
+            @else
+                return this.quantity * {{ $product->price }};
+            @endif
+        },
+
+        formatPrice(price) {
+            return new Intl.NumberFormat('fr-FR', {
+                style: 'currency',
+                currency: 'EUR'
+            }).format(price);
         }
     }))
 })
@@ -473,8 +591,10 @@ function increaseQuantity() {
     const maxValue = parseInt(input.getAttribute('max'));
     
     if (currentValue < maxValue) {
-        input.value = currentValue + 1;
-        Alpine.store('productDetail').quantity = currentValue + 1;
+        const newValue = currentValue + 1;
+        input.value = newValue;
+        // Mettre à jour Alpine.js via un événement personnalisé
+        input.dispatchEvent(new Event('input'));
     }
 }
 
@@ -483,8 +603,10 @@ function decreaseQuantity() {
     const currentValue = parseInt(input.value);
     
     if (currentValue > 1) {
-        input.value = currentValue - 1;
-        Alpine.store('productDetail').quantity = currentValue - 1;
+        const newValue = currentValue - 1;
+        input.value = newValue;
+        // Mettre à jour Alpine.js via un événement personnalisé
+        input.dispatchEvent(new Event('input'));
     }
 }
 

@@ -744,6 +744,68 @@ class Product extends Model
     }
 
     /**
+     * Récupère l'offre spéciale active valide pour une quantité donnée
+     */
+    public function getActiveSpecialOffer($quantity = 1)
+    {
+        return $this->specialOffers()
+            ->where('is_active', true)
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->where('minimum_quantity', '<=', $quantity)
+            ->where(function($query) {
+                $query->whereNull('usage_limit')
+                      ->orWhereColumn('usage_count', '<', 'usage_limit');
+            })
+            ->orderBy('discount_percentage', 'desc')
+            ->first();
+    }
+
+    /**
+     * Calcule le prix avec réduction pour une quantité donnée
+     */
+    public function getPriceForQuantity($quantity = 1)
+    {
+        $basePrice = $this->price * $quantity;
+        $specialOffer = $this->getActiveSpecialOffer($quantity);
+        
+        if ($specialOffer) {
+            $discount = ($basePrice * $specialOffer->discount_percentage) / 100;
+            return $basePrice - $discount;
+        }
+        
+        return $basePrice;
+    }
+
+    /**
+     * Calcule le montant de la réduction pour une quantité donnée
+     */
+    public function getDiscountAmount($quantity = 1)
+    {
+        $basePrice = $this->price * $quantity;
+        $discountedPrice = $this->getPriceForQuantity($quantity);
+        
+        return $basePrice - $discountedPrice;
+    }
+
+    /**
+     * Récupère le pourcentage de réduction pour une quantité donnée
+     */
+    public function getDiscountPercentage($quantity = 1)
+    {
+        $specialOffer = $this->getActiveSpecialOffer($quantity);
+        return $specialOffer ? $specialOffer->discount_percentage : 0;
+    }
+
+    /**
+     * Vérifie si le produit a une offre spéciale active pour une quantité donnée
+     */
+    public function hasActiveSpecialOffer($quantity = 1)
+    {
+        return $this->getActiveSpecialOffer($quantity) !== null;
+    }
+
+    /**
      * Utiliser le slug comme clé de route
      */
     public function getRouteKeyName()

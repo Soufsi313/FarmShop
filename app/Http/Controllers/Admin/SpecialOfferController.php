@@ -18,11 +18,22 @@ class SpecialOfferController extends Controller
             abort(403, 'Accès non autorisé. Seuls les administrateurs peuvent gérer les offres spéciales.');
         }
 
+        // Calculer les statistiques globales
+        $stats = [
+            'total' => SpecialOffer::count(),
+            'active' => SpecialOffer::where('is_active', true)
+                ->where('start_date', '<=', now())
+                ->where('end_date', '>=', now())
+                ->count(),
+            'upcoming' => SpecialOffer::where('start_date', '>', now())->count(),
+            'expired' => SpecialOffer::where('end_date', '<', now())->count(),
+        ];
+
         $specialOffers = SpecialOffer::with('product')
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
-        return view('admin.special-offers.index', compact('specialOffers'));
+        return view('admin.special-offers.index', compact('specialOffers', 'stats'));
     }
 
     public function create()
@@ -43,14 +54,16 @@ class SpecialOfferController extends Controller
             abort(403, 'Accès non autorisé. Seuls les administrateurs peuvent gérer les offres spéciales.');
         }
         $request->validate([
-            'title' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'description' => 'required|string',
             'discount_percentage' => 'required|numeric|min:1|max:100',
+            'minimum_quantity' => 'required|integer|min:1',
             'product_id' => 'required|exists:products,id',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'is_active' => 'required|boolean'
+            'is_active' => 'required|boolean',
+            'usage_limit' => 'nullable|integer|min:1'
         ]);
 
         $data = $request->all();
@@ -98,14 +111,16 @@ class SpecialOfferController extends Controller
             abort(403, 'Accès non autorisé. Seuls les administrateurs peuvent gérer les offres spéciales.');
         }
         $request->validate([
-            'title' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'description' => 'required|string',
             'discount_percentage' => 'required|numeric|min:1|max:100',
+            'minimum_quantity' => 'required|integer|min:1',
             'product_id' => 'required|exists:products,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'is_active' => 'required|boolean'
+            'is_active' => 'required|boolean',
+            'usage_limit' => 'nullable|integer|min:1'
         ]);
 
         $data = $request->all();

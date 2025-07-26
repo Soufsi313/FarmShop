@@ -145,47 +145,13 @@ class StripeService
             ]
         ]);
 
-        // Version avec délais de 15 secondes entre chaque changement de statut
-        try {
-            Log::info("DÉBUT progression pour commande {$order->order_number}");
-            
-            // Étape 1: Confirmation
-            $order->updateStatus('confirmed');
-            Log::info("Confirmation OK");
-            
-            sleep(15); // 15 secondes
-            
-            // Étape 2: Préparation
-            $order = $order->fresh();
-            if ($order->status !== 'cancelled') {
-                $order->updateStatus('preparing');
-                Log::info("Préparation OK");
-                
-                sleep(15); // 15 secondes
-                
-                // Étape 3: Expédition
-                $order = $order->fresh();
-                if ($order->status !== 'cancelled') {
-                    $order->updateStatus('shipped');
-                    Log::info("Expédition OK");
-                    
-                    sleep(15); // 15 secondes
-                    
-                    // Étape 4: Livraison
-                    $order = $order->fresh();
-                    if ($order->status !== 'cancelled') {
-                        $order->updateStatus('delivered');
-                        Log::info("Livraison OK");
-                    }
-                }
-            }
-            
-            Log::info("FIN progression pour commande {$order->order_number}");
-            
-        } catch (\Exception $e) {
-            Log::error("ERREUR progression: " . $e->getMessage());
-            Log::error("Ligne: " . $e->getLine() . " - Fichier: " . $e->getFile());
-        }
+        // ✅ NOUVEAU SYSTÈME NON-BLOQUANT : Progression via le modèle Order
+        Log::info("Démarrage progression non-bloquante pour commande {$order->order_number}");
+        
+        // Passer à confirmed et déclencher les transitions automatiques
+        $order->updateStatus('confirmed');
+        
+        Log::info("Commande {$order->order_number} confirmée - Transitions automatiques démarrées");
 
         // Décrémenter le stock des produits
         foreach ($order->items as $item) {
@@ -437,7 +403,7 @@ class StripeService
     /**
      * Convertir un montant en centimes pour Stripe
      */
-    private function convertToStripeAmount(float $amount): int
+    public function convertToStripeAmount(float $amount): int
     {
         return (int) round($amount * 100);
     }
@@ -502,6 +468,60 @@ class StripeService
             DB::rollBack();
             Log::error('Erreur lors de l\'annulation de location', [
                 'order_location_id' => $orderLocation->id,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Traiter un remboursement automatique pour une commande retournée
+     */
+    public function processAutomaticRefund(Order $order): bool
+    {
+        try {
+            if (!$order->stripe_payment_intent_id) {
+                Log::error('Impossible de rembourser: aucun PaymentIntent trouvé', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number
+                ]);
+                return false;
+            }
+
+            // Créer le remboursement via Stripe
+            $refund = \Stripe\Refund::create([
+                'payment_intent' => $order->stripe_payment_intent_id,
+                'amount' => $this->convertToStripeAmount($order->total_amount),
+                'reason' => 'requested_by_customer',
+                'metadata' => [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'refund_type' => 'automatic_return',
+                    'user_id' => $order->user_id,
+                    'return_reason' => $order->return_reason ?? 'Retour automatique'
+                ]
+            ]);
+
+            // Mettre à jour la commande
+            $order->update([
+                'refund_processed' => true,
+                'refund_processed_at' => now(),
+                'refund_stripe_id' => $refund->id
+            ]);
+
+            Log::info('Remboursement automatique traité avec succès', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'refund_id' => $refund->id,
+                'amount' => $order->total_amount
+            ]);
+
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error('Erreur lors du remboursement automatique', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
                 'error' => $e->getMessage()
             ]);
             return false;

@@ -117,6 +117,9 @@ Route::middleware(['auth:web'])->group(function () {
     Route::delete('/profile/self-delete', [UserController::class, 'selfDelete'])->name('api.users.self-delete');
     Route::get('/profile/download-data', [UserController::class, 'downloadData'])->name('api.users.download-data');
     
+    // Routes de statut de commandes - Supprimé car dupliqué plus bas
+    Route::post('/orders/{order}/trigger-next-status', [\App\Http\Controllers\Api\OrderStatusController::class, 'triggerNextStatus'])->name('api.orders.trigger-next');
+    
     // Routes newsletter
     Route::post('/newsletter/subscribe', [UserController::class, 'subscribeNewsletter'])->name('api.newsletter.subscribe');
     Route::post('/newsletter/unsubscribe', [UserController::class, 'unsubscribeNewsletter'])->name('api.newsletter.unsubscribe');
@@ -534,4 +537,5 @@ Route::middleware(['auth:web'])->prefix('stripe')->name('api.stripe.')->group(fu
 Route::middleware(['auth:web'])->group(function () {
     Route::post('/likes/products/{product}/toggle', [ProductLikeController::class, 'toggle'])->name('api.likes.web.toggle');
     Route::post('/wishlist/products/{product}/toggle', [WishlistController::class, 'toggle'])->name('api.wishlist.web.toggle');
+    Route::get('/orders/{order}/status', [\App\Http\Controllers\Api\OrderStatusController::class, 'getStatus'])->name('api.orders.status');
 });

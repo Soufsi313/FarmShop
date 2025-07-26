@@ -27,6 +27,7 @@ class SpecialOffer extends Model
         'is_active',
         'usage_count',
         'usage_limit',
+        'image',
     ];
 
     /**

@@ -336,6 +336,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/payment/{order}/stripe', [\App\Http\Controllers\StripePaymentController::class, 'createPaymentIntentForPurchase'])
         ->name('payment.stripe.process');
     
+    // Route webhook Stripe (sans middleware auth pour que Stripe puisse y accéder)
+    Route::post('/webhook/stripe', [\App\Http\Controllers\StripePaymentController::class, 'webhook'])
+        ->withoutMiddleware(['web', 'auth']);
+    
     // Route de test pour simuler le décrément de stock
     Route::get('/test-webhook/{order}', function(\App\Models\Order $order) {
         $order->update(['status' => 'confirmed', 'payment_status' => 'paid']);
@@ -376,6 +380,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders/{order}/cancel', [\App\Http\Controllers\OrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('/orders/{order}/cancelled', [\App\Http\Controllers\OrderController::class, 'showCancelled'])->name('orders.cancelled');
     Route::get('/orders/{order}/invoice', [\App\Http\Controllers\OrderController::class, 'downloadInvoice'])->name('orders.invoice');
+    Route::get('/orders/{order}/return-confirm', [\App\Http\Controllers\OrderController::class, 'showReturnConfirmation'])->name('orders.return.confirm');
     Route::post('/orders/{order}/return', [\App\Http\Controllers\OrderController::class, 'requestReturn'])->name('orders.return');
 });// Routes d'authentification
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -456,6 +461,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::patch('/orders/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
     Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
     
     // Gestion des commandes de location

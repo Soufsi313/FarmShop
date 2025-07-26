@@ -228,15 +228,29 @@ document.addEventListener('alpine:init', () => {
         filterProducts() {
             this.loading = true;
             
-            // Construire l'URL avec les paramètres de recherche
-            const params = new URLSearchParams();
-            if (this.searchTerm) params.append('search', this.searchTerm);
-            if (this.selectedCategory) params.append('category', this.selectedCategory);
-            if (this.selectedStatus) params.append('status', this.selectedStatus);
-            if (this.itemsPerPage !== 15) params.append('per_page', this.itemsPerPage);
+            const formData = new FormData();
+            formData.append('search', this.searchTerm);
+            formData.append('category', this.selectedCategory);
+            formData.append('status', this.selectedStatus);
+            formData.append('per_page', this.itemsPerPage);
             
-            const url = '{{ route("admin.products.index") }}' + (params.toString() ? '?' + params.toString() : '');
-            window.location.href = url;
+            fetch('{{ route("admin.products.index") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('productsTable').innerHTML = html;
+                this.loading = false;
+            })
+            .catch(error => {
+                console.error('Erreur lors du filtrage:', error);
+                this.loading = false;
+            });
         },
 
         clearFilters() {
@@ -275,7 +289,27 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
 
-            alert(`Fonctionnalité en cours de développement. Action demandée: ${action === 'activate' ? 'Activer' : 'Désactiver'} ${this.selectedProducts.length} produit(s).`);
+            if (confirm(`Êtes-vous sûr de vouloir ${action === 'activate' ? 'activer' : 'désactiver'} les produits sélectionnés ?`)) {
+                const formData = new FormData();
+                formData.append('action', action);
+                formData.append('product_ids', JSON.stringify(this.selectedProducts));
+                
+                fetch('{{ route("admin.products.bulk-action") }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.filterProducts();
+                        this.selectedProducts = [];
+                    }
+                });
+            }
         },
 
         confirmDelete(product) {
@@ -304,11 +338,12 @@ document.addEventListener('alpine:init', () => {
         },
 
         exportProducts() {
-            alert('Fonctionnalité d\'export en cours de développement');
+            window.location.href = '{{ route("admin.products.export") }}';
         },
 
         importProducts() {
-            alert('Fonctionnalité d\'import en cours de développement');
+            // Ouvrir modal d'import ou rediriger vers page d'import
+            window.location.href = '{{ route("admin.products.import") }}';
         }
     }));
 });

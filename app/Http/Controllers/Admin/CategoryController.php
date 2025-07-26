@@ -12,11 +12,19 @@ class CategoryController extends Controller
 {
     public function index()
     {
+        // Calculer les statistiques globales
+        $stats = [
+            'total' => Category::count(),
+            'active' => Category::where('is_active', true)->count(),
+            'with_products' => Category::has('products')->count(),
+            'inactive' => Category::where('is_active', false)->count(),
+        ];
+        
         $categories = Category::withCount('products')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
-        return view('admin.categories.index', compact('categories'));
+        return view('admin.categories.index', compact('categories', 'stats'));
     }
 
     public function create()

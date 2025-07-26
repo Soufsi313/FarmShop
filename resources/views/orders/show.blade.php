@@ -3,7 +3,28 @@
 @section('title', 'Commande #' . $order->order_number . ' - FarmShop')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 py-8">
+<div class="min-h-screen bg-gray-50 py-8" 
+     x-data="{
+         order: {
+             id: {{ $order->id }},
+             status: '{{ $order->status }}',
+             payment_status: '{{ $order->payment_status }}',
+             delivered_at: {{ $order->delivered_at ? "'" . $order->delivered_at->toISOString() . "'" : 'null' }},
+             has_returnable_items: {{ $order->has_returnable_items ? 'true' : 'false' }},
+             can_be_cancelled: {{ $order->can_be_cancelled ? 'true' : 'false' }},
+             invoice_number: '{{ $order->invoice_number ?? '' }}'
+         },
+         get canBeReturnedNow() {
+             if (this.order.status !== 'delivered' || !this.order.has_returnable_items || !this.order.delivered_at) {
+                 return false;
+             }
+             const deliveredDate = new Date(this.order.delivered_at);
+             const now = new Date();
+             const daysDiff = Math.floor((now - deliveredDate) / (1000 * 60 * 60 * 24));
+             return daysDiff <= 14;
+         }
+     }"
+>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- En-tête -->
@@ -24,7 +45,9 @@
                         {{ $order->status == 'confirmed' ? 'bg-blue-100 text-blue-800' : '' }}
                         {{ $order->status == 'shipped' ? 'bg-purple-100 text-purple-800' : '' }}
                         {{ $order->status == 'delivered' ? 'bg-green-100 text-green-800' : '' }}
-                        {{ $order->status == 'cancelled' ? 'bg-red-100 text-red-800' : '' }}">
+                        {{ $order->status == 'cancelled' ? 'bg-red-100 text-red-800' : '' }}
+                        {{ $order->status == 'return_requested' ? 'bg-orange-100 text-orange-800' : '' }}
+                        {{ $order->status == 'returned' ? 'bg-gray-100 text-gray-800' : '' }}">
                         @switch($order->status)
                             @case('pending')
                                 🟡 En attente de confirmation
@@ -40,6 +63,17 @@
                                 @break
                             @case('cancelled')
                                 🔴 Annulée
+                                @break
+                            @case('return_requested')
+                                🔶 Retour demandé
+                                @break
+                            @case('returned')
+                                🟢 Retournée
+                                @if($order->refund_processed)
+                                    <span class="text-xs block text-green-600">✅ Remboursement effectué</span>
+                                @else
+                                    <span class="text-xs block text-orange-600">⏳ Remboursement en cours</span>
+                                @endif
                                 @break
                             @default
                                 ⚪ {{ ucfirst($order->status) }}
@@ -269,6 +303,13 @@
                         </a>
                         @endif
                         
+                        <!-- Retourner la commande (si livrée et dans les 14 jours) -->
+                        <a x-show="canBeReturnedNow" 
+                           href="{{ route('orders.return.confirm', $order) }}" 
+                           class="w-full bg-orange-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-orange-700 transition-colors text-center block">
+                            🔄 Retourner la commande
+                        </a>
+                        
                         <!-- Renouveler la commande -->
                         <a href="#" onclick="alert('Fonctionnalité bientôt disponible')"
                            class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors text-center block">
@@ -281,5 +322,157 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de retour -->
+<div id="returnModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 text-center mb-4">
+                Demander un retour
+            </h3>
+            <form id="returnForm" method="POST" action="">
+                @csrf
+                <div class="mb-4">
+                    <label for="return_reason" class="block text-sm font-medium text-gray-700 mb-2">
+                        Raison du retour *
+                    </label>
+                    <textarea name="reason" id="return_reason" rows="4" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                              placeholder="Expliquez pourquoi vous souhaitez retourner cette commande..."
+                              required></textarea>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeReturnModal()" 
+                            class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                        Annuler
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700">
+                        Demander le retour
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Fonctions pour la modal de retour
+function openReturnModal(orderId) {
+    const modal = document.getElementById('returnModal');
+    const form = document.getElementById('returnForm');
+    
+    // Mettre à jour l'action du formulaire
+    form.action = `/orders/${orderId}/return`;
+    
+    // Afficher la modal
+    modal.classList.remove('hidden');
+}
+
+function closeReturnModal() {
+    const modal = document.getElementById('returnModal');
+    modal.classList.add('hidden');
+    
+    // Réinitialiser le formulaire
+    document.getElementById('return_reason').value = '';
+}
+
+// Fermer la modal en cliquant à l'extérieur
+document.getElementById('returnModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeReturnModal();
+    }
+});
+
+// Fonction pour mettre à jour l'affichage du statut sans recharger la page
+function updateStatusDisplay(newStatus) {
+    // Mettre à jour le badge de statut
+    const statusBadge = document.querySelector('[x-text*="status"]');
+    if (statusBadge) {
+        statusBadge.textContent = getStatusText(newStatus);
+        statusBadge.className = getStatusClasses(newStatus);
+    }
+    
+    // Mettre à jour les boutons d'action
+    updateActionButtons(newStatus);
+}
+
+function getStatusText(status) {
+    const statusTexts = {
+        'pending': '⏳ En attente',
+        'confirmed': '✅ Confirmée',
+        'preparing': '📦 En préparation',
+        'shipped': '🚚 Expédiée',
+        'delivered': '📍 Livrée',
+        'cancelled': '❌ Annulée',
+        'return_requested': '🔄 Retour demandé',
+        'returned': '↩️ Retournée'
+    };
+    return statusTexts[status] || status;
+}
+
+function getStatusClasses(status) {
+    const baseClasses = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ';
+    const statusClasses = {
+        'pending': 'bg-yellow-100 text-yellow-800',
+        'confirmed': 'bg-blue-100 text-blue-800',
+        'preparing': 'bg-indigo-100 text-indigo-800',
+        'shipped': 'bg-purple-100 text-purple-800',
+        'delivered': 'bg-green-100 text-green-800',
+        'cancelled': 'bg-red-100 text-red-800',
+        'return_requested': 'bg-orange-100 text-orange-800',
+        'returned': 'bg-gray-100 text-gray-800'
+    };
+    return baseClasses + (statusClasses[status] || '');
+}
+
+function updateActionButtons(status) {
+    // Masquer/afficher les boutons selon le statut
+    const cancelButton = document.querySelector('button[onclick*="cancel"]');
+    const returnButton = document.querySelector('button[onclick*="return"]');
+    
+    if (cancelButton) {
+        cancelButton.style.display = ['pending', 'confirmed'].includes(status) ? 'inline-flex' : 'none';
+    }
+    
+    if (returnButton) {
+        returnButton.style.display = status === 'delivered' ? 'inline-flex' : 'none';
+    }
+}
+
+// Polling pour mettre à jour le statut en temps réel
+function pollOrderUpdate() {
+    const orderData = Alpine.$data(document.querySelector('[x-data]'));
+    if (orderData && orderData.order) {
+        fetch(`/api/orders/${orderData.order.id}/status`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Mettre à jour les données Alpine.js
+                    orderData.order.status = data.order.status;
+                    orderData.order.payment_status = data.order.payment_status;
+                    orderData.order.delivered_at = data.order.delivered_at;
+                    orderData.order.has_returnable_items = data.order.has_returnable_items;
+                    orderData.order.can_be_cancelled = data.order.can_be_cancelled;
+                    orderData.order.invoice_number = data.order.invoice_number || '';
+                    
+                    // Mettre à jour l'affichage du statut dynamiquement (sans recharger la page)
+                    updateStatusDisplay(data.order.status);
+                    
+                    console.log('Statut mis à jour:', data.order.status);
+                }
+            })
+            .catch(error => {
+                console.log('Erreur lors de la mise à jour du statut:', error);
+            });
+    }
+}
+
+// Démarrer le polling toutes les 10 secondes
+setInterval(pollOrderUpdate, 10000);
+
+// Premier appel après 5 secondes
+setTimeout(pollOrderUpdate, 5000);
+</script>
 
 @endsection

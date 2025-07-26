@@ -13,6 +13,14 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+        // Calculer les statistiques globales avant la pagination
+        $stats = [
+            'total' => Product::count(),
+            'available' => Product::where('is_active', true)->count(),
+            'low_stock' => Product::whereColumn('quantity', '<=', 'low_stock_threshold')->count(),
+            'categories' => Category::count(),
+        ];
+        
         $query = Product::with(['category', 'rentalCategory']);
 
         // Filtrage par recherche
@@ -67,7 +75,7 @@ class ProductController extends Controller
             return view('admin.products._table', compact('products'))->render();
         }
 
-        return view('admin.products.index', compact('products', 'categories'));
+        return view('admin.products.index', compact('products', 'categories', 'stats'));
     }
 
     public function create()

@@ -29,9 +29,14 @@ Artisan::command('rentals:auto-update', function () {
     $this->info('🔄 Job de mise à jour automatique des statuts de location lancé');
 })->purpose('Mise à jour automatique intelligente des statuts de location');
 
+// Planification des tâches
+Schedule::command('special-offers:clean-expired')->dailyAt('00:00');
+Schedule::command('orders:update-status')->hourly();
+Schedule::command('rentals:auto-update')->everyFiveMinutes();
+
 // ⏰ PROGRAMMATION AUTOMATIQUE
-// Vérifier les statuts de commande toutes les 45 secondes
-Schedule::command('orders:update-status')->everyMinute()->withoutOverlapping();
+// Note: La mise à jour des statuts de commande est maintenant gérée par des jobs individuels
+// Schedule::command('orders:update-status')->everyMinute()->withoutOverlapping(); // DÉSACTIVÉ
 
 // Vérifier les statuts de location toutes les heures
 Schedule::command('rentals:auto-update')->hourly()->withoutOverlapping();

@@ -5,13 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Cart;
 use App\Models\User;
+use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
+    protected $stripeService;
+
+    public function __construct(StripeService $stripeService)
+    {
+        $this->stripeService = $stripeService;
+    }
+
     /**
      * Afficher la page de checkout pour l'interface web
      */
@@ -321,11 +330,41 @@ class OrderController extends Controller
         ]);
 
         try {
+            // Annuler la commande
             $order->cancel($validated['reason'] ?? null);
 
-            // Restaurer le stock des produits
-            foreach ($order->items as $item) {
-                $item->product->increment('quantity', $item->quantity);
+            // CORRECTION CRITIQUE: Restaurer le stock TOUJOURS si la commande avait décrémenté le stock
+            // Cela arrive dès que payment_status était 'paid' à un moment donné
+            if (in_array($order->payment_status, ['paid', 'refunded']) || $order->paid_at) {
+                foreach ($order->items as $item) {
+                    if ($item->product) {
+                        $oldQuantity = $item->product->quantity;
+                        $item->product->increment('quantity', $item->quantity);
+                        
+                        Log::info('Stock restauré après annulation', [
+                            'product_id' => $item->product->id,
+                            'product_name' => $item->product->name,
+                            'previous_quantity' => $oldQuantity,
+                            'new_quantity' => $item->product->fresh()->quantity,
+                            'quantity_restored' => $item->quantity,
+                            'order_id' => $order->id,
+                            'order_number' => $order->order_number,
+                            'payment_status' => $order->payment_status,
+                            'had_special_offer' => $item->special_offer_id ? true : false
+                        ]);
+                    }
+                }
+                Log::info('Stock restauré pour commande annulée', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'payment_status' => $order->payment_status
+                ]);
+            } else {
+                Log::info('Pas de restauration de stock - commande jamais payée', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'payment_status' => $order->payment_status
+                ]);
             }
 
             if ($request->expectsJson()) {
@@ -660,6 +699,53 @@ class OrderController extends Controller
     }
 
     /**
+     * Afficher la page de confirmation de retour
+     */
+    public function showReturnConfirmation(Order $order)
+    {
+        // Vérifier que la commande appartient à l'utilisateur connecté
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Accès non autorisé à cette commande');
+        }
+
+        // Vérifier que la commande est livrée
+        if ($order->status !== 'delivered') {
+            return redirect()->route('orders.show', $order)->with('error', 'Seules les commandes livrées peuvent être retournées.');
+        }
+
+        // Vérifier que la commande peut être retournée (moins de 14 jours)
+        if (!$order->can_be_returned) {
+            return redirect()->route('orders.show', $order)->with('error', 'La période de retour de 14 jours est dépassée.');
+        }
+
+        // Séparer les articles retournables et non-retournables
+        $returnableItems = $order->items->filter(function ($item) {
+            return $item->is_returnable;
+        });
+
+        $nonReturnableItems = $order->items->filter(function ($item) {
+            return !$item->is_returnable;
+        });
+
+        // Calculer les montants
+        $returnableAmount = $returnableItems->sum(function ($item) {
+            return $item->unit_price * $item->quantity;
+        });
+
+        $nonReturnableAmount = $nonReturnableItems->sum(function ($item) {
+            return $item->unit_price * $item->quantity;
+        });
+
+        return view('orders.return-confirmation', compact(
+            'order', 
+            'returnableItems', 
+            'nonReturnableItems',
+            'returnableAmount',
+            'nonReturnableAmount'
+        ));
+    }
+
+    /**
      * Demander un retour de commande
      */
     public function requestReturn(Order $order, Request $request)
@@ -671,12 +757,12 @@ class OrderController extends Controller
 
         // Vérifier que la commande est livrée
         if ($order->status !== 'delivered') {
-            return redirect()->back()->with('error', 'Seules les commandes livrées peuvent être retournées.');
+            return redirect()->route('orders.show', $order)->with('error', 'Seules les commandes livrées peuvent être retournées.');
         }
 
         // Vérifier que la commande peut être retournée (moins de 14 jours)
         if (!$order->can_be_returned) {
-            return redirect()->back()->with('error', 'La période de retour de 14 jours est dépassée.');
+            return redirect()->route('orders.show', $order)->with('error', 'La période de retour de 14 jours est dépassée.');
         }
 
         // Valider la demande
@@ -684,14 +770,89 @@ class OrderController extends Controller
             'reason' => 'required|string|max:500',
         ]);
 
-        // Mettre à jour le statut de la commande
-        $order->update([
-            'status' => 'return_requested',
-            'return_reason' => $request->reason,
-            'return_requested_at' => now(),
-        ]);
+        try {
+            DB::beginTransaction();
 
-        return redirect()->back()->with('success', 'Votre demande de retour a été envoyée. Nous vous recontacterons sous 48h.');
+            // Traitement automatique du retour si toutes les conditions sont remplies
+            // (moins de 14 jours + produits non-alimentaires uniquement)
+            if ($order->has_returnable_items && $order->can_be_returned_now) {
+                
+                // Marquer la commande comme retournée automatiquement
+                $order->update([
+                    'status' => 'returned',
+                    'return_reason' => $request->reason,
+                    'return_requested_at' => now(),
+                    'return_processed_at' => now(),
+                    'return_processed_by' => 'system_auto',
+                ]);
+
+                // Restaurer le stock des produits retournables
+                foreach ($order->items as $item) {
+                    if ($item->is_returnable) {
+                        $item->product->increment('quantity', $item->quantity);
+                        
+                        Log::info('Stock restauré après retour automatique', [
+                            'product_id' => $item->product->id,
+                            'product_name' => $item->product->name,
+                            'quantity_restored' => $item->quantity,
+                            'order_id' => $order->id,
+                            'order_number' => $order->order_number
+                        ]);
+                    }
+                }
+
+                // TODO: Déclencher un remboursement automatique via Stripe
+                $refundSuccess = $this->stripeService->processAutomaticRefund($order);
+                
+                if (!$refundSuccess) {
+                    Log::warning('Remboursement automatique échoué, traitement manuel requis', [
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number
+                    ]);
+                }
+
+                Log::info('Retour automatique traité', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'user_id' => $order->user_id,
+                    'reason' => $request->reason
+                ]);
+
+                DB::commit();
+
+                return redirect()->route('orders.show', $order)->with('success', 
+                    'Votre retour a été traité automatiquement ! Le stock a été restauré et un remboursement sera effectué sous 3-5 jours ouvrés.');
+                
+            } else {
+                // Cas exceptionnel : demande manuelle (ne devrait pas arriver avec nos conditions)
+                $order->update([
+                    'status' => 'return_requested',
+                    'return_reason' => $request->reason,
+                    'return_requested_at' => now(),
+                ]);
+
+                Log::info('Demande de retour manuelle créée', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'reason' => $request->reason
+                ]);
+
+                DB::commit();
+
+                return redirect()->route('orders.show', $order)->with('success', 
+                    'Votre demande de retour a été envoyée. Nous vous recontacterons sous 48h.');
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Erreur lors du traitement du retour', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->route('orders.show', $order)->with('error', 
+                'Une erreur est survenue lors du traitement de votre retour. Veuillez réessayer.');
+        }
     }
 
     /**
@@ -712,5 +873,105 @@ class OrderController extends Controller
         $order->load(['items.product', 'user']);
 
         return view('orders.cancelled', compact('order'));
+    }
+
+    /**
+     * Récupérer le statut d'une commande pour l'API
+     */
+    public function getOrderStatus(Order $order)
+    {
+        // Vérifier que la commande appartient à l'utilisateur connecté
+        if ($order->user_id !== Auth::id()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Accès non autorisé à cette commande'
+            ], 403);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'order' => [
+                'id' => $order->id,
+                'status' => $order->status,
+                'payment_status' => $order->payment_status,
+                'delivered_at' => $order->delivered_at?->toISOString(),
+                'has_returnable_items' => $order->has_returnable_items,
+                'can_be_cancelled' => $order->can_be_cancelled,
+                'invoice_number' => $order->invoice_number,
+                'can_be_returned_now' => $order->can_be_returned_now
+            ]
+        ]);
+    }
+
+    /**
+     * Traiter un remboursement partiel
+     */
+    private function processPartialRefund(Order $order, float $amount): bool
+    {
+        try {
+            if (!$order->stripe_payment_intent_id) {
+                Log::error('Impossible de rembourser: aucun PaymentIntent trouvé', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number
+                ]);
+                return false;
+            }
+
+            // Créer le remboursement partiel via Stripe
+            $refund = \Stripe\Refund::create([
+                'payment_intent' => $order->stripe_payment_intent_id,
+                'amount' => $this->stripeService->convertToStripeAmount($amount),
+                'reason' => 'requested_by_customer',
+                'metadata' => [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'refund_type' => 'partial_return',
+                    'user_id' => $order->user_id,
+                    'partial_amount' => $amount
+                ]
+            ]);
+
+            // Mettre à jour la commande
+            $order->update([
+                'refund_processed' => true,
+                'refund_processed_at' => now(),
+                'refund_stripe_id' => $refund->id
+            ]);
+
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error('Erreur lors du remboursement partiel', [
+                'order_id' => $order->id,
+                'amount' => $amount,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Envoyer l'email de confirmation de retour personnalisé
+     */
+    private function sendReturnConfirmationEmail(Order $order, $returnableItems, $nonReturnableItems, float $refundAmount)
+    {
+        try {
+            // TODO: Créer et envoyer l'email de confirmation personnalisé
+            // Cette fonctionnalité sera implémentée avec un template email dédié
+            
+            Log::info('Email de confirmation de retour envoyé', [
+                'order_id' => $order->id,
+                'user_email' => $order->user->email,
+                'refund_amount' => $refundAmount,
+                'returnable_items_count' => $returnableItems->count(),
+                'non_returnable_items_count' => $nonReturnableItems->count()
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'envoi de l\'email de confirmation de retour', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }

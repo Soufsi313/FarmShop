@@ -10,7 +10,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">Modifier l'Offre Spéciale</h1>
-                    <p class="text-gray-600 mt-2">{{ $specialOffer->title }}</p>
+                    <p class="text-gray-600 mt-2">{{ $specialOffer->name }}</p>
                 </div>
                 <a href="{{ route('admin.special-offers.index') }}" 
                    class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
@@ -28,19 +28,19 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <!-- Left Column -->
                     <div class="space-y-6">
-                        <!-- Title -->
+                        <!-- Name -->
                         <div>
-                            <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
-                                Titre de l'offre <span class="text-red-500">*</span>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                                Nom de l'offre <span class="text-red-500">*</span>
                             </label>
                             <input type="text" 
-                                   id="title" 
-                                   name="title" 
-                                   value="{{ old('title', $specialOffer->title) }}"
+                                   id="name" 
+                                   name="name" 
+                                   value="{{ old('name', $specialOffer->name) }}"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                    placeholder="Ex: Offre spéciale tomates bio"
                                    required>
-                            @error('title')
+                            @error('name')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
@@ -106,6 +106,29 @@
                             @enderror
                         </div>
 
+                        <!-- Minimum Quantity -->
+                        <div>
+                            <label for="minimum_quantity" class="block text-sm font-medium text-gray-700 mb-2">
+                                Quantité minimum <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <input type="number" 
+                                       id="minimum_quantity" 
+                                       name="minimum_quantity" 
+                                       value="{{ old('minimum_quantity', $specialOffer->minimum_quantity ?? 1) }}"
+                                       min="1" 
+                                       step="1"
+                                       class="w-full px-4 py-3 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                       placeholder="1"
+                                       required>
+                                <span class="absolute right-3 top-3 text-gray-500">kg</span>
+                            </div>
+                            @error('minimum_quantity')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                            <p class="text-sm text-gray-500 mt-1">Quantité minimum pour bénéficier de l'offre</p>
+                        </div>
+
                         <!-- Status -->
                         <div>
                             <label for="is_active" class="block text-sm font-medium text-gray-700 mb-2">
@@ -121,6 +144,25 @@
                             @error('is_active')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
+                        </div>
+
+                        <!-- Usage Limit -->
+                        <div>
+                            <label for="usage_limit" class="block text-sm font-medium text-gray-700 mb-2">
+                                Limite d'utilisation
+                            </label>
+                            <input type="number" 
+                                   id="usage_limit" 
+                                   name="usage_limit" 
+                                   value="{{ old('usage_limit', $specialOffer->usage_limit) }}"
+                                   min="1" 
+                                   step="1"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                   placeholder="Laissez vide pour illimité">
+                            @error('usage_limit')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                            <p class="text-sm text-gray-500 mt-1">Nombre maximum d'utilisations (optionnel)</p>
                         </div>
                     </div>
 

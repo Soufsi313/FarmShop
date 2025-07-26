@@ -197,6 +197,23 @@
                                     
                                     <!-- Badges -->
                                     <div class="absolute top-2 left-2 flex flex-col space-y-1">
+                                        @php
+                                            $availableOfferBadge = $product->specialOffers()
+                                                ->where('is_active', true)
+                                                ->where('start_date', '<=', now())
+                                                ->where('end_date', '>=', now())
+                                                ->where(function($query) {
+                                                    $query->whereNull('usage_limit')
+                                                          ->orWhereColumn('usage_count', '<', 'usage_limit');
+                                                })
+                                                ->orderBy('discount_percentage', 'desc')
+                                                ->first();
+                                        @endphp
+                                        @if($availableOfferBadge)
+                                            <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                                                🔥 -{{ $availableOfferBadge->discount_percentage }}%
+                                            </span>
+                                        @endif
                                         @if($product->is_featured)
                                             <span class="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium">
                                                 ⭐ Vedette
@@ -233,10 +250,51 @@
 
                                     <!-- Prix -->
                                     <div class="mb-4">
-                                        <div class="text-2xl font-bold text-green-600">
-                                            {{ number_format($product->price, 2) }}€
+                                        @php
+                                            // Chercher s'il y a une offre spéciale disponible (même si pas encore applicable)
+                                            $availableOffer = $product->specialOffers()
+                                                ->where('is_active', true)
+                                                ->where('start_date', '<=', now())
+                                                ->where('end_date', '>=', now())
+                                                ->where(function($query) {
+                                                    $query->whereNull('usage_limit')
+                                                          ->orWhereColumn('usage_count', '<', 'usage_limit');
+                                                })
+                                                ->orderBy('discount_percentage', 'desc')
+                                                ->first();
+                                        @endphp
+                                        
+                                        @if($availableOffer)
+                                            <!-- Badge offre spéciale -->
+                                            <div class="mb-2">
+                                                <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                                                    🔥 -{{ $availableOffer->discount_percentage }}% dès {{ $availableOffer->minimum_quantity }}{{ $product->unit_symbol }}
+                                                </span>
+                                            </div>
+                                            
+                                            <!-- Prix avec offre potentielle -->
+                                            <div class="flex items-center space-x-2">
+                                                <div class="text-2xl font-bold text-red-600">
+                                                    {{ number_format($product->getPriceForQuantity($availableOffer->minimum_quantity) / $availableOffer->minimum_quantity, 2) }}€
+                                                </div>
+                                                <div class="text-lg text-gray-500 line-through">
+                                                    {{ number_format($product->price, 2) }}€
+                                                </div>
+                                            </div>
                                             <span class="text-sm font-normal text-gray-500">/ {{ $product->unit_symbol }}</span>
-                                        </div>
+                                            
+                                            <!-- Détails de l'offre -->
+                                            <div class="text-xs text-gray-600 mt-1">
+                                                {{ $availableOffer->name }}
+                                            </div>
+                                        @else
+                                            <!-- Prix normal -->
+                                            <div class="text-2xl font-bold text-green-600">
+                                                {{ number_format($product->price, 2) }}€
+                                                <span class="text-sm font-normal text-gray-500">/ {{ $product->unit_symbol }}</span>
+                                            </div>
+                                        @endif
+                                        
                                         @if($product->rental_price_per_day && ($product->type === 'rental' || $product->type === 'both'))
                                             <div class="text-sm text-gray-500">
                                                 Location : {{ number_format($product->rental_price_per_day, 2) }}€/jour

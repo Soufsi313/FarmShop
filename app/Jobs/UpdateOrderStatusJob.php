@@ -34,9 +34,10 @@ class UpdateOrderStatusJob implements ShouldQueue
             }
             */
 
-            // Mettre à jour les commandes confirmées vers préparation (après 45 secondes)
+            // Mettre à jour les commandes confirmées vers préparation (après 15 secondes)
             $confirmedOrders = Order::where('status', 'confirmed')
-                ->where('status_updated_at', '<=', now()->subSeconds(45))
+                ->where('status_updated_at', '<=', now()->subSeconds(15))
+                ->limit(5) // Limiter à 5 commandes par exécution pour éviter les blocages
                 ->get();
 
             foreach ($confirmedOrders as $order) {
@@ -44,9 +45,10 @@ class UpdateOrderStatusJob implements ShouldQueue
                 Log::info("Commande {$order->order_number} passée en préparation automatiquement");
             }
 
-            // Mettre à jour les commandes en préparation vers expédition (après 45 secondes)
+            // Mettre à jour les commandes en préparation vers expédition (après 15 secondes)
             $preparingOrders = Order::where('status', 'preparing')
-                ->where('status_updated_at', '<=', now()->subSeconds(45))
+                ->where('status_updated_at', '<=', now()->subSeconds(15))
+                ->limit(5) // Limiter à 5 commandes par exécution
                 ->get();
 
             foreach ($preparingOrders as $order) {
@@ -54,9 +56,10 @@ class UpdateOrderStatusJob implements ShouldQueue
                 Log::info("Commande {$order->order_number} expédiée automatiquement");
             }
 
-            // Mettre à jour les commandes expédiées vers livraison (après 45 secondes)
+            // Mettre à jour les commandes expédiées vers livraison (après 15 secondes)
             $shippedOrders = Order::where('status', 'shipped')
-                ->where('status_updated_at', '<=', now()->subSeconds(45))
+                ->where('status_updated_at', '<=', now()->subSeconds(15))
+                ->limit(5) // Limiter à 5 commandes par exécution
                 ->get();
 
             foreach ($shippedOrders as $order) {

@@ -15,7 +15,11 @@ class ProductController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Product::with(['category'])
+        $query = Product::with(['category', 'specialOffers' => function($q) {
+                $q->where('is_active', true)
+                  ->where('start_date', '<=', now())
+                  ->where('end_date', '>=', now());
+            }])
             ->where('is_active', true)
             ->whereIn('type', ['sale', 'both']); // Exclure les produits "rental" uniquement
 
@@ -90,10 +94,20 @@ class ProductController extends Controller
         }
 
         // Charger les relations nécessaires
-        $product->load(['category']);
+        $product->load(['category', 'specialOffers' => function($q) {
+            $q->where('is_active', true)
+              ->where('start_date', '<=', now())
+              ->where('end_date', '>=', now())
+              ->orderBy('discount_percentage', 'desc');
+        }]);
 
         // Produits similaires (même catégorie, excluant le produit actuel)
-        $similarProducts = Product::where('category_id', $product->category_id)
+        $similarProducts = Product::with(['specialOffers' => function($q) {
+                $q->where('is_active', true)
+                  ->where('start_date', '<=', now())
+                  ->where('end_date', '>=', now());
+            }])
+            ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->where('is_active', true)
             ->limit(4)

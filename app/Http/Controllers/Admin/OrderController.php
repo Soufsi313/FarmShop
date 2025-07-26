@@ -27,7 +27,7 @@ class OrderController extends Controller
     {
         $this->checkAdminAccess();
 
-        $query = Order::with(['user', 'items.product']);
+        $query = Order::with(['user', 'items.product.category']);
 
         // Recherche
         if ($request->filled('search')) {
@@ -140,6 +140,26 @@ class OrderController extends Controller
         $order->update($validated);
 
         return redirect()->back()->with('success', 'Statut de la commande mis à jour avec succès.');
+    }
+
+    /**
+     * Annuler une commande
+     */
+    public function cancel(Order $order)
+    {
+        $this->checkAdminAccess();
+
+        // Vérifier que la commande peut être annulée
+        if (!in_array($order->status, ['pending', 'confirmed'])) {
+            return redirect()->back()->with('error', 'Cette commande ne peut pas être annulée dans son état actuel.');
+        }
+
+        // Mettre à jour le statut de la commande
+        $order->update([
+            'status' => 'cancelled'
+        ]);
+
+        return redirect()->back()->with('success', 'Commande annulée avec succès.');
     }
 
     /**

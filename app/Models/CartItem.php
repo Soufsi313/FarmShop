@@ -22,15 +22,22 @@ class CartItem extends Model
         'tax_amount',
         'total',
         'product_metadata',
-        'is_available'
+        'is_available',
+        'special_offer_id',
+        'original_unit_price',
+        'discount_percentage',
+        'discount_amount'
     ];
 
     protected $casts = [
         'unit_price' => 'decimal:2',
+        'original_unit_price' => 'decimal:2',
         'subtotal' => 'decimal:2',
         'tax_rate' => 'decimal:2',
         'tax_amount' => 'decimal:2',
         'total' => 'decimal:2',
+        'discount_percentage' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
         'quantity' => 'integer',
         'product_metadata' => 'array',
         'is_available' => 'boolean'
@@ -53,15 +60,59 @@ class CartItem extends Model
     }
 
     /**
+     * Get the special offer applied to this cart item.
+     */
+    public function specialOffer(): BelongsTo
+    {
+        return $this->belongsTo(SpecialOffer::class);
+    }
+
+    /**
      * Calculate and update totals when quantity or price changes.
      */
     public function recalculate(): void
     {
+        // Vérifier si il y a une offre spéciale applicable
+        $this->applySpecialOffer();
+        
         // Le unit_price est HT, nous devons calculer les totaux
         $this->subtotal = $this->unit_price * $this->quantity; // Sous-total HT
         $this->tax_amount = round($this->subtotal * ($this->tax_rate / 100), 2); // TVA
         $this->total = $this->subtotal + $this->tax_amount; // Total TTC
         $this->save();
+    }
+
+    /**
+     * Apply special offer if applicable
+     */
+    public function applySpecialOffer(): void
+    {
+        $product = $this->product;
+        if (!$product) return;
+
+        $specialOffer = $product->getActiveSpecialOffer($this->quantity);
+        
+        if ($specialOffer) {
+            // Sauvegarder le prix original s'il n'est pas déjà sauvegardé
+            if (!$this->original_unit_price) {
+                $this->original_unit_price = $product->price;
+            }
+            
+            // Appliquer la réduction
+            $this->special_offer_id = $specialOffer->id;
+            $this->discount_percentage = $specialOffer->discount_percentage;
+            $this->discount_amount = ($this->original_unit_price * $this->discount_percentage / 100);
+            $this->unit_price = $this->original_unit_price - $this->discount_amount;
+        } else {
+            // Pas d'offre spéciale, utiliser le prix original
+            if ($this->special_offer_id) {
+                $this->special_offer_id = null;
+                $this->discount_percentage = 0;
+                $this->discount_amount = 0;
+                $this->unit_price = $this->original_unit_price ?: $product->price;
+                $this->original_unit_price = null;
+            }
+        }
     }
 
     /**
@@ -219,42 +270,56 @@ class CartItem extends Model
      */
     public static function createFromProduct(Cart $cart, Product $product, int $quantity = 1): self
     {
-        // Le prix en base est TTC
-        $priceTTC = $product->price;
+        // Vérifier s'il y a une offre spéciale pour ce produit et cette quantité
+        $specialOffer = $product->getActiveSpecialOffer($quantity);
+        $finalPrice = $product->getPriceForQuantity($quantity) / $quantity; // Prix unitaire avec réduction
+        
         $taxRate = $product->getTaxRate();
         
-        // Calculer le prix HT à partir du prix TTC
-        $priceHT = round($priceTTC / (1 + ($taxRate / 100)), 2);
+        // Calculer le prix HT à partir du prix TTC final
+        $priceHT = round($finalPrice / (1 + ($taxRate / 100)), 2);
         
         // Calculs pour la quantité
         $subtotal = $priceHT * $quantity; // Sous-total HT
         $taxAmount = round($subtotal * ($taxRate / 100), 2); // Montant TVA
-        $total = $priceTTC * $quantity; // Total TTC (prix TTC × quantité)
+        $total = $finalPrice * $quantity; // Total TTC avec réduction
 
-        return self::create([
+        $cartItemData = [
             'cart_id' => $cart->id,
             'product_id' => $product->id,
             'product_name' => $product->name,
             'product_category' => $product->category->name ?? 'Non classé',
-            'unit_price' => $priceHT, // Prix unitaire HT
+            'unit_price' => $priceHT, // Prix unitaire HT avec réduction
             'quantity' => $quantity,
             'subtotal' => $subtotal, // Sous-total HT
             'tax_rate' => $taxRate,
             'tax_amount' => $taxAmount, // Montant TVA
-            'total' => $total, // Total TTC
+            'total' => $total, // Total TTC avec réduction
             'product_metadata' => [
                 'slug' => $product->slug,
-                'image' => $product->image_url, // Utiliser la nouvelle méthode
+                'image' => $product->image_url,
                 'description' => $product->short_description,
                 'category_id' => $product->category_id,
                 'food_type' => $product->category->food_type ?? 'non_alimentaire',
-                'price_ttc_unitaire' => $priceTTC,
+                'price_ttc_unitaire' => $finalPrice,
+                'original_price_ttc' => $product->price,
                 'is_active' => $product->is_active,
                 'stock' => $product->stock,
                 'unit_symbol' => $product->unit_symbol
             ],
             'is_available' => true
-        ]);
+        ];
+
+        // Ajouter les informations d'offre spéciale si applicable
+        if ($specialOffer) {
+            $originalPriceHT = round($product->price / (1 + ($taxRate / 100)), 2);
+            $cartItemData['special_offer_id'] = $specialOffer->id;
+            $cartItemData['original_unit_price'] = $originalPriceHT;
+            $cartItemData['discount_percentage'] = $specialOffer->discount_percentage;
+            $cartItemData['discount_amount'] = $originalPriceHT - $priceHT;
+        }
+
+        return self::create($cartItemData);
     }
 
     /**
@@ -266,7 +331,7 @@ class CartItem extends Model
         $priceTTCUnitaire = $metadata['price_ttc_unitaire'] ?? ($this->unit_price * (1 + ($this->tax_rate / 100)));
         $unitSymbol = $metadata['unit_symbol'] ?? 'unité';
         
-        return [
+        $data = [
             'id' => $this->id,
             'product_id' => $this->product_id,
             'product_name' => $this->product_name,
@@ -308,6 +373,34 @@ class CartItem extends Model
                 'image_url' => $this->product->image_url
             ] : null
         ];
+
+        // Ajouter les informations d'offre spéciale si applicable
+        if ($this->special_offer_id) {
+            $originalPriceTTC = $this->original_unit_price ? 
+                $this->original_unit_price * (1 + ($this->tax_rate / 100)) : null;
+            
+            $specialOffer = $this->specialOffer; // Récupérer l'offre spéciale
+            
+            $data['special_offer'] = [
+                'id' => $this->special_offer_id,
+                'title' => $specialOffer ? $specialOffer->title : 'Offre spéciale',
+                'description' => $specialOffer ? $specialOffer->description : null,
+                'discount_percentage' => $this->discount_percentage,
+                'discount_amount_ht' => $this->discount_amount,
+                'discount_amount_ttc' => $this->discount_amount * (1 + ($this->tax_rate / 100)),
+                'original_price_ht' => $this->original_unit_price,
+                'original_price_ttc' => $originalPriceTTC,
+                'savings_total_ht' => $this->discount_amount * $this->quantity,
+                'savings_total_ttc' => $this->discount_amount * (1 + ($this->tax_rate / 100)) * $this->quantity,
+                'discount_amount_ttc_formatted' => number_format($this->discount_amount * (1 + ($this->tax_rate / 100)), 2) . ' €',
+                'original_price_ttc_formatted' => $originalPriceTTC ? number_format($originalPriceTTC, 2) . ' €' : null,
+                'savings_total_ttc_formatted' => number_format($this->discount_amount * (1 + ($this->tax_rate / 100)) * $this->quantity, 2) . ' €'
+            ];
+        } else {
+            $data['special_offer'] = null;
+        }
+
+        return $data;
     }
 
     /**

@@ -75,6 +75,15 @@ class DashboardController extends Controller
         if (!in_array($sortOrder, $allowedOrders)) {
             $sortOrder = 'desc';
         }
+
+        // Calculer les statistiques globales avant la pagination
+        $stats = [
+            'total' => User::count(),
+            'admins' => User::where('role', 'Admin')->count(),
+            'users' => User::where('role', 'User')->count(),
+            'new_users' => User::where('created_at', '>=', now()->subDays(30))->count(),
+            'active_users' => User::where('updated_at', '>=', now()->subDays(7))->count(),
+        ];
         
         // Recherche
         if ($request->has('search') && $request->search) {
@@ -93,7 +102,7 @@ class DashboardController extends Controller
         
         $users = $query->orderBy($sortBy, $sortOrder)->paginate(20);
         
-        return view('admin.users.index', compact('users', 'sortBy', 'sortOrder'));
+        return view('admin.users.index', compact('users', 'stats', 'sortBy', 'sortOrder'));
     }
 
     /**

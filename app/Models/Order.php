@@ -38,6 +38,7 @@ class Order extends Model
         'cancelled_at',
         'cancellation_reason',
         'has_returnable_items',
+        'has_non_returnable_items',
         'return_deadline',
         'return_reason',
         'return_requested_at',
@@ -67,6 +68,7 @@ class Order extends Model
         'can_be_cancelled' => 'boolean',
         'can_be_returned' => 'boolean',
         'has_returnable_items' => 'boolean',
+        'has_non_returnable_items' => 'boolean',
         'return_deadline' => 'datetime',
         'return_requested_at' => 'datetime',
         'invoice_generated_at' => 'datetime',
@@ -84,6 +86,7 @@ class Order extends Model
         'can_be_cancelled' => true,
         'can_be_returned' => false,
         'has_returnable_items' => false,
+        'has_non_returnable_items' => false,
         'tax_amount' => 0,
         'shipping_cost' => 0,
         'discount_amount' => 0,
@@ -262,8 +265,8 @@ class Order extends Model
                 break;
         }
 
-        // Envoyer notification email
-        if ($sendNotification) {
+        // Envoyer notification email seulement si ce n'est pas automatique
+        if ($sendNotification && !($history[count($history) - 1]['automatic'] ?? false)) {
             $this->sendStatusNotification($oldStatus, $newStatus);
         }
 
@@ -279,6 +282,12 @@ class Order extends Model
                 'invoice_generated_at' => now()
             ]);
         }
+        
+        // ✅ RÉACTIVÉ : Programmer la progression automatique du statut (maintenant non-bloquant)
+        \App\Jobs\ProcessSingleOrderStatusJob::dispatch($this->id, 'preparing')
+            ->delay(now()->addSeconds(15));
+        
+        \Log::info("Commande confirmée {$this->order_number} - Transitions automatiques programmées");
     }
 
     protected function onPreparing()
@@ -286,8 +295,8 @@ class Order extends Model
         // Mettre à jour le statut des items
         $this->items()->update(['status' => 'preparing']);
         
-        // Plus possible d'annuler facilement
-        $this->update(['can_be_cancelled' => false]);
+        // Laisser la possibilité d'annuler pendant la préparation
+        // L'annulation sera bloquée seulement après expédition
     }
 
     protected function onShipped()
@@ -309,11 +318,14 @@ class Order extends Model
     {
         $deliveredAt = now();
         
+        // Vérifier quels items peuvent être retournés
+        $hasReturnableItems = $this->checkReturnableItems();
+        
         $this->update([
             'delivered_at' => $deliveredAt,
             'can_be_cancelled' => false,
-            'can_be_returned' => $this->has_returnable_items,
-            'return_deadline' => $this->has_returnable_items ? $deliveredAt->addDays(14) : null
+            'can_be_returned' => $hasReturnableItems,
+            'return_deadline' => $hasReturnableItems ? $deliveredAt->addDays(14) : null
         ]);
 
         // Mettre à jour le statut des items
@@ -369,8 +381,15 @@ class Order extends Model
         $hasReturnableItems = $this->items()
             ->where('is_returnable', true)
             ->exists();
+            
+        $hasNonReturnableItems = $this->items()
+            ->where('is_returnable', false)
+            ->exists();
 
-        $this->update(['has_returnable_items' => $hasReturnableItems]);
+        $this->update([
+            'has_returnable_items' => $hasReturnableItems,
+            'has_non_returnable_items' => $hasNonReturnableItems
+        ]);
 
         return $hasReturnableItems;
     }
@@ -508,7 +527,7 @@ class Order extends Model
 
                 // Créer les items de commande
                 foreach ($cart->items as $cartItem) {
-                    $order->items()->create([
+                    $orderItemData = [
                         'product_id' => $cartItem->product_id,
                         'product_name' => $cartItem->product_name,
                         'product_sku' => $cartItem->product->sku ?? null,
@@ -521,10 +540,20 @@ class Order extends Model
                             'is_returnable' => $cartItem->product->category->is_returnable ?? false
                         ],
                         'quantity' => $cartItem->quantity,
-                        'unit_price' => $cartItem->unit_price * (1 + ($cartItem->tax_rate / 100)), // Prix TTC unitaire
+                        'unit_price' => $cartItem->unit_price * (1 + ($cartItem->tax_rate / 100)), // Prix TTC unitaire avec réduction
                         'total_price' => $cartItem->total,
                         'is_returnable' => $cartItem->product->category->is_returnable ?? false
-                    ]);
+                    ];
+
+                    // Ajouter les informations d'offre spéciale si applicable
+                    if ($cartItem->special_offer_id) {
+                        $orderItemData['special_offer_id'] = $cartItem->special_offer_id;
+                        $orderItemData['original_unit_price'] = $cartItem->original_unit_price * (1 + ($cartItem->tax_rate / 100)); // Prix TTC original
+                        $orderItemData['discount_percentage'] = $cartItem->discount_percentage;
+                        $orderItemData['discount_amount'] = $cartItem->discount_amount * (1 + ($cartItem->tax_rate / 100)); // Réduction TTC
+                    }
+
+                    $order->items()->create($orderItemData);
                 }
 
                 // Si on arrive ici, la création a réussi

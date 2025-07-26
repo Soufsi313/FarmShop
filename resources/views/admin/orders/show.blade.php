@@ -59,7 +59,18 @@
                     @if($order->shipping_address)
                     <div>
                         <dt class="text-sm font-medium text-gray-500">Adresse de livraison</dt>
-                        <dd class="text-sm text-gray-900 whitespace-pre-line">{{ $order->shipping_address }}</dd>
+                        <dd class="text-sm text-gray-900">
+                            @if(is_array($order->shipping_address))
+                                {{ $order->shipping_address['address'] ?? '' }}<br>
+                                @if(!empty($order->shipping_address['address_line_2']))
+                                    {{ $order->shipping_address['address_line_2'] }}<br>
+                                @endif
+                                {{ $order->shipping_address['postal_code'] ?? '' }} {{ $order->shipping_address['city'] ?? '' }}<br>
+                                {{ $order->shipping_address['country'] ?? '' }}
+                            @else
+                                {{ $order->shipping_address }}
+                            @endif
+                        </dd>
                     </div>
                     @endif
                 </dl>
@@ -79,6 +90,8 @@
                                 'shipped' => 'bg-indigo-100 text-indigo-800',
                                 'delivered' => 'bg-green-100 text-green-800',
                                 'cancelled' => 'bg-red-100 text-red-800',
+                                'return_requested' => 'bg-orange-100 text-orange-800',
+                                'returned' => 'bg-gray-100 text-gray-800',
                             ];
                             $statusLabels = [
                                 'pending' => 'En attente',
@@ -87,6 +100,8 @@
                                 'shipped' => 'Expédiée',
                                 'delivered' => 'Livrée',
                                 'cancelled' => 'Annulée',
+                                'return_requested' => 'Retour demandé',
+                                'returned' => 'Retournée',
                             ];
                         @endphp
                         <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full {{ $statusColors[$order->status] }}">

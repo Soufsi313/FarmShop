@@ -18,6 +18,10 @@ class OrderItem extends Model
         'product_description',
         'product_image',
         'product_category',
+        'special_offer_id',
+        'original_unit_price',
+        'discount_percentage',
+        'discount_amount',
         'quantity',
         'unit_price',
         'total_price',
@@ -40,6 +44,9 @@ class OrderItem extends Model
         'product_category' => 'array',
         'quantity' => 'integer',
         'unit_price' => 'decimal:2',
+        'original_unit_price' => 'decimal:2',
+        'discount_percentage' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
         'total_price' => 'decimal:2',
         'status_updated_at' => 'datetime',
         'is_returnable' => 'boolean',
@@ -73,6 +80,11 @@ class OrderItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function specialOffer()
+    {
+        return $this->belongsTo(SpecialOffer::class);
     }
 
     public function returns()
@@ -283,7 +295,7 @@ class OrderItem extends Model
             'reason' => $reason,
             'description' => $description,
             'requested_at' => now(),
-            'refund_amount' => $quantity * $this->unit_price,
+            'refund_amount' => $this->calculateRefundAmount($quantity),
             'status' => 'requested'
         ]);
 
@@ -304,6 +316,9 @@ class OrderItem extends Model
     public function calculateRefundAmount($quantity = null)
     {
         $quantityToRefund = $quantity ?: $this->quantity;
+        
+        // Le unit_price stocké dans la commande inclut déjà la réduction d'offre spéciale
+        // donc on utilise ce prix pour le remboursement
         return $quantityToRefund * $this->unit_price;
     }
 
@@ -361,5 +376,25 @@ class OrderItem extends Model
                 }
             }
         });
+    }
+
+    /**
+     * Récupère les détails de l'offre spéciale appliquée
+     */
+    public function getSpecialOfferDetailsAttribute()
+    {
+        if (!$this->special_offer_id) {
+            return null;
+        }
+
+        return [
+            'id' => $this->special_offer_id,
+            'original_price' => $this->original_unit_price,
+            'discounted_price' => $this->unit_price,
+            'discount_percentage' => $this->discount_percentage,
+            'discount_amount' => $this->discount_amount,
+            'savings_per_unit' => $this->discount_amount,
+            'total_savings' => $this->discount_amount * $this->quantity
+        ];
     }
 }

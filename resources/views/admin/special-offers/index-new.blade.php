@@ -85,7 +85,7 @@
                             <div class="relative h-48 bg-gray-100">
                                 @if($offer->image)
                                     <img src="{{ asset('storage/' . $offer->image) }}" 
-                                         alt="{{ $offer->title }}" 
+                                         alt="{{ $offer->name }}" 
                                          class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-100 to-blue-100">
@@ -126,7 +126,7 @@
 
                             <div class="p-4">
                                 <!-- Title -->
-                                <h3 class="font-semibold text-lg text-gray-900 mb-2">{{ $offer->title }}</h3>
+                                <h3 class="font-semibold text-lg text-gray-900 mb-2">{{ $offer->name }}</h3>
                                 
                                 <!-- Product -->
                                 <p class="text-sm text-gray-600 mb-2">
