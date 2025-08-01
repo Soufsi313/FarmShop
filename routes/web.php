@@ -120,44 +120,63 @@ Route::middleware('auth')->group(function () {
         return view('cart.simple');
     })->name('cart.index');
     
+    // Route du panier de location
+    Route::get('/cart-location', function () {
+        return view('cart-location.index');
+    })->name('cart-location.index');
+    
     // Route AJAX pour récupérer les données du panier
     Route::get('/cart/data', function () {
-        $user = auth()->user();
-        $cart = $user->getOrCreateActiveCart();
-        $cartSummary = $cart->getCompleteCartSummary();
-        
-        // Calculer les détails TVA par taux
-        $tvaTaxDetails = [];
-        $items = $cart->items;
-        
-        foreach ($items as $item) {
-            $taxRate = $item->tax_rate;
-            if (!isset($tvaTaxDetails[$taxRate])) {
-                $tvaTaxDetails[$taxRate] = [
-                    'rate' => $taxRate,
-                    'subtotal_ht' => 0,
-                    'tax_amount' => 0
-                ];
+        try {
+            $user = auth()->user();
+            $cart = $user->getOrCreateActiveCart();
+            $cartSummary = $cart->getCompleteCartSummary();
+            
+            // Calculer les détails TVA par taux
+            $tvaTaxDetails = [];
+            $items = $cart->items;
+            
+            foreach ($items as $item) {
+                $taxRate = $item->tax_rate;
+                if (!isset($tvaTaxDetails[$taxRate])) {
+                    $tvaTaxDetails[$taxRate] = [
+                        'rate' => $taxRate,
+                        'subtotal_ht' => 0,
+                        'tax_amount' => 0
+                    ];
+                }
+                $tvaTaxDetails[$taxRate]['subtotal_ht'] += $item->subtotal;
+                $tvaTaxDetails[$taxRate]['tax_amount'] += $item->tax_amount;
             }
-            $tvaTaxDetails[$taxRate]['subtotal_ht'] += $item->subtotal;
-            $tvaTaxDetails[$taxRate]['tax_amount'] += $item->tax_amount;
+            
+            return response()->json([
+                'success' => true,
+                'items' => $cart->items->map(function($item) {
+                    return $item->toDisplayArray();
+                }),
+                'subtotal' => $cartSummary['formatted']['subtotal_ht'],
+                'tva_details' => $tvaTaxDetails,
+                'tva_amount' => $cartSummary['formatted']['tax_amount'],
+                'total' => $cartSummary['formatted']['total_ttc'],
+                'shipping_cost' => $cartSummary['formatted']['shipping_cost'],
+                'total_with_shipping' => $cartSummary['formatted']['total_with_shipping'],
+                'is_free_shipping' => $cartSummary['is_free_shipping'],
+                'remaining_for_free_shipping' => $cartSummary['formatted']['remaining_for_free_shipping'],
+                'total_items' => $cartSummary['total_items']
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de la récupération des données du panier', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des données du panier',
+                'error' => $e->getMessage()
+            ], 500);
         }
-        
-        return response()->json([
-            'success' => true,
-            'items' => $cart->items->map(function($item) {
-                return $item->toDisplayArray();
-            }),
-            'subtotal' => $cartSummary['formatted']['subtotal_ht'],
-            'tva_details' => $tvaTaxDetails,
-            'tva_amount' => $cartSummary['formatted']['tax_amount'],
-            'total' => $cartSummary['formatted']['total_ttc'],
-            'shipping_cost' => $cartSummary['formatted']['shipping_cost'],
-            'total_with_shipping' => $cartSummary['formatted']['total_with_shipping'],
-            'is_free_shipping' => $cartSummary['is_free_shipping'],
-            'remaining_for_free_shipping' => $cartSummary['formatted']['remaining_for_free_shipping'],
-            'total_items' => $cartSummary['total_items']
-        ]);
     })->name('cart.data');
     
     // Route de debug temporaire
@@ -433,6 +452,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Page de statistiques avancées
     Route::get('/statistics', [DashboardController::class, 'statistics'])->name('statistics');
     
+    // Routes spécifiques pour les produits (avant resource pour éviter les conflits)
+    Route::post('/products/{product}/restock', [DashboardController::class, 'restockProduct'])->name('products.restock');
+    Route::post('/products/{product}/restock-suggestion', [DashboardController::class, 'getProductRestockSuggestion'])->name('products.restock-suggestion');
+    
     // Gestion des produits
     Route::resource('products', AdminProductController::class);
     
@@ -448,8 +471,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // Routes pour la gestion des stocks (API-like)
     Route::post('/stock/restock-suggestions', [DashboardController::class, 'getRestockSuggestions'])->name('stock.restock-suggestions');
-    Route::post('/products/{product}/restock', [DashboardController::class, 'restockProduct'])->name('products.restock');
-    Route::post('/products/{product}/restock-suggestion', [DashboardController::class, 'getProductRestockSuggestion'])->name('products.restock-suggestion');
     Route::post('/stock/apply-all-restock', [DashboardController::class, 'applyAllRestock'])->name('stock.apply-all-restock');
     Route::post('/stock/bulk-restock', [DashboardController::class, 'bulkRestock'])->name('stock.bulk-restock');
     Route::post('/stock/bulk-update', [DashboardController::class, 'bulkUpdateStock'])->name('stock.bulk-update');
@@ -555,4 +576,10 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('blog')->name('blog.')->group(function () {
     Route::get('/', [\App\Http\Controllers\BlogPostController::class, 'index'])->name('index');
     Route::get('/{slug}', [\App\Http\Controllers\BlogPostController::class, 'showWeb'])->name('show');
+});
+
+// Routes API publiques pour les fonctionnalités de location (sans CSRF)
+Route::prefix('api/rentals')->name('api.rentals.')->withoutMiddleware(['csrf'])->group(function () {
+    Route::get('/{product}/constraints', [RentalController::class, 'getProductConstraints'])->name('constraints');
+    Route::post('/{product}/calculate-cost', [RentalController::class, 'calculateRentalCost'])->name('calculate-cost');
 });

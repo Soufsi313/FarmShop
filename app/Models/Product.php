@@ -806,6 +806,16 @@ class Product extends Model
     }
 
     /**
+     * Vérifie si le produit est disponible pour un jour donné
+     */
+    public function isDayAvailable($date)
+    {
+        // Pour l'instant, on considère que tous les jours sont disponibles
+        // Cette méthode peut être étendue pour vérifier les réservations existantes
+        return true;
+    }
+
+    /**
      * Utiliser le slug comme clé de route
      */
     public function getRouteKeyName()

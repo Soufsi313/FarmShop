@@ -321,19 +321,26 @@ document.addEventListener('alpine:init', () => {
         
         async applyQuickRestock(productId, quantity) {
             try {
+                // Créer FormData au lieu de JSON
+                const formData = new FormData();
+                formData.append('quantity', quantity);
+                
                 const response = await fetch(`/admin/products/${productId}/restock`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
-                    body: JSON.stringify({ quantity })
+                    body: formData
                 });
                 
                 if (response.ok) {
+                    const result = await response.json();
+                    console.log('Réapprovisionnement réussi:', result);
                     location.reload();
                 } else {
-                    alert('Erreur lors du réapprovisionnement');
+                    const error = await response.text();
+                    console.error('Erreur HTTP:', response.status, error);
+                    alert(`Erreur lors du réapprovisionnement: ${response.status}`);
                 }
             } catch (error) {
                 console.error('Erreur:', error);

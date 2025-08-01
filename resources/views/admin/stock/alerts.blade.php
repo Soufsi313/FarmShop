@@ -366,22 +366,27 @@ document.addEventListener('alpine:init', () => {
             if (!this.selectedProductId || !this.quickRestockQuantity) return;
             
             try {
+                // Créer FormData au lieu de JSON
+                const formData = new FormData();
+                formData.append('quantity', this.quickRestockQuantity);
+                
                 const response = await fetch(`/admin/products/${this.selectedProductId}/restock`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
-                    body: JSON.stringify({ 
-                        quantity: this.quickRestockQuantity 
-                    })
+                    body: formData
                 });
                 
                 if (response.ok) {
+                    const result = await response.json();
+                    console.log('Réapprovisionnement réussi:', result);
                     this.closeQuickRestockModal();
                     location.reload();
                 } else {
-                    alert('Erreur lors du réapprovisionnement');
+                    const error = await response.text();
+                    console.error('Erreur HTTP:', response.status, error);
+                    alert(`Erreur lors du réapprovisionnement: ${response.status}`);
                 }
             } catch (error) {
                 console.error('Erreur:', error);

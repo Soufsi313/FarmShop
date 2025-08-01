@@ -293,10 +293,39 @@
                 <td class="text-right"><strong>{{ number_format($order->subtotal, 2, ',', ' ') }} €</strong></td>
             </tr>
             @if($order->tax_amount > 0)
-            <tr>
-                <td colspan="3" class="text-right"><strong>TVA (20%):</strong></td>
-                <td class="text-right"><strong>{{ number_format($order->tax_amount, 2, ',', ' ') }} €</strong></td>
-            </tr>
+            @php
+                // Calculer les détails TVA par taux pour l'affichage
+                $taxDetails = [];
+                foreach($order->items as $item) {
+                    $taxRate = $item->tax_rate ?? 21; // Default to 21% if not set
+                    if (!isset($taxDetails[$taxRate])) {
+                        $taxDetails[$taxRate] = [
+                            'rate' => $taxRate,
+                            'subtotal_ht' => 0,
+                            'tax_amount' => 0
+                        ];
+                    }
+                    $taxDetails[$taxRate]['subtotal_ht'] += $item->subtotal;
+                    $taxDetails[$taxRate]['tax_amount'] += $item->tax_amount;
+                }
+            @endphp
+            
+            @if(count($taxDetails) > 1)
+                {{-- Affichage détaillé si plusieurs taux TVA --}}
+                @foreach($taxDetails as $taxDetail)
+                <tr>
+                    <td colspan="3" class="text-right"><strong>TVA ({{ number_format($taxDetail['rate'], 0) }}%) sur {{ number_format($taxDetail['subtotal_ht'], 2, ',', ' ') }} €:</strong></td>
+                    <td class="text-right"><strong>{{ number_format($taxDetail['tax_amount'], 2, ',', ' ') }} €</strong></td>
+                </tr>
+                @endforeach
+            @else
+                {{-- Affichage simple si un seul taux TVA --}}
+                @php $singleTaxDetail = reset($taxDetails); @endphp
+                <tr>
+                    <td colspan="3" class="text-right"><strong>TVA ({{ number_format($singleTaxDetail['rate'], 0) }}%):</strong></td>
+                    <td class="text-right"><strong>{{ number_format($order->tax_amount, 2, ',', ' ') }} €</strong></td>
+                </tr>
+            @endif
             @endif
             @if($order->shipping_cost > 0)
             <tr>

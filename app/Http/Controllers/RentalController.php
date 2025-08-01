@@ -186,7 +186,7 @@ class RentalController extends Controller
         
         $subtotal = $dailyPrice * $quantity * $days;
         $deposit = $depositAmount * $quantity;
-        $tax = $subtotal * 0.20; // TVA 20%
+        $tax = $subtotal * ($product->getTaxRate() / 100); // TVA basée sur le produit
         $total = $subtotal + $tax;
 
         return response()->json([

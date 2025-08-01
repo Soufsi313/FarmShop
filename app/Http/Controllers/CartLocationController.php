@@ -20,6 +20,15 @@ class CartLocationController extends Controller
     public function index(): JsonResponse
     {
         $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Authentification requise',
+                'data' => null
+            ], 401);
+        }
+        
         $cartLocation = $user->getOrCreateActiveCartLocation();
         
         $cartLocation->load(['items.product.category', 'items.product.rentalCategory']);
@@ -100,9 +109,7 @@ class CartLocationController extends Controller
                     'cart_item' => $cartItem->toDisplayArray(),
                     'cart_summary' => $cartLocation->fresh()->getSummary(),
                     'rental_info' => [
-                        'duration_days' => $validation['duration'],
-                        'total_cost' => $validation['total_cost'],
-                        'deposit_required' => $validation['deposit_required']
+                        'duration_days' => $validation['duration_days']
                     ]
                 ]
             ], 201);
@@ -334,6 +341,24 @@ class CartLocationController extends Controller
     public function summary(): JsonResponse
     {
         $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Authentification requise',
+                'data' => [
+                    'total_amount' => 0,
+                    'total_deposit' => 0,
+                    'total_tva' => 0,
+                    'total_with_tax' => 0,
+                    'total_items' => 0,
+                    'total_quantity' => 0,
+                    'items_count' => 0,
+                    'is_empty' => true
+                ]
+            ], 401);
+        }
+        
         $cartLocation = $user->activeCartLocation;
 
         if (!$cartLocation) {

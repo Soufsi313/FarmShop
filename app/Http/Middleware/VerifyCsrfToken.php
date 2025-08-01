@@ -17,6 +17,8 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         // Exclure les webhooks et autres endpoints qui ne nécessitent pas de CSRF
         'api/stripe/webhook',
+        // Exclure les APIs publiques de location
+        'api/rentals/*',
     ];
 
     /**
@@ -28,6 +30,11 @@ class VerifyCsrfToken extends Middleware
      */
     public function handle($request, Closure $next)
     {
+        // Skip CSRF verification for specific API routes
+        if ($request->is('api/rentals/*')) {
+            return $next($request);
+        }
+
         return parent::handle($request, $next);
     }
 }

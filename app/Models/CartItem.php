@@ -327,17 +327,30 @@ class CartItem extends Model
      */
     public function toDisplayArray(): array
     {
+        // Vérifier et appliquer les offres spéciales en temps réel
+        $this->applySpecialOffer();
+        $this->recalculate();
+        
         $metadata = $this->product_metadata ?? [];
         $priceTTCUnitaire = $metadata['price_ttc_unitaire'] ?? ($this->unit_price * (1 + ($this->tax_rate / 100)));
         $unitSymbol = $metadata['unit_symbol'] ?? 'unité';
+        
+        // Récupérer les informations du produit si elles ne sont pas en cache
+        $productImage = null;
+        $productSlug = null;
+        
+        if ($this->product) {
+            $productImage = $this->product->main_image ? asset('storage/' . $this->product->main_image) : null;
+            $productSlug = $this->product->slug;
+        }
         
         $data = [
             'id' => $this->id,
             'product_id' => $this->product_id,
             'product_name' => $this->product_name,
             'product_category' => $this->product_category,
-            'product_image' => $this->product_image,
-            'product_slug' => $this->product_slug,
+            'product_image' => $productImage,
+            'product_slug' => $productSlug,
             'quantity' => $this->quantity,
             'unit_label' => $unitSymbol,
             
@@ -379,8 +392,12 @@ class CartItem extends Model
             $originalPriceTTC = $this->original_unit_price ? 
                 $this->original_unit_price * (1 + ($this->tax_rate / 100)) : null;
             
+            // Récupérer l'offre spéciale pour obtenir son nom
+            $specialOffer = $this->product ? $this->product->getActiveSpecialOffer($this->quantity) : null;
+            
             $data['special_offer'] = [
                 'id' => $this->special_offer_id,
+                'title' => $specialOffer ? $specialOffer->name : 'Offre spéciale',
                 'discount_percentage' => $this->discount_percentage,
                 'discount_amount_ht' => $this->discount_amount,
                 'discount_amount_ttc' => $this->discount_amount * (1 + ($this->tax_rate / 100)),

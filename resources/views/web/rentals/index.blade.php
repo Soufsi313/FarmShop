@@ -291,7 +291,9 @@
                                             </div>
 
                                             <button class="flex-1 add-to-cart-location px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors text-sm"
-                                                    x-on:click="addToCartLocation({{ $product->id }})">
+                                                    data-product-slug="{{ $product->slug }}"
+                                                    data-product-data="{{ json_encode(['id' => $product->id, 'slug' => $product->slug]) }}"
+                                                    x-on:click="addToCartLocation('{{ $product->slug }}')">
                                                 ➕ Panier
                                             </button>
 
@@ -415,7 +417,7 @@
                             <span x-text="calculation.subtotal.toFixed(2) + '€'" class="font-medium"></span>
                         </div>
                         <div class="flex justify-between">
-                            <span>TVA (20%):</span>
+                            <span>TVA (21%):</span>
                             <span x-text="calculation.tax.toFixed(2) + '€'" class="font-medium"></span>
                         </div>
                         <div class="flex justify-between">
@@ -546,14 +548,18 @@ document.addEventListener('alpine:init', () => {
         },
         
         // Ajouter au panier de location
-        addToCartLocation(productId) {
-            const quantity = this.quantities[productId];
+        addToCartLocation(productSlug) {
+            // La quantité est basée sur l'ID du produit, mais l'API utilise le slug
+            // On récupère l'ID depuis le slug passé (qui sera converti dans le template)
+            const productData = JSON.parse(document.querySelector(`[data-product-slug="${productSlug}"]`).dataset.productData);
+            
+            const quantity = this.quantities[productData.id];
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             const weekLater = new Date();
             weekLater.setDate(weekLater.getDate() + 8);
             
-            this.makeApiCall(`/api/cart-location/products/${productId}`, {
+            this.makeApiCall(`/api/cart-location/products/${productSlug}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     quantity: quantity,
@@ -566,6 +572,13 @@ document.addEventListener('alpine:init', () => {
                     this.updateCartLocationCount();
                 } else {
                     this.showNotification('❌ ' + data.message, 'error');
+                }
+            }).catch(error => {
+                // Gérer les erreurs spécifiques du backend
+                if (error.message && error.message.includes('déjà dans votre panier')) {
+                    this.showNotification('ℹ️ ' + error.message, 'info');
+                } else {
+                    this.showNotification('❌ ' + (error.message || 'Erreur lors de l\'ajout au panier'), 'error');
                 }
             });
         },
@@ -585,7 +598,7 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
             
-            this.makeApiCall(`/api/rentals/${this.selectedProduct.id}/calculate-cost`, {
+            this.makeApiCall(`/api/rentals/${this.selectedProduct.slug}/calculate-cost`, {
                 method: 'POST',
                 body: JSON.stringify({
                     start_date: this.rentalForm.startDate,
@@ -618,7 +631,7 @@ document.addEventListener('alpine:init', () => {
         
         // Confirmer la location
         confirmRental() {
-            this.makeApiCall(`/api/cart-location/products/${this.selectedProduct.id}`, {
+            this.makeApiCall(`/api/cart-location/products/${this.selectedProduct.slug}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     quantity: this.rentalForm.quantity,
@@ -633,6 +646,14 @@ document.addEventListener('alpine:init', () => {
                 } else {
                     this.rentalError = data.message;
                 }
+            }).catch(error => {
+                // Gérer les erreurs spécifiques du backend
+                if (error.message && error.message.includes('déjà dans votre panier')) {
+                    this.showNotification('ℹ️ ' + error.message, 'info');
+                    this.showRentalModal = false;
+                } else {
+                    this.rentalError = error.message || 'Erreur lors de l\'ajout au panier';
+                }
             });
         },
         
@@ -642,6 +663,10 @@ document.addEventListener('alpine:init', () => {
                 .then(data => {
                     if (data.success) {
                         this.cartLocationCount = data.data.total_items || 0;
+                        // Mettre à jour le compteur global dans le header
+                        if (window.updateCartLocationCount) {
+                            window.updateCartLocationCount(this.cartLocationCount);
+                        }
                     }
                 });
         },
@@ -652,10 +677,39 @@ document.addEventListener('alpine:init', () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
                     ...options.headers
                 },
+                credentials: 'same-origin',
                 ...options
-            }).then(response => response.json());
+            }).then(async response => {
+                const jsonData = await response.json();
+                
+                if (!response.ok) {
+                    // Pour les erreurs HTTP, essayer de récupérer le message du JSON
+                    const errorMessage = jsonData?.message || `HTTP error! status: ${response.status}`;
+                    const error = new Error(errorMessage);
+                    error.response = response;
+                    error.data = jsonData;
+                    throw error;
+                }
+                
+                return jsonData;
+            }).catch(error => {
+                // Ne pas logger les erreurs "normales" ou informatives
+                const isInformativeError = error.message && (
+                    error.message.includes('déjà dans votre panier') ||
+                    error.message.includes('already in cart') ||
+                    error.message.includes('Durée minimale') ||
+                    error.message.includes('Durée maximale')
+                );
+                
+                if (!isInformativeError) {
+                    console.error('API call failed:', error);
+                }
+                throw error;
+            });
         },
         
         showNotification(message, type = 'info') {

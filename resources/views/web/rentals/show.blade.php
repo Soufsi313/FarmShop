@@ -240,13 +240,15 @@
                             <div class="space-y-3">
                                 <button x-on:click="addToCartLocation()" 
                                         class="w-full px-6 py-3 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors font-medium">
-                                    ➕ Ajouter au panier de location
+                                    🛒 Ajouter au panier (<span x-text="quantity"></span> unité<span x-show="quantity > 1">s</span>)
                                 </button>
+                                <p class="text-xs text-gray-500 text-center">Ajoutez les quantités souhaitées à votre panier</p>
                                 
                                 <button x-on:click="showRentalModal = true" 
                                         class="w-full px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors font-medium">
-                                    🏠 Louer maintenant
+                                    ⚡ Louer maintenant (1 unité)
                                 </button>
+                                <p class="text-xs text-gray-400 text-center">Ajout rapide d'1 unité et redirection vers le panier</p>
                             </div>
                         @else
                             <div class="text-center py-4">
@@ -292,8 +294,12 @@
                     </div>
 
                     <!-- Résultats -->
-                    <div x-show="calculation.show" class="bg-white/20 rounded-md p-4">
-                        <div class="space-y-2 text-sm">
+                    <div x-show="calculation.loading || calculation.show" class="bg-white/20 rounded-md p-4">
+                        <div x-show="calculation.loading" class="flex items-center justify-center py-4">
+                            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                            <span class="ml-2 text-sm">Calcul en cours...</span>
+                        </div>
+                        <div x-show="calculation.show && !calculation.loading" class="space-y-2 text-sm">
                             <div class="flex justify-between">
                                 <span>Durée :</span>
                                 <span x-text="calculation.days + ' jour(s)'" class="font-medium"></span>
@@ -303,7 +309,7 @@
                                 <span x-text="calculation.subtotal.toFixed(2) + '€'" class="font-medium"></span>
                             </div>
                             <div class="flex justify-between">
-                                <span>TVA (20%) :</span>
+                                <span>TVA (21%) :</span>
                                 <span x-text="calculation.tax.toFixed(2) + '€'" class="font-medium"></span>
                             </div>
                             <div class="flex justify-between">
@@ -432,9 +438,13 @@
             </div>
 
             <!-- Calcul -->
-            <div x-show="calculation.show" class="bg-blue-50 p-4 rounded-md mb-4">
+            <div x-show="calculation.loading || calculation.show" class="bg-blue-50 p-4 rounded-md mb-4">
                 <h5 class="font-medium text-blue-900 mb-2">💰 Récapitulatif</h5>
-                <div class="space-y-1 text-sm">
+                <div x-show="calculation.loading" class="flex items-center justify-center py-4">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                    <span class="ml-2 text-sm text-blue-800">Calcul en cours...</span>
+                </div>
+                <div x-show="calculation.show && !calculation.loading" class="space-y-1 text-sm">
                     <div class="flex justify-between">
                         <span>Durée :</span>
                         <span x-text="calculation.days + ' jour(s)'" class="font-medium"></span>
@@ -444,7 +454,7 @@
                         <span x-text="calculation.subtotal.toFixed(2) + '€'" class="font-medium"></span>
                     </div>
                     <div class="flex justify-between">
-                        <span>TVA (20%) :</span>
+                        <span>TVA (21%) :</span>
                         <span x-text="calculation.tax.toFixed(2) + '€'" class="font-medium"></span>
                     </div>
                     <div class="flex justify-between">
@@ -454,6 +464,16 @@
                     <div class="flex justify-between border-t pt-1 mt-2">
                         <span class="font-semibold">Total à payer :</span>
                         <span x-text="calculation.total.toFixed(2) + '€'" class="font-bold text-purple-600"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages d'erreur de calcul -->
+            <div x-show="calculationError" class="bg-red-50 border border-red-200 rounded-md p-3 mb-4">
+                <div class="flex">
+                    <div class="text-red-400">⚠️</div>
+                    <div class="ml-3">
+                        <p x-text="calculationError" class="text-sm text-red-800"></p>
                     </div>
                 </div>
             </div>
@@ -490,6 +510,10 @@
 <script>
 document.addEventListener('alpine:init', () => {
     Alpine.data('rentalDetailPage', () => ({
+        // Contraintes du produit
+        minRentalDays: {{ $product->min_rental_days ?? 1 }},
+        maxRentalDays: {{ $product->max_rental_days ?? 365 }},
+        
         // État
         quantity: 1,
         showRentalModal: false,
@@ -500,6 +524,7 @@ document.addEventListener('alpine:init', () => {
         calculation: {
             show: false,
             valid: false,
+            loading: false,
             days: 0,
             subtotal: 0,
             tax: 0,
@@ -524,26 +549,48 @@ document.addEventListener('alpine:init', () => {
             
             // Calculer le coût initial
             this.calculateCost();
+            
+            // Watchers pour recalculer automatiquement quand les dates changent
+            this.$watch('startDate', () => {
+                if (this.startDate && this.endDate) {
+                    this.calculateCost();
+                }
+            });
+            
+            this.$watch('endDate', () => {
+                if (this.startDate && this.endDate) {
+                    this.calculateCost();
+                }
+            });
+            
+            this.$watch('quantity', () => {
+                if (this.startDate && this.endDate) {
+                    this.calculateCost();
+                }
+            });
         },
         
         // Gestion des quantités
         increaseQuantity() {
             if (this.quantity < {{ $product->quantity }}) {
                 this.quantity++;
-                this.calculateCost();
             }
         },
         
         decreaseQuantity() {
             if (this.quantity > 1) {
                 this.quantity--;
-                this.calculateCost();
             }
         },
         
-        // Ajouter au panier de location
+        // Ajouter au panier de location (avec quantité choisie)
         addToCartLocation() {
-            this.makeApiCall(`/api/cart-location/products/{{ $product->id }}`, {
+            if (!this.startDate || !this.endDate) {
+                this.showNotification('❌ Veuillez sélectionner les dates de location', 'error');
+                return;
+            }
+            
+            this.makeApiCall(`{{ url('/api/cart-location/products') }}/{{ $product->id }}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     quantity: this.quantity,
@@ -553,9 +600,16 @@ document.addEventListener('alpine:init', () => {
             }).then(data => {
                 if (data.success) {
                     this.showNotification('✅ Produit ajouté au panier de location !', 'success');
+                    // Mettre à jour le compteur global dans le header
+                    if (window.updateCartLocationCount) {
+                        this.updateCartLocationCount();
+                    }
                 } else {
                     this.showNotification('❌ ' + data.message, 'error');
                 }
+            }).catch((error) => {
+                console.error('Add to cart error:', error);
+                this.showNotification('❌ Erreur lors de l\'ajout au panier', 'error');
             });
         },
         
@@ -563,11 +617,42 @@ document.addEventListener('alpine:init', () => {
         calculateCost() {
             if (!this.startDate || !this.endDate) {
                 this.calculation.show = false;
+                this.calculation.loading = false;
                 this.calculationError = '';
                 return;
             }
             
-            this.makeApiCall(`/api/rentals/{{ $product->id }}/calculate-cost`, {
+            // Valider que la date de fin est après la date de début
+            if (new Date(this.endDate) <= new Date(this.startDate)) {
+                this.calculation.show = false;
+                this.calculation.loading = false;
+                this.calculationError = 'La date de fin doit être après la date de début';
+                return;
+            }
+            
+            // Validation côté client des contraintes de durée
+            const startDateObj = new Date(this.startDate);
+            const endDateObj = new Date(this.endDate);
+            const days = Math.ceil((endDateObj - startDateObj) / (1000 * 60 * 60 * 24)) + 1;
+            
+            if (days < this.minRentalDays) {
+                this.calculation.show = false;
+                this.calculation.loading = false;
+                this.calculationError = `Durée minimale de location : ${this.minRentalDays} jour(s)`;
+                return;
+            }
+            
+            if (days > this.maxRentalDays) {
+                this.calculation.show = false;
+                this.calculation.loading = false;
+                this.calculationError = `Durée maximale de location : ${this.maxRentalDays} jour(s)`;
+                return;
+            }
+            
+            this.calculation.loading = true;
+            this.calculationError = '';
+            
+            this.makeApiCall(`{{ url('/api/rentals') }}/{{ $product->slug }}/calculate-cost`, {
                 method: 'POST',
                 body: JSON.stringify({
                     start_date: this.startDate,
@@ -575,10 +660,12 @@ document.addEventListener('alpine:init', () => {
                     quantity: this.quantity
                 })
             }).then(data => {
+                this.calculation.loading = false;
                 if (data.success) {
                     this.calculation = {
                         show: true,
                         valid: true,
+                        loading: false,
                         days: data.data.rental_period.days,
                         subtotal: data.data.pricing.subtotal,
                         tax: data.data.pricing.tax_amount,
@@ -590,21 +677,36 @@ document.addEventListener('alpine:init', () => {
                 } else {
                     this.calculation.show = false;
                     this.calculation.valid = false;
-                    this.calculationError = data.message;
+                    this.calculationError = data.message || 'Erreur lors du calcul';
                 }
-            }).catch(() => {
+            }).catch((error) => {
+                this.calculation.loading = false;
+                console.error('Calcul error:', error);
                 this.calculation.show = false;
                 this.calculation.valid = false;
-                this.calculationError = 'Erreur lors du calcul';
+                
+                // Utiliser le message d'erreur spécifique de l'API si disponible
+                if (error.data && error.data.message) {
+                    this.calculationError = error.data.message;
+                } else if (error.message) {
+                    this.calculationError = error.message;
+                } else {
+                    this.calculationError = 'Erreur lors du calcul';
+                }
             });
         },
         
-        // Confirmer la location
+        // Confirmer la location (Louer maintenant - quantité 1)
         confirmRental() {
-            this.makeApiCall(`/api/cart-location/products/{{ $product->id }}`, {
+            if (!this.startDate || !this.endDate) {
+                this.showNotification('❌ Veuillez sélectionner les dates de location', 'error');
+                return;
+            }
+            
+            this.makeApiCall(`{{ url('/api/cart-location/products') }}/{{ $product->id }}`, {
                 method: 'POST',
                 body: JSON.stringify({
-                    quantity: this.quantity,
+                    quantity: 1, // Quantité fixe de 1 pour "Louer maintenant"
                     start_date: this.startDate,
                     end_date: this.endDate
                 })
@@ -612,6 +714,10 @@ document.addEventListener('alpine:init', () => {
                 if (data.success) {
                     this.showNotification('✅ Produit ajouté au panier de location !', 'success');
                     this.showRentalModal = false;
+                    // Mettre à jour le compteur global dans le header
+                    if (window.updateCartLocationCount) {
+                        this.updateCartLocationCount();
+                    }
                     // Rediriger vers le panier ou la page de commande
                     setTimeout(() => {
                         window.location.href = '/cart-location';
@@ -619,7 +725,22 @@ document.addEventListener('alpine:init', () => {
                 } else {
                     this.rentalError = data.message;
                 }
+            }).catch((error) => {
+                console.error('Confirm rental error:', error);
+                this.rentalError = 'Erreur lors de l\'ajout au panier';
             });
+        },
+        
+        // Mettre à jour le compteur du panier de location
+        async updateCartLocationCount() {
+            try {
+                const response = await this.makeApiCall('{{ url('/api/cart-location/summary') }}');
+                if (response.success && window.updateCartLocationCount) {
+                    window.updateCartLocationCount(response.data.total_items || 0);
+                }
+            } catch (error) {
+                console.error('Erreur lors de la mise à jour du compteur:', error);
+            }
         },
         
         // Utilitaires
@@ -628,10 +749,29 @@ document.addEventListener('alpine:init', () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
                     ...options.headers
                 },
+                credentials: 'same-origin',
                 ...options
-            }).then(response => response.json());
+            }).then(async response => {
+                const jsonData = await response.json();
+                
+                if (!response.ok) {
+                    // Pour les erreurs HTTP, essayer de récupérer le message du JSON
+                    const errorMessage = jsonData?.message || `HTTP error! status: ${response.status}`;
+                    const error = new Error(errorMessage);
+                    error.response = response;
+                    error.data = jsonData;
+                    throw error;
+                }
+                
+                return jsonData;
+            }).catch(error => {
+                console.error('API call failed:', error);
+                throw error;
+            });
         },
         
         showNotification(message, type = 'info') {

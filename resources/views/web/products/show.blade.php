@@ -38,7 +38,7 @@
 @endpush
 
 @section('content')
-<div class="min-h-screen bg-gray-50" x-data="productDetailPage">
+<div class="min-h-screen bg-gray-50" x-data="productPricing">
     
     <!-- Breadcrumb -->
     <div class="bg-white shadow-sm">
@@ -502,33 +502,6 @@
 @push('scripts')
 <script>
 document.addEventListener('alpine:init', () => {
-    Alpine.data('productDetailPage', () => ({
-        quantity: 1,
-        
-        formatPrice(price) {
-            return new Intl.NumberFormat('fr-FR', {
-                style: 'currency',
-                currency: 'EUR'
-            }).format(price);
-        },
-
-        getPriceForQuantity(quantity) {
-            @if($hasSpecialOffer)
-                const basePrice = {{ $product->price }} * quantity;
-                const minQuantity = {{ $specialOffer->minimum_quantity }};
-                const discountPercentage = {{ $specialOffer->discount_percentage }};
-                
-                if (quantity >= minQuantity) {
-                    const discount = (basePrice * discountPercentage) / 100;
-                    return basePrice - discount;
-                }
-                return basePrice;
-            @else
-                return {{ $product->price }} * quantity;
-            @endif
-        }
-    }))
-
     Alpine.data('productPricing', () => ({
         quantity: 1,
         
@@ -565,6 +538,22 @@ document.addEventListener('alpine:init', () => {
                 style: 'currency',
                 currency: 'EUR'
             }).format(price);
+        },
+
+        getPriceForQuantity(quantity) {
+            @if($hasSpecialOffer)
+                const basePrice = {{ $product->price }} * quantity;
+                const minQuantity = {{ $specialOffer->minimum_quantity }};
+                const discountPercentage = {{ $specialOffer->discount_percentage }};
+                
+                if (quantity >= minQuantity) {
+                    const discount = (basePrice * discountPercentage) / 100;
+                    return basePrice - discount;
+                }
+                return basePrice;
+            @else
+                return {{ $product->price }} * quantity;
+            @endif
         }
     }))
 })

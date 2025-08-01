@@ -426,12 +426,12 @@
                                         <span>Panier Achat</span>
                                         <span id="cart-count" class="ml-2 bg-green-600 text-white text-xs rounded-full px-2 py-1 hidden">0</span>
                                     </a>
-                                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                    <a href="{{ route('cart-location.index') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <svg class="h-4 w-4 mr-3 text-farm-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                         <span>Panier Location</span>
-                                        <span class="ml-2 bg-orange-500 text-white text-xs rounded-full px-2 py-1 opacity-50">Bientôt</span>
+                                        <span id="cart-location-count" class="ml-2 bg-orange-500 text-white text-xs rounded-full px-2 py-1 hidden">0</span>
                                     </a>
                                 </div>
                             </div>
@@ -1028,7 +1028,83 @@
             } else {
                 console.error('❌ FarmShop.cookieConsent.show n\'est pas une fonction');
             }
+            
+            // Initialiser les compteurs de panier
+            initCartCounters();
         });
+
+        // Système de gestion des compteurs de panier
+        function initCartCounters() {
+            // Charger le compteur du panier d'achat
+            @auth
+            loadCartCount();
+            loadCartLocationCount();
+            @endauth
+        }
+
+        // Fonction globale pour mettre à jour le compteur du panier d'achat
+        window.updateCartCount = function(count) {
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement) {
+                cartCountElement.textContent = count;
+                cartCountElement.style.display = count > 0 ? 'inline' : 'none';
+                if (count > 0) {
+                    cartCountElement.classList.remove('hidden');
+                }
+            }
+        };
+
+        // Fonction globale pour mettre à jour le compteur du panier de location
+        window.updateCartLocationCount = function(count) {
+            const cartLocationCountElement = document.getElementById('cart-location-count');
+            if (cartLocationCountElement) {
+                cartLocationCountElement.textContent = count;
+                cartLocationCountElement.style.display = count > 0 ? 'inline' : 'none';
+                if (count > 0) {
+                    cartLocationCountElement.classList.remove('hidden');
+                }
+            }
+        };
+
+        // Charger le compteur du panier d'achat
+        async function loadCartCount() {
+            try {
+                const response = await fetch('/cart/data');
+                const data = await response.json();
+                if (data.cartSummary && data.cartSummary.total_items) {
+                    updateCartCount(data.cartSummary.total_items);
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement du compteur panier:', error);
+            }
+        }
+
+        // Charger le compteur du panier de location
+        async function loadCartLocationCount() {
+            try {
+                const response = await fetch('/api/cart-location/summary', {
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data && data.data.total_items) {
+                        updateCartLocationCount(data.data.total_items);
+                    }
+                } else if (response.status === 401) {
+                    // Utilisateur non connecté, ce n'est pas une erreur
+                    console.log('Utilisateur non connecté - pas de panier de location');
+                } else {
+                    console.error('Erreur HTTP:', response.status);
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement du compteur panier location:', error);
+            }
+        }
     </script>
 </body>
 </html>

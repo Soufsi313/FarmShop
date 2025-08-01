@@ -150,14 +150,39 @@ class User extends Authenticatable
      */
     public function getOrCreateActiveCart(): Cart
     {
+        // D'abord essayer de récupérer un panier actif existant
         $cart = $this->activeCart()->notExpired()->first();
         
         if (!$cart) {
-            $cart = $this->carts()->create([
-                'status' => 'active',
-                'tax_rate' => 20.00, // TVA par défaut
-                'expires_at' => now()->addDays(7) // Expiration dans 7 jours
-            ]);
+            // Vérifier s'il y a un panier actif expiré et le mettre à jour
+            $expiredCart = $this->activeCart()->first();
+            
+            if ($expiredCart) {
+                // Réactiver le panier expiré en mettant à jour sa date d'expiration
+                $expiredCart->update([
+                    'expires_at' => now()->addDays(7)
+                ]);
+                return $expiredCart;
+            }
+            
+            // Sinon, créer un nouveau panier
+            try {
+                $cart = $this->carts()->create([
+                    'status' => 'active',
+                    'tax_rate' => 20.00, // TVA par défaut
+                    'expires_at' => now()->addDays(7) // Expiration dans 7 jours
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                // En cas d'erreur de contrainte unique, récupérer le panier existant
+                if ($e->getCode() === '23000') {
+                    $cart = $this->activeCart()->first();
+                    if ($cart) {
+                        $cart->update(['expires_at' => now()->addDays(7)]);
+                        return $cart;
+                    }
+                }
+                throw $e;
+            }
         }
         
         return $cart;

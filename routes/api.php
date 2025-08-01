@@ -109,7 +109,7 @@ Route::post('/special-offers/calculate-discount', [App\Http\Controllers\SpecialO
 Route::post('/stripe/webhook', [StripePaymentController::class, 'webhook'])->name('api.stripe.webhook');
 
 // Routes protégées nécessitant une authentification
-Route::middleware(['auth:web'])->group(function () {
+Route::middleware(['web', 'auth'])->group(function () {
     
     // Routes utilisateur standard
     Route::get('/profile', [UserController::class, 'show'])->name('api.users.profile');
@@ -211,12 +211,6 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('/summary', [CartLocationController::class, 'summary'])->name('summary');
         Route::put('/default-dates', [CartLocationController::class, 'updateDefaultDates'])->name('update-default-dates');
         Route::get('/checkout/prepare', [CartLocationController::class, 'prepareForCheckout'])->name('prepare-checkout');
-    });
-    
-    // Routes API pour les fonctionnalités de location (publiques)
-    Route::prefix('rentals')->name('api.rentals.')->group(function () {
-        Route::get('/{product}/constraints', [RentalController::class, 'getProductConstraints'])->name('constraints');
-        Route::post('/{product}/calculate-cost', [RentalController::class, 'calculateRentalCost'])->name('calculate-cost');
     });
     
     // Routes éléments de panier de location pour utilisateurs connectés

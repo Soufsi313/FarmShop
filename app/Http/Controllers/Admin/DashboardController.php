@@ -15,6 +15,7 @@ use App\Models\BlogCommentReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -1083,9 +1084,14 @@ class DashboardController extends Controller
     /**
      * Appliquer le réapprovisionnement d'un produit
      */
-    public function restockProduct(Request $request, Product $product)
+    public function restockProduct(Request $request, $product)
     {
         $this->checkAdminAccess();
+        
+        // Résoudre le produit manuellement si nécessaire
+        if (!$product instanceof Product) {
+            $product = Product::findOrFail($product);
+        }
         
         $request->validate([
             'quantity' => 'required|integer|min:1'
@@ -1095,21 +1101,26 @@ class DashboardController extends Controller
         $product->update(['quantity' => $newQuantity]);
         
         // Créer un message d'alerte de réapprovisionnement
-        \App\Models\Message::createSystemMessage(
-            1, // ID admin (à adapter)
-            "✅ Réapprovisionnement effectué",
-            "Le produit \"{$product->name}\" a été réapprovisionné. Quantité ajoutée: {$request->quantity}. Nouveau stock: {$newQuantity}.",
-            [
-                'product_id' => $product->id,
-                'quantity_added' => $request->quantity,
-                'new_stock' => $newQuantity,
-                'action_type' => 'restock'
-            ],
-            'normal',
-            false,
-            route('admin.products.edit', $product),
-            'Voir le produit'
-        );
+        try {
+            \App\Models\Message::createSystemMessage(
+                Auth::id() ?: 1, // Utiliser l'ID de l'utilisateur connecté ou 1 par défaut
+                "✅ Réapprovisionnement effectué",
+                "Le produit \"{$product->name}\" a été réapprovisionné. Quantité ajoutée: {$request->quantity}. Nouveau stock: {$newQuantity}.",
+                [
+                    'product_id' => $product->id,
+                    'quantity_added' => $request->quantity,
+                    'new_stock' => $newQuantity,
+                    'action_type' => 'restock'
+                ],
+                'normal',
+                false,
+                route('admin.products.edit', $product),
+                'Voir le produit'
+            );
+        } catch (\Exception $e) {
+            // Log l'erreur mais continue l'exécution
+            Log::error('Erreur lors de la création du message système pour le restock: ' . $e->getMessage());
+        }
         
         return response()->json([
             'success' => true,
