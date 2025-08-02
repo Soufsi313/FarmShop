@@ -141,13 +141,16 @@ class CartItemLocationController extends Controller
             'start_date' => [
                 'required',
                 'date',
-                new RentalDateValidation($cartItemLocation->product, null, 'start')
+                new RentalDateValidation($cartItemLocation->product, null, null, 'start')
             ],
             'end_date' => [
                 'required', 
                 'date',
                 'after:start_date',
-                new RentalDateValidation($cartItemLocation->product, $request->start_date, 'end')
+                new RentalDateValidation($cartItemLocation->product, 
+                    $request->start_date ? Carbon::parse($request->start_date) : null, 
+                    null, 
+                    'end')
             ]
         ]);
 

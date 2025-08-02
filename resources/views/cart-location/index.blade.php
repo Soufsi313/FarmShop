@@ -450,6 +450,22 @@ document.addEventListener('alpine:init', () => {
                     await this.loadCart();
                     this.showDateModal = false;
                     this.showNotification('Dates mises à jour', 'success');
+                } else if (response.status === 422) {
+                    // Gestion des erreurs de validation
+                    let errorMessage = 'Erreur de validation :';
+                    
+                    if (response.errors) {
+                        // Afficher toutes les erreurs de validation
+                        for (const [field, messages] of Object.entries(response.errors)) {
+                            for (const message of messages) {
+                                errorMessage += `\n- ${message}`;
+                            }
+                        }
+                    } else {
+                        errorMessage += `\n- ${response.message}`;
+                    }
+                    
+                    this.showNotification(errorMessage, 'error');
                 } else {
                     this.showNotification(response.message || 'Erreur lors de la mise à jour des dates', 'error');
                 }
@@ -465,8 +481,8 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
             
-            // TODO: Navigate to checkout page
-            this.showNotification('Redirection vers le checkout... (à implémenter)', 'info');
+            // Rediriger vers la page de checkout pour les locations
+            window.location.href = '{{ route("checkout-rental.index") }}';
         },
 
         // Utility functions
@@ -495,20 +511,35 @@ document.addEventListener('alpine:init', () => {
                 ...options
             });
 
-            if (!response.ok) {
-                if (response.status === 401) {
-                    throw new Error('HTTP error! status: 401 - Non autorisé');
-                }
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
             const text = await response.text();
+            let data;
+            
             try {
-                return JSON.parse(text);
+                data = JSON.parse(text);
             } catch (e) {
                 console.error('Response was not JSON:', text);
                 throw new Error('La réponse du serveur n\'est pas au format JSON');
             }
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('HTTP error! status: 401 - Non autorisé');
+                }
+                
+                // Pour les erreurs 422 (validation), retournons les données avec le statut
+                if (response.status === 422) {
+                    return {
+                        success: false,
+                        status: 422,
+                        errors: data.errors || {},
+                        message: data.message || 'Erreur de validation'
+                    };
+                }
+                
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return data;
         },
 
         showNotification(message, type = 'info') {
@@ -520,7 +551,7 @@ document.addEventListener('alpine:init', () => {
                 warning: 'bg-yellow-500 text-black'
             };
 
-            notification.className = `${colors[type]} px-6 py-3 rounded-md shadow-lg transition-all duration-300 transform translate-x-full`;
+            notification.className = `${colors[type]} px-6 py-3 rounded-md shadow-lg transition-all duration-300 transform translate-x-full whitespace-pre-line`;
             notification.textContent = message;
 
             const container = document.getElementById('notifications');
@@ -539,7 +570,7 @@ document.addEventListener('alpine:init', () => {
                         notification.parentNode.removeChild(notification);
                     }
                 }, 300);
-            }, 3000);
+            }, 5000); // Plus de temps pour lire les messages d'erreur
         }
     }));
 });

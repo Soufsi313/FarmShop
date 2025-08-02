@@ -189,6 +189,7 @@ class StripeService
         $orderLocation->update([
             'payment_status' => 'paid',
             'status' => 'confirmed',
+            'confirmed_at' => now(),
             'paid_at' => now(),
             'stripe_payment_intent_id' => $paymentIntent->id,
             'payment_method' => 'stripe',
@@ -214,16 +215,104 @@ class StripeService
                     'new_quantity' => $newQuantity,
                     'decremented_by' => $item->quantity,
                     'order_location_id' => $orderLocation->id,
-                    'rental_period' => $item->start_date . ' - ' . $item->end_date
+                    'rental_period' => $orderLocation->start_date->format('Y-m-d') . ' - ' . $orderLocation->end_date->format('Y-m-d')
                 ]);
             }
         }
 
+        // Programmer les tâches automatiques pour cette location
+        $this->scheduleRentalTasks($orderLocation);
+
         Log::info('Location payée avec succès', [
             'order_location_id' => $orderLocation->id,
             'order_number' => $orderLocation->order_number,
-            'amount' => $orderLocation->total_amount
+            'amount' => $orderLocation->total_amount,
+            'rental_period' => $orderLocation->start_date->format('Y-m-d') . ' - ' . $orderLocation->end_date->format('Y-m-d')
         ]);
+    }
+
+    /**
+     * Programmer les tâches automatiques pour une location
+     */
+    private function scheduleRentalTasks(OrderLocation $orderLocation): void
+    {
+        try {
+            // 1. Envoyer l'email de confirmation immédiatement
+            \Mail::to($orderLocation->user->email)->send(new \App\Mail\RentalConfirmationMail($orderLocation));
+            
+            Log::info('Email de confirmation de location envoyé', [
+                'order_location_id' => $orderLocation->id,
+                'user_email' => $orderLocation->user->email
+            ]);
+
+            // 2. Programmer les notifications selon les dates de location
+            $this->scheduleRentalNotifications($orderLocation);
+
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la programmation des tâches de location', [
+                'order_location_id' => $orderLocation->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Programmer les notifications automatiques de location
+     */
+    private function scheduleRentalNotifications(OrderLocation $orderLocation): void
+    {
+        $startDate = $orderLocation->start_date;
+        $endDate = $orderLocation->end_date;
+        $now = now();
+
+        // Notification de début de location (si la location commence dans le futur)
+        if ($startDate->isAfter($now)) {
+            // Job pour marquer la location comme "en cours" au début
+            \App\Jobs\StartRentalJob::dispatch($orderLocation)->delay($startDate);
+            
+            Log::info('Job de début de location programmé', [
+                'order_location_id' => $orderLocation->id,
+                'scheduled_for' => $startDate->toISOString()
+            ]);
+        } elseif ($startDate->isToday() || $startDate->isPast()) {
+            // Si la location commence aujourd'hui ou était censée commencer avant, la marquer comme en cours
+            $orderLocation->update([
+                'status' => 'in_progress',
+                'started_at' => $startDate->isPast() ? $startDate : now()
+            ]);
+        }
+
+        // Notification de rappel 1 jour avant la fin
+        $reminderDate = $endDate->copy()->subDay();
+        if ($reminderDate->isAfter($now)) {
+            \App\Jobs\RentalEndReminderJob::dispatch($orderLocation)->delay($reminderDate);
+            
+            Log::info('Job de rappel de fin de location programmé', [
+                'order_location_id' => $orderLocation->id,
+                'scheduled_for' => $reminderDate->toISOString()
+            ]);
+        }
+
+        // Notification de fin de location et demande de retour
+        if ($endDate->isAfter($now)) {
+            \App\Jobs\EndRentalJob::dispatch($orderLocation)->delay($endDate);
+            
+            Log::info('Job de fin de location programmé', [
+                'order_location_id' => $orderLocation->id,
+                'scheduled_for' => $endDate->toISOString()
+            ]);
+        }
+
+        // Notification de retard si applicable (1 jour après la fin)
+        $overdueDate = $endDate->copy()->addDay();
+        if ($overdueDate->isAfter($now)) {
+            \App\Jobs\RentalOverdueJob::dispatch($orderLocation)->delay($overdueDate);
+            
+            Log::info('Job de retard de location programmé', [
+                'order_location_id' => $orderLocation->id,
+                'scheduled_for' => $overdueDate->toISOString()
+            ]);
+        }
     }
 
     /**

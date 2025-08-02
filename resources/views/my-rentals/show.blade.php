@@ -1,0 +1,309 @@
+@extends('layouts.app')
+
+@section('title', 'Location #' . $orderLocation->order_number)
+
+@section('content')
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto">
+        
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{{ route('my-rentals.index') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-purple-600">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                        </svg>
+                        Mes Locations
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="ml-1 text-sm font-medium text-gray-500">Commande #{{ $orderLocation->order_number }}</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        @php
+            $now = \Carbon\Carbon::now();
+            $status = null;
+            $canClose = false;
+            
+            switch ($orderLocation->status) {
+                case 'confirmed':
+                    if ($now->isBefore($orderLocation->start_date)) {
+                        $status = ['label' => 'À venir', 'class' => 'bg-blue-100 text-blue-800'];
+                    } elseif ($now->between($orderLocation->start_date, $orderLocation->end_date)) {
+                        $status = ['label' => 'En cours', 'class' => 'bg-green-100 text-green-800'];
+                        $canClose = true;
+                    } else {
+                        $status = ['label' => 'En retard', 'class' => 'bg-red-100 text-red-800'];
+                        $canClose = true;
+                    }
+                    break;
+                case 'started':
+                    if ($now->isAfter($orderLocation->end_date)) {
+                        $status = ['label' => 'En retard', 'class' => 'bg-red-100 text-red-800'];
+                    } else {
+                        $status = ['label' => 'En cours', 'class' => 'bg-green-100 text-green-800'];
+                    }
+                    $canClose = true;
+                    break;
+                case 'completed':
+                    $status = ['label' => 'Terminée', 'class' => 'bg-gray-100 text-gray-800'];
+                    break;
+                case 'closed':
+                    $status = ['label' => 'Clôturée', 'class' => 'bg-gray-100 text-gray-800'];
+                    break;
+            }
+        @endphp
+
+        <!-- Header avec statut et action -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Location #{{ $orderLocation->order_number }}</h1>
+                    <p class="text-gray-600 mt-1">
+                        Période: {{ $orderLocation->start_date->format('d/m/Y') }} - {{ $orderLocation->end_date->format('d/m/Y') }}
+                        ({{ $orderLocation->rental_days }} jours)
+                    </p>
+                    <p class="text-gray-500 text-sm mt-1">
+                        Créée le {{ $orderLocation->created_at->format('d/m/Y à H:i') }}
+                    </p>
+                </div>
+                
+                <div class="text-right">
+                    @if($status)
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $status['class'] }}">
+                            {{ $status['label'] }}
+                        </span>
+                    @endif
+                    
+                    <div class="mt-3 space-y-2">
+                        @if($orderLocation->canGenerateInvoice())
+                            <a href="{{ route('my-rentals.invoice', $orderLocation) }}" 
+                               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Télécharger la facture
+                            </a>
+                        @endif
+                        
+                        @if($canClose)
+                            <button onclick="closeRental({{ $orderLocation->id }})" 
+                                    class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                Clôturer la location
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Détails de la location -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Produits loués -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Produits loués</h2>
+                    
+                    <div class="space-y-4">
+                        @foreach($orderLocation->items as $item)
+                            <div class="flex space-x-4 p-4 border border-gray-200 rounded-lg">
+                                @if($item->product && $item->product->image_url)
+                                    <img src="{{ $item->product->image_url }}" 
+                                         alt="{{ $item->product_name }}" 
+                                         class="w-20 h-20 object-cover rounded-lg">
+                                @else
+                                    <div class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                @endif
+                                
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-900">{{ $item->product_name }}</h3>
+                                    @if($item->product_description)
+                                        <p class="text-gray-600 text-sm mt-1">{{ Str::limit($item->product_description, 100) }}</p>
+                                    @endif
+                                    
+                                    <div class="flex items-center justify-between mt-3">
+                                        <div class="text-sm text-gray-500">
+                                            <span class="font-medium">Quantité:</span> {{ $item->quantity }}
+                                            <span class="ml-4 font-medium">Durée:</span> {{ $item->rental_days }} jours
+                                            <span class="ml-4 font-medium">Prix/jour:</span> {{ number_format($item->daily_rate, 2) }}€
+                                        </div>
+                                        
+                                        <div class="text-right">
+                                            <p class="font-semibold">{{ number_format($item->subtotal, 2) }} €</p>
+                                            @if($item->total_deposit > 0)
+                                                <p class="text-sm text-gray-500">Caution: {{ number_format($item->total_deposit, 2) }}€</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Adresses de retrait et retour -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Adresses</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="font-medium text-gray-900 mb-2">Adresse de retrait</h3>
+                            <div class="p-3 bg-gray-50 rounded-md">
+                                <p class="text-sm">{{ $orderLocation->billing_address['address'] ?? 'Non spécifiée' }}</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-medium text-gray-900 mb-2">Adresse de retour</h3>
+                            <div class="p-3 bg-gray-50 rounded-md">
+                                <p class="text-sm">{{ $orderLocation->delivery_address['address'] ?? 'Non spécifiée' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if($orderLocation->notes)
+                    <!-- Notes -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-semibold mb-4">Notes</h2>
+                        <div class="p-3 bg-gray-50 rounded-md">
+                            <p class="text-sm">{{ $orderLocation->notes }}</p>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Sidebar - Résumé financier -->
+            <div class="space-y-6">
+                
+                <!-- Résumé des coûts -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Résumé financier</h2>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Sous-total location</span>
+                            <span class="font-medium">{{ number_format($orderLocation->subtotal, 2) }} €</span>
+                        </div>
+                        
+                        @if($orderLocation->deposit_amount > 0)
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Caution</span>
+                                <span class="font-medium">{{ number_format($orderLocation->deposit_amount, 2) }} €</span>
+                            </div>
+                        @endif
+                        
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">TVA ({{ $orderLocation->tax_rate }}%)</span>
+                            <span class="font-medium">{{ number_format($orderLocation->tax_amount, 2) }} €</span>
+                        </div>
+                        
+                        @if($orderLocation->late_fees > 0)
+                            <div class="flex justify-between text-red-600">
+                                <span>Pénalités de retard ({{ $orderLocation->late_days }} jours)</span>
+                                <span class="font-medium">{{ number_format($orderLocation->late_fees, 2) }} €</span>
+                            </div>
+                        @endif
+                        
+                        <hr class="my-3">
+                        
+                        <div class="flex justify-between text-lg font-bold">
+                            <span>Total</span>
+                            <span>{{ number_format($orderLocation->total_amount + ($orderLocation->late_fees ?? 0), 2) }} €</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informations de statut -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Informations</h2>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <span class="text-gray-500">Statut de paiement:</span>
+                            <span class="ml-2 font-medium capitalize">{{ $orderLocation->payment_status }}</span>
+                        </div>
+                        
+                        @if($orderLocation->confirmed_at)
+                            <div>
+                                <span class="text-gray-500">Confirmée le:</span>
+                                <span class="ml-2 font-medium">{{ $orderLocation->confirmed_at->format('d/m/Y à H:i') }}</span>
+                            </div>
+                        @endif
+                        
+                        @if($orderLocation->started_at)
+                            <div>
+                                <span class="text-gray-500">Démarrée le:</span>
+                                <span class="ml-2 font-medium">{{ $orderLocation->started_at->format('d/m/Y à H:i') }}</span>
+                            </div>
+                        @endif
+                        
+                        @if($orderLocation->completed_at)
+                            <div>
+                                <span class="text-gray-500">Terminée le:</span>
+                                <span class="ml-2 font-medium">{{ $orderLocation->completed_at->format('d/m/Y à H:i') }}</span>
+                            </div>
+                        @endif
+                        
+                        @if($orderLocation->actual_return_date)
+                            <div>
+                                <span class="text-gray-500">Retour effectué le:</span>
+                                <span class="ml-2 font-medium">{{ $orderLocation->actual_return_date->format('d/m/Y à H:i') }}</span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script pour clôturer une location -->
+<script>
+async function closeRental(rentalId) {
+    if (!confirm('Êtes-vous sûr de vouloir clôturer cette location ? Cette action signale que vous avez rendu le matériel et ne peut pas être annulée.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/my-rentals/${rentalId}/close`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert(data.message);
+            window.location.reload();
+        } else {
+            alert('Erreur: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de la clôture de la location.');
+    }
+}
+</script>
+@endsection

@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RentalCategoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\MyRentalsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -328,6 +329,11 @@ Route::middleware('auth')->group(function () {
     
     Route::post('/checkout/create-order', [\App\Http\Controllers\OrderController::class, 'store'])->name('checkout.create-order');
     
+    // Routes de checkout pour les locations
+    Route::get('/checkout-rental', [\App\Http\Controllers\OrderLocationController::class, 'showCheckout'])->name('checkout-rental.index');
+    
+    Route::post('/checkout-rental/create-order', [\App\Http\Controllers\OrderLocationController::class, 'store'])->name('checkout-rental.create-order');
+    
     // Route pour la page de paiement Stripe
     Route::get('/payment/{order}', function (Order $order) {
         // Debug - vérifier l'utilisateur connecté
@@ -359,6 +365,34 @@ Route::middleware('auth')->group(function () {
     // Route webhook Stripe (sans middleware auth pour que Stripe puisse y accéder)
     Route::post('/webhook/stripe', [\App\Http\Controllers\StripePaymentController::class, 'webhook'])
         ->withoutMiddleware(['web', 'auth']);
+    
+    // Routes pour le paiement des locations
+    Route::get('/payment-rental/{orderLocation}', function (\App\Models\OrderLocation $orderLocation) {
+        // Debug - vérifier l'utilisateur connecté
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Vous devez être connecté pour accéder à cette page');
+        }
+        
+        // Vérifier que la commande appartient à l'utilisateur connecté
+        if ($orderLocation->user_id !== auth()->id()) {
+            abort(403, 'Commande non autorisée');
+        }
+        
+        // Vérifier que la commande est en attente de paiement
+        if ($orderLocation->status !== 'pending') {
+            return redirect()->route('rental-orders.show', $orderLocation)
+                ->with('error', 'Cette commande ne peut plus être payée');
+        }
+        
+        // Charger les items de la commande avec les produits
+        $orderLocation->load(['items.product']);
+        
+        return view('payment.stripe-rental', compact('orderLocation'));
+    })->name('payment.stripe-rental');
+    
+    // Route POST pour traiter le paiement Stripe des locations
+    Route::post('/payment-rental/{orderLocation}/stripe', [\App\Http\Controllers\StripePaymentController::class, 'createPaymentIntentForRental'])
+        ->name('payment.stripe-rental.process');
     
     // Route de test pour simuler le décrément de stock
     Route::get('/test-webhook/{order}', function(\App\Models\Order $order) {
@@ -402,7 +436,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders/{order}/invoice', [\App\Http\Controllers\OrderController::class, 'downloadInvoice'])->name('orders.invoice');
     Route::get('/orders/{order}/return-confirm', [\App\Http\Controllers\OrderController::class, 'showReturnConfirmation'])->name('orders.return.confirm');
     Route::post('/orders/{order}/return', [\App\Http\Controllers\OrderController::class, 'requestReturn'])->name('orders.return');
-});// Routes d'authentification
+    
+    // Routes pour les commandes de location utilisateur
+    Route::get('/rental-orders', [\App\Http\Controllers\OrderLocationController::class, 'index'])->name('rental-orders.index');
+    Route::get('/rental-orders/{orderLocation}', [\App\Http\Controllers\OrderLocationController::class, 'show'])->name('rental-orders.show');
+    Route::post('/rental-orders/{orderLocation}/cancel', [\App\Http\Controllers\OrderLocationController::class, 'cancel'])->name('rental-orders.cancel');
+});
+
+// Routes d'authentification
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -426,6 +467,12 @@ Route::middleware(['auth'])->group(function () {
     
     // Wishlist
     Route::get('/wishlist', [WishlistController::class, 'showPage'])->name('wishlist.index');
+    
+    // Mes locations
+    Route::get('/my-rentals', [MyRentalsController::class, 'index'])->name('my-rentals.index');
+    Route::get('/my-rentals/{orderLocation}', [MyRentalsController::class, 'show'])->name('my-rentals.show');
+    Route::post('/my-rentals/{orderLocation}/close', [MyRentalsController::class, 'close'])->name('my-rentals.close');
+    Route::get('/my-rentals/{orderLocation}/invoice', [MyRentalsController::class, 'downloadInvoice'])->name('my-rentals.invoice');
     
     // Gestion des messages
     Route::patch('/messages/{message}/read', [UserController::class, 'markMessageAsRead'])->name('messages.read');

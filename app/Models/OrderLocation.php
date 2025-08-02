@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Events\OrderLocationStatusChanged;
 
@@ -50,7 +51,9 @@ class OrderLocation extends Model
         'started_at',
         'completed_at',
         'closed_at',
-        'cancelled_at'
+        'cancelled_at',
+        'invoice_number',
+        'invoice_generated_at'
     ];
 
     protected $casts = [
@@ -517,5 +520,139 @@ class OrderLocation extends Model
         } catch (\Exception $e) {
             \Log::error("Erreur envoi rapport inspection {$this->order_number}: " . $e->getMessage());
         }
+    }
+
+        /**
+     * Générer et sauvegarder la facture PDF
+     */
+    public function generateInvoicePdf()
+    {
+        if (!$this->invoice_number) {
+            $this->generateInvoiceNumber();
+        }
+
+        $pdf = \PDF::loadView('invoices.rental-invoice', [
+            'orderLocation' => $this,
+            'items' => $this->items()->with('product')->get(),
+            'user' => $this->user,
+            'company' => [
+                'name' => config('app.name', 'FarmShop'),
+                'address' => 'Rue de la Ferme, 123',
+                'postal_code' => '1000',
+                'city' => 'Bruxelles',
+                'country' => 'Belgique',
+                'phone' => '+32 2 123 45 67',
+                'email' => 'contact@farmshop.be',
+                'vat_number' => 'BE0123456789'
+            ]
+        ]);
+
+        $filename = 'facture-location-' . $this->invoice_number . '.pdf';
+        $path = storage_path('app/public/invoices/rentals/');
+        
+        if (!file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
+        
+        $pdf->save($path . $filename);
+        
+        // Marquer la facture comme générée
+        $this->update([
+            'invoice_generated_at' => now()
+        ]);
+        
+        return $path . $filename;
+    }
+
+    /**
+     * Générer un numéro de facture unique
+     */
+    public function generateInvoiceNumber()
+    {
+        if ($this->invoice_number) {
+            return $this->invoice_number;
+        }
+
+        $prefix = 'FL-' . date('Y') . '-';
+        
+        for ($attempt = 0; $attempt < 10; $attempt++) {
+            DB::transaction(function () use ($prefix, &$invoiceNumber) {
+                $lastInvoice = static::where('invoice_number', 'like', $prefix . '%')
+                    ->orderBy('invoice_number', 'desc')
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($lastInvoice) {
+                    $lastNumber = intval(substr($lastInvoice->invoice_number, -4));
+                    $newNumber = $lastNumber + 1;
+                } else {
+                    $newNumber = 1;
+                }
+
+                $invoiceNumber = $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+            });
+            
+            // Vérifier que ce numéro n'existe pas déjà
+            if (!static::where('invoice_number', $invoiceNumber)->exists()) {
+                $this->update(['invoice_number' => $invoiceNumber]);
+                return $invoiceNumber;
+            }
+            
+            usleep(100000); // 100ms
+        }
+        
+        // Fallback avec timestamp
+        $invoiceNumber = $prefix . time();
+        $this->update(['invoice_number' => $invoiceNumber]);
+        return $invoiceNumber;
+    }
+
+    /**
+     * Vérifier si la facture peut être générée
+     */
+    public function canGenerateInvoice()
+    {
+        return in_array($this->payment_status, ['paid', 'partially_paid']) && 
+               in_array($this->status, ['confirmed', 'in_progress', 'returned', 'inspecting', 'finished']);
+    }
+
+    /**
+     * Générer un numéro de commande unique
+     */
+    public static function generateOrderNumber()
+    {
+        $prefix = 'LOC-' . date('Y') . date('m');
+        $maxRetries = 10;
+        
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            // Utiliser une transaction avec verrouillage pour éviter les conditions de course
+            $orderNumber = \DB::transaction(function () use ($prefix) {
+                // Verrouiller la table pour éviter les lectures concurrentes
+                $lastOrder = static::where('order_number', 'like', $prefix . '%')
+                    ->lockForUpdate()
+                    ->orderBy('order_number', 'desc')
+                    ->first();
+
+                if ($lastOrder) {
+                    $lastNumber = intval(substr($lastOrder->order_number, -4));
+                    $newNumber = $lastNumber + 1;
+                } else {
+                    $newNumber = 1;
+                }
+
+                return $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+            });
+            
+            // Vérifier que ce numéro n'existe pas déjà (double vérification)
+            if (!static::where('order_number', $orderNumber)->exists()) {
+                return $orderNumber;
+            }
+            
+            // Si le numéro existe déjà, attendre un peu et réessayer
+            usleep(100000); // 100ms
+        }
+        
+        // Si toutes les tentatives échouent, utiliser un UUID comme fallback
+        return $prefix . '-' . \Str::random(8);
     }
 }

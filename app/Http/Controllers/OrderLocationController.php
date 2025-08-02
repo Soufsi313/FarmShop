@@ -13,6 +13,7 @@ use App\Mail\RentalOrderConfirmed;
 use App\Mail\RentalOrderCancelled;
 use App\Mail\RentalOrderCompleted;
 use App\Mail\RentalOrderInspection;
+use Carbon\Carbon;
 
 class OrderLocationController extends Controller
 {
@@ -59,11 +60,14 @@ class OrderLocationController extends Controller
     /**
      * Afficher les détails d'une commande de location
      */
-    public function show(OrderLocation $orderLocation)
+    public function show(OrderLocation $orderLocation, Request $request)
     {
         // Vérifier les permissions
         if (!Auth::user()->isAdmin() && $orderLocation->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Non autorisé'], 403);
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Non autorisé'], 403);
+            }
+            abort(403, 'Commande non autorisée');
         }
 
         $orderLocation->load([
@@ -72,10 +76,34 @@ class OrderLocationController extends Controller
             'orderItemLocations.product.media'
         ]);
 
+        // Si c'est une requête web, retourner la vue
+        if (!$request->expectsJson()) {
+            return view('rental-orders.show', compact('orderLocation'));
+        }
+
         return response()->json([
             'success' => true,
             'data' => $orderLocation
         ]);
+    }
+
+    /**
+     * Afficher la page de checkout pour les locations
+     */
+    public function showCheckout()
+    {
+        $user = Auth::user();
+        $cartLocation = $user->activeCartLocation;
+        
+        if (!$cartLocation || $cartLocation->items->isEmpty()) {
+            return redirect()->route('cart-location.index')
+                ->with('error', 'Votre panier de location est vide.');
+        }
+        
+        // Calculer le résumé du panier
+        $summary = $cartLocation->getSummary();
+        
+        return view('checkout-rental.index', compact('cartLocation', 'summary'));
     }
 
     /**
@@ -92,17 +120,41 @@ class OrderLocationController extends Controller
             'notes' => 'nullable|string|max:1000'
         ]);
 
-        $cartLocation = CartLocation::with('cartItemLocations.product')
+        $cartLocation = CartLocation::with('items.product')
             ->where('id', $request->cart_location_id)
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        if ($cartLocation->cartItemLocations->isEmpty()) {
+        if ($cartLocation->items->isEmpty()) {
             return response()->json(['error' => 'Le panier est vide'], 400);
         }
 
         DB::beginTransaction();
         try {
+            // Calculer la durée de location
+            $startDate = Carbon::parse($request->start_date);
+            $endDate = Carbon::parse($request->end_date);
+            $rentalDays = $startDate->diffInDays($endDate) + 1;
+            
+            // Calculer les totaux d'abord
+            $subtotal = 0;
+            $totalDeposit = 0;
+            $dailyRate = 0;
+            
+            foreach ($cartLocation->items as $cartItem) {
+                $product = $cartItem->product;
+                $itemTotal = $product->rental_price_per_day * $cartItem->quantity * $rentalDays;
+                $depositPerItem = $product->rental_deposit ?? 0; // Valeur par défaut si null
+                $itemDeposit = $depositPerItem * $cartItem->quantity;
+                $dailyRate += $product->rental_price_per_day * $cartItem->quantity;
+                
+                $subtotal += $itemTotal;
+                $totalDeposit += $itemDeposit;
+            }
+            
+            $taxAmount = $subtotal * 0.21;
+            $totalAmount = $subtotal + $taxAmount;
+            
             // Créer la commande de location
             $orderLocation = OrderLocation::create([
                 'user_id' => Auth::id(),
@@ -110,60 +162,59 @@ class OrderLocationController extends Controller
                 'status' => 'pending',
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
-                'pickup_address' => $request->pickup_address,
-                'return_address' => $request->return_address,
+                'rental_days' => $rentalDays,
+                'daily_rate' => $dailyRate,
+                'total_rental_cost' => $subtotal,
+                'billing_address' => [
+                    'address' => $request->pickup_address,
+                    'type' => 'pickup'
+                ],
+                'delivery_address' => [
+                    'address' => $request->return_address,
+                    'type' => 'return'
+                ],
                 'notes' => $request->notes,
-                'subtotal' => 0,
-                'deposit_amount' => 0,
-                'tax_amount' => 0,
-                'total_amount' => 0,
-                'currency' => 'EUR',
-                'tax_rate' => 21.00
-            ]);
-
-            $subtotal = 0;
-            $totalDeposit = 0;
-
-            // Créer les éléments de la commande
-            foreach ($cartLocation->cartItemLocations as $cartItem) {
-                $product = $cartItem->product;
-                $days = $orderLocation->getRentalDaysCount();
-                $itemTotal = $product->rental_price_per_day * $cartItem->quantity * $days;
-                $itemDeposit = $product->rental_deposit * $cartItem->quantity;
-
-                $orderLocation->orderItemLocations()->create([
-                    'product_id' => $product->id,
-                    'quantity' => $cartItem->quantity,
-                    'daily_price' => $product->rental_price_per_day,
-                    'total_days' => $days,
-                    'subtotal' => $itemTotal,
-                    'deposit_amount' => $itemDeposit,
-                    'product_name' => $product->name,
-                    'product_description' => $product->description
-                ]);
-
-                $subtotal += $itemTotal;
-                $totalDeposit += $itemDeposit;
-            }
-
-            // Calculer les montants finaux
-            $taxAmount = $subtotal * ($orderLocation->tax_rate / 100);
-            $totalAmount = $subtotal + $taxAmount + $totalDeposit;
-
-            $orderLocation->update([
                 'subtotal' => $subtotal,
                 'deposit_amount' => $totalDeposit,
                 'tax_amount' => $taxAmount,
-                'total_amount' => $totalAmount
+                'total_amount' => $totalAmount,
+                'tax_rate' => 21.00,
+                'payment_status' => 'pending'
             ]);
 
+            // Créer les éléments de la commande
+            foreach ($cartLocation->items as $cartItem) {
+                $product = $cartItem->product;
+                $itemTotal = $product->rental_price_per_day * $cartItem->quantity * $rentalDays;
+                $depositPerItem = $product->rental_deposit ?? 0; // Valeur par défaut si null
+                $itemDeposit = $depositPerItem * $cartItem->quantity;
+                $itemTaxAmount = $itemTotal * 0.21; // 21% TVA
+                
+                $orderLocation->items()->create([
+                    'product_id' => $product->id,
+                    'quantity' => $cartItem->quantity,
+                    'daily_rate' => $product->rental_price_per_day,
+                    'rental_days' => $rentalDays,
+                    'subtotal' => $itemTotal,
+                    'deposit_per_item' => $depositPerItem,
+                    'total_deposit' => $itemDeposit,
+                    'tax_amount' => $itemTaxAmount,
+                    'total_amount' => $itemTotal + $itemTaxAmount,
+                    'product_name' => $product->name,
+                    'product_description' => $product->description
+                ]);
+            }
+
             // Vider le panier de location
-            $cartLocation->cartItemLocations()->delete();
+            $cartLocation->items()->delete();
 
             DB::commit();
 
-            // Charger les relations pour la réponse
-            $orderLocation->load(['user', 'orderItemLocations.product']);
+            // Si c'est une requête web, rediriger vers la page de paiement
+            if (!$request->expectsJson()) {
+                return redirect()->route('payment.stripe-rental', $orderLocation)
+                    ->with('success', 'Votre commande de location a été créée avec succès ! Procédez au paiement.');
+            }
 
             return response()->json([
                 'success' => true,
@@ -173,7 +224,27 @@ class OrderLocationController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Erreur lors de la création de la commande'], 500);
+            
+            // Log complet de l'erreur pour debugging
+            \Log::error('Erreur création OrderLocation:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Si c'est une requête web, rediriger avec erreur détaillée
+            if (!$request->expectsJson()) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Erreur lors de la création de la commande: ' . $e->getMessage() . ' (Ligne: ' . $e->getLine() . ')');
+            }
+            
+            return response()->json([
+                'error' => 'Erreur lors de la création de la commande', 
+                'details' => $e->getMessage(),
+                'line' => $e->getLine()
+            ], 500);
         }
     }
 
