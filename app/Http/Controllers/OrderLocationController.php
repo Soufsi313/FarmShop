@@ -199,6 +199,8 @@ class OrderLocationController extends Controller
                     'product_name' => $product->name,
                     'product_description' => $product->description
                 ]);
+                
+                // Note: Le stock sera décrémenté lors de la confirmation du paiement via webhook
             }
 
             // Vider le panier de location
@@ -287,12 +289,8 @@ class OrderLocationController extends Controller
 
         $oldStatus = $orderLocation->status;
 
-        // Mettre à jour la commande avec le statut annulé
-        $orderLocation->update([
-            'status' => 'cancelled',
-            'cancellation_reason' => $request->cancellation_reason,
-            'cancelled_at' => now()
-        ]);
+        // Annuler la commande (cela va aussi restaurer le stock)
+        $orderLocation->cancel($request->cancellation_reason);
 
         // Envoyer la notification d'annulation
         try {

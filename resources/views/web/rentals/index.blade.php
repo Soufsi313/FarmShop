@@ -196,9 +196,9 @@
 
                                         <!-- Badge stock -->
                                         <div class="absolute top-2 right-2 px-2 py-1 rounded-md text-xs font-medium
-                                                   {{ $product->quantity > 10 ? 'bg-green-100 text-green-800' : 
-                                                      ($product->quantity > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
-                                            Stock: {{ $product->quantity }}
+                                                   {{ $product->rental_stock > 10 ? 'bg-green-100 text-green-800' : 
+                                                      ($product->rental_stock > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
+                                            Stock: {{ $product->rental_stock }}
                                         </div>
 
                                         <!-- Overlay "Voir détails" -->
@@ -283,11 +283,11 @@
                                                 <input type="number" 
                                                        x-model="quantities[{{ $product->id }}]" 
                                                        min="1" 
-                                                       max="{{ $product->quantity }}" 
+                                                       max="{{ $product->rental_stock }}" 
                                                        class="w-12 text-center border-0 focus:ring-0">
                                                 <button type="button" 
                                                         class="quantity-btn plus px-2 py-1 text-gray-500 hover:text-gray-700" 
-                                                        x-on:click="increaseQuantity({{ $product->id }}, {{ $product->quantity }})">+</button>
+                                                        x-on:click="increaseQuantity({{ $product->id }}, {{ $product->rental_stock }})">+</button>
                                             </div>
 
                                             <button class="flex-1 add-to-cart-location px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors text-sm"
@@ -380,7 +380,7 @@
                     <input type="number" 
                            x-model="rentalForm.quantity" 
                            min="1" 
-                           :max="selectedProduct.quantity"
+                           :max="selectedProduct.rental_stock"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                 </div>
 

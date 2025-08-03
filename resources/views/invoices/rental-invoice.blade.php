@@ -374,8 +374,8 @@
                 <td class="text-center">{{ $item->quantity }}</td>
                 <td class="text-right">{{ number_format($item->daily_rate, 2, ',', ' ') }} €</td>
                 <td class="text-center">{{ $orderLocation->rental_days }}</td>
-                <td class="text-right">{{ number_format($item->deposit_per_item, 2, ',', ' ') }} €</td>
-                <td class="text-right">{{ number_format($item->total_amount, 2, ',', ' ') }} €</td>
+                <td class="text-right">{{ number_format($item->total_deposit, 2, ',', ' ') }} €</td>
+                <td class="text-right">{{ number_format($item->subtotal, 2, ',', ' ') }} €</td>
             </tr>
             @endforeach
         </tbody>

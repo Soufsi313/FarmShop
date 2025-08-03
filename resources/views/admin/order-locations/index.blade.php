@@ -148,24 +148,61 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="{{ route('admin.order-locations.show', $order) }}" 
-                               class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition duration-200 mr-2">
-                                Voir
-                            </a>
-                            
-                            @if($order->status === 'pending')
-                            <button onclick="updateStatus({{ $order->id }}, 'confirmed')" 
-                                    class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition duration-200 mr-2">
-                                Confirmer
-                            </button>
-                            @endif
-                            
-                            @if(in_array($order->status, ['completed', 'closed', 'inspecting']))
-                            <a href="{{ route('admin.rental-returns.show', $order) }}" 
-                               class="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 transition duration-200 mr-2">
-                                Retour
-                            </a>
-                            @endif
+                            <div class="flex gap-2">
+                                <!-- Bouton Voir avec icône œil -->
+                                <a href="{{ route('admin.order-locations.show', $order) }}" 
+                                   class="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition duration-200"
+                                   title="Voir les détails">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </a>
+                                
+                                @if($order->status === 'pending')
+                                <!-- Bouton Confirmer avec icône check -->
+                                <button onclick="updateStatus({{ $order->id }}, 'confirmed')" 
+                                        class="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition duration-200"
+                                        title="Confirmer la commande">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </button>
+                                @endif
+
+                                @if($order->status === 'completed')
+                                <!-- Bouton Clôturer pour les locations terminées -->
+                                <button onclick="updateStatus({{ $order->id }}, 'closed')" 
+                                        class="inline-flex items-center px-3 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition duration-200"
+                                        title="Clôturer la location">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </button>
+                                @endif
+                                
+                                @if(in_array($order->status, ['completed', 'closed', 'inspecting']))
+                                <!-- Bouton Retour avec icône -->
+                                <a href="{{ route('admin.rental-returns.show', $order) }}" 
+                                   class="inline-flex items-center px-3 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700 transition duration-200"
+                                   title="Gérer le retour">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                </a>
+                                @endif
+                                
+                                @if(!in_array($order->status, ['finished', 'cancelled']))
+                                <!-- Bouton Annuler - Admin peut annuler même les locations actives -->
+                                <button onclick="if(confirm('Confirmer l\'annulation ? Cette action est irréversible.')) updateStatus({{ $order->id }}, 'cancelled')" 
+                                        class="inline-flex items-center px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition duration-200"
+                                        title="Annuler la commande">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -198,21 +235,28 @@ function updateStatus(orderId, status) {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify({ status: status })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             location.reload();
         } else {
-            alert('Erreur lors de la mise à jour du statut');
+            alert('Erreur lors de la mise à jour du statut: ' + (data.message || 'Erreur inconnue'));
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Erreur lors de la mise à jour du statut');
+        alert('Erreur lors de la mise à jour du statut: ' + error.message);
     });
 }
 </script>

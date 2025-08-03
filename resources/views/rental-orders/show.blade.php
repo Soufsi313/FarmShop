@@ -186,7 +186,7 @@
                                         Sous-total: {{ number_format($item->subtotal, 2) }}€
                                     </span>
                                     <span class="text-sm text-gray-600 ml-4">
-                                        Caution: {{ number_format($item->deposit_per_item, 2) }}€
+                                        Caution: {{ number_format($item->total_deposit, 2) }}€
                                     </span>
                                 </div>
                             </div>

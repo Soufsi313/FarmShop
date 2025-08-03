@@ -158,9 +158,9 @@
                         <div class="flex items-center space-x-3">
                             <span class="text-sm font-medium text-gray-700">Disponibilité :</span>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                       {{ $product->quantity > 10 ? 'bg-green-100 text-green-800' : 
-                                          ($product->quantity > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
-                                {{ $product->quantity > 0 ? $product->quantity . ' en stock' : 'Rupture de stock' }}
+                                       {{ $product->rental_stock > 10 ? 'bg-green-100 text-green-800' : 
+                                          ($product->rental_stock > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
+                                {{ $product->rental_stock > 0 ? $product->rental_stock . ' en stock' : 'Rupture de stock' }}
                             </span>
                         </div>
                     </div>
@@ -213,7 +213,7 @@
                     </div>
 
                     @auth
-                        @if($product->quantity > 0)
+                        @if($product->rental_stock > 0)
                             <!-- Sélecteur de quantité -->
                             <div class="flex items-center justify-between">
                                 <label class="text-sm font-medium text-gray-700">Quantité :</label>
@@ -226,7 +226,7 @@
                                     <input type="number" 
                                            x-model="quantity" 
                                            min="1" 
-                                           max="{{ $product->quantity }}" 
+                                           max="{{ $product->rental_stock }}" 
                                            class="w-16 text-center border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                                     <button type="button" 
                                             x-on:click="increaseQuantity()" 
@@ -572,7 +572,7 @@ document.addEventListener('alpine:init', () => {
         
         // Gestion des quantités
         increaseQuantity() {
-            if (this.quantity < {{ $product->quantity }}) {
+            if (this.quantity < {{ $product->rental_stock }}) {
                 this.quantity++;
             }
         },

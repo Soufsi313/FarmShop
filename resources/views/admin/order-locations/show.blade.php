@@ -69,7 +69,13 @@
                     @if($orderLocation->delivery_address)
                     <div>
                         <dt class="text-sm font-medium text-gray-500">Adresse de livraison</dt>
-                        <dd class="text-sm text-gray-900 whitespace-pre-line">{{ $orderLocation->delivery_address }}</dd>
+                        <dd class="text-sm text-gray-900 whitespace-pre-line">
+                            @if(is_array($orderLocation->delivery_address))
+                                {{ implode("\n", $orderLocation->delivery_address) }}
+                            @else
+                                {{ $orderLocation->delivery_address }}
+                            @endif
+                        </dd>
                     </div>
                     @endif
                 </dl>
@@ -215,7 +221,7 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ number_format($item->price_per_unit, 2) }}€
+                            {{ number_format($item->daily_rate, 2) }}€
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ $item->quantity }}
@@ -229,7 +235,7 @@
                             {{ $days }} jour(s)
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ number_format($item->total_price, 2) }}€
+                            {{ number_format($item->subtotal, 2) }}€
                         </td>
                     </tr>
                     @endforeach

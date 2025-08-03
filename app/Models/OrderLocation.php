@@ -85,6 +85,14 @@ class OrderLocation extends Model
     ];
 
     /**
+     * Calculer la date limite d'annulation (24h avant le début de location)
+     */
+    public function getCancellationDeadline()
+    {
+        return $this->start_date ? $this->start_date->subDay() : null;
+    }
+
+    /**
      * Boot du modèle - Événements automatiques
      */
     protected static function boot()
@@ -273,33 +281,34 @@ class OrderLocation extends Model
     {
         $oldStatus = $this->status;
         
-        $this->update([
+        // Préparer les données à mettre à jour
+        $updateData = [
             'status' => $newStatus,
             'notes' => $notes
-        ]);
+        ];
         
-        // Mettre à jour les timestamps selon le statut
+        // Ajouter les timestamps selon le statut
         switch ($newStatus) {
             case 'confirmed':
-                $this->update(['confirmed_at' => now()]);
+                $updateData['confirmed_at'] = now();
                 break;
             case 'active':
-                $this->update(['started_at' => now()]);
+                $updateData['started_at'] = now();
                 break;
             case 'completed':
-                $this->update(['completed_at' => now()]);
+                $updateData['completed_at'] = now();
                 break;
             case 'closed':
-                $this->update([
-                    'closed_at' => now(),
-                    'actual_return_date' => now(),
-                    'status' => 'inspecting' // Passe automatiquement en inspection
-                ]);
+                $updateData['closed_at'] = now();
+                $updateData['actual_return_date'] = now();
                 break;
             case 'cancelled':
-                $this->update(['cancelled_at' => now()]);
+                $updateData['cancelled_at'] = now();
                 break;
         }
+        
+        // Un seul update pour éviter les boucles
+        $this->update($updateData);
         
         // Envoyer notification email selon le nouveau statut
         $this->sendStatusNotification($oldStatus, $newStatus);
@@ -387,7 +396,7 @@ class OrderLocation extends Model
         
         // Remettre le stock disponible
         foreach ($this->items as $item) {
-            $item->product->increment('rental_stock', $item->quantity);
+            $item->product->increaseRentalStock($item->quantity);
         }
         
         return $this;
@@ -435,7 +444,7 @@ class OrderLocation extends Model
             'payment_status' => 'pending'
         ]);
         
-        // Créer les articles de la commande
+        // Créer les articles de la commande et décrémenter le stock
         foreach ($cart->items as $cartItem) {
             $orderLocation->items()->create([
                 'product_id' => $cartItem->product_id,
@@ -451,8 +460,11 @@ class OrderLocation extends Model
                 'tax_amount' => ($cartItem->product->daily_rental_price * $cartItem->quantity * $rentalDays) * 0.21,
                 'total_amount' => ($cartItem->product->daily_rental_price * $cartItem->quantity * $rentalDays) * 1.21
             ]);
+            
+            // Décrémenter le stock de location
+            $cartItem->product->decreaseRentalStock($cartItem->quantity);
         }
-        
+
         return $orderLocation;
     }
 

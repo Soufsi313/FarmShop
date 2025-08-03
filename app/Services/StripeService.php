@@ -536,32 +536,10 @@ class StripeService
             // Vérifier si la location peut être annulée (avant le début)
             $canCancel = now()->lt($orderLocation->start_date);
             
-            if ($canCancel) {
-                // Restaurer le stock pour chaque item de location
-                foreach ($orderLocation->items as $item) {
-                    $product = $item->product;
-                    if ($product) {
-                        $product->increment('quantity', $item->quantity);
-                        
-                        Log::info('Stock restauré lors de l\'annulation de location', [
-                            'product_id' => $product->id,
-                            'product_name' => $product->name,
-                            'previous_quantity' => $product->quantity - $item->quantity,
-                            'new_quantity' => $product->quantity,
-                            'restored_by' => $item->quantity,
-                            'order_location_id' => $orderLocation->id,
-                            'cancelled_before_start' => true
-                        ]);
-                    }
-                }
-            }
-
-            // Mettre à jour le statut de la location
-            $orderLocation->update([
-                'status' => 'cancelled',
-                'cancelled_at' => now(),
-                'cancellation_reason' => $canCancel ? 'cancelled_before_start' : 'cancelled_during_rental'
-            ]);
+            $cancellationReason = $canCancel ? 'cancelled_before_start' : 'cancelled_during_rental';
+            
+            // Utiliser la méthode cancel du modèle qui gère correctement le stock
+            $orderLocation->cancel($cancellationReason);
 
             DB::commit();
             

@@ -212,21 +212,21 @@ class OrderLocationController extends Controller
             'notes' => 'nullable|string|max:1000'
         ]);
 
-        // Si c'est une requête AJAX (depuis le bouton de l'interface)
-        if ($request->ajax()) {
+        // Si c'est une requête JSON (depuis le bouton de l'interface)
+        if ($request->expectsJson() || $request->ajax()) {
             $orderLocation->update(['status' => $validated['status']]);
             return response()->json(['success' => true, 'message' => 'Statut mis à jour avec succès']);
         }
 
-        // Valider les transitions de statut pour les requêtes classiques
+        // Valider les transitions de statut pour les requêtes classiques (Admin a plus de pouvoirs)
         $validTransitions = [
             'pending' => ['confirmed', 'cancelled'],
             'confirmed' => ['active', 'cancelled'],
-            'active' => ['completed', 'cancelled'],
-            'completed' => ['closed', 'inspecting'],
+            'active' => ['completed', 'cancelled'], // Admin peut annuler même une location active
+            'completed' => ['closed', 'inspecting', 'cancelled'], // Admin peut clôturer ou annuler
             'closed' => ['inspecting'],
             'inspecting' => ['finished'],
-            'finished' => [],
+            'finished' => [], // Une location finalisée ne peut plus être modifiée
             'cancelled' => []
         ];
 

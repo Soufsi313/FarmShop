@@ -29,6 +29,7 @@ class Product extends Model
         'available_days',
         'type',
         'quantity',
+        'rental_stock',
         'critical_threshold',
         'low_stock_threshold',
         'out_of_stock_threshold',
@@ -386,6 +387,56 @@ class Product extends Model
         
         // Vérifier si on sort d'une alerte de stock critique
         $this->checkStockRecovery($oldQuantity);
+    }
+
+    /**
+     * Diminuer le stock de location
+     */
+    public function decreaseRentalStock($quantity)
+    {
+        $oldRentalStock = $this->rental_stock ?? 0;
+        
+        if ($oldRentalStock >= $quantity) {
+            $this->decrement('rental_stock', $quantity);
+            
+            // Log pour debugging
+            \Log::info("Stock de location décrementé", [
+                'product_id' => $this->id,
+                'product_name' => $this->name,
+                'old_rental_stock' => $oldRentalStock,
+                'new_rental_stock' => $this->rental_stock,
+                'quantity_decremented' => $quantity
+            ]);
+            
+            return true;
+        }
+        
+        \Log::warning("Stock de location insuffisant", [
+            'product_id' => $this->id,
+            'product_name' => $this->name,
+            'current_rental_stock' => $oldRentalStock,
+            'requested_quantity' => $quantity
+        ]);
+        
+        return false;
+    }
+
+    /**
+     * Augmenter le stock de location (lors du retour)
+     */
+    public function increaseRentalStock($quantity)
+    {
+        $oldRentalStock = $this->rental_stock ?? 0;
+        $this->increment('rental_stock', $quantity);
+        
+        // Log pour debugging
+        \Log::info("Stock de location incrémenté", [
+            'product_id' => $this->id,
+            'product_name' => $this->name,
+            'old_rental_stock' => $oldRentalStock,
+            'new_rental_stock' => $this->rental_stock,
+            'quantity_incremented' => $quantity
+        ]);
     }
 
     public function setStock($quantity)
