@@ -247,16 +247,13 @@ class StripeService
     private function scheduleRentalTasks(OrderLocation $orderLocation): void
     {
         try {
-            // 1. Envoyer l'email de confirmation immédiatement
-            \Mail::to($orderLocation->user->email)->send(new \App\Mail\RentalConfirmationMail($orderLocation));
-            
-            Log::info('Email de confirmation de location envoyé', [
+            // Programmer les notifications selon les dates de location
+            $this->scheduleRentalNotifications($orderLocation);
+
+            Log::info('Tâches de location programmées (email géré par le listener)', [
                 'order_location_id' => $orderLocation->id,
                 'user_email' => $orderLocation->user->email
             ]);
-
-            // 2. Programmer les notifications selon les dates de location
-            $this->scheduleRentalNotifications($orderLocation);
 
         } catch (\Exception $e) {
             Log::error('Erreur lors de la programmation des tâches de location', [

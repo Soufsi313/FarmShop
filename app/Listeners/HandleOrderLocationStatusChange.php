@@ -75,13 +75,18 @@ class HandleOrderLocationStatusChange implements ShouldQueue
      */
     private function handleConfirmed($orderLocation)
     {
+        // Éviter les doublons d'emails si déjà confirmé
+        if ($orderLocation->confirmed_at) {
+            Log::info("Location déjà confirmée, pas d'email envoyé: {$orderLocation->order_number}");
+            return;
+        }
+
         // Mettre à jour les timestamps
         $orderLocation->update([
             'confirmed_at' => now(),
-            'payment_status' => 'deposit_paid'
         ]);
 
-        // Envoyer email de confirmation
+        // Envoyer email de confirmation (une seule fois)
         try {
             Mail::to($orderLocation->user->email)->send(new RentalOrderConfirmed($orderLocation));
             Log::info("Email de confirmation envoyé pour la commande {$orderLocation->order_number}");
