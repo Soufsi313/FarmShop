@@ -76,33 +76,12 @@
                     localStorage.setItem('cookie_consent_date', new Date().toISOString());
                 },
 
-                // Afficher l'overlay de blocage
-                showOverlay() {
-                    const overlay = document.getElementById('cookie-overlay');
-                    if (overlay) {
-                        overlay.classList.remove('hidden');
-                        // Désactiver le scroll de la page
-                        document.body.style.overflow = 'hidden';
-                    }
-                },
-
-                // Masquer l'overlay de blocage
-                hideOverlay() {
-                    const overlay = document.getElementById('cookie-overlay');
-                    if (overlay) {
-                        overlay.classList.add('hidden');
-                        // Réactiver le scroll de la page
-                        document.body.style.overflow = '';
-                    }
-                },
-
-                // Masquer la bannière et l'overlay
+                // Masquer la bannière
                 hideBanner() {
                     const banner = document.getElementById('cookie-banner');
                     if (banner) {
                         banner.classList.add('hidden');
                     }
-                    this.hideOverlay();
                     this.setLocalConsent();
                 },
 
@@ -126,8 +105,7 @@
                             console.log('🍪 Réponse API:', response);
                             
                             if (response.data && response.data.consent_required) {
-                                console.log('🍪 Consentement requis = TRUE -> Affichage du bandeau et overlay');
-                                this.showOverlay();
+                                console.log('🍪 Consentement requis = TRUE -> Affichage du bandeau');
                                 banner.classList.remove('hidden');
                             } else {
                                 console.log('🍪 Consentement requis = FALSE -> Pas d\'affichage');
@@ -135,9 +113,8 @@
                             }
                         } catch (error) {
                             console.error('🍪 Erreur lors de la vérification du consentement:', error);
-                            // Afficher le banner et overlay par défaut en cas d'erreur
-                            console.log('🍪 Affichage du bandeau et overlay par défaut suite à l\'erreur');
-                            this.showOverlay();
+                            // Afficher le banner par défaut en cas d'erreur
+                            console.log('🍪 Affichage du bandeau par défaut suite à l\'erreur');
                             banner.classList.remove('hidden');
                         }
                     } else {
@@ -736,37 +713,28 @@
         </div>
     </footer>
 
-    <!-- Overlay de blocage pour consentement cookies -->
-    <div id="cookie-overlay" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-40 backdrop-blur-sm">
-        <div class="flex items-center justify-center h-full">
-            <div class="text-white text-center p-6">
-                <svg class="w-16 h-16 mx-auto mb-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                </svg>
-                <p class="text-lg font-medium">Veuillez accepter ou refuser les cookies pour continuer</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Banner de consentement des cookies -->
-    <div id="cookie-banner" class="hidden fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-4 z-50 shadow-2xl">
+    <!-- Banner de consentement des cookies (non-bloquant mais visible) -->
+    <div id="cookie-banner" class="hidden fixed bottom-0 left-0 right-0 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white p-4 z-50 shadow-2xl border-t-4 border-green-500 animate-pulse">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="text-sm flex-1">
-                <p class="mb-2">🍪 <strong>Ce site utilise des cookies</strong></p>
+                <p class="mb-2 flex items-center">
+                    <span class="text-2xl mr-2 animate-bounce">🍪</span>
+                    <strong class="text-green-400">Ce site utilise des cookies</strong>
+                </p>
                 <p class="text-gray-300">Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser le contenu. Vous pouvez choisir quels cookies accepter.</p>
             </div>
             <div class="flex flex-col sm:flex-row gap-3 min-w-fit">
                 <button onclick="FarmShop.cookieConsent.showCookieSettings()" 
-                        class="px-4 py-2 text-sm border border-gray-600 rounded hover:bg-gray-800 transition-colors whitespace-nowrap">
+                        class="px-4 py-2 text-sm border border-gray-600 rounded hover:bg-gray-700 hover:border-green-500 transition-all duration-300 whitespace-nowrap">
                     ⚙️ Personnaliser
                 </button>
                 <button onclick="FarmShop.cookieConsent.decline()" 
-                        class="px-4 py-2 text-sm border border-gray-600 rounded hover:bg-gray-800 transition-colors whitespace-nowrap">
-                    Refuser
+                        class="px-4 py-2 text-sm border border-red-500 rounded hover:bg-red-600 hover:border-red-400 transition-all duration-300 whitespace-nowrap">
+                    ❌ Refuser
                 </button>
                 <button onclick="FarmShop.cookieConsent.accept()" 
-                        class="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 rounded transition-colors whitespace-nowrap">
-                    Tout accepter
+                        class="px-6 py-2 text-sm bg-green-600 hover:bg-green-700 rounded transition-all duration-300 whitespace-nowrap font-semibold shadow-lg hover:shadow-green-500/50">
+                    ✅ Tout accepter
                 </button>
             </div>
         </div>
