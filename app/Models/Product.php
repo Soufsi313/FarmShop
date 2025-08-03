@@ -245,7 +245,8 @@ class Product extends Model
     {
         return in_array($this->type, ['rental', 'both']) 
                && $this->is_active 
-               && $this->quantity > 0 
+               && $this->is_rental_available
+               && ($this->rental_stock ?? 0) > 0 
                && !$this->is_out_of_stock;
     }
 

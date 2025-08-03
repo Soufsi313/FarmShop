@@ -22,7 +22,7 @@ class OrderLocationController extends Controller
      */
     public function index(Request $request)
     {
-        $query = OrderLocation::with(['user', 'orderItemLocations.product']);
+        $query = OrderLocation::with(['user', 'items.product']);
 
         // Filtrage par statut
         if ($request->filled('status')) {
@@ -51,10 +51,7 @@ class OrderLocationController extends Controller
         // Tri par défaut par date de création décroissante
         $orderLocations = $query->orderBy('created_at', 'desc')->paginate(20);
 
-        return response()->json([
-            'success' => true,
-            'data' => $orderLocations
-        ]);
+        return view('rental-orders.index', compact('orderLocations'));
     }
 
     /**
@@ -72,8 +69,7 @@ class OrderLocationController extends Controller
 
         $orderLocation->load([
             'user',
-            'orderItemLocations.product',
-            'orderItemLocations.product.media'
+            'items.product'
         ]);
 
         // Si c'est une requête web, retourner la vue
@@ -285,19 +281,34 @@ class OrderLocationController extends Controller
             'cancellation_reason' => 'required|string|max:500'
         ]);
 
-        if (!$orderLocation->canBeCancelled()) {
+        if (!$orderLocation->can_be_cancelled) {
             return response()->json(['error' => 'Cette commande ne peut plus être annulée'], 400);
         }
 
-        // Le changement de statut déclenchera automatiquement les événements
+        $oldStatus = $orderLocation->status;
+
+        // Mettre à jour la commande avec le statut annulé
         $orderLocation->update([
             'status' => 'cancelled',
-            'cancellation_reason' => $request->cancellation_reason
+            'cancellation_reason' => $request->cancellation_reason,
+            'cancelled_at' => now()
         ]);
+
+        // Envoyer la notification d'annulation
+        try {
+            Mail::send('rental-order-cancelled', ['orderLocation' => $orderLocation], function ($message) use ($orderLocation) {
+                $message->to($orderLocation->user->email, $orderLocation->user->name)
+                        ->subject("Annulation de votre location {$orderLocation->order_number}");
+            });
+            
+            \Log::info("Email d'annulation envoyé pour la location {$orderLocation->order_number}");
+        } catch (\Exception $e) {
+            \Log::error("Erreur envoi email d'annulation pour la location {$orderLocation->order_number}: " . $e->getMessage());
+        }
 
         return response()->json([
             'success' => true,
-            'message' => 'Commande annulée avec succès',
+            'message' => 'Commande annulée avec succès. Un email de confirmation vous a été envoyé.',
             'data' => $orderLocation->fresh()
         ]);
     }
@@ -397,7 +408,7 @@ class OrderLocationController extends Controller
 
             // Mettre à jour chaque item avec les résultats de l'inspection
             foreach ($request->items as $itemData) {
-                $orderItem = $orderLocation->orderItemLocations()->findOrFail($itemData['id']);
+                $orderItem = $orderLocation->items()->findOrFail($itemData['id']);
                 
                 $penalties = $orderItem->finishInspection(
                     $itemData['return_condition'],
@@ -423,7 +434,7 @@ class OrderLocationController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Inspection terminée avec succès',
-                'data' => $orderLocation->fresh()->load('orderItemLocations')
+                'data' => $orderLocation->fresh()->load('items')
             ]);
 
         } catch (\Exception $e) {
@@ -471,7 +482,7 @@ class OrderLocationController extends Controller
             return response()->json(['error' => 'Non autorisé'], 403);
         }
 
-        $query = OrderLocation::with(['user', 'orderItemLocations.product']);
+        $query = OrderLocation::with(['user', 'items.product']);
 
         // Appliquer les filtres si fournis
         if ($request->filled('status')) {
@@ -510,5 +521,76 @@ class OrderLocationController extends Controller
             'data' => $data,
             'filename' => 'commandes_location_' . now()->format('Y-m-d') . '.csv'
         ]);
+    }
+
+    /**
+     * Télécharger la facture d'une location
+     */
+    public function downloadInvoice(OrderLocation $orderLocation)
+    {
+        try {
+            // Vérifier les permissions
+            if (!Auth::user()->isAdmin() && $orderLocation->user_id !== Auth::id()) {
+                return redirect()->back()->with('error', 'Accès non autorisé.');
+            }
+
+            // Vérifier que la facture peut être générée
+            if (!$orderLocation->canGenerateInvoice()) {
+                return redirect()->back()->with('error', 'La facture ne peut pas encore être générée pour cette location.');
+            }
+
+            try {
+                // Générer la facture PDF
+                $orderLocation->generateInvoicePdf();
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', 'Erreur lors de la génération de la facture.');
+            }
+
+            $filename = 'facture-location-' . $orderLocation->invoice_number . '.pdf';
+            $filePath = storage_path('app/invoices/rentals/' . $filename);
+
+            return response()->download($filePath, $filename);
+
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors du téléchargement de la facture de location', [
+                'order_location_id' => $orderLocation->id,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->back()->with('error', 'Erreur lors du téléchargement de la facture. Veuillez réessayer.');
+        }
+    }
+
+    /**
+     * Page de succès après paiement Stripe
+     */
+    public function paymentSuccess(OrderLocation $orderLocation)
+    {
+        // Vérifier les permissions
+        if (!Auth::user()->isAdmin() && $orderLocation->user_id !== Auth::id()) {
+            abort(403, 'Commande non autorisée');
+        }
+
+        // Charger les relations nécessaires
+        $orderLocation->load(['user', 'items.product']);
+
+        return view('rental-orders.payment-success', compact('orderLocation'));
+    }
+
+    /**
+     * Page d'annulation/échec de paiement Stripe
+     */
+    public function paymentCancel(OrderLocation $orderLocation)
+    {
+        // Vérifier les permissions
+        if (!Auth::user()->isAdmin() && $orderLocation->user_id !== Auth::id()) {
+            abort(403, 'Commande non autorisée');
+        }
+
+        // Charger les relations nécessaires
+        $orderLocation->load(['user', 'items.product']);
+
+        return view('rental-orders.payment-cancel', compact('orderLocation'));
     }
 }

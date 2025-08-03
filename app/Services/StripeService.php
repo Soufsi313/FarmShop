@@ -69,6 +69,7 @@ class StripeService
             ],
             'automatic_payment_methods' => [
                 'enabled' => true,
+                'allow_redirects' => 'never'
             ],
         ]);
 
@@ -106,11 +107,13 @@ class StripeService
                 $orderLocationId = (int)$metadata['order_id'];
                 $this->processSuccessfulRental($orderLocationId, $paymentIntent);
                 
+                $orderLocation = \App\Models\OrderLocation::find($orderLocationId);
                 return [
                     'success' => true,
                     'order_type' => 'rental',
                     'order_id' => $orderLocationId,
-                    'redirect_url' => route('rentals.confirmation', $orderLocationId)
+                    'order_number' => $orderLocation?->order_number,
+                    'redirect_url' => route('rental.payment.success', $orderLocationId)
                 ];
             }
 
@@ -201,21 +204,28 @@ class StripeService
             ]
         ]);
 
-        // Décrémenter le stock des produits pour la période de location
+        // Décrémenter le stock de location des produits
         foreach ($orderLocation->items as $item) {
             $product = $item->product;
-            if ($product && $product->quantity >= $item->quantity) {
-                $newQuantity = $product->quantity - $item->quantity;
-                $product->update(['quantity' => $newQuantity]);
+            if ($product && $product->rental_stock >= $item->quantity) {
+                $newRentalStock = $product->rental_stock - $item->quantity;
+                $product->update(['rental_stock' => $newRentalStock]);
                 
-                Log::info('Stock décrémenté pour location', [
+                Log::info('Stock de location décrémenté', [
                     'product_id' => $product->id,
                     'product_name' => $product->name,
-                    'previous_quantity' => $product->quantity + $item->quantity,
-                    'new_quantity' => $newQuantity,
+                    'previous_rental_stock' => $product->rental_stock + $item->quantity,
+                    'new_rental_stock' => $newRentalStock,
                     'decremented_by' => $item->quantity,
                     'order_location_id' => $orderLocation->id,
                     'rental_period' => $orderLocation->start_date->format('Y-m-d') . ' - ' . $orderLocation->end_date->format('Y-m-d')
+                ]);
+            } else {
+                Log::warning('Stock de location insuffisant', [
+                    'product_id' => $product?->id,
+                    'product_name' => $product?->name,
+                    'available_rental_stock' => $product?->rental_stock,
+                    'requested_quantity' => $item->quantity
                 ]);
             }
         }
@@ -277,7 +287,7 @@ class StripeService
         } elseif ($startDate->isToday() || $startDate->isPast()) {
             // Si la location commence aujourd'hui ou était censée commencer avant, la marquer comme en cours
             $orderLocation->update([
-                'status' => 'in_progress',
+                'status' => 'active',
                 'started_at' => $startDate->isPast() ? $startDate : now()
             ]);
         }
@@ -427,10 +437,20 @@ class StripeService
 
             // Log de TOUS les événements reçus
             error_log("🎯 WEBHOOK REÇU: " . $event->type . " - ID: " . $event->id);
+            Log::info('Webhook Stripe reçu', [
+                'event_type' => $event->type,
+                'event_id' => $event->id,
+                'payment_intent_id' => $event->data->object->id ?? 'N/A',
+                'metadata' => $event->data->object->metadata ?? []
+            ]);
 
             switch ($event->type) {
                 case 'payment_intent.succeeded':
                     error_log("💰 TRAITEMENT payment_intent.succeeded - ID: " . $event->data->object->id);
+                    Log::info('🔥 PROCESSING payment_intent.succeeded', [
+                        'payment_intent_id' => $event->data->object->id,
+                        'metadata' => $event->data->object->metadata->toArray()
+                    ]);
                     $this->handleSuccessfulPayment($event->data->object->id);
                     break;
                 

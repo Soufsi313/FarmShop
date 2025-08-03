@@ -45,13 +45,50 @@ class CartLocationController extends Controller
     /**
      * Ajouter un produit au panier de location
      */
-    public function addProduct(Request $request, Product $product): JsonResponse
+    public function addProduct(Request $request, $productSlug): JsonResponse
     {
+        // Debug: log du paramètre reçu
+        \Log::info('Paramètre productSlug reçu', [
+            'productSlug' => $productSlug,
+            'request_url' => $request->fullUrl(),
+            'user_id' => Auth::id()
+        ]);
+        
+        // Debug: récupérer le produit par slug
+        $product = Product::where('slug', $productSlug)->first();
+        
+        if (!$product) {
+            \Log::error('Produit non trouvé pour ajout panier location', [
+                'product_slug' => $productSlug,
+                'user_id' => Auth::id()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Produit non trouvé'
+            ], 404);
+        }
+        
+        \Log::info('Tentative ajout produit au panier location', [
+            'product_slug' => $productSlug,
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'user_id' => Auth::id(),
+            'is_rentable' => $product->isRentable()
+        ]);
+
         $user = Auth::user();
         $cartLocation = $user->getOrCreateActiveCartLocation();
 
         // Vérifier que le produit est louable
         if (!$product->isRentable()) {
+            \Log::warning('Produit non louable', [
+                'product_slug' => $productSlug,
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'type' => $product->type,
+                'is_rental_available' => $product->is_rental_available,
+                'rental_stock' => $product->rental_stock
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Ce produit n\'est pas disponible à la location'
@@ -134,8 +171,13 @@ class CartLocationController extends Controller
     /**
      * Mettre à jour la quantité d'un produit
      */
-    public function updateQuantity(Request $request, Product $product): JsonResponse
+    public function updateQuantity(Request $request, $productSlug): JsonResponse
     {
+        $product = Product::where('slug', $productSlug)->first();
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Produit non trouvé'], 404);
+        }
+
         $user = Auth::user();
         $cartLocation = $user->activeCartLocation;
 
@@ -179,8 +221,13 @@ class CartLocationController extends Controller
     /**
      * Mettre à jour les dates de location d'un produit
      */
-    public function updateDates(Request $request, Product $product): JsonResponse
+    public function updateDates(Request $request, $productSlug): JsonResponse
     {
+        $product = Product::where('slug', $productSlug)->first();
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Produit non trouvé'], 404);
+        }
+
         $user = Auth::user();
         $cartLocation = $user->activeCartLocation;
 
@@ -228,8 +275,13 @@ class CartLocationController extends Controller
     /**
      * Supprimer un produit du panier de location
      */
-    public function removeProduct(Product $product): JsonResponse
+    public function removeProduct($productSlug): JsonResponse
     {
+        $product = Product::where('slug', $productSlug)->first();
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Produit non trouvé'], 404);
+        }
+
         $user = Auth::user();
         $cartLocation = $user->activeCartLocation;
 

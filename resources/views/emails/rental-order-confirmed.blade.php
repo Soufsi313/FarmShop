@@ -21,9 +21,10 @@ Votre commande de location **#{{ $orderLocation->order_number }}** a été confi
 @foreach($items as $item)
 - **{{ $item->product_name }}**
   - Quantité : {{ $item->quantity }}
-  - Prix par jour : {{ number_format($item->daily_price, 2) }}€
-  - Sous-total : {{ number_format($item->subtotal, 2) }}€
-  - Dépôt de garantie : {{ number_format($item->deposit_amount, 2) }}€
+  - Prix par jour : {{ number_format($item->daily_rate, 2) }}€
+  - Durée : {{ $item->rental_days }} jour{{ $item->rental_days > 1 ? 's' : '' }}
+  - Sous-total location : {{ number_format($item->subtotal, 2) }}€
+  - Dépôt de garantie : {{ number_format($item->total_deposit, 2) }}€
 
 @endforeach
 

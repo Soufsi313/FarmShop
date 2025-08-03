@@ -40,7 +40,7 @@ class StartRentalJob implements ShouldQueue
 
             // Marquer la location comme démarrée
             $this->orderLocation->update([
-                'status' => 'in_progress',
+                'status' => 'active',
                 'started_at' => now()
             ]);
 

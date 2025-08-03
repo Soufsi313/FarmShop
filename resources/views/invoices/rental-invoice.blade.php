@@ -239,7 +239,7 @@
     <div class="addresses">
         <div class="address-box">
             <div class="address-title">ADRESSE DE FACTURATION</div>
-            @php $billing = json_decode($orderLocation->billing_address, true); @endphp
+            @php $billing = $orderLocation->billing_address ?? []; @endphp
             <div>{{ $billing['name'] ?? $user->name }}</div>
             <div>{{ $billing['address'] ?? '' }}</div>
             <div>{{ $billing['postal_code'] ?? '' }} {{ $billing['city'] ?? '' }}</div>
@@ -248,7 +248,7 @@
         
         <div class="address-box">
             <div class="address-title">ADRESSE DE LIVRAISON</div>
-            @php $delivery = json_decode($orderLocation->delivery_address, true); @endphp
+            @php $delivery = $orderLocation->delivery_address ?? []; @endphp
             <div>{{ $delivery['name'] ?? $user->name }}</div>
             <div>{{ $delivery['address'] ?? '' }}</div>
             <div>{{ $delivery['postal_code'] ?? '' }} {{ $delivery['city'] ?? '' }}</div>
@@ -283,7 +283,7 @@
                     @case('confirmed')
                         Confirmée
                         @break
-                    @case('in_progress')
+                    @case('active')
                         En cours
                         @break
                     @case('returned')
@@ -372,9 +372,9 @@
                     @endif
                 </td>
                 <td class="text-center">{{ $item->quantity }}</td>
-                <td class="text-right">{{ number_format($item->unit_price_per_day, 2, ',', ' ') }} €</td>
+                <td class="text-right">{{ number_format($item->daily_rate, 2, ',', ' ') }} €</td>
                 <td class="text-center">{{ $orderLocation->rental_days }}</td>
-                <td class="text-right">{{ number_format($item->deposit_amount, 2, ',', ' ') }} €</td>
+                <td class="text-right">{{ number_format($item->deposit_per_item, 2, ',', ' ') }} €</td>
                 <td class="text-right">{{ number_format($item->total_amount, 2, ',', ' ') }} €</td>
             </tr>
             @endforeach

@@ -16,8 +16,9 @@ class RentalController extends Controller
     {
         $query = Product::with(['category', 'rentalCategory'])
             ->where('is_active', true)
+            ->where('is_rental_available', true)
             ->whereIn('type', ['rental', 'both'])
-            ->where('quantity', '>', 0);
+            ->where('rental_stock', '>', 0);
 
         // Filtrage par catégorie de location
         if ($request->filled('rental_category')) {

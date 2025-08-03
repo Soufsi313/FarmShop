@@ -107,6 +107,19 @@ class StripePaymentController extends Controller
 
             $paymentIntent = $this->stripeService->createPaymentIntentForRental($orderLocation);
 
+            // Pour les tests : confirmer automatiquement le paiement en environnement local
+            if (app()->environment('local')) {
+                $confirmedPaymentIntent = \Stripe\PaymentIntent::retrieve($paymentIntent->id);
+                $confirmedPaymentIntent->confirm([
+                    'payment_method' => 'pm_card_visa', // Carte de test Stripe
+                ]);
+                
+                Log::info('Payment Intent location confirmé automatiquement pour les tests', [
+                    'payment_intent_id' => $paymentIntent->id,
+                    'order_location_id' => $orderLocation->id
+                ]);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Intention de paiement créée avec succès',

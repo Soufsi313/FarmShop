@@ -238,7 +238,8 @@ document.addEventListener('alpine:init', () => {
                 const data = await response.json();
                 
                 if (data.success) {
-                    window.location.href = data.redirect_url || '{{ route("rental-orders.show", $orderLocation) }}';
+                    // Rediriger vers la page de succès
+                    window.location.href = '{{ route("rental.payment.success", $orderLocation) }}';
                 } else {
                     alert(data.message || 'Erreur lors du paiement');
                 }

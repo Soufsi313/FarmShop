@@ -202,10 +202,10 @@ Route::middleware(['web', 'auth'])->group(function () {
     // Routes panier de location pour utilisateurs connectés
     Route::prefix('cart-location')->name('api.cart-location.')->group(function () {
         Route::get('/', [CartLocationController::class, 'index'])->name('index');
-        Route::post('/products/{product}', [CartLocationController::class, 'addProduct'])->middleware('check.product.availability')->name('add-product');
-        Route::put('/products/{product}/quantity', [CartLocationController::class, 'updateQuantity'])->middleware('check.product.availability')->name('update-quantity');
-        Route::put('/products/{product}/dates', [CartLocationController::class, 'updateDates'])->name('update-dates');
-        Route::delete('/products/{product}', [CartLocationController::class, 'removeProduct'])->name('remove-product');
+        Route::post('/products/{productSlug}', [CartLocationController::class, 'addProduct'])->name('add-product');
+        Route::put('/products/{productSlug}/quantity', [CartLocationController::class, 'updateQuantity'])->middleware('check.product.availability')->name('update-quantity');
+        Route::put('/products/{productSlug}/dates', [CartLocationController::class, 'updateDates'])->name('update-dates');
+        Route::delete('/products/{productSlug}', [CartLocationController::class, 'removeProduct'])->name('remove-product');
         Route::delete('/clear', [CartLocationController::class, 'clear'])->name('clear');
         Route::get('/availability', [CartLocationController::class, 'checkAvailability'])->name('check-availability');
         Route::get('/summary', [CartLocationController::class, 'summary'])->name('summary');

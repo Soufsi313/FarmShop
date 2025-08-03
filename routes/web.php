@@ -394,6 +394,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/payment-rental/{orderLocation}/stripe', [\App\Http\Controllers\StripePaymentController::class, 'createPaymentIntentForRental'])
         ->name('payment.stripe-rental.process');
     
+    // Routes de retour après paiement Stripe pour les locations
+    Route::get('/rental-payment-success/{orderLocation}', [App\Http\Controllers\OrderLocationController::class, 'paymentSuccess'])
+        ->name('rental.payment.success');
+    
+    Route::get('/rental-payment-cancel/{orderLocation}', [App\Http\Controllers\OrderLocationController::class, 'paymentCancel'])
+        ->name('rental.payment.cancel');
+    
     // Route de test pour simuler le décrément de stock
     Route::get('/test-webhook/{order}', function(\App\Models\Order $order) {
         $order->update(['status' => 'confirmed', 'payment_status' => 'paid']);
@@ -441,6 +448,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/rental-orders', [\App\Http\Controllers\OrderLocationController::class, 'index'])->name('rental-orders.index');
     Route::get('/rental-orders/{orderLocation}', [\App\Http\Controllers\OrderLocationController::class, 'show'])->name('rental-orders.show');
     Route::post('/rental-orders/{orderLocation}/cancel', [\App\Http\Controllers\OrderLocationController::class, 'cancel'])->name('rental-orders.cancel');
+    Route::get('/rental-orders/{orderLocation}/invoice', [\App\Http\Controllers\OrderLocationController::class, 'downloadInvoice'])->name('rental-orders.invoice');
 });
 
 // Routes d'authentification
@@ -556,9 +564,22 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // Gestion des commandes de location
     Route::get('/order-locations', [AdminOrderLocationController::class, 'index'])->name('order-locations.index');
+    Route::get('/order-locations/export', [AdminOrderLocationController::class, 'export'])->name('order-locations.export');
     Route::get('/order-locations/{orderLocation}', [AdminOrderLocationController::class, 'show'])->name('order-locations.show');
     Route::patch('/order-locations/{orderLocation}/status', [AdminOrderLocationController::class, 'updateStatus'])->name('order-locations.update-status');
     Route::delete('/order-locations/{orderLocation}', [AdminOrderLocationController::class, 'destroy'])->name('order-locations.destroy');
+    
+    // Inspection des locations
+    Route::post('/order-locations/{orderLocation}/start-inspection', [AdminOrderLocationController::class, 'startInspection'])->name('order-locations.start-inspection');
+    Route::post('/order-locations/{orderLocation}/finalize-inspection', [AdminOrderLocationController::class, 'finalizeInspection'])->name('order-locations.finalize-inspection');
+    
+    // Gestion des retours de location
+    Route::get('/rental-returns', [\App\Http\Controllers\Admin\RentalReturnsController::class, 'index'])->name('rental-returns.index');
+    Route::get('/rental-returns/{orderLocation}', [\App\Http\Controllers\Admin\RentalReturnsController::class, 'show'])->name('rental-returns.show');
+    Route::patch('/rental-returns/{orderLocation}/mark-returned', [\App\Http\Controllers\Admin\RentalReturnsController::class, 'markAsReturned'])->name('rental-returns.mark-returned');
+    Route::patch('/rental-returns/{orderLocation}/start-inspection', [\App\Http\Controllers\Admin\RentalReturnsController::class, 'startInspection'])->name('rental-returns.start-inspection');
+    Route::patch('/rental-returns/{orderLocation}/finish-inspection', [\App\Http\Controllers\Admin\RentalReturnsController::class, 'finishInspection'])->name('rental-returns.finish-inspection');
+    Route::get('/rental-returns-export', [\App\Http\Controllers\Admin\RentalReturnsController::class, 'export'])->name('rental-returns.export');
     
     // Gestion des messages (nouvelle section)
     Route::get('/messages', [AdminMessageController::class, 'index'])->name('messages.index');

@@ -32,6 +32,8 @@ class OrderLocation extends Model
         'payment_status',
         'payment_method',
         'payment_reference',
+        'stripe_payment_intent_id',
+        'payment_details',
         'billing_address',
         'delivery_address',
         'late_days',
@@ -113,6 +115,12 @@ class OrderLocation extends Model
     public function items()
     {
         return $this->hasMany(OrderItemLocation::class);
+    }
+
+    // Alias pour compatibilité avec le code existant
+    public function orderItemLocations()
+    {
+        return $this->items();
     }
 
     public function inspector()
@@ -197,6 +205,17 @@ class OrderLocation extends Model
     public function getDaysUntilEndAttribute()
     {
         return now()->diffInDays($this->end_date, false);
+    }
+
+    public function getRentalDaysCount()
+    {
+        return $this->start_date->diffInDays($this->end_date) + 1;
+    }
+
+    public function getFormattedRentalDaysAttribute()
+    {
+        $days = $this->getRentalDaysCount();
+        return $days . ' jour' . ($days > 1 ? 's' : '');
     }
 
     /**
@@ -426,9 +445,9 @@ class OrderLocation extends Model
                 'quantity' => $cartItem->quantity,
                 'daily_rate' => $cartItem->product->daily_rental_price,
                 'rental_days' => $rentalDays,
-                'deposit_per_item' => $cartItem->product->rental_deposit,
+                'deposit_per_item' => $cartItem->product->deposit_amount,
                 'subtotal' => $cartItem->product->daily_rental_price * $cartItem->quantity * $rentalDays,
-                'total_deposit' => $cartItem->product->rental_deposit * $cartItem->quantity,
+                'total_deposit' => $cartItem->product->deposit_amount * $cartItem->quantity,
                 'tax_amount' => ($cartItem->product->daily_rental_price * $cartItem->quantity * $rentalDays) * 0.21,
                 'total_amount' => ($cartItem->product->daily_rental_price * $cartItem->quantity * $rentalDays) * 1.21
             ]);
@@ -465,11 +484,11 @@ class OrderLocation extends Model
         // Implémentation des emails selon le statut
         try {
             $template = match($newStatus) {
-                'confirmed' => 'emails.rental.confirmed',
-                'active' => 'emails.rental.started',
-                'completed' => 'emails.rental.completed',
-                'finished' => 'emails.rental.finished',
-                'cancelled' => 'emails.rental.cancelled',
+                'confirmed' => 'rental-order-confirmed',
+                'active' => 'rental-order-started',
+                'completed' => 'rental-order-completed',
+                'finished' => 'rental-order-finished',
+                'cancelled' => 'rental-order-cancelled',
                 default => null
             };
             
@@ -478,6 +497,8 @@ class OrderLocation extends Model
                     $message->to($this->user->email, $this->user->name)
                             ->subject("Location {$this->order_number} - {$this->status_label}");
                 });
+                
+                \Log::info("Email de notification envoyé pour la location {$this->order_number} - statut: {$newStatus}");
             }
         } catch (\Exception $e) {
             \Log::error("Erreur envoi email location {$this->order_number}: " . $e->getMessage());
@@ -531,7 +552,7 @@ class OrderLocation extends Model
             $this->generateInvoiceNumber();
         }
 
-        $pdf = \PDF::loadView('invoices.rental-invoice', [
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.rental-invoice', [
             'orderLocation' => $this,
             'items' => $this->items()->with('product')->get(),
             'user' => $this->user,
@@ -548,7 +569,7 @@ class OrderLocation extends Model
         ]);
 
         $filename = 'facture-location-' . $this->invoice_number . '.pdf';
-        $path = storage_path('app/public/invoices/rentals/');
+        $path = storage_path('app/invoices/rentals/');
         
         if (!file_exists($path)) {
             mkdir($path, 0755, true);
@@ -613,7 +634,7 @@ class OrderLocation extends Model
     public function canGenerateInvoice()
     {
         return in_array($this->payment_status, ['paid', 'partially_paid']) && 
-               in_array($this->status, ['confirmed', 'in_progress', 'returned', 'inspecting', 'finished']);
+               in_array($this->status, ['confirmed', 'active', 'returned', 'inspecting', 'finished']);
     }
 
     /**
@@ -621,38 +642,29 @@ class OrderLocation extends Model
      */
     public static function generateOrderNumber()
     {
-        $prefix = 'LOC-' . date('Y') . date('m');
-        $maxRetries = 10;
+        $prefix = 'LOC-' . date('Y') . date('m') . date('d');
+        $maxRetries = 20;
         
         for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
-            // Utiliser une transaction avec verrouillage pour éviter les conditions de course
-            $orderNumber = \DB::transaction(function () use ($prefix) {
-                // Verrouiller la table pour éviter les lectures concurrentes
-                $lastOrder = static::where('order_number', 'like', $prefix . '%')
-                    ->lockForUpdate()
-                    ->orderBy('order_number', 'desc')
-                    ->first();
-
-                if ($lastOrder) {
-                    $lastNumber = intval(substr($lastOrder->order_number, -4));
-                    $newNumber = $lastNumber + 1;
-                } else {
-                    $newNumber = 1;
-                }
-
-                return $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-            });
+            // Générer un numéro aléatoire pour éviter les conflits
+            $randomSuffix = str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            $orderNumber = $prefix . $randomSuffix;
             
-            // Vérifier que ce numéro n'existe pas déjà (double vérification)
+            // Vérifier l'unicité
             if (!static::where('order_number', $orderNumber)->exists()) {
+                \Log::info("Numéro de commande généré: {$orderNumber} (tentative {$attempt})");
                 return $orderNumber;
             }
             
-            // Si le numéro existe déjà, attendre un peu et réessayer
-            usleep(100000); // 100ms
+            // Attendre un peu avant la prochaine tentative
+            usleep(50000); // 50ms
         }
         
-        // Si toutes les tentatives échouent, utiliser un UUID comme fallback
-        return $prefix . '-' . \Str::random(8);
+        // Fallback avec timestamp microseconde
+        $timestamp = str_replace('.', '', microtime(true));
+        $fallbackNumber = $prefix . substr($timestamp, -4);
+        
+        \Log::warning("Fallback numéro commande utilisé: {$fallbackNumber}");
+        return $fallbackNumber;
     }
 }

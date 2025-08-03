@@ -14,16 +14,8 @@ class MyRentalsController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-        
-        // Récupérer toutes les locations de l'utilisateur, triées par date de création
-        $rentals = OrderLocation::where('user_id', $user->id)
-            ->whereIn('status', ['confirmed', 'started', 'completed', 'closed'])
-            ->with(['items.product'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-        return view('my-rentals.index', compact('rentals'));
+        // Rediriger vers la nouvelle page des locations
+        return redirect()->route('rental-orders.index');
     }
 
     /**

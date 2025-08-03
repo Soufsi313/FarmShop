@@ -30,7 +30,7 @@ class EndRentalJob implements ShouldQueue
     {
         try {
             // Vérifier que la location est toujours en cours ou confirmée
-            if (!in_array($this->orderLocation->status, ['confirmed', 'in_progress'])) {
+            if (!in_array($this->orderLocation->status, ['confirmed', 'active'])) {
                 Log::info('Fin de location non traitée car statut incorrect', [
                     'order_location_id' => $this->orderLocation->id,
                     'current_status' => $this->orderLocation->status

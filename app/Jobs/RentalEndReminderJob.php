@@ -30,7 +30,7 @@ class RentalEndReminderJob implements ShouldQueue
     {
         try {
             // Vérifier que la location est toujours en cours
-            if (!in_array($this->orderLocation->status, ['confirmed', 'in_progress'])) {
+            if (!in_array($this->orderLocation->status, ['confirmed', 'active'])) {
                 Log::info('Rappel de fin non envoyé car statut incorrect', [
                     'order_location_id' => $this->orderLocation->id,
                     'current_status' => $this->orderLocation->status

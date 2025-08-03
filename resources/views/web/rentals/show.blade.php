@@ -590,7 +590,7 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
             
-            this.makeApiCall(`{{ url('/api/cart-location/products') }}/{{ $product->id }}`, {
+            this.makeApiCall(`{{ url('/api/cart-location/products') }}/{{ $product->slug }}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     quantity: this.quantity,
@@ -703,7 +703,7 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
             
-            this.makeApiCall(`{{ url('/api/cart-location/products') }}/{{ $product->id }}`, {
+            this.makeApiCall(`{{ url('/api/cart-location/products') }}/{{ $product->slug }}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     quantity: 1, // Quantité fixe de 1 pour "Louer maintenant"
