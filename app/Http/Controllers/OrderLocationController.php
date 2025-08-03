@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RentalOrderConfirmed;
-use App\Mail\RentalOrderCancelled;
-use App\Mail\RentalOrderCompleted;
-use App\Mail\RentalOrderInspection;
 use Carbon\Carbon;
 
 class OrderLocationController extends Controller
@@ -292,17 +289,8 @@ class OrderLocationController extends Controller
         // Annuler la commande (cela va aussi restaurer le stock)
         $orderLocation->cancel($request->cancellation_reason);
 
-        // Envoyer la notification d'annulation
-        try {
-            Mail::send('rental-order-cancelled', ['orderLocation' => $orderLocation], function ($message) use ($orderLocation) {
-                $message->to($orderLocation->user->email, $orderLocation->user->name)
-                        ->subject("Annulation de votre location {$orderLocation->order_number}");
-            });
-            
-            \Log::info("Email d'annulation envoyé pour la location {$orderLocation->order_number}");
-        } catch (\Exception $e) {
-            \Log::error("Erreur envoi email d'annulation pour la location {$orderLocation->order_number}: " . $e->getMessage());
-        }
+        // Email d'annulation envoyé automatiquement par le listener
+        \Log::info("Commande annulée: {$orderLocation->order_number} (email géré par le listener)");
 
         return response()->json([
             'success' => true,
@@ -422,12 +410,8 @@ class OrderLocationController extends Controller
 
             DB::commit();
 
-            // Envoyer l'email de fin d'inspection
-            try {
-                Mail::to($orderLocation->user->email)->send(new RentalOrderInspection($orderLocation));
-            } catch (\Exception $e) {
-                \Log::error('Erreur envoi email inspection location: ' . $e->getMessage());
-            }
+            // Email d'inspection envoyé automatiquement par le listener
+            \Log::info("Inspection terminée: {$orderLocation->order_number} (email géré par le listener)");
 
             return response()->json([
                 'success' => true,

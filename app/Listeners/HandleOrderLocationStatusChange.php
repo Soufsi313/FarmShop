@@ -182,12 +182,12 @@ class HandleOrderLocationStatusChange implements ShouldQueue
             'payment_status' => 'paid'
         ]);
 
-        // Envoyer le rapport final d'inspection
+        // Envoyer le rapport final d'inspection (utilise la méthode du modèle)
         try {
-            Mail::to($orderLocation->user->email)->send(new RentalOrderInspection($orderLocation));
-            Log::info("Rapport d'inspection envoyé pour {$orderLocation->order_number}");
+            $orderLocation->sendInspectionReport();
+            Log::info("Rapport d'inspection final envoyé pour {$orderLocation->order_number}");
         } catch (\Exception $e) {
-            Log::error("Erreur envoi rapport inspection: " . $e->getMessage());
+            Log::error("Erreur envoi rapport inspection final: " . $e->getMessage());
         }
     }
 

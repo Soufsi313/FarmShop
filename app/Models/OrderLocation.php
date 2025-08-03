@@ -373,8 +373,8 @@ class OrderLocation extends Model
             'inspected_by' => auth()->id()
         ]);
         
-        // Envoyer le rapport d'inspection au client
-        $this->sendInspectionReport();
+        // Email de rapport d'inspection envoyé automatiquement par le listener
+        \Log::info("Inspection complétée: {$this->order_number} (email géré par le listener)");
         
         return $this;
     }
@@ -543,7 +543,7 @@ class OrderLocation extends Model
     /**
      * Envoyer le rapport d'inspection
      */
-    private function sendInspectionReport()
+    public function sendInspectionReport()
     {
         try {
             Mail::send('emails.rental.inspection-report', ['orderLocation' => $this], function ($message) {
