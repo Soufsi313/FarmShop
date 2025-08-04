@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'role',
         'newsletter_subscribed',
+        'newsletter_subscribed_at',
         'phone',
         'address',
         'address_line_2',
@@ -53,6 +54,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'newsletter_subscribed' => 'boolean',
+            'newsletter_subscribed_at' => 'datetime',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+            'deleted_at' => 'datetime',
         ];
     }
 
@@ -257,7 +262,7 @@ class User extends Authenticatable
     /**
      * Se désabonner de la newsletter (nouvelle approche)
      */
-    public function unsubscribeFromNewsletterNew(string $reason = null): void
+    public function unsubscribeFromNewsletterNew(?string $reason = null): void
     {
         $subscription = $this->newsletterSubscription;
         if ($subscription) {

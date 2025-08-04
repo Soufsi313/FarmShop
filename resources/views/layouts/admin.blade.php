@@ -291,15 +291,14 @@
                                 <span>Signalements</span>
                             </a>
 
-                            <a href="#" onclick="alert('Module newsletter en développement')" 
-                               class="text-slate-300 hover:bg-slate-700/50 hover:text-white group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105">
-                                <div class="bg-slate-600 group-hover:bg-slate-500 p-2 rounded-lg mr-4 transition-colors">
+                            <a href="{{ route('admin.newsletters.index') }}" 
+                               class="text-slate-300 hover:bg-slate-700/50 hover:text-white group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105 {{ request()->routeIs('admin.newsletters.*') ? 'bg-slate-700/50 text-white' : '' }}">
+                                <div class="bg-slate-600 group-hover:bg-slate-500 p-2 rounded-lg mr-4 transition-colors {{ request()->routeIs('admin.newsletters.*') ? 'bg-slate-500' : '' }}">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                     </svg>
                                 </div>
                                 <span>Newsletter</span>
-                                <span class="ml-auto px-2 py-1 text-xs bg-yellow-500/20 text-yellow-400 rounded-full">Bientôt</span>
                             </a>
                         </div>
                     </div>

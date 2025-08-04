@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\SpecialOfferController as AdminSpecialOfferContro
 use App\Http\Controllers\Admin\MessageController as AdminMessageController;
 use App\Http\Controllers\Admin\BlogCommentController as AdminBlogCommentController;
 use App\Http\Controllers\Admin\StockController as AdminStockController;
+use App\Http\Controllers\Admin\NewsletterController as AdminNewsletterController;
 use App\Http\Controllers\Web\ProductController as WebProductController;
 use App\Http\Controllers\HomeController;
 use App\Models\Product;
@@ -614,6 +615,30 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/blog-comment-reports', [AdminBlogCommentController::class, 'reports'])->name('blog-comment-reports.index');
     Route::put('/blog-comment-reports/{report}', [AdminBlogCommentController::class, 'updateReport'])->name('blog-comment-reports.update');
     Route::delete('/blog-comment-reports/{report}', [AdminBlogCommentController::class, 'destroyReport'])->name('blog-comment-reports.destroy');
+    
+    // Gestion des newsletters
+    Route::resource('newsletters', AdminNewsletterController::class);
+    Route::post('/newsletters/{newsletter}/send', [AdminNewsletterController::class, 'send'])->name('newsletters.send');
+    Route::post('/newsletters/{newsletter}/test', [AdminNewsletterController::class, 'sendTest'])->name('newsletters.test');
+    Route::get('/newsletters/{newsletter}/subscribers', [AdminNewsletterController::class, 'subscribers'])->name('newsletters.subscribers');
+    Route::post('/newsletters/{newsletter}/duplicate', [AdminNewsletterController::class, 'duplicate'])->name('newsletters.duplicate');
+    
+    // Gestion des abonnés newsletter
+    Route::get('/newsletter-subscribers', [AdminNewsletterController::class, 'allSubscribers'])->name('newsletter.subscribers');
+    Route::post('/newsletter-subscribers/{user}/toggle', [AdminNewsletterController::class, 'toggleSubscription'])->name('newsletter.subscribers.toggle');
+    Route::delete('/newsletter-subscribers/{user}', [AdminNewsletterController::class, 'deleteSubscriber'])->name('newsletter.subscribers.delete');
+    Route::post('/newsletter-subscribers/bulk-action', [AdminNewsletterController::class, 'bulkSubscriberAction'])->name('newsletter.subscribers.bulk');
+    Route::get('/newsletter-subscribers/{user}/history', [AdminNewsletterController::class, 'subscriberHistory'])->name('newsletter.subscribers.history');
+    Route::get('/newsletter-subscribers/export', [AdminNewsletterController::class, 'exportSubscribers'])->name('newsletter.subscribers.export');
+    
+    // Gestion des abonnés newsletter
+    Route::prefix('newsletters/subscribers')->name('newsletters.subscribers.')->group(function () {
+        Route::get('/export', [AdminNewsletterController::class, 'exportSubscribers'])->name('export');
+        Route::get('/{user}/history', [AdminNewsletterController::class, 'subscriberHistory'])->name('history');
+        Route::post('/{user}/toggle', [AdminNewsletterController::class, 'toggleSubscription'])->name('toggle');
+        Route::delete('/{user}', [AdminNewsletterController::class, 'deleteSubscriber'])->name('delete');
+        Route::post('/bulk-action', [AdminNewsletterController::class, 'bulkAction'])->name('bulk-action');
+    });
     
     // Gestion des cookies
     Route::get('/cookies', [App\Http\Controllers\Admin\CookieController::class, 'index'])->name('cookies.index');
