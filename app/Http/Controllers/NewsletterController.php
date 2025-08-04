@@ -586,4 +586,96 @@ class NewsletterController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Tracker l'ouverture d'un email
+     */
+    public function track($token)
+    {
+        $send = NewsletterSend::where('tracking_token', $token)->first();
+        
+        if ($send && !$send->opened_at) {
+            $send->update([
+                'opened_at' => now(),
+                'status' => 'opened'
+            ]);
+            
+            // Mettre à jour les statistiques de la newsletter
+            $send->newsletter->increment('opened_count');
+        }
+        
+        // Retourner une image transparente 1x1 pixel
+        $pixel = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==');
+        
+        return response($pixel, 200)
+            ->header('Content-Type', 'image/png')
+            ->header('Content-Length', strlen($pixel))
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
+    }
+    
+    /**
+     * Se désabonner de la newsletter
+     */
+    public function unsubscribe($token)
+    {
+        $send = NewsletterSend::where('unsubscribe_token', $token)->first();
+        
+        if (!$send) {
+            return view('newsletter.unsubscribe', [
+                'success' => false,
+                'message' => 'Lien de désabonnement invalide ou expiré.'
+            ]);
+        }
+        
+        // Désabonner l'utilisateur
+        if ($send->user) {
+            $send->user->update(['newsletter_subscribed' => false]);
+        }
+        
+        // Marquer comme désabonné
+        $send->update([
+            'unsubscribed_at' => now(),
+            'status' => 'unsubscribed'
+        ]);
+        
+        // Mettre à jour les statistiques de la newsletter
+        $send->newsletter->increment('unsubscribed_count');
+        
+        return view('newsletter.unsubscribe', [
+            'success' => true,
+            'message' => 'Vous avez été désabonné(e) avec succès de notre newsletter.',
+            'email' => $send->email
+        ]);
+    }
+    
+    /**
+     * Tracker les clics dans les emails
+     */
+    public function trackClick(Request $request, $token)
+    {
+        $send = NewsletterSend::where('tracking_token', $token)->first();
+        $url = $request->get('url');
+        
+        if ($send) {
+            // Enregistrer le clic s'il n'a pas déjà été enregistré
+            if (!$send->clicked_at) {
+                $send->update([
+                    'clicked_at' => now(),
+                    'status' => 'clicked'
+                ]);
+                
+                // Mettre à jour les statistiques de la newsletter
+                $send->newsletter->increment('clicked_count');
+            }
+        }
+        
+        // Rediriger vers l'URL de destination
+        if ($url && filter_var($url, FILTER_VALIDATE_URL)) {
+            return redirect($url);
+        }
+        
+        return redirect('/');
+    }
 }

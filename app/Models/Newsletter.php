@@ -83,6 +83,14 @@ class Newsletter extends Model
     }
 
     /**
+     * Alias pour la relation sends (pour compatibilité)
+     */
+    public function newsletterSends(): HasMany
+    {
+        return $this->sends();
+    }
+
+    /**
      * Obtenir le libellé du statut
      */
     public function getStatusLabelAttribute(): string

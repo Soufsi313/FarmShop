@@ -492,6 +492,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/newsletter/subscribe', [UserController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
     Route::post('/newsletter/unsubscribe', [UserController::class, 'unsubscribeNewsletter'])->name('newsletter.unsubscribe');
     
+    // Routes publiques pour tracking newsletter
+    Route::get('/newsletter/track/{token}', [\App\Http\Controllers\NewsletterController::class, 'track'])->name('newsletter.track');
+    Route::get('/newsletter/unsubscribe/{token}', [\App\Http\Controllers\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+    Route::get('/newsletter/click/{token}', [\App\Http\Controllers\NewsletterController::class, 'trackClick'])->name('newsletter.click');
+    
     // Export données RGPD
     Route::get('/profile/download-data', [UserController::class, 'downloadData'])->name('users.download-data');
     
@@ -622,6 +627,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/newsletters/{newsletter}/test', [AdminNewsletterController::class, 'sendTest'])->name('newsletters.test');
     Route::get('/newsletters/{newsletter}/subscribers', [AdminNewsletterController::class, 'subscribers'])->name('newsletters.subscribers');
     Route::post('/newsletters/{newsletter}/duplicate', [AdminNewsletterController::class, 'duplicate'])->name('newsletters.duplicate');
+    
+    // Gestion des abonnés newsletter (nouvelles routes)
+    Route::post('/newsletter-subscribers/subscribe', [AdminNewsletterController::class, 'subscribeUser'])->name('newsletter.subscribers.subscribe');
+    Route::post('/newsletter-subscribers/unsubscribe', [AdminNewsletterController::class, 'unsubscribeUser'])->name('newsletter.subscribers.unsubscribe');
+    Route::post('/newsletter-subscribers/bulk-action', [AdminNewsletterController::class, 'bulkSubscriberAction'])->name('newsletter.subscribers.bulk');
     
     // Gestion des abonnés newsletter
     Route::get('/newsletter-subscribers', [AdminNewsletterController::class, 'allSubscribers'])->name('newsletter.subscribers');

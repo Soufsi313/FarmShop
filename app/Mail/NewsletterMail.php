@@ -35,10 +35,11 @@ class NewsletterMail extends Mailable implements ShouldQueue
      */
     public function envelope(): Envelope
     {
+        // Pour éviter les problèmes de RFC 2822, utilisons seulement les emails sans noms
         return new Envelope(
-            to: [$this->user->email => $this->user->name],
+            to: $this->user->email,
             subject: $this->newsletter->subject,
-            replyTo: ['s.mef2703@gmail.com' => 'FarmShop Newsletter']
+            replyTo: 's.mef2703@gmail.com'
         );
     }
 

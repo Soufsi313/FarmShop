@@ -11,6 +11,7 @@ class NewsletterSend extends Model
     protected $fillable = [
         'newsletter_id',
         'user_id',
+        'email',
         'status',
         'sent_at',
         'failure_reason',
@@ -26,6 +27,9 @@ class NewsletterSend extends Model
         'unsubscribed_at',
         'tracking_token',
         'unsubscribe_token',
+        'tracking_url',
+        'unsubscribe_url',
+        'error_message',
         'metadata'
     ];
 

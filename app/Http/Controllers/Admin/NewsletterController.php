@@ -47,7 +47,32 @@ class NewsletterController extends Controller
             'subscribers' => User::where('newsletter_subscribed', true)->count()
         ];
 
-        return view('admin.newsletters.index', compact('newsletters', 'stats'));
+        // Liste des abonnés avec recherche et pagination
+        $subscribersQuery = User::query();
+        
+        // Filtres pour les abonnés
+        if (request()->filled('subscriber_search')) {
+            $subscribersQuery->where(function($q) {
+                $search = request('subscriber_search');
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        
+        if (request()->filled('subscription_status')) {
+            $status = request('subscription_status');
+            if ($status === 'subscribed') {
+                $subscribersQuery->where('newsletter_subscribed', true);
+            } elseif ($status === 'unsubscribed') {
+                $subscribersQuery->where('newsletter_subscribed', false);
+            }
+        } else {
+            // Par défaut, afficher tous les utilisateurs
+        }
+        
+        $subscribers = $subscribersQuery->orderBy('created_at', 'desc')->paginate(20, ['*'], 'subscribers_page');
+
+        return view('admin.newsletters.index', compact('newsletters', 'stats', 'subscribers'));
     }
 
     /**
@@ -108,7 +133,7 @@ class NewsletterController extends Controller
      */
     public function show(Newsletter $newsletter)
     {
-        $newsletter->load(['creator', 'updater', 'sends.user']);
+        $newsletter->load(['creator', 'updater', 'newsletterSends.user']);
         
         // Statistiques détaillées
         $stats = [
@@ -145,6 +170,11 @@ class NewsletterController extends Controller
         if ($newsletter->status === 'sent') {
             return redirect()->route('admin.newsletters.show', $newsletter)
                            ->with('error', 'Impossible de modifier une newsletter déjà envoyée.');
+        }
+
+        // Vérifier s'il s'agit d'une action d'envoi immédiat
+        if ($request->input('action') === 'send_now') {
+            return $this->sendNow($newsletter);
         }
 
         $request->validate([
@@ -231,16 +261,37 @@ class NewsletterController extends Controller
     /**
      * Tester l'envoi à l'admin
      */
-    public function sendTest(Newsletter $newsletter)
+    public function sendTest(Newsletter $newsletter, Request $request)
     {
         $admin = Auth::user();
         
+        // Récupérer l'email depuis la requête ou utiliser celui de l'admin
+        $testEmail = $request->input('email', $admin->email);
+        
+        // Valider l'email
+        if (!filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Adresse email invalide'
+            ], 400);
+        }
+        
         try {
-            \Mail::to($admin->email)->send(new \App\Mail\NewsletterMail($newsletter, $admin));
+            // Créer un objet NewsletterSend temporaire pour le test
+            $testSend = new \App\Models\NewsletterSend();
+            $testSend->newsletter_id = $newsletter->id;
+            $testSend->email = $testEmail;
+            $testSend->tracking_url = '';
+            $testSend->unsubscribe_url = route('newsletter.unsubscribe', ['token' => 'test']);
+            
+            // Trouver l'utilisateur ou utiliser l'admin pour les données personnelles
+            $testUser = \App\Models\User::where('email', $testEmail)->first() ?? $admin;
+            
+            \Mail::to($testEmail)->send(new \App\Mail\NewsletterMail($newsletter, $testUser, $testSend));
             
             return response()->json([
                 'success' => true,
-                'message' => "Email de test envoyé à {$admin->email}"
+                'message' => "Email de test envoyé à {$testEmail}"
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -530,6 +581,48 @@ class NewsletterController extends Controller
         
         return response()->json($data, 200, [
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
+    }
+
+    /**
+     * Abonner un utilisateur à la newsletter
+     */
+    public function subscribeUser(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id'
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+        $user->update([
+            'newsletter_subscribed' => true,
+            'newsletter_subscribed_at' => now()
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Utilisateur abonné avec succès'
+        ]);
+    }
+
+    /**
+     * Désabonner un utilisateur de la newsletter
+     */
+    public function unsubscribeUser(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id'
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+        $user->update([
+            'newsletter_subscribed' => false,
+            'newsletter_subscribed_at' => null
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Utilisateur désabonné avec succès'
         ]);
     }
 }
