@@ -57,47 +57,37 @@ FarmShop est une application web dynamique développée avec Laravel 11 qui perm
 
 ## ✨ Fonctionnalités
 
-### 🔐 Authentification
-- Inscription et connexion sécurisée
-- Gestion de profil utilisateur
-- Suppression de compte (RGPD)
-- Export des données personnelles
+### 🏷️ Version ALPHA v1.0.0 (MVP Fonctionnel)
+- **🔐 Authentification** : Inscription, connexion, gestion profil
+- **🛒 Catalogue produits** : 159 produits avec filtres avancés
+- **👨‍💼 Interface admin** : Dashboard, gestion produits, messages
+- **🎨 Design moderne** : Responsive, Tailwind CSS, animations
 
-### 🛒 E-commerce
-- Catalogue produits avec filtres avancés
-- Séparation achat/location
-- **Panier d'achats intelligent**
-- **Système de commandes complet**
-- **Paiements Stripe sécurisés**
-- **Suivi des livraisons en temps réel**
-- **Gestion automatique des stocks**
+### 🏷️ Version BETA v1.0.0-beta (E-commerce Complet)
 
-### 📊 Gestion des Stocks
-- **Surveillance automatique des seuils**
-- **Alertes critiques temps réel**
-- **Dashboard de gestion des stocks**
-- **Notifications WebSocket**
-- **Historique des mouvements**
+#### 💳 Processus d'Achat Complet
+- **Panier intelligent** avec calculs TVA automatiques
+- **Checkout sécurisé** avec validation d'adresses
+- **Paiements Stripe** (cartes, PayPal, virements)
+- **Webhooks sécurisés** pour confirmations automatiques
+- **Gestion d'états** : progression automatique des commandes
+- **Suivi des livraisons** en temps réel
+- **Système de remboursement** avec restauration stock
 
-### 📧 Newsletter System
-- **Campagnes email marketing**
-- **Gestion des abonnés**
-- **Templates personnalisables**
-- **Statistiques d'ouverture**
-- **Programmation d'envois**
+#### 📊 Surveillance Intelligente des Stocks
+- **Observer Pattern** pour monitoring temps réel
+- **Seuils configurables** (critique, bas stock, rupture)
+- **Alertes multi-niveaux** avec notifications WebSocket
+- **Dashboard administrateur** avec actions rapides
+- **Protection anti-spam** avec système de cooldown
+- **Historique complet** des mouvements de stock
 
-### 👨‍💼 Administration
-- Dashboard avec statistiques
-- Gestion produits (CRUD complet)
-- Gestion des commandes
-- Système de messages
-- Gestion des catégories
-
-### 🎨 Interface
-- Design responsive (mobile-first)
-- Navigation intuitive
-- Animations fluides
-- Thème moderne et professionnel
+#### 📧 Système de Newsletters Professionnel
+- **Campagnes email marketing** avec éditeur visuel
+- **Gestion complète des abonnés** (filtres, actions en lot)
+- **Statistiques détaillées** (ouvertures, clics, désabonnements)
+- **Programmation d'envois** avec gestion des fuseaux horaires
+- **Templates personnalisables** pour différents types de contenus
 
 ## 🔧 Prérequis
 
