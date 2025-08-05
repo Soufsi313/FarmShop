@@ -1,6 +1,30 @@
 # 🌱 FarmShop - Plateforme E-commerce Agricole
 
-**Application web Laravel pour la vente et location de produits agricoles biologiques**
+**Application web Laravel p- **Thème moderne et professionnel**
+
+## 🚀 Nouveautés BETA v1.0.0-beta
+
+### 💳 Processus d'Achat Complet
+- **Intégration Stripe native** avec cartes, PayPal, virements
+- **Webhooks sécurisés** pour confirmation automatique
+- **Gestion d'états avancée** (pending → confirmed → preparing → shipped → delivered)
+- **Système de remboursement** avec restauration automatique du stock
+
+### 📊 Surveillance Intelligente des Stocks
+- **Observer Pattern** pour monitoring temps réel
+- **Seuils configurables** (critique, bas stock, rupture)
+- **Alertes multi-niveaux** avec notifications WebSocket
+- **Dashboard administrateur** avec actions rapides
+- **Protection anti-spam** avec système de cooldown
+
+### 📧 Système de Newsletters Professionnel
+- **Campagnes email marketing** avec éditeur visuel
+- **Gestion complète des abonnés** (filtres, actions en lot)
+- **Statistiques détaillées** (ouvertures, clics, désabonnements)
+- **Programmation d'envois** avec gestion des fuseaux horaires
+- **Templates personnalisables** pour différents types de contenus
+
+## 🔧 Prérequis la vente et location de produits agricoles biologiques**
 
 ![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.4+-777BB4?style=for-the-badge&logo=php&logoColor=white)
@@ -29,7 +53,7 @@ FarmShop est une application web dynamique développée avec Laravel 11 qui perm
 - **Gestion administrative complète** (commandes, utilisateurs, stock)
 - **Interface responsive moderne** avec Tailwind CSS
 
-**Version actuelle :** Alpha v1.0.0 (MVP fonctionnel)
+**Version actuelle :** BETA v1.0.0-beta (Fonctionnalités e-commerce complètes)
 
 ## ✨ Fonctionnalités
 
@@ -42,8 +66,25 @@ FarmShop est une application web dynamique développée avec Laravel 11 qui perm
 ### 🛒 E-commerce
 - Catalogue produits avec filtres avancés
 - Séparation achat/location
-- Panier d'achats
-- Système de commandes
+- **Panier d'achats intelligent**
+- **Système de commandes complet**
+- **Paiements Stripe sécurisés**
+- **Suivi des livraisons en temps réel**
+- **Gestion automatique des stocks**
+
+### 📊 Gestion des Stocks
+- **Surveillance automatique des seuils**
+- **Alertes critiques temps réel**
+- **Dashboard de gestion des stocks**
+- **Notifications WebSocket**
+- **Historique des mouvements**
+
+### 📧 Newsletter System
+- **Campagnes email marketing**
+- **Gestion des abonnés**
+- **Templates personnalisables**
+- **Statistiques d'ouverture**
+- **Programmation d'envois**
 
 ### 👨‍💼 Administration
 - Dashboard avec statistiques
@@ -171,13 +212,29 @@ APP_URL=http://localhost:8000
 
 # Configuration mail (optionnel pour les tests)
 MAIL_MAILER=smtp
-MAIL_HOST=mailpit
-MAIL_PORT=1025
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=null
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_username
+MAIL_PASSWORD=your_password
+MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS="noreply@farmshop.local"
 MAIL_FROM_NAME="${APP_NAME}"
+
+# Configuration Stripe (BETA)
+STRIPE_KEY=pk_test_votre_cle_publique_stripe
+STRIPE_SECRET=sk_test_votre_cle_secrete_stripe
+STRIPE_WEBHOOK_SECRET=whsec_votre_secret_webhook_stripe
+
+# Gestion des Stocks (BETA)
+STOCK_ALERTS_ENABLED=true
+STOCK_ALERT_COOLDOWN=1800
+DEFAULT_CRITICAL_THRESHOLD=5
+DEFAULT_LOW_STOCK_THRESHOLD=10
+
+# Newsletter System (BETA)
+NEWSLETTER_FROM_EMAIL=newsletter@farmshop.local
+NEWSLETTER_FROM_NAME="FarmShop Newsletter"
+```
 ```
 
 ### 3. Créer la Base de Données
