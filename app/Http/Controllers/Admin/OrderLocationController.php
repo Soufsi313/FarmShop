@@ -363,25 +363,15 @@ class OrderLocationController extends Controller
 
             // Envoyer le message dans la boîte de réception utilisateur
             \App\Models\Message::create([
-                'sender_id' => 1, // ID de Mr Clank (admin système)
-                'recipient_id' => $orderLocation->user_id,
+                'user_id' => $orderLocation->user_id,
+                'sender_id' => 103, // ID de Mr Clank 🤖 (system@farmshop.local)
+                'type' => 'system',
                 'subject' => "🤖 Location #{$orderLocation->order_number} finalisée - Caution remboursée",
-                'message' => $message,
-                'is_system' => true,
-                'sent_at' => now()
+                'content' => $message,
+                'status' => 'unread',
+                'priority' => 'high',
+                'is_important' => true,
             ]);
-
-            // Envoyer aussi par email
-            \Mail::send('emails.mr-clank-rental-finalized', [
-                'orderLocation' => $orderLocation,
-                'message' => $message,
-                'depositAmount' => $depositAmount,
-                'damageFeesTotal' => $damageFeesTotal,
-                'refundAmount' => $refundAmount
-            ], function ($mail) use ($orderLocation) {
-                $mail->to($orderLocation->user->email, $orderLocation->user->name)
-                     ->subject("🤖 Mr Clank - Location #{$orderLocation->order_number} finalisée");
-            });
 
             \Log::info('Message Mr Clank envoyé', [
                 'order_location_id' => $orderLocation->id,

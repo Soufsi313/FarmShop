@@ -52,17 +52,19 @@ class StripeService
     }
 
     /**
-     * Créer un PaymentIntent pour une location
+     * Créer un PaymentIntent pour une location (PAIEMENT IMMÉDIAT)
      */
-    public function createPaymentIntentForRental(OrderLocation $orderLocation): PaymentIntent
+    public function createPaymentIntentForRental(OrderLocation $orderLocation): array
     {
+        // ÉTAPE 1 : Paiement immédiat de la location (sans caution)
         $paymentIntent = PaymentIntent::create([
             'amount' => $this->convertToStripeAmount($orderLocation->total_amount),
             'currency' => 'eur',
-            'description' => "Location #{$orderLocation->order_number}",
+            'description' => "Location #{$orderLocation->order_number} - Paiement location",
             'metadata' => [
                 'order_id' => $orderLocation->id,
                 'order_type' => 'rental',
+                'payment_type' => 'rental_payment',
                 'order_number' => $orderLocation->order_number,
                 'user_id' => $orderLocation->user_id,
                 'user_email' => $orderLocation->user->email ?? ''
@@ -73,13 +75,79 @@ class StripeService
             ],
         ]);
 
-        // Sauvegarder l'ID du PaymentIntent
+        // ÉTAPE 2 : Préautorisation de la caution (si > 0)
+        $depositAuthorization = null;
+        $depositAuthorizationId = null;
+        if ($orderLocation->deposit_amount > 0) {
+            $depositAuthorization = $this->createDepositAuthorization($orderLocation);
+            $depositAuthorizationId = $depositAuthorization ? $depositAuthorization->id : null;
+        }
+
+        // Sauvegarder les IDs des PaymentIntents
         $orderLocation->update([
             'stripe_payment_intent_id' => $paymentIntent->id,
+            'stripe_deposit_authorization_id' => $depositAuthorizationId,
             'payment_status' => 'pending'
         ]);
 
-        return $paymentIntent;
+        // Retourner les informations pour le frontend
+        return [
+            'success' => true,
+            'rental_payment_intent_id' => $paymentIntent->id,
+            'rental_client_secret' => $paymentIntent->client_secret,
+            'rental_amount' => $this->convertFromStripeAmount($paymentIntent->amount),
+            'deposit_authorization_id' => $depositAuthorizationId,
+            'deposit_client_secret' => $depositAuthorization ? $depositAuthorization->client_secret : null,
+            'deposit_amount' => $orderLocation->deposit_amount,
+            'order_location_id' => $orderLocation->id,
+            'order_number' => $orderLocation->order_number
+        ];
+    }
+
+    /**
+     * Créer une préautorisation pour la caution (CAPTURE MANUELLE)
+     */
+    public function createDepositAuthorization(OrderLocation $orderLocation): ?PaymentIntent
+    {
+        if ($orderLocation->deposit_amount <= 0) {
+            return null;
+        }
+
+        try {
+            $authorizationIntent = PaymentIntent::create([
+                'amount' => $this->convertToStripeAmount($orderLocation->deposit_amount),
+                'currency' => 'eur',
+                'capture_method' => 'manual', // 🔑 PRÉAUTORISATION !
+                'description' => "Caution #{$orderLocation->order_number} - Préautorisation",
+                'metadata' => [
+                    'order_id' => $orderLocation->id,
+                    'order_type' => 'rental',
+                    'payment_type' => 'deposit_authorization',
+                    'order_number' => $orderLocation->order_number,
+                    'user_id' => $orderLocation->user_id,
+                    'user_email' => $orderLocation->user->email ?? '',
+                    'deposit_amount' => $orderLocation->deposit_amount
+                ],
+                'automatic_payment_methods' => [
+                    'enabled' => true,
+                    'allow_redirects' => 'never'
+                ],
+            ]);
+
+            Log::info('Préautorisation caution créée', [
+                'order_location_id' => $orderLocation->id,
+                'deposit_authorization_id' => $authorizationIntent->id,
+                'deposit_amount' => $orderLocation->deposit_amount
+            ]);
+
+            return $authorizationIntent;
+        } catch (\Exception $e) {
+            Log::error('Erreur création préautorisation caution', [
+                'order_location_id' => $orderLocation->id,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
     }
 
     /**
@@ -105,7 +173,17 @@ class StripeService
                 ];
             } elseif ($metadata['order_type'] === 'rental') {
                 $orderLocationId = (int)$metadata['order_id'];
-                $this->processSuccessfulRental($orderLocationId, $paymentIntent);
+                
+                // Déterminer le type de paiement (location ou caution)
+                $paymentType = $metadata['payment_type'] ?? 'rental_payment';
+                
+                if ($paymentType === 'rental_payment') {
+                    // Paiement de la location confirmé
+                    $this->processSuccessfulRental($orderLocationId, $paymentIntent);
+                } elseif ($paymentType === 'deposit_authorization') {
+                    // Préautorisation de caution confirmée
+                    $this->processSuccessfulDepositAuthorization($orderLocationId, $paymentIntent);
+                }
                 
                 $orderLocation = \App\Models\OrderLocation::find($orderLocationId);
                 return [
@@ -113,7 +191,8 @@ class StripeService
                     'order_type' => 'rental',
                     'order_id' => $orderLocationId,
                     'order_number' => $orderLocation?->order_number,
-                    'redirect_url' => route('rental.payment.success', $orderLocationId)
+                    'redirect_url' => route('rental.payment.success', $orderLocationId),
+                    'payment_type' => $paymentType
                 ];
             }
 
@@ -182,56 +261,79 @@ class StripeService
     }
 
     /**
-     * Traiter une location réussie
+     * Traiter une location réussie - gère les deux types de paiement (location et caution)
      */
     private function processSuccessfulRental(int $orderLocationId, PaymentIntent $paymentIntent): void
     {
         $orderLocation = OrderLocation::findOrFail($orderLocationId);
+        $metadata = $paymentIntent->metadata ?? [];
+        $paymentType = $metadata['payment_type'] ?? 'rental_payment';
         
-        // Mettre à jour le statut de paiement
-        $orderLocation->update([
-            'payment_status' => 'paid',
-            'status' => 'confirmed',
-            'confirmed_at' => now(),
-            'paid_at' => now(),
-            'stripe_payment_intent_id' => $paymentIntent->id,
-            'payment_method' => 'stripe',
-            'payment_details' => [
+        if ($paymentType === 'rental_payment') {
+            // Traitement du paiement de location
+            $orderLocation->update([
+                'payment_status' => 'paid',
+                'status' => 'confirmed',
+                'confirmed_at' => now(),
+                'paid_at' => now(),
                 'stripe_payment_intent_id' => $paymentIntent->id,
-                'amount_paid' => $this->convertFromStripeAmount($paymentIntent->amount),
-                'currency' => $paymentIntent->currency,
-                'paid_at' => now()->toISOString()
-            ]
-        ]);
+                'payment_method' => 'stripe',
+                'payment_details' => [
+                    'stripe_payment_intent_id' => $paymentIntent->id,
+                    'amount_paid' => $this->convertFromStripeAmount($paymentIntent->amount),
+                    'currency' => $paymentIntent->currency,
+                    'paid_at' => now()->toISOString()
+                ]
+            ]);
 
-        // Décrémenter le stock de location des produits
-        foreach ($orderLocation->items as $item) {
-            $product = $item->product;
-            if ($product && $product->rental_stock >= $item->quantity) {
-                $newRentalStock = $product->rental_stock - $item->quantity;
-                $product->update(['rental_stock' => $newRentalStock]);
-                
-                Log::info('Stock de location décrémenté', [
-                    'product_id' => $product->id,
-                    'product_name' => $product->name,
-                    'previous_rental_stock' => $product->rental_stock + $item->quantity,
-                    'new_rental_stock' => $newRentalStock,
-                    'decremented_by' => $item->quantity,
-                    'order_location_id' => $orderLocation->id,
-                    'rental_period' => $orderLocation->start_date->format('Y-m-d') . ' - ' . $orderLocation->end_date->format('Y-m-d')
-                ]);
-            } else {
-                Log::warning('Stock de location insuffisant', [
-                    'product_id' => $product?->id,
-                    'product_name' => $product?->name,
-                    'available_rental_stock' => $product?->rental_stock,
-                    'requested_quantity' => $item->quantity
-                ]);
+            // Décrémenter le stock de location des produits
+            foreach ($orderLocation->items as $item) {
+                $product = $item->product;
+                if ($product && $product->rental_stock >= $item->quantity) {
+                    $newRentalStock = $product->rental_stock - $item->quantity;
+                    $product->update(['rental_stock' => $newRentalStock]);
+                    
+                    Log::info('Stock de location décrémenté', [
+                        'product_id' => $product->id,
+                        'product_name' => $product->name,
+                        'previous_rental_stock' => $product->rental_stock + $item->quantity,
+                        'new_rental_stock' => $newRentalStock,
+                        'decremented_by' => $item->quantity,
+                        'order_location_id' => $orderLocation->id,
+                        'rental_period' => $orderLocation->start_date->format('Y-m-d') . ' - ' . $orderLocation->end_date->format('Y-m-d')
+                    ]);
+                } else {
+                    Log::warning('Stock de location insuffisant', [
+                        'product_id' => $product?->id,
+                        'product_name' => $product?->name,
+                        'available_rental_stock' => $product?->rental_stock,
+                        'requested_quantity' => $item->quantity
+                    ]);
+                }
             }
-        }
 
-        // Programmer les tâches automatiques pour cette location
-        $this->scheduleRentalTasks($orderLocation);
+            // Programmer les tâches automatiques pour cette location
+            $this->scheduleRentalTasks($orderLocation);
+            
+            Log::info("Paiement de location traité avec succès", [
+                'order_location_id' => $orderLocationId,
+                'payment_intent_id' => $paymentIntent->id,
+                'amount' => $paymentIntent->amount / 100
+            ]);
+            
+        } elseif ($paymentType === 'deposit_authorization') {
+            // Traitement de la préautorisation de caution
+            $orderLocation->update([
+                'stripe_deposit_authorization_id' => $paymentIntent->id,
+                'deposit_status' => 'authorized'
+            ]);
+            
+            Log::info("Préautorisation de caution traitée avec succès", [
+                'order_location_id' => $orderLocationId,
+                'authorization_id' => $paymentIntent->id,
+                'amount' => $paymentIntent->amount / 100
+            ]);
+        }
 
         Log::info('Location payée avec succès', [
             'order_location_id' => $orderLocation->id,
@@ -589,23 +691,119 @@ class StripeService
             // Mettre à jour la commande
             $order->update([
                 'refund_processed' => true,
-                'refund_processed_at' => now(),
-                'refund_stripe_id' => $refund->id
+                'refund_amount' => $this->convertFromStripeAmount($refund->amount),
+                'refund_id' => $refund->id,
+                'refunded_at' => now()
             ]);
 
-            Log::info('Remboursement automatique traité avec succès', [
+            Log::info('Remboursement automatique traité', [
                 'order_id' => $order->id,
-                'order_number' => $order->order_number,
                 'refund_id' => $refund->id,
-                'amount' => $order->total_amount
+                'amount' => $refund->amount / 100
+            ]);
+
+            return true;
+                
+        } catch (\Exception $e) {
+            Log::error('Erreur lors du traitement du remboursement automatique', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Capturer une préautorisation de caution (en cas de dommages)
+     */
+    public function captureDepositAuthorization(OrderLocation $orderLocation, float $amount = null): bool
+    {
+        try {
+            if (!$orderLocation->stripe_deposit_authorization_id) {
+                Log::error('Impossible de capturer: aucune préautorisation trouvée', [
+                    'order_location_id' => $orderLocation->id,
+                    'order_number' => $orderLocation->order_number
+                ]);
+                return false;
+            }
+
+            // Récupérer le PaymentIntent de préautorisation
+            $paymentIntent = PaymentIntent::retrieve($orderLocation->stripe_deposit_authorization_id);
+            
+            // Si pas de montant spécifié, capturer le montant total autorisé
+            if ($amount === null) {
+                $captureAmount = $paymentIntent->amount;
+            } else {
+                $captureAmount = $this->convertToStripeAmount($amount);
+                // S'assurer que le montant ne dépasse pas l'autorisation
+                if ($captureAmount > $paymentIntent->amount) {
+                    $captureAmount = $paymentIntent->amount;
+                }
+            }
+
+            // Capturer le paiement
+            $capturedPayment = $paymentIntent->capture([
+                'amount_to_capture' => $captureAmount
+            ]);
+
+            // Mettre à jour la location
+            $orderLocation->update([
+                'deposit_status' => 'captured',
+                'deposit_captured_amount' => $this->convertFromStripeAmount($captureAmount),
+                'deposit_captured_at' => now()
+            ]);
+
+            Log::info('Préautorisation de caution capturée', [
+                'order_location_id' => $orderLocation->id,
+                'authorization_id' => $orderLocation->stripe_deposit_authorization_id,
+                'captured_amount' => $captureAmount / 100
             ]);
 
             return true;
 
         } catch (\Exception $e) {
-            Log::error('Erreur lors du remboursement automatique', [
-                'order_id' => $order->id,
-                'order_number' => $order->order_number,
+            Log::error('Erreur lors de la capture de préautorisation', [
+                'order_location_id' => $orderLocation->id,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Annuler une préautorisation de caution (retour sans dommages)
+     */
+    public function cancelDepositAuthorization(OrderLocation $orderLocation): bool
+    {
+        try {
+            if (!$orderLocation->stripe_deposit_authorization_id) {
+                Log::error('Impossible d\'annuler: aucune préautorisation trouvée', [
+                    'order_location_id' => $orderLocation->id,
+                    'order_number' => $orderLocation->order_number
+                ]);
+                return false;
+            }
+
+            // Récupérer et annuler le PaymentIntent
+            $paymentIntent = PaymentIntent::retrieve($orderLocation->stripe_deposit_authorization_id);
+            $cancelledPayment = $paymentIntent->cancel();
+
+            // Mettre à jour la location
+            $orderLocation->update([
+                'deposit_status' => 'cancelled',
+                'deposit_cancelled_at' => now()
+            ]);
+
+            Log::info('Préautorisation de caution annulée', [
+                'order_location_id' => $orderLocation->id,
+                'authorization_id' => $orderLocation->stripe_deposit_authorization_id
+            ]);
+
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'annulation de préautorisation', [
+                'order_location_id' => $orderLocation->id,
                 'error' => $e->getMessage()
             ]);
             return false;

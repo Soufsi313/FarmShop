@@ -170,6 +170,14 @@
                                 </a>
                             @endif
                             
+                            @if($order->can_be_closed)
+                                <button type="button" 
+                                        onclick="closeRental({{ $order->id }})"
+                                        class="bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                    🔒 Clôturer la location
+                                </button>
+                            @endif
+                            
                             @if($order->can_be_cancelled)
                                 <button type="button" 
                                         onclick="cancelOrder({{ $order->id }}, '{{ $order->status }}')"
@@ -248,6 +256,71 @@
                             onclick="confirmCancellation()" 
                             class="px-4 py-2 bg-red-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                         ❌ Confirmer l'annulation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modale de clôture de location -->
+<div id="closeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50" style="display: none;">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full">
+            <div class="p-6">
+                <div class="flex items-center mb-6">
+                    <div class="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                        <svg class="w-7 h-7 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="ml-3 text-xl font-semibold text-gray-900">
+                        🔒 Clôture de location
+                    </h3>
+                </div>
+                
+                <div class="mb-6">
+                    <p class="text-gray-700 mb-4">
+                        Êtes-vous sûr de vouloir clôturer cette location ?
+                    </p>
+                    
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                        <h4 class="flex items-center text-sm font-medium text-green-800 mb-2">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Cette action confirme que :
+                        </h4>
+                        <ul class="text-sm text-green-700 space-y-1">
+                            <li>• Vous avez rendu tout le matériel</li>
+                            <li>• Le matériel est en bon état</li>
+                            <li>• Vous acceptez l'inspection admin</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <h4 class="flex items-center text-sm font-medium text-yellow-800 mb-2">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                            Important à savoir
+                        </h4>
+                        <p class="text-sm text-yellow-700">
+                            Cette action ne peut pas être annulée et déclenchera l'inspection par l'administration.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" 
+                            onclick="closeCloseModal()" 
+                            class="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors">
+                        Annuler
+                    </button>
+                    <button type="button" 
+                            onclick="confirmClose()" 
+                            class="px-6 py-2 bg-orange-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors">
+                        🔒 Confirmer la clôture
                     </button>
                 </div>
             </div>
@@ -403,6 +476,48 @@ function confirmCancellation() {
     });
 }
 
+// Fonction pour clôturer une location
+let currentOrderIdForClose = null;
+
+function closeRental(orderId) {
+    currentOrderIdForClose = orderId;
+    document.getElementById('closeModal').style.display = 'block';
+    document.getElementById('closeModal').classList.remove('hidden');
+}
+
+function closeCloseModal() {
+    document.getElementById('closeModal').style.display = 'none';
+    document.getElementById('closeModal').classList.add('hidden');
+    currentOrderIdForClose = null;
+}
+
+function confirmClose() {
+    if (!currentOrderIdForClose) return;
+    
+    // Appel AJAX pour clôturer la location
+    fetch(`/my-rentals/${currentOrderIdForClose}/close`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        closeCloseModal(); // Fermer la modale d'abord
+        if (data.success) {
+            alert('Location clôturée avec succès');
+            location.reload();
+        } else {
+            alert(data.message || 'Erreur lors de la clôture de la location');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert('Une erreur est survenue lors de la clôture de la location.');
+    });
+}
+
 // S'assurer que le DOM est chargé
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded');
@@ -411,12 +526,16 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(event) {
         const cancelModal = document.getElementById('cancelModal');
         const infoModal = document.getElementById('infoModal');
+        const closeModal = document.getElementById('closeModal');
         
         if (event.target === cancelModal) {
             closeCancelModal();
         }
         if (event.target === infoModal) {
             closeInfoModal();
+        }
+        if (event.target === closeModal) {
+            closeCloseModal();
         }
     });
 });

@@ -104,6 +104,126 @@
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 mb-4">Produits de la Location</h2>
                 
+                <!-- Frais et Pénalités -->
+                @if(($orderLocation->status === 'finished' && ($orderLocation->late_fees > 0 || $orderLocation->damage_cost > 0)) || ($orderLocation->status === 'inspecting' && ($orderLocation->late_days > 0 || $orderLocation->damage_cost > 0)))
+                <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <h3 class="text-lg font-semibold text-yellow-800 mb-3">⚠️ Frais et Pénalités</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        @if(($orderLocation->status === 'finished' && $orderLocation->late_fees > 0) || ($orderLocation->status === 'inspecting' && $orderLocation->late_days > 0))
+                        <div class="bg-orange-50 p-3 rounded border border-orange-200">
+                            <div class="text-sm font-medium text-orange-800">Frais de retard</div>
+                            <div class="text-xl font-bold text-orange-900">{{ abs($orderLocation->late_days) }} jour{{ abs($orderLocation->late_days) > 1 ? 's' : '' }}</div>
+                            <div class="text-lg font-semibold text-orange-700" id="summary_late_fees_display">
+                                @if($orderLocation->status === 'finished')
+                                    {{ number_format($orderLocation->late_fees, 2) }}€
+                                @else
+                                    {{ number_format($orderLocation->late_fees ?? (abs($orderLocation->late_days) * 10), 2) }}€
+                                @endif
+                            </div>
+                        </div>
+                        @endif
+                        
+                        @if($orderLocation->damage_cost > 0)
+                        <div class="bg-red-50 p-3 rounded border border-red-200">
+                            <div class="text-sm font-medium text-red-800">Frais de dégâts</div>
+                            <div class="text-xl font-bold text-red-900">Dommages</div>
+                            <div class="text-lg font-semibold text-red-700" id="summary_damage_costs_display">{{ number_format($orderLocation->damage_cost, 2) }}€</div>
+                        </div>
+                        @endif
+                        
+                        <div class="bg-gray-50 p-3 rounded border border-gray-200">
+                            <div class="text-sm font-medium text-gray-800">Total des pénalités</div>
+                            <div class="text-xl font-bold text-gray-900">Calculé</div>
+                            <div class="text-lg font-semibold text-gray-700" id="summary_total_penalties_display">
+                                @if($orderLocation->status === 'finished')
+                                    {{ number_format($orderLocation->penalty_amount ?? 0, 2) }}€
+                                @else
+                                    {{ number_format(($orderLocation->late_fees ?? (abs($orderLocation->late_days) * 10)) + ($orderLocation->damage_cost ?? 0), 2) }}€
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                
+                @if($orderLocation->status === 'finished')
+                <!-- Résultats de l'inspection terminée -->
+                <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+                    <h3 class="text-lg font-semibold text-green-800 mb-4">✅ Inspection Terminée</h3>
+                    
+                    <!-- Résumé financier final -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white p-4 rounded border">
+                            <div class="text-sm font-medium text-gray-600">Frais de Retard</div>
+                            <div class="text-xl font-bold text-orange-600">{{ number_format($orderLocation->late_fees ?? 0, 2) }}€</div>
+                        </div>
+                        <div class="bg-white p-4 rounded border">
+                            <div class="text-sm font-medium text-gray-600">Frais de Dégâts</div>
+                            <div class="text-xl font-bold text-red-600">{{ number_format($orderLocation->damage_cost ?? 0, 2) }}€</div>
+                        </div>
+                        <div class="bg-white p-4 rounded border">
+                            <div class="text-sm font-medium text-gray-600">Total Pénalités</div>
+                            <div class="text-xl font-bold text-gray-800">{{ number_format($orderLocation->penalty_amount ?? 0, 2) }}€</div>
+                        </div>
+                        <div class="bg-white p-4 rounded border">
+                            <div class="text-sm font-medium text-gray-600">Remboursement</div>
+                            <div class="text-xl font-bold text-green-600">{{ number_format($orderLocation->deposit_refund ?? 0, 2) }}€</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Détail des produits inspectés -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900">Détail de l'inspection :</h4>
+                        @foreach($orderLocation->orderItemLocations as $item)
+                        <div class="bg-white border rounded-lg p-4">
+                            <div class="flex items-start space-x-4">
+                                @if($item->product && $item->product->main_image)
+                                <img src="{{ asset('storage/' . $item->product->main_image) }}" alt="{{ $item->product_name }}" class="w-12 h-12 object-cover rounded">
+                                @else
+                                <div class="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                                    <span class="text-xs text-gray-500">IMG</span>
+                                </div>
+                                @endif
+                                
+                                <div class="flex-1">
+                                    <h5 class="font-medium text-gray-900">{{ $item->product_name }}</h5>
+                                    <div class="text-sm text-gray-600 mt-1">
+                                        <span>Quantité: {{ $item->quantity }}</span> • 
+                                        <span>État: 
+                                            @if($item->condition_at_return === 'excellent')
+                                                <span class="text-green-600">Excellent</span>
+                                            @elseif($item->condition_at_return === 'good')
+                                                <span class="text-blue-600">Bon</span>
+                                            @elseif($item->condition_at_return === 'poor')
+                                                <span class="text-red-600">Mauvais</span>
+                                            @else
+                                                <span class="text-gray-500">Non spécifié</span>
+                                            @endif
+                                        </span>
+                                        @if($item->item_damage_cost > 0)
+                                        • <span class="text-red-600 font-medium">Dégâts: {{ number_format($item->item_damage_cost, 2) }}€</span>
+                                        @endif
+                                    </div>
+                                    @if($item->item_inspection_notes)
+                                    <div class="text-sm text-gray-700 mt-2 bg-gray-50 p-2 rounded">
+                                        <strong>Notes:</strong> {{ $item->item_inspection_notes }}
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    
+                    @if($orderLocation->inspection_notes)
+                    <div class="mt-4 bg-white border rounded-lg p-4">
+                        <h5 class="font-medium text-gray-900 mb-2">Notes générales d'inspection:</h5>
+                        <p class="text-gray-700">{{ $orderLocation->inspection_notes }}</p>
+                    </div>
+                    @endif
+                </div>
+                @endif
+                
                 @if($orderLocation->status === 'inspecting')
                 <!-- Formulaire d'inspection -->
                 <form action="{{ route('admin.rental-returns.finish-inspection', $orderLocation) }}" method="POST" id="inspectionForm">
@@ -114,8 +234,8 @@
                         @foreach($orderLocation->orderItemLocations as $item)
                         <div class="border border-gray-200 rounded-lg p-4">
                             <div class="flex items-start space-x-4">
-                                @if($item->product && $item->product->image)
-                                <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product_name }}" class="w-16 h-16 object-cover rounded">
+                                @if($item->product && $item->product->main_image)
+                                <img src="{{ asset('storage/' . $item->product->main_image) }}" alt="{{ $item->product_name }}" class="w-16 h-16 object-cover rounded">
                                 @else
                                 <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
                                     <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,8 +268,10 @@
                                                    step="0.01" 
                                                    min="0" 
                                                    max="999999.99"
-                                                   class="w-full border border-gray-300 rounded px-3 py-2"
-                                                   placeholder="0.00">
+                                                   class="w-full border border-gray-300 rounded px-3 py-2 item-damage-cost"
+                                                   placeholder="0.00"
+                                                   oninput="updatePenaltiesDisplay()"
+                                                   onchange="updatePenaltiesDisplay()">>
                                         </div>
                                         
                                         <div class="md:col-span-1">
@@ -164,6 +286,35 @@
                             </div>
                         </div>
                         @endforeach
+                        
+                        <!-- Section Frais généraux -->
+                        <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                            <h4 class="font-medium text-gray-900 mb-4">💰 Frais et Pénalités</h4>
+                            <div class="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        Frais de retard (€)
+                                        @if($orderLocation->late_days > 0)
+                                        <small class="text-orange-600">({{ $orderLocation->late_days }} jour{{ $orderLocation->late_days > 1 ? 's' : '' }} × 10€ = {{ $orderLocation->late_days * 10 }}€ suggéré)</small>
+                                        @endif
+                                    </label>
+                                    <input type="number" 
+                                           id="late_fees_input"
+                                           name="late_fees" 
+                                           value="{{ $orderLocation->late_fees ?? ($orderLocation->late_days * 10) }}"
+                                           step="0.01" 
+                                           min="0" 
+                                           max="999999.99"
+                                           class="w-full border border-gray-300 rounded px-3 py-2"
+                                           placeholder="0.00"
+                                           oninput="updatePenaltiesDisplay()"
+                                           onchange="updatePenaltiesDisplay()">>
+                                    <small class="text-gray-500">Vous pouvez modifier le montant des frais de retard selon les circonstances</small>
+                                </div>
+                                
+
+                            </div>
+                        </div>
                         
                         <div class="border-t pt-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Notes générales d'inspection</label>
@@ -183,44 +334,6 @@
                         </div>
                     </div>
                 </form>
-                @else
-                <!-- Affichage simple des produits -->
-                <div class="space-y-4">
-                    @foreach($orderLocation->orderItemLocations as $item)
-                    <div class="border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-start space-x-4">
-                            @if($item->product && $item->product->image)
-                            <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product_name }}" class="w-16 h-16 object-cover rounded">
-                            @else
-                            <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
-                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                            </div>
-                            @endif
-                            
-                            <div class="flex-1">
-                                <h4 class="font-medium text-gray-900">{{ $item->product_name }}</h4>
-                                <div class="mt-2 grid grid-cols-2 gap-4 text-sm text-gray-600">
-                                    <div>Quantité: {{ $item->quantity }}</div>
-                                    <div>Dépôt par item: {{ number_format($item->deposit_per_item, 2) }}€</div>
-                                    @if($item->condition_at_return)
-                                    <div>État au retour: {{ $item->condition_at_return }}</div>
-                                    @endif
-                                    @if($item->item_damage_cost > 0)
-                                    <div class="text-red-600">Coût dégâts: {{ number_format($item->item_damage_cost, 2) }}€</div>
-                                    @endif
-                                </div>
-                                @if($item->item_inspection_notes)
-                                <div class="mt-2 text-sm text-gray-700">
-                                    <strong>Notes:</strong> {{ $item->item_inspection_notes }}
-                                </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
                 @endif
             </div>
         </div>
@@ -335,4 +448,45 @@
         </div>
     </div>
 </div>
+
+<script>
+function updatePenaltiesDisplay() {
+    // Récupérer les frais de retard
+    const lateFees = parseFloat(document.getElementById('late_fees_input')?.value || 0);
+    
+    // Calculer la somme des coûts de dégâts par produit
+    let itemDamageCosts = 0;
+    const itemDamageInputs = document.querySelectorAll('.item-damage-cost');
+    itemDamageInputs.forEach(input => {
+        itemDamageCosts += parseFloat(input.value || 0);
+    });
+    
+    // Total des pénalités
+    const totalPenalties = lateFees + itemDamageCosts;
+    
+    // Mettre à jour l'affichage
+    const lateFeesDisplay = document.getElementById('late_fees_display');
+    if (lateFeesDisplay) {
+        lateFeesDisplay.textContent = lateFees.toFixed(2) + '€';
+    }
+    
+    const damageDisplay = document.getElementById('damage_costs_display');
+    if (damageDisplay) {
+        damageDisplay.textContent = itemDamageCosts.toFixed(2) + '€';
+    }
+    
+    const totalDisplay = document.getElementById('total_penalties_display');
+    if (totalDisplay) {
+        totalDisplay.textContent = totalPenalties.toFixed(2) + '€';
+    }
+}
+
+// Initialiser l'affichage au chargement de la page SEULEMENT en mode inspection
+document.addEventListener('DOMContentLoaded', function() {
+    @if($orderLocation->status === 'inspecting')
+    updatePenaltiesDisplay();
+    @endif
+});
+</script>
+
 @endsection

@@ -8,6 +8,7 @@ use App\Models\OrderItemLocation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class RentalReturnsController extends Controller
 {
@@ -132,6 +133,7 @@ class RentalReturnsController extends Controller
             'items.*.condition_at_return' => 'required|in:excellent,good,poor',
             'items.*.item_inspection_notes' => 'nullable|string|max:1000',
             'items.*.item_damage_cost' => 'nullable|numeric|min:0|max:999999.99',
+            'late_fees' => 'nullable|numeric|min:0|max:999999.99',
             'general_notes' => 'nullable|string|max:2000'
         ]);
 
@@ -153,22 +155,49 @@ class RentalReturnsController extends Controller
                 ]);
             }
 
-            // Calculer le remboursement de caution
-            $depositRefund = max(0, $orderLocation->deposit_amount - $totalDamageCosts);
+            // Récupérer les frais saisis dans le formulaire
+            $lateFees = floatval($request->late_fees ?? 0);
+            
+            // Le total des dégâts = somme des dégâts par produit seulement
+            
+            // Calculer le total des pénalités (frais de retard + dégâts)
+            $totalPenalties = $lateFees + $totalDamageCosts;
+            
+            // Calculer le remboursement de caution (caution - TOUTES les pénalités)
+            $depositRefund = max(0, $orderLocation->deposit_amount - $totalPenalties);
 
             // Finaliser la location
             $orderLocation->update([
                 'status' => 'finished',
                 'inspection_status' => 'completed',
                 'inspection_finished_at' => now(),
-                'penalty_amount' => $totalDamageCosts,
+                'late_fees' => $lateFees, // Frais de retard saisis par l'admin
+                'damage_cost' => $totalDamageCosts, // Frais de dégâts seulement
+                'penalty_amount' => $totalPenalties, // Total des pénalités (retard + dégâts)
                 'deposit_refund' => $depositRefund,
                 'inspection_notes' => $request->general_notes
             ]);
 
             DB::commit();
 
-            return redirect()->back()->with('success', 'Inspection terminée avec succès. Remboursement de caution: ' . number_format($depositRefund, 2) . '€');
+            // 🤖 Envoyer message Mr Clank et email d'inspection
+            $this->sendMrClankMessage($orderLocation, $totalPenalties, $depositRefund);
+            
+            // 📧 Envoyer l'email d'inspection au client
+            try {
+                Mail::to($orderLocation->user->email)->send(new \App\Mail\RentalOrderInspection($orderLocation));
+                \Log::info('Email d\'inspection envoyé', [
+                    'order_location_id' => $orderLocation->id,
+                    'user_email' => $orderLocation->user->email
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Erreur envoi email d\'inspection', [
+                    'order_location_id' => $orderLocation->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Inspection terminée avec succès. Email d\'inspection envoyé. Pénalités totales: ' . number_format($totalPenalties, 2) . '€ - Remboursement: ' . number_format($depositRefund, 2) . '€');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -237,5 +266,75 @@ class RentalReturnsController extends Controller
             'data' => $data,
             'filename' => 'retours_location_' . now()->format('Y-m-d') . '.csv'
         ]);
+    }
+
+    /**
+     * Envoyer un message automatique via Mr Clank
+     */
+    private function sendMrClankMessage(OrderLocation $orderLocation, $totalPenalties, $refundAmount)
+    {
+        try {
+            // Créer le message système de Mr Clank
+            $message = "🤖 **Mr Clank - Message Automatique**\n\n";
+            $message .= "Bonjour {$orderLocation->user->name},\n\n";
+            $message .= "Votre location #{$orderLocation->order_number} a été finalisée avec succès !\n\n";
+            $message .= "📋 **Détails de l'inspection :**\n";
+            $message .= "- Date de retour : " . now()->format('d/m/Y à H:i') . "\n";
+            $message .= "- Statut : Inspection terminée\n";
+            
+            $message .= "\n💰 **Détails de la caution :**\n";
+            $message .= "- Caution versée : " . number_format($orderLocation->deposit_amount, 2) . "€\n";
+            
+            // Détailler les frais
+            if ($orderLocation->late_fees > 0 || $orderLocation->damage_cost > 0) {
+                if ($orderLocation->late_fees > 0) {
+                    $message .= "- Frais de retard ({$orderLocation->late_days} jour" . ($orderLocation->late_days > 1 ? 's' : '') . ") : " . number_format($orderLocation->late_fees, 2) . "€\n";
+                }
+                if ($orderLocation->damage_cost > 0) {
+                    $message .= "- Frais de dommages : " . number_format($orderLocation->damage_cost, 2) . "€\n";
+                }
+                $message .= "- **Total des pénalités : " . number_format($totalPenalties, 2) . "€**\n";
+                $message .= "- **Montant à vous rembourser : " . number_format($refundAmount, 2) . "€**\n";
+                $message .= "\n⚠️ Des pénalités ont été appliquées suite à l'inspection.\n";
+            } else {
+                $message .= "- **Caution intégralement remboursée : " . number_format($refundAmount, 2) . "€**\n";
+                $message .= "\n✅ Aucun problème constaté !\n";
+            }
+            
+            $message .= "\n🏦 Le remboursement sera effectué sous 3-5 jours ouvrés sur votre moyen de paiement original.\n";
+            $message .= "\nMerci de votre confiance !\n\n";
+            $message .= "---\n";
+            $message .= "🤖 Message automatique généré par Mr Clank\n";
+            $message .= "Système de gestion FarmShop";
+
+            // Envoyer le message dans la boîte de réception utilisateur
+            \App\Models\Message::create([
+                'user_id' => $orderLocation->user_id,
+                'sender_id' => 103, // ID de Mr Clank 🤖 (system@farmshop.local)
+                'type' => 'system',
+                'subject' => "🤖 Location #{$orderLocation->order_number} finalisée - Caution remboursée",
+                'content' => $message,
+                'status' => 'unread',
+                'priority' => 'high',
+                'is_important' => true,
+            ]);
+
+            \Log::info('Message Mr Clank envoyé', [
+                'order_location_id' => $orderLocation->id,
+                'user_id' => $orderLocation->user_id,
+                'type' => 'rental_finalized',
+                'deposit_amount' => $orderLocation->deposit_amount,
+                'late_fees' => $orderLocation->late_fees ?? 0,
+                'damage_costs' => $orderLocation->damage_cost ?? 0,
+                'total_penalties' => $totalPenalties,
+                'refund_amount' => $refundAmount
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Erreur envoi message Mr Clank', [
+                'order_location_id' => $orderLocation->id,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }

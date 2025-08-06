@@ -282,7 +282,7 @@ class NewsletterController extends Controller
             $testSend->newsletter_id = $newsletter->id;
             $testSend->email = $testEmail;
             $testSend->tracking_url = '';
-            $testSend->unsubscribe_url = route('newsletter.unsubscribe', ['token' => 'test']);
+            $testSend->unsubscribe_url = route('newsletter.unsubscribe.token', ['token' => 'test']);
             
             // Trouver l'utilisateur ou utiliser l'admin pour les données personnelles
             $testUser = \App\Models\User::where('email', $testEmail)->first() ?? $admin;

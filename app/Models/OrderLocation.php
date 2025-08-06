@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Events\OrderLocationStatusChanged;
 
@@ -21,7 +22,7 @@ class OrderLocation extends Model
         'end_date',
         'rental_days',
         'daily_rate',
-        'total_rental_cost',
+        'total_rental_cost',  // Ajout du champ manquant
         'deposit_amount',
         'late_fee_per_day',
         'tax_rate',
@@ -33,6 +34,11 @@ class OrderLocation extends Model
         'payment_method',
         'payment_reference',
         'stripe_payment_intent_id',
+        'stripe_deposit_authorization_id',
+        'deposit_status',
+        'deposit_captured_amount',
+        'deposit_captured_at',
+        'deposit_cancelled_at',
         'payment_details',
         'billing_address',
         'delivery_address',
@@ -42,6 +48,7 @@ class OrderLocation extends Model
         'inspection_status',
         'product_condition',
         'damage_cost',
+        'penalty_amount',
         'total_penalties',
         'deposit_refund',
         'inspection_notes',
@@ -546,10 +553,9 @@ class OrderLocation extends Model
     public function sendInspectionReport()
     {
         try {
-            Mail::send('emails.rental.inspection-report', ['orderLocation' => $this], function ($message) {
-                $message->to($this->user->email, $this->user->name)
-                        ->subject("Rapport d'inspection - Location {$this->order_number}");
-            });
+            Mail::to($this->user->email)->send(new \App\Mail\RentalOrderInspection($this));
+            
+            Log::info("Rapport d'inspection envoyé par email pour {$this->order_number}");
         } catch (\Exception $e) {
             \Log::error("Erreur envoi rapport inspection {$this->order_number}: " . $e->getMessage());
         }
@@ -646,7 +652,7 @@ class OrderLocation extends Model
     public function canGenerateInvoice()
     {
         return in_array($this->payment_status, ['paid', 'partially_paid']) && 
-               in_array($this->status, ['confirmed', 'active', 'returned', 'inspecting', 'finished']);
+               in_array($this->status, ['confirmed', 'active', 'completed', 'returned', 'inspecting', 'finished']);
     }
 
     /**

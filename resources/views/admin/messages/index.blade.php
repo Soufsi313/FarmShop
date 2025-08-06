@@ -250,7 +250,11 @@
                             <!-- Sujet et contenu (aperçu) - 4 colonnes -->
                             <div class="col-span-4 min-w-0">
                                 <h3 class="font-medium text-gray-900 text-sm mb-1 truncate">{{ $message->subject }}</h3>
-                                <p class="text-xs text-gray-600 line-clamp-2">{{ Str::limit($message->content, 100) }}</p>
+                                @if($message->type === 'system')
+                                    <p class="text-xs text-gray-600 line-clamp-5">{{ Str::limit($message->content, 600) }}</p>
+                                @else
+                                    <p class="text-xs text-gray-600 line-clamp-2">{{ Str::limit($message->content, 100) }}</p>
+                                @endif
                             </div>
 
                             <!-- Date et motif - 2 colonnes -->
@@ -364,7 +368,11 @@
                             
                             <div class="mb-3">
                                 <h3 class="font-medium text-gray-900 text-sm mb-1">{{ $message->subject }}</h3>
-                                <p class="text-xs text-gray-600">{{ Str::limit($message->content, 120) }}</p>
+                                @if($message->type === 'system')
+                                    <p class="text-xs text-gray-600">{{ Str::limit($message->content, 800) }}</p>
+                                @else
+                                    <p class="text-xs text-gray-600">{{ Str::limit($message->content, 120) }}</p>
+                                @endif
                             </div>
                             
                             <div class="flex items-center justify-between">

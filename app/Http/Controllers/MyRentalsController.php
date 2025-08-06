@@ -52,7 +52,7 @@ class MyRentalsController extends Controller
         }
 
         // Vérifier que la location peut être clôturée
-        if (!in_array($orderLocation->status, ['confirmed', 'started'])) {
+        if (!$orderLocation->can_be_closed) {
             return response()->json([
                 'success' => false,
                 'message' => 'Cette location ne peut pas être clôturée dans son état actuel'

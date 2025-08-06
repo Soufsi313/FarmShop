@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class RentalOrderInspection extends Mailable implements ShouldQueue
+class RentalOrderInspection extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -30,8 +30,8 @@ class RentalOrderInspection extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Rapport d\'inspection de votre location #' . $this->orderLocation->order_number,
-            from: config('mail.from.address'),
+            subject: '📋 Rapport d\'inspection - Location #' . $this->orderLocation->order_number . ' - FarmShop',
+            from: 's.mef2703@gmail.com',
         );
     }
 
@@ -40,55 +40,13 @@ class RentalOrderInspection extends Mailable implements ShouldQueue
      */
     public function content(): Content
     {
-        $inspectionSummary = $this->getInspectionSummary();
-        
         return new Content(
-            markdown: 'emails.rental-order-inspection',
+            view: 'emails.rental-order-inspection',
             with: [
                 'orderLocation' => $this->orderLocation,
                 'user' => $this->orderLocation->user,
-                'items' => $this->orderLocation->orderItemLocations,
-                'inspectionSummary' => $inspectionSummary,
-                'totalPenalties' => $this->orderLocation->penalty_amount,
-                'depositRefund' => $this->orderLocation->deposit_amount - $this->orderLocation->penalty_amount,
-                'hasGoodItems' => $inspectionSummary['good_items'] > 0,
-                'hasDamagedItems' => $inspectionSummary['damaged_items'] > 0,
-                'hasLostItems' => $inspectionSummary['lost_items'] > 0,
-                'hasPenalties' => $this->orderLocation->penalty_amount > 0,
-            ],
+            ]
         );
-    }
-
-    /**
-     * Obtenir un résumé de l'inspection
-     */
-    private function getInspectionSummary(): array
-    {
-        $summary = [
-            'total_items' => 0,
-            'good_items' => 0,
-            'damaged_items' => 0,
-            'lost_items' => 0,
-            'damage_costs' => 0,
-            'late_fees' => 0,
-        ];
-
-        foreach ($this->orderLocation->orderItemLocations as $item) {
-            $summary['total_items'] += $item->quantity;
-            
-            if ($item->return_condition === 'good') {
-                $summary['good_items'] += $item->quantity;
-            } elseif ($item->return_condition === 'damaged') {
-                $summary['damaged_items'] += $item->quantity;
-                $summary['damage_costs'] += $item->damage_cost;
-            } elseif ($item->return_condition === 'lost') {
-                $summary['lost_items'] += $item->quantity;
-            }
-            
-            $summary['late_fees'] += $item->penalty_amount - $item->damage_cost;
-        }
-
-        return $summary;
     }
 
     /**

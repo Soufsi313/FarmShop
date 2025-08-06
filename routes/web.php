@@ -494,7 +494,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Routes publiques pour tracking newsletter
     Route::get('/newsletter/track/{token}', [\App\Http\Controllers\NewsletterController::class, 'track'])->name('newsletter.track');
-    Route::get('/newsletter/unsubscribe/{token}', [\App\Http\Controllers\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+    Route::get('/newsletter/unsubscribe/{token}', [\App\Http\Controllers\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe.token');
     Route::get('/newsletter/click/{token}', [\App\Http\Controllers\NewsletterController::class, 'trackClick'])->name('newsletter.click');
     
     // Export données RGPD

@@ -11,6 +11,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class HandleOrderLocationStatusChange implements ShouldQueue
 {
@@ -119,21 +121,33 @@ class HandleOrderLocationStatusChange implements ShouldQueue
      */
     private function handleCompleted($orderLocation)
     {
-        $orderLocation->update([
-            'completed_at' => now(),
-            'status' => 'completed'
-        ]);
-
-        // Envoyer email demandant la fermeture
-        try {
-            Mail::to($orderLocation->user->email)->send(new RentalOrderCompleted($orderLocation));
-            Log::info("Email de fin de location envoyé pour {$orderLocation->order_number}");
-        } catch (\Exception $e) {
-            Log::error("Erreur envoi email fin de location: " . $e->getMessage());
+        // PROTECTION ANTI-DOUBLON STRICTE
+        $lockKey = "email_completed_lock_{$orderLocation->id}";
+        
+        // Essai de verrou atomique avec cache
+        if (!Cache::add($lockKey, true, 1800)) { // 30 minutes
+            Log::info("Email de fin de location déjà traité pour {$orderLocation->order_number} - VERROU ACTIF");
+            return;
         }
 
-        // Programmer un rappel si pas fermé après 24h
-        $this->scheduleCloseReminder($orderLocation);
+        try {
+            $orderLocation->update([
+                'completed_at' => now(),
+                'status' => 'completed'
+            ]);
+
+            // Envoyer email demandant la fermeture
+            Mail::to($orderLocation->user->email)->send(new RentalOrderCompleted($orderLocation));
+            Log::info("✅ Email de fin de location envoyé pour {$orderLocation->order_number}");
+            
+            // Programmer un rappel si pas fermé après 24h
+            $this->scheduleCloseReminder($orderLocation);
+            
+        } catch (\Exception $e) {
+            Log::error("❌ Erreur envoi email fin de location: " . $e->getMessage());
+            // Libérer le verrou en cas d'erreur pour réessayer plus tard
+            Cache::forget($lockKey);
+        }
     }
 
     /**
@@ -183,11 +197,20 @@ class HandleOrderLocationStatusChange implements ShouldQueue
         ]);
 
         // Envoyer le rapport final d'inspection (utilise la méthode du modèle)
-        try {
-            $orderLocation->sendInspectionReport();
-            Log::info("Rapport d'inspection final envoyé pour {$orderLocation->order_number}");
-        } catch (\Exception $e) {
-            Log::error("Erreur envoi rapport inspection final: " . $e->getMessage());
+        // Vérifier si un email a déjà été envoyé récemment pour éviter les doublons
+        $cacheKey = "inspection_email_sent_{$orderLocation->id}";
+        if (!cache()->has($cacheKey)) {
+            try {
+                $orderLocation->sendInspectionReport();
+                Log::info("Rapport d'inspection final envoyé pour {$orderLocation->order_number}");
+                
+                // Cache pendant 10 minutes pour éviter les doublons
+                cache()->put($cacheKey, true, 600);
+            } catch (\Exception $e) {
+                Log::error("Erreur envoi rapport inspection final: " . $e->getMessage());
+            }
+        } else {
+            Log::info("Email inspection déjà envoyé récemment pour {$orderLocation->order_number}, ignoré pour éviter doublon");
         }
     }
 

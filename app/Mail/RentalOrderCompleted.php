@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class RentalOrderCompleted extends Mailable implements ShouldQueue
+class RentalOrderCompleted extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -40,17 +40,26 @@ class RentalOrderCompleted extends Mailable implements ShouldQueue
      */
     public function content(): Content
     {
+        // Calculs simples pour éviter les erreurs
+        $startDate = $this->orderLocation->start_date;
+        $endDate = $this->orderLocation->end_date;
+        $plannedDays = $this->orderLocation->rental_days ?: $startDate->diffInDays($endDate);
+        $actualDays = $startDate->diffInDays(now());
+        $lateDays = max(0, $actualDays - $plannedDays);
+        $potentialLateFees = $lateDays * 10; // 10€/jour
+        
         return new Content(
-            markdown: 'emails.rental-order-completed',
+            view: 'emails.rental-order-completed-custom',
+            text: 'emails.rental-order-completed-text',
             with: [
                 'orderLocation' => $this->orderLocation,
                 'user' => $this->orderLocation->user,
                 'items' => $this->orderLocation->orderItemLocations,
-                'endDate' => $this->orderLocation->end_date,
-                'actualDays' => $this->orderLocation->getActualRentalDays(),
-                'plannedDays' => $this->orderLocation->getRentalDaysCount(),
-                'lateDays' => max(0, $this->orderLocation->getActualRentalDays() - $this->orderLocation->getRentalDaysCount()),
-                'potentialLateFees' => $this->orderLocation->calculateLateFees(),
+                'endDate' => $endDate,
+                'actualDays' => $actualDays,
+                'plannedDays' => $plannedDays,
+                'lateDays' => $lateDays,
+                'potentialLateFees' => $potentialLateFees,
                 'closeDeadline' => now()->addDays(2)->format('d/m/Y à 23:59'),
             ],
         );

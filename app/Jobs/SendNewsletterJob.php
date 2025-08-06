@@ -55,7 +55,7 @@ class SendNewsletterJob implements ShouldQueue
 
                 // Générer les URLs de suivi
                 $send->tracking_url = route('newsletter.track', ['token' => $send->tracking_token]);
-                $send->unsubscribe_url = route('newsletter.unsubscribe', ['token' => $send->unsubscribe_token]);
+                $send->unsubscribe_url = route('newsletter.unsubscribe.token', ['token' => $send->unsubscribe_token]);
                 $send->save();
 
                 // Envoyer l'email
