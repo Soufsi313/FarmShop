@@ -259,18 +259,25 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex gap-2">
+                            <div class="flex gap-3">
                                 <a href="{{ route('admin.rental-returns.show', $orderLocation) }}" 
-                                   class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition duration-200">
-                                    Voir
+                                   class="text-blue-600 hover:text-blue-800 transition-colors"
+                                   title="Voir les détails">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
                                 </a>
                                 
                                 @if($orderLocation->status === 'completed')
                                 <form action="{{ route('admin.rental-returns.mark-returned', $orderLocation) }}" method="POST" class="inline">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition duration-200">
-                                        Confirmer retour
+                                    <button type="submit" class="text-green-600 hover:text-green-800 transition-colors"
+                                            title="Confirmer le retour">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/>
+                                        </svg>
                                     </button>
                                 </form>
                                 @endif
@@ -279,8 +286,12 @@
                                 <form action="{{ route('admin.rental-returns.start-inspection', $orderLocation) }}" method="POST" class="inline">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 transition duration-200">
-                                        Démarrer inspection
+                                    <button type="submit" class="text-purple-600 hover:text-purple-800 transition-colors"
+                                            title="Démarrer l'inspection">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                        </svg>
                                     </button>
                                 </form>
                                 @endif

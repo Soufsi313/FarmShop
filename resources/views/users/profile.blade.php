@@ -419,7 +419,31 @@
                                             
                                             <!-- Contenu -->
                                             <div class="text-sm text-gray-700">
-                                                {!! nl2br(e(Str::limit($message->content, 300))) !!}
+                                                @php
+                                                    $isContentLong = strlen($message->content) > 300;
+                                                    $shortContent = $isContentLong ? Str::limit($message->content, 300) : $message->content;
+                                                @endphp
+                                                
+                                                <div id="message-content-{{ $message->id }}">
+                                                    {!! nl2br(e($shortContent)) !!}
+                                                </div>
+                                                
+                                                @if($isContentLong)
+                                                    <div id="message-full-content-{{ $message->id }}" class="hidden">
+                                                        {!! nl2br(e($message->content)) !!}
+                                                    </div>
+                                                    
+                                                    <div class="mt-2">
+                                                        <button onclick="toggleMessageContent({{ $message->id }})" 
+                                                                id="toggle-btn-{{ $message->id }}"
+                                                                class="inline-flex items-center text-blue-600 hover:text-blue-800 text-xs font-medium transition-colors">
+                                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                                            </svg>
+                                                            <span id="toggle-text-{{ $message->id }}">Voir plus</span>
+                                                        </button>
+                                                    </div>
+                                                @endif
                                             </div>
                                             
                                             <!-- Référence si c'est un message de contact -->
@@ -832,6 +856,33 @@ document.getElementById('contactForm').addEventListener('submit', async function
         submitBtn.disabled = false;
     }
 });
+
+// Fonction pour étendre/contracter le contenu des messages
+function toggleMessageContent(messageId) {
+    const shortContent = document.getElementById(`message-content-${messageId}`);
+    const fullContent = document.getElementById(`message-full-content-${messageId}`);
+    const toggleBtn = document.getElementById(`toggle-btn-${messageId}`);
+    const toggleText = document.getElementById(`toggle-text-${messageId}`);
+    const toggleIcon = toggleBtn.querySelector('svg');
+    
+    if (fullContent.classList.contains('hidden')) {
+        // Afficher le contenu complet
+        shortContent.classList.add('hidden');
+        fullContent.classList.remove('hidden');
+        toggleText.textContent = 'Voir moins';
+        
+        // Changer l'icône (flèche vers le haut)
+        toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>';
+    } else {
+        // Afficher le contenu court
+        shortContent.classList.remove('hidden');
+        fullContent.classList.add('hidden');
+        toggleText.textContent = 'Voir plus';
+        
+        // Changer l'icône (flèche vers le bas)
+        toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>';
+    }
+}
 
 // Fermer la modale en cliquant à l'extérieur
 document.getElementById('contactModal').addEventListener('click', function(e) {
