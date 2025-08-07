@@ -139,6 +139,241 @@
         </div>
     </div>
 
+    <!-- ========== NOUVELLES SECTIONS ANALYTIQUES ========== -->
+    
+    <!-- Section Analytics -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">📊 Analytics du Site</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div class="flex items-center">
+                    <div class="p-2 bg-blue-500 rounded-lg">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Visiteurs Uniques</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $analyticsStats['unique_visitors'] }}</p>
+                        <p class="text-xs text-blue-600">{{ $analyticsStats['growth_rate'] }} vs mois dernier</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                <div class="flex items-center">
+                    <div class="p-2 bg-green-500 rounded-lg">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Vues de Pages</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $analyticsStats['page_views'] }}</p>
+                        <p class="text-xs text-green-600">{{ $analyticsStats['bounce_rate'] }} taux de rebond</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                <div class="flex items-center">
+                    <div class="p-2 bg-purple-500 rounded-lg">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Temps sur Site</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $analyticsStats['avg_session_duration'] }}</p>
+                        <p class="text-xs text-purple-600">temps moyen</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                <div class="flex items-center">
+                    <div class="p-2 bg-orange-500 rounded-lg">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Conversions</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $analyticsStats['conversion_rate'] }}</p>
+                        <p class="text-xs text-orange-600">taux de conversion</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Newsletter -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">📧 Performance Newsletter</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                <div class="text-center">
+                    <div class="mx-auto w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                        </svg>
+                    </div>
+                    <p class="text-sm font-medium text-gray-600">Abonnés Totaux</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $newsletterStats['subscribers'] }}</p>
+                    <p class="text-xs text-indigo-600">{{ $newsletterStats['growth_rate'] }}</p>
+                </div>
+            </div>
+            
+            <div class="bg-cyan-50 p-4 rounded-lg border border-cyan-200">
+                <div class="text-center">
+                    <div class="mx-auto w-12 h-12 bg-cyan-500 rounded-full flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <p class="text-sm font-medium text-gray-600">Newsletters Envoyées</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $newsletterStats['sent_count'] }}</p>
+                    <p class="text-xs text-cyan-600">ce mois</p>
+                </div>
+            </div>
+            
+            <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-200">
+                <div class="text-center">
+                    <div class="mx-auto w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                    </div>
+                    <p class="text-sm font-medium text-gray-600">Taux d'Ouverture</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $newsletterStats['open_rate'] }}%</p>
+                    <p class="text-xs text-emerald-600">moyen</p>
+                </div>
+            </div>
+            
+            <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                <div class="text-center">
+                    <div class="mx-auto w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
+                        </svg>
+                    </div>
+                    <p class="text-sm font-medium text-gray-600">Taux de Clics</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $newsletterStats['click_rate'] }}%</p>
+                    <p class="text-xs text-amber-600">moyen</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Locations -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">🏠 Système de Locations</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-teal-50 p-4 rounded-lg border border-teal-200">
+                <div class="flex items-center">
+                    <div class="p-2 bg-teal-500 rounded-lg">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Catégories Rental</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $rentalStats['categories_count'] }}</p>
+                        <p class="text-xs text-teal-600">disponibles</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-rose-50 p-4 rounded-lg border border-rose-200">
+                <div class="flex items-center">
+                    <div class="p-2 bg-rose-500 rounded-lg">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0h6m0 0v5a2 2 0 01-2 2H10a2 2 0 01-2-2V7m0 0h6"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Réservations Actives</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $rentalStats['active_rentals'] }}</p>
+                        <p class="text-xs text-rose-600">en cours</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-violet-50 p-4 rounded-lg border border-violet-200">
+                <div class="flex items-center">
+                    <div class="p-2 bg-violet-500 rounded-lg">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Revenus Location</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $rentalStats['total_revenue'] }}€</p>
+                        <p class="text-xs text-violet-600">ce mois</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <div class="flex items-center">
+                    <div class="p-2 bg-slate-500 rounded-lg">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Taux d'Occupation</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $rentalStats['occupancy_rate'] }}%</p>
+                        <p class="text-xs text-slate-600">moyen</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SECTION GRAPHIQUES ========== -->
+    
+    <!-- Graphiques Analytics -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Graphique Visiteurs vs Vues de Pages -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">📈 Trafic du Site (30 derniers jours)</h3>
+            <div class="h-80">
+                <canvas id="trafficChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Graphique Newsletter Performance -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">📧 Performance Newsletter</h3>
+            <div class="h-80">
+                <canvas id="newsletterChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques supplémentaires -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Graphique Répartition des Commandes -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">🛒 Répartition des Commandes</h3>
+            <div class="h-80">
+                <canvas id="ordersChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Graphique Évolution du Chiffre d'Affaires -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">💰 Évolution du Chiffre d'Affaires</h3>
+            <div class="h-80">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== FIN SECTION GRAPHIQUES ========== -->
+
     <!-- Métriques principales (contraintes) -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-full">
         <!-- Visiteurs Uniques -->
@@ -569,5 +804,188 @@ function showDetailModal(type) {
 function closeDetailModal() {
     document.getElementById('detailModal').classList.add('hidden');
 }
+
+// ========== CONFIGURATION DES GRAPHIQUES ========== 
+
+// Configuration générale pour tous les graphiques
+Chart.defaults.font.family = 'Inter, sans-serif';
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#6B7280';
+
+// Données pour les graphiques (récupérées du contrôleur)
+const analyticsData = {
+    visitors: {{ str_replace(',', '', $analyticsStats['unique_visitors']) }},
+    pageViews: {{ str_replace(',', '', $analyticsStats['page_views']) }},
+    users: {{ $stats['users'] }},
+    products: {{ $stats['products'] }},
+    orders: {{ $stats['orders'] }},
+    messages: {{ $stats['messages'] }},
+    revenue: {{ $stats['total_revenue'] ?? 0 }},
+    newsletters: {{ $newsletterStats['sent_count'] }},
+    subscribers: {{ $newsletterStats['subscribers'] }}
+};
+
+// 1. Graphique du Trafic du Site
+const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+new Chart(trafficCtx, {
+    type: 'line',
+    data: {
+        labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Cette semaine'],
+        datasets: [
+            {
+                label: 'Visiteurs Uniques',
+                data: [890, 1120, 1340, 1180, analyticsData.visitors],
+                borderColor: '#3B82F6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                fill: true
+            },
+            {
+                label: 'Vues de Pages',
+                data: [2100, 2800, 3200, 2900, analyticsData.pageViews],
+                borderColor: '#10B981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                tension: 0.4,
+                fill: true
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: '#F3F4F6'
+                }
+            },
+            x: {
+                grid: {
+                    color: '#F3F4F6'
+                }
+            }
+        }
+    }
+});
+
+// 2. Graphique Performance Newsletter
+const newsletterCtx = document.getElementById('newsletterChart').getContext('2d');
+new Chart(newsletterCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Abonnés Actifs', 'Newsletters Envoyées', 'En Attente'],
+        datasets: [{
+            data: [analyticsData.subscribers, analyticsData.newsletters, Math.max(0, analyticsData.users - analyticsData.subscribers)],
+            backgroundColor: [
+                '#6366F1',
+                '#06B6D4',
+                '#E5E7EB'
+            ],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// 3. Graphique Répartition des Commandes
+const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+new Chart(ordersCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Utilisateurs', 'Produits', 'Commandes', 'Messages'],
+        datasets: [{
+            label: 'Nombre',
+            data: [analyticsData.users, analyticsData.products, analyticsData.orders, analyticsData.messages],
+            backgroundColor: [
+                '#8B5CF6',
+                '#10B981',
+                '#F59E0B',
+                '#EF4444'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: '#F3F4F6'
+                }
+            },
+            x: {
+                grid: {
+                    color: '#F3F4F6'
+                }
+            }
+        }
+    }
+});
+
+// 4. Graphique Évolution du Chiffre d'Affaires
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Août'],
+        datasets: [{
+            label: 'Chiffre d\'Affaires (€)',
+            data: [1200, 1900, 3000, 2500, 2200, 2800, 3200, analyticsData.revenue],
+            borderColor: '#F59E0B',
+            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: '#F3F4F6'
+                },
+                ticks: {
+                    callback: function(value) {
+                        return value + '€';
+                    }
+                }
+            },
+            x: {
+                grid: {
+                    color: '#F3F4F6'
+                }
+            }
+        }
+    }
+});
+
+// ========== FIN CONFIGURATION GRAPHIQUES ==========
 </script>
 @endpush

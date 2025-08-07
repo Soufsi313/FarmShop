@@ -71,12 +71,15 @@ Route::post('/rental-constraints/{product}/validate', [RentalConstraintControlle
 Route::get('/rental-constraints/{product}/calendar', [RentalConstraintController::class, 'getAvailabilityCalendar'])->name('api.rental-constraints.calendar');
 Route::get('/rental-constraints/{product}/suggestions', [RentalConstraintController::class, 'suggestOptimalDates'])->name('api.rental-constraints.suggestions');
 
-// Routes publiques pour la gestion des cookies
-Route::get('/cookies/preferences', [CookieController::class, 'getPreferences'])->name('api.cookies.preferences');
-Route::post('/cookies/preferences', [CookieController::class, 'updatePreferences'])->name('api.cookies.update-preferences');
-Route::post('/cookies/accept-all', [CookieController::class, 'acceptAll'])->name('api.cookies.accept-all');
-Route::post('/cookies/reject-all', [CookieController::class, 'rejectAll'])->name('api.cookies.reject-all');
-Route::get('/cookies/consent/{cookieType}', [CookieController::class, 'checkConsent'])->name('api.cookies.check-consent');
+// Routes publiques pour la gestion des cookies (avec sessions web pour l'auth)
+Route::middleware(['web'])->group(function () {
+    Route::get('/cookies/preferences', [CookieController::class, 'getPreferences'])->name('api.cookies.preferences');
+    Route::post('/cookies/preferences', [CookieController::class, 'updatePreferences'])->name('api.cookies.update-preferences');
+    Route::post('/cookies/accept-all', [CookieController::class, 'acceptAll'])->name('api.cookies.accept-all');
+    Route::post('/cookies/reject-all', [CookieController::class, 'rejectAll'])->name('api.cookies.reject-all');
+    Route::get('/cookies/consent/{cookieType}', [CookieController::class, 'checkConsent'])->name('api.cookies.check-consent');
+    Route::post('/cookies/migrate-guest', [CookieController::class, 'migrateGuestCookies'])->name('api.cookies.migrate-guest');
+});
 
 // Routes publiques pour les likes (consultation seulement)
 Route::get('/products-likes', [ProductLikeController::class, 'index'])->name('api.product-likes.index');

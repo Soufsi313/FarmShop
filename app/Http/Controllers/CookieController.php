@@ -268,13 +268,35 @@ class CookieController extends Controller
         
         // Pour les utilisateurs connectés
         if (Auth::check()) {
-            $cookie = Cookie::where('user_id', Auth::id())
+            $userId = Auth::id();
+            
+            // Chercher d'abord un cookie existant pour cet utilisateur
+            $cookie = Cookie::where('user_id', $userId)
                            ->latest()
                            ->first();
+            
+            // Si pas de cookie utilisateur, chercher un cookie visiteur récent avec la même session/IP
+            if (!$cookie) {
+                $guestCookie = Cookie::where('session_id', $sessionId)
+                                   ->where('ip_address', $ipAddress)
+                                   ->whereNull('user_id')
+                                   ->latest()
+                                   ->first();
+                
+                if ($guestCookie) {
+                    // Migrer le cookie visiteur vers l'utilisateur connecté
+                    $guestCookie->update([
+                        'user_id' => $userId,
+                        'session_id' => null // Nettoyer session_id car l'utilisateur est connecté
+                    ]);
+                    return $guestCookie;
+                }
+            }
         } else {
             // Pour les visiteurs non connectés
             $cookie = Cookie::where('session_id', $sessionId)
                            ->where('ip_address', $ipAddress)
+                           ->whereNull('user_id')
                            ->latest()
                            ->first();
         }
@@ -497,5 +519,52 @@ class CookieController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Migrer les cookies visiteurs vers l'utilisateur connecté (méthode utilitaire)
+     */
+    public function migrateGuestCookies(Request $request): JsonResponse
+    {
+        if (Auth::guest()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Utilisateur non authentifié'
+            ], 401);
+        }
+
+        $userId = Auth::id();
+        $sessionId = Session::getId();
+        $ipAddress = $request->ip();
+
+        // Trouver les cookies visiteurs récents avec la même session/IP
+        $guestCookies = Cookie::where('session_id', $sessionId)
+                             ->where('ip_address', $ipAddress)
+                             ->whereNull('user_id')
+                             ->where('created_at', '>=', now()->subHours(24)) // Seulement les 24 dernières heures
+                             ->get();
+
+        $migratedCount = 0;
+        foreach ($guestCookies as $guestCookie) {
+            // Vérifier qu'il n'y a pas déjà un cookie pour cet utilisateur
+            $existingUserCookie = Cookie::where('user_id', $userId)->exists();
+            
+            if (!$existingUserCookie) {
+                $guestCookie->update([
+                    'user_id' => $userId,
+                    'session_id' => null
+                ]);
+                $migratedCount++;
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "Migration terminée: {$migratedCount} cookie(s) migrés",
+            'data' => [
+                'migrated_count' => $migratedCount,
+                'user_id' => $userId
+            ]
+        ]);
     }
 }
