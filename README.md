@@ -1,35 +1,41 @@
 # 🌱 FarmShop - Plateforme E-commerce Agricole
 
-**Application web Laravel p- **Thème moderne et professionnel**
-
-## 🚀 Nouveautés BETA v1.0.0-beta
-
-### 💳 Processus d'Achat Complet
-- **Intégration Stripe native** avec cartes, PayPal, virements
-- **Webhooks sécurisés** pour confirmation automatique
-- **Gestion d'états avancée** (pending → confirmed → preparing → shipped → delivered)
-- **Système de remboursement** avec restauration automatique du stock
-
-### 📊 Surveillance Intelligente des Stocks
-- **Observer Pattern** pour monitoring temps réel
-- **Seuils configurables** (critique, bas stock, rupture)
-- **Alertes multi-niveaux** avec notifications WebSocket
-- **Dashboard administrateur** avec actions rapides
-- **Protection anti-spam** avec système de cooldown
-
-### 📧 Système de Newsletters Professionnel
-- **Campagnes email marketing** avec éditeur visuel
-- **Gestion complète des abonnés** (filtres, actions en lot)
-- **Statistiques détaillées** (ouvertures, clics, désabonnements)
-- **Programmation d'envois** avec gestion des fuseaux horaires
-- **Templates personnalisables** pour différents types de contenus
-
-## 🔧 Prérequis la vente et location de produits agricoles biologiques**
+**Application web Laravel pour la vente et location de produits agricoles biologiques**
 
 ![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.4+-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![MariaDB](https://img.shields.io/badge/MariaDB-11.5+-003545?style=for-the-badge&logo=mariadb&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Version](https://img.shields.io/badge/Version-1.1.0--beta-blue?style=for-the-badge)
+
+## 🚀 Nouveautés v1.1.0-beta
+
+### 🏭 Système de Location Complet
+- **Contraintes intelligentes** : Durées min/max, jours disponibles, délais configurables
+- **API de contraintes REST** : Validation temps réel et suggestions de dates
+- **Processus de retour automatisé** : Workflow complet avec notifications
+- **Inspection professionnelle** : Évaluation détaillée avec photos et notes
+- **Sanctions automatiques** : Calcul pénalités retard et dommages
+- **Gestion dépôts** : Retenue/restitution automatique via Stripe
+
+### �️ Conformité GDPR Totale
+- **Bannière cookies intelligente** : Affichage contextuel selon statut utilisateur
+- **5 catégories configurables** : Nécessaires, Analytics, Marketing, Préférences, Social
+- **Migration automatique** : Cookies visiteur → utilisateur connecté
+- **Interface admin complète** : Historique, statistiques temps réel
+- **Persistance 365 jours** avec renouvellement automatique
+
+### � Administration Enrichie
+- **Dashboard professionnel** : Calculs automatiques des dépôts de garantie
+- **Recherche multicritères** : Filtres avancés pour toutes les entités
+- **Gestion signalements AJAX** : Modération commentaires blog optimisée
+- **Interface responsive** : Optimisée mobile et desktop
+
+### � E-commerce Complet (versions précédentes)
+- **Intégration Stripe native** avec cartes, PayPal, virements
+- **Webhooks sécurisés** pour confirmation automatique
+- **Surveillance stocks intelligente** avec alertes temps réel
+- **Système newsletters professionnel** avec statistiques
 
 ## 📋 Table des Matières
 
@@ -53,15 +59,32 @@ FarmShop est une application web dynamique développée avec Laravel 11 qui perm
 - **Gestion administrative complète** (commandes, utilisateurs, stock)
 - **Interface responsive moderne** avec Tailwind CSS
 
-**Version actuelle :** BETA v1.0.0-beta (Fonctionnalités e-commerce complètes)
+**Version actuelle :** v1.1.0-beta (Système de location complet + GDPR)
 
 ## ✨ Fonctionnalités
 
-### 🏷️ Version ALPHA v1.0.0 (MVP Fonctionnel)
-- **🔐 Authentification** : Inscription, connexion, gestion profil
-- **🛒 Catalogue produits** : 159 produits avec filtres avancés
-- **👨‍💼 Interface admin** : Dashboard, gestion produits, messages
-- **🎨 Design moderne** : Responsive, Tailwind CSS, animations
+### 🏷️ Version v1.1.0-beta (Location + GDPR Complet)
+
+#### 🏭 Système de Location Professionnel
+- **Contraintes intelligentes** par produit (durées, jours, délais)
+- **API REST complète** pour validation temps réel
+- **Processus retour automatisé** avec notifications
+- **Inspection détaillée** avec photos et évaluation dommages
+- **Sanctions automatiques** (retard, dommages, perte)
+- **Gestion dépôts** avec retenue/restitution automatique
+
+#### 🛡️ Conformité GDPR Totale
+- **Bannière cookies intelligente** selon statut utilisateur
+- **5 catégories configurables** (Nécessaires, Analytics, etc.)
+- **Migration automatique** visiteur → utilisateur connecté
+- **Interface admin** avec historique et statistiques
+- **Persistance 365 jours** avec renouvellement
+
+#### 🔧 Administration Enrichie
+- **Dashboard professionnel** avec calculs automatiques
+- **Recherche multicritères** avancée sur toutes entités
+- **Gestion signalements AJAX** pour modération blog
+- **Interface responsive** optimisée mobile/desktop
 
 ### 🏷️ Version BETA v1.0.0-beta (E-commerce Complet)
 
