@@ -1,10 +1,10 @@
-# FarmShop - Release v1.1.0
+# FarmShop - Release v1.1.0-beta
 
 ## Description du Projet
 
-FarmShop est une application web dynamique de commerce électronique spécialisée dans la vente et location de produits agricoles biologiques. Cette release v1.1.0 apporte le système complet de location avec inspection et sanctions.
+FarmShop est une application web dynamique de commerce électronique spécialisée dans la vente et location de produits agricoles biologiques. Cette release v1.1.0-beta apporte le système complet de location avec inspection et sanctions.
 
-## Nouvelles Fonctionnalités v1.1.0
+## Nouvelles Fonctionnalités v1.1.0-beta
 
 ### 🏭 Système de Location Complet
 - **Contraintes de location** : Durées min/max, jours disponibles, délais minimum

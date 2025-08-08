@@ -1,6 +1,6 @@
 # Changelog - FarmShop
 
-## [1.1.0] - 2025-08-08
+## [1.1.0-beta] - 2025-08-08
 
 ### Système de Location Complet
 - **Contraintes de location intelligentes**
