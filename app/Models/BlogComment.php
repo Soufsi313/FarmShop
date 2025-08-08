@@ -182,8 +182,8 @@ class BlogComment extends Model
 
         $user = auth()->user();
         
-        // Admin peut toujours modifier
-        if ($user->role === 'admin') {
+        // Admin peut toujours modifier (attention à la casse)
+        if (in_array($user->role, ['admin', 'Admin'])) {
             return true;
         }
 
@@ -200,8 +200,8 @@ class BlogComment extends Model
 
         $user = auth()->user();
         
-        // Admin peut toujours supprimer
-        if ($user->role === 'admin') {
+        // Admin peut toujours supprimer (attention à la casse)
+        if (in_array($user->role, ['admin', 'Admin'])) {
             return true;
         }
 

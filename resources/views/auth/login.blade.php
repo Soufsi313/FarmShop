@@ -163,4 +163,11 @@
         </div>
     </div>
 </div>
+
+<script>
+// Nettoyer le localStorage des cookies quand on arrive sur la page de connexion
+localStorage.removeItem('cookie_consent_given');
+localStorage.removeItem('cookie_consent_date');
+console.log('🍪 localStorage des cookies nettoyé pour la connexion');
+</script>
 @endsection

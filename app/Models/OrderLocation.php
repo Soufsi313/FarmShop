@@ -212,6 +212,19 @@ class OrderLocation extends Model
         return number_format($this->deposit_amount, 2, ',', ' ') . ' €';
     }
 
+    public function getCalculatedDepositAmountAttribute()
+    {
+        // Si le dépôt est déjà calculé et stocké, l'utiliser
+        if ($this->deposit_amount > 0) {
+            return $this->deposit_amount;
+        }
+
+        // Sinon, calculer dynamiquement à partir des produits
+        return $this->orderItemLocations->sum(function ($item) {
+            return $item->quantity * ($item->product->deposit_amount ?? 0);
+        });
+    }
+
     public function getDaysUntilStartAttribute()
     {
         return now()->diffInDays($this->start_date, false);
@@ -317,8 +330,8 @@ class OrderLocation extends Model
         // Un seul update pour éviter les boucles
         $this->update($updateData);
         
-        // Envoyer notification email selon le nouveau statut
-        $this->sendStatusNotification($oldStatus, $newStatus);
+        // DÉSACTIVÉ: Ancienne notification email - maintenant gérée par HandleOrderLocationStatusChange Listener
+        // $this->sendStatusNotification($oldStatus, $newStatus);
     }
 
     /**
@@ -531,7 +544,7 @@ class OrderLocation extends Model
     {
         try {
             // Récupérer tous les admins
-            $admins = User::where('role', 'admin')->get();
+            $admins = User::whereIn('role', ['admin', 'Admin'])->get();
             
             foreach ($admins as $admin) {
                 Mail::send('emails.rental.inspection-needed', [

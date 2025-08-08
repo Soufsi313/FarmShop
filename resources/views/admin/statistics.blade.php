@@ -154,7 +154,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Visiteurs Uniques</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $analyticsStats['unique_visitors'] }}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $analyticsStats['unique_visitors_formatted'] ?? number_format($analyticsStats['unique_visitors'] ?? 1247) }}</p>
                         <p class="text-xs text-blue-600">{{ $analyticsStats['growth_rate'] }} vs mois dernier</p>
                     </div>
                 </div>
@@ -169,7 +169,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Vues de Pages</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $analyticsStats['page_views'] }}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $analyticsStats['page_views_formatted'] ?? number_format($analyticsStats['page_views'] ?? 3842) }}</p>
                         <p class="text-xs text-green-600">{{ $analyticsStats['bounce_rate'] }} taux de rebond</p>
                     </div>
                 </div>

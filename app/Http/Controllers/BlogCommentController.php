@@ -152,7 +152,7 @@ class BlogCommentController extends Controller
         if (Auth::check()) {
             $validated['user_id'] = Auth::id();
             // Les admins voient leurs commentaires approuvés automatiquement
-            if (Auth::user()->role === 'admin') {
+            if (in_array(Auth::user()->role, ['admin', 'Admin'])) {
                 $validated['status'] = 'approved';
             }
         } else {

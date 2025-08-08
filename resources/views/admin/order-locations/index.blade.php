@@ -28,7 +28,21 @@
     </div>
 
     <!-- Statistiques rapides -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <div class="text-2xl font-bold text-orange-600">{{ $stats['pending_orders'] ?? 0 }}</div>
+                    <div class="text-sm text-orange-700">En attente</div>
+                </div>
+            </div>
+        </div>
+
         <div class="bg-green-50 border border-green-200 rounded-lg p-4">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -47,7 +61,7 @@
             <div class="flex items-center">
                 <div class="flex-shrink-0">
                     <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/>
                     </svg>
                 </div>
                 <div class="ml-4">
@@ -70,7 +84,10 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    <!-- Statistiques financières -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -84,6 +101,127 @@
                 </div>
             </div>
         </div>
+
+        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <div class="text-2xl font-bold text-emerald-600">{{ number_format($stats['revenue_year'] ?? 0, 0) }}€</div>
+                    <div class="text-sm text-emerald-700">Revenus cette année</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <div class="text-2xl font-bold text-amber-600">{{ number_format($stats['deposits_held'] ?? 0, 0) }}€</div>
+                    <div class="text-sm text-amber-700">Dépôts bloqués</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recherche avancée -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8" x-data="{ showFilters: false }">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                Recherche & Filtres
+            </h3>
+            <button @click="showFilters = !showFilters" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                <span x-text="showFilters ? 'Masquer les filtres' : 'Afficher les filtres'"></span>
+            </button>
+        </div>
+
+        <form method="GET" action="{{ route('admin.order-locations.index') }}" class="space-y-4">
+            <!-- Recherche rapide -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Recherche rapide</label>
+                    <input type="text" id="search" name="search" value="{{ request('search') }}" 
+                           placeholder="Numéro de commande, nom client, email..."
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                </div>
+                
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                    <select id="status" name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                        <option value="">Tous les statuts</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>En attente</option>
+                        <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmée</option>
+                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Terminée</option>
+                        <option value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>Fermée</option>
+                        <option value="inspecting" {{ request('status') === 'inspecting' ? 'selected' : '' }}>Inspection</option>
+                        <option value="finished" {{ request('status') === 'finished' ? 'selected' : '' }}>Finalisée</option>
+                        <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Annulée</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="sort_by" class="block text-sm font-medium text-gray-700 mb-1">Trier par</label>
+                    <select id="sort_by" name="sort_by" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                        <option value="recent" {{ request('sort_by') === 'recent' ? 'selected' : '' }}>Plus récentes</option>
+                        <option value="oldest" {{ request('sort_by') === 'oldest' ? 'selected' : '' }}>Plus anciennes</option>
+                        <option value="start_date" {{ request('sort_by') === 'start_date' ? 'selected' : '' }}>Date de début</option>
+                        <option value="end_date" {{ request('sort_by') === 'end_date' ? 'selected' : '' }}>Date de fin</option>
+                        <option value="total_desc" {{ request('sort_by') === 'total_desc' ? 'selected' : '' }}>Montant décroissant</option>
+                        <option value="total_asc" {{ request('sort_by') === 'total_asc' ? 'selected' : '' }}>Montant croissant</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Filtres avancés -->
+            <div x-show="showFilters" x-transition class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
+                <div>
+                    <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">Date création (de)</label>
+                    <input type="date" id="date_from" name="date_from" value="{{ request('date_from') }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                </div>
+
+                <div>
+                    <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1">Date création (à)</label>
+                    <input type="date" id="date_to" name="date_to" value="{{ request('date_to') }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                </div>
+
+                <div>
+                    <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Début location (après)</label>
+                    <input type="date" id="start_date" name="start_date" value="{{ request('start_date') }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                </div>
+
+                <div>
+                    <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">Fin location (avant)</label>
+                    <input type="date" id="end_date" name="end_date" value="{{ request('end_date') }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button type="submit" class="px-6 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors">
+                    🔍 Rechercher
+                </button>
+                <a href="{{ route('admin.order-locations.index') }}" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+                    🔄 Réinitialiser
+                </a>
+                <a href="{{ route('admin.order-locations.export', request()->all()) }}" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors">
+                    📊 Exporter CSV
+                </a>
+            </div>
+        </form>
     </div>
 
     <!-- Tableau des commandes -->
@@ -118,7 +256,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             <div><strong>Total:</strong> {{ number_format($order->total_amount, 2) }}€</div>
-                            <div class="text-gray-500">Dépôt: {{ number_format($order->deposit_amount, 2) }}€</div>
+                            <div class="text-gray-500">Dépôt: {{ number_format($order->calculated_deposit_amount, 2) }}€</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @php

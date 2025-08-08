@@ -89,10 +89,15 @@ class OrderLocationController extends Controller
         // Statistiques pour le dashboard
         $stats = [
             'total_orders' => OrderLocation::count(),
+            'pending_orders' => OrderLocation::where('status', 'pending')->count(),
             'active_rentals' => OrderLocation::where('status', 'active')->count(),
             'pending_returns' => OrderLocation::whereIn('status', ['completed', 'closed'])->count(),
             'revenue_month' => OrderLocation::whereMonth('created_at', now()->month)
                                             ->sum('total_amount'),
+            'revenue_year' => OrderLocation::whereYear('created_at', now()->year)
+                                           ->sum('total_amount'),
+            'deposits_held' => OrderLocation::whereIn('status', ['confirmed', 'active', 'completed'])
+                                          ->sum('deposit_amount'),
         ];
 
         return view('admin.order-locations.index', compact('orders', 'stats'));
@@ -173,7 +178,7 @@ class OrderLocationController extends Controller
                     $order->rental_days,
                     $order->orderItemLocations->count(),
                     number_format($order->total_amount, 2, ',', ' '),
-                    number_format($order->deposit_amount, 2, ',', ' '),
+                    number_format($order->calculated_deposit_amount, 2, ',', ' '),
                     $order->status,
                     $order->created_at->format('d/m/Y H:i')
                 ]);

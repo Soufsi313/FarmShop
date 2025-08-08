@@ -432,21 +432,38 @@ class StripeService
         try {
             DB::beginTransaction();
 
-            // Restaurer le stock pour chaque item
-            foreach ($order->items as $item) {
-                $product = $item->product;
-                if ($product) {
-                    $product->increment('quantity', $item->quantity);
-                    
-                    Log::info('Stock restauré lors de l\'annulation', [
-                        'product_id' => $product->id,
-                        'product_name' => $product->name,
-                        'previous_quantity' => $product->quantity - $item->quantity,
-                        'new_quantity' => $product->quantity,
-                        'restored_by' => $item->quantity,
-                        'order_id' => $order->id
-                    ]);
+            // Ne restaurer le stock QUE si la commande était confirmée/payée 
+            // (et donc le stock avait été prélevé)
+            $shouldRestoreStock = in_array($order->status, ['confirmed', 'processing', 'shipped', 'delivered']);
+            
+            if ($shouldRestoreStock) {
+                Log::info('Restoration du stock car commande était confirmée', [
+                    'order_id' => $order->id,
+                    'order_status' => $order->status
+                ]);
+                
+                // Restaurer le stock pour chaque item
+                foreach ($order->items as $item) {
+                    $product = $item->product;
+                    if ($product) {
+                        $product->increment('quantity', $item->quantity);
+                        
+                        Log::info('Stock restauré lors de l\'annulation', [
+                            'product_id' => $product->id,
+                            'product_name' => $product->name,
+                            'previous_quantity' => $product->quantity - $item->quantity,
+                            'new_quantity' => $product->quantity,
+                            'restored_by' => $item->quantity,
+                            'order_id' => $order->id
+                        ]);
+                    }
                 }
+            } else {
+                Log::info('Pas de restoration de stock car commande était en attente', [
+                    'order_id' => $order->id,
+                    'order_status' => $order->status,
+                    'note' => 'Le stock n\'avait jamais été prélevé'
+                ]);
             }
 
             // Mettre à jour le statut de la commande
@@ -459,7 +476,8 @@ class StripeService
             
             Log::info('Commande annulée avec succès', [
                 'order_id' => $order->id,
-                'order_number' => $order->order_number
+                'order_number' => $order->order_number,
+                'stock_restored' => $shouldRestoreStock
             ]);
 
             return true;

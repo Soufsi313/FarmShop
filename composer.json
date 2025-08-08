@@ -1,8 +1,9 @@
 {
-    "name": "laravel/laravel",
+    "name": "farmshop/farmshop",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "version": "1.1.0",
+    "description": "FarmShop - Plateforme e-commerce spécialisée vente et location produits agricoles biologiques",
+    "keywords": ["laravel", "ecommerce", "agriculture", "location", "bio"],
     "license": "MIT",
     "require": {
         "php": "^8.2",

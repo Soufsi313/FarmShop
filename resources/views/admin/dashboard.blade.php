@@ -450,7 +450,7 @@
             <div class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-white rounded-lg p-3 border border-blue-100">
-                        <div class="text-2xl font-bold text-blue-600">{{ number_format($stats['analytics']['visitors'] ?? 1247) }}</div>
+                        <div class="text-2xl font-bold text-blue-600">{{ number_format($stats['analytics']['unique_visitors'] ?? 1247) }}</div>
                         <div class="text-xs text-gray-600">Visiteurs uniques</div>
                         <div class="text-xs text-green-600">+12.5% ce mois</div>
                     </div>

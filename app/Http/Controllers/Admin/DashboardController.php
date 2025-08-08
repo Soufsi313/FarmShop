@@ -1551,12 +1551,15 @@ class DashboardController extends Controller
         $bounceRate = '42.3%'; // Peut être calculé avec des données de tracking
         
         return [
-            'unique_visitors' => number_format($visitors), // Clé corrigée
-            'page_views' => number_format($pageViews), // Clé corrigée
+            'unique_visitors' => $visitors, // Nombre brut pour dashboard
+            'page_views' => $pageViews, // Nombre brut pour dashboard
             'avg_session_duration' => $avgSessionTime,
             'bounce_rate' => $bounceRate,
-            'growth_rate' => '+12.5%', // Clé corrigée
-            'conversion_rate' => '2.4%' // Clé ajoutée
+            'growth_rate' => '+12.5%',
+            'conversion_rate' => '2.4%',
+            // Versions formatées pour la page statistics
+            'unique_visitors_formatted' => number_format($visitors),
+            'page_views_formatted' => number_format($pageViews)
         ];
     }
 

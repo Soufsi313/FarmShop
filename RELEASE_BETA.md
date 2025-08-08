@@ -1,8 +1,30 @@
-# FarmShop - Release BETA v1.0.0-beta
+# FarmShop - Release v1.1.0
 
 ## Description du Projet
 
-FarmShop est une application web dynamique de commerce électronique spécialisée dans la vente et location de produits agricoles biologiques. Cette release BETA apporte deux fonctionnalités majeures de production prêtes à l'emploi.
+FarmShop est une application web dynamique de commerce électronique spécialisée dans la vente et location de produits agricoles biologiques. Cette release v1.1.0 apporte le système complet de location avec inspection et sanctions.
+
+## Nouvelles Fonctionnalités v1.1.0
+
+### 🏭 Système de Location Complet
+- **Contraintes de location** : Durées min/max, jours disponibles, délais minimum
+- **Calendrier intelligent** : Vérification disponibilité temps réel
+- **Processus de retour** : Workflow automatisé pour retours matériel
+- **Inspection matériel** : Système d'évaluation état des équipements retournés
+- **Sanctions automatiques** : Calcul pénalités selon dommages et retards
+- **Gestion dépôts** : Retenue/restitution automatique des cautions
+
+### Interface d'Administration Professionnelle
+- **Dashboard enrichi** : Calculs automatiques des dépôts de garantie
+- **Recherche multicritères** : Filtres avancés pour commandes et locations  
+- **Gestion des signalements** : Modération AJAX des commentaires blog
+
+### Système de Cookies Conforme GDPR
+- **Bannière intelligente** : Affichage contextuel selon statut utilisateur
+- **5 catégories de cookies** : Nécessaires, Analytics, Marketing, Préférences, Social
+- **Migration automatique** : Cookies visiteur → utilisateur connecté
+- **Interface admin** : Historique complet et statistiques temps réel
+- **Conformité totale** : Persistance, expiration, droits utilisateur
 
 ## Architecture Technique
 
@@ -42,6 +64,58 @@ FarmShop est une application web dynamique de commerce électronique spécialis�
 - **Templates** : Modèles prédéfinis personnalisables
 - **Programmation** : Envoi différé avec gestion des fuseaux horaires
 
+### 4. Système de Location avec Inspection et Sanctions
+- **Contraintes intelligentes** : Système avancé de règles de location
+  - Durées min/max configurables par produit (ex: 1-7 jours)
+  - Jours disponibles personnalisables (ex: Lundi-Samedi uniquement)
+  - Délai minimum configurable (ex: pas de location le jour même)
+  - Validation automatique des périodes selon contraintes business
+
+- **API de contraintes** : Services REST pour validation temps réel
+  - `GET /api/rental-constraints/{product}` : Récupération contraintes
+  - `POST /api/rental-constraints/{product}/validate` : Validation période
+  - `GET /api/rental-constraints/{product}/calendar` : Calendrier disponibilité
+  - `GET /api/rental-constraints/{product}/suggestions` : Suggestions dates optimales
+
+- **Processus de retour matériel** : Workflow automatisé complet
+  - Notification automatique fin de location
+  - Interface utilisateur pour signaler retour
+  - Changement d'état automatique vers "inspection_pending"
+  - Alertes admin pour matériel en attente d'inspection
+
+- **Système d'inspection professionnelle** :
+  - Interface admin dédiée pour évaluation matériel retourné
+  - Évaluation état : "excellent", "good", "fair", "poor", "damaged"
+  - Notes d'inspection détaillées avec photos
+  - Évaluation dommages : type, description, photos
+  - Calcul automatique coût réparation/remplacement
+
+- **Sanctions automatiques** : Algorithme de calcul des pénalités
+  - **Retard** : Pénalité progressive (ex: 10% du prix/jour de retard)
+  - **Dommages** : Calcul selon gravité et coût réparation
+    - Dommages mineurs : 10-30% du dépôt
+    - Dommages majeurs : 50-100% du dépôt
+    - Remplacement : Retenue totale + coût supplémentaire
+  - **Perte** : Facturation prix neuf + pénalité administrative
+
+- **Gestion automatique des dépôts** :
+  - Retenue automatique selon résultat inspection
+  - Calcul restitution après déduction sanctions
+  - Remboursement automatique via Stripe si applicable
+  - Facturation supplémentaire si dépassement dépôt
+
+- **Notifications et communication** :
+  - Emails automatiques à chaque étape du processus
+  - Templates personnalisés par type d'événement
+  - Notifications admin pour actions requises
+  - Historique complet des communications
+
+- **Interface utilisateur "Mes Locations"** :
+  - Suivi temps réel statut des locations
+  - Historique complet avec détails inspections
+  - Calcul sanctions et restitutions
+  - Documents et factures téléchargeables
+
 ## Améliorations Techniques
 
 ### Performance et Sécurité
@@ -62,6 +136,40 @@ class ProductStockObserver
         $this->createStockAlerts($product);
         $this->broadcastStockUpdate($product);
     }
+}
+```
+
+### Architecture Système de Location
+```php
+// Modèle principal de location avec contraintes
+class OrderLocation extends Model
+{
+    public function validateRentalPeriod($startDate, $endDate)
+    public function calculateTotalDeposit()
+    public function markAsReturned()
+    public function completeInspection($inspectionData)
+    public function calculateSanctions($lateDays, $damageData)
+    public function processDepositRefund()
+}
+
+// Validation des contraintes de location
+class RentalDateValidation extends Rule
+{
+    public function passes($attribute, $value)
+    {
+        // Vérification jours disponibles
+        // Validation durée min/max
+        // Contrôle délai minimum
+    }
+}
+
+// Service de gestion des retours
+class RentalReturnService
+{
+    public function processReturn(OrderLocation $rental)
+    public function conductInspection($rentalId, $inspectionData)
+    public function calculatePenalties($rental, $inspectionResult)
+    public function handleDepositRefund($rental, $refundAmount)
 }
 ```
 
@@ -98,12 +206,35 @@ class StripeService
 - **Tests Observer** : Surveillance stocks automatique
 - **Tests Webhooks** : Réception et traitement Stripe
 - **Tests Interface** : Parcours utilisateur complets
+- **Tests Système Location** : Contraintes, inspection, sanctions
+- **Tests Cookies GDPR** : Consentement, migration, persistance
 
 ### Scripts de Diagnostic
 ```bash
 php test_complete_order_flow.php     # Test processus complet
 php debug_stock_alerts.php           # Test alertes stock
 php populate_cart.php                # Génération données test
+php debug_rental_constraints.php     # Test contraintes location
+php test_inspection_workflow.php     # Test workflow inspection
+php debug_cookie_connexion.php       # Test système cookies
+```
+
+### Validation Système Location
+```bash
+# Test des contraintes de location
+curl -X POST http://localhost:8000/api/rental-constraints/1/validate \
+  -H "Content-Type: application/json" \
+  -d '{"start_date":"2025-08-09","end_date":"2025-08-15"}'
+
+# Test du processus d'inspection
+php artisan rental:test-inspection 123 \
+  --condition=good \
+  --damage='{"type":"minor","description":"Rayure légère"}'
+
+# Test calcul sanctions
+php artisan rental:calculate-penalties 123 \
+  --late-days=2 \
+  --damage-cost=50.00
 ```
 
 ## Base de Données
@@ -112,6 +243,51 @@ php populate_cart.php                # Génération données test
 - `newsletter_sends` : Tracking envois newsletters
 - `stock_alerts` : Historique alertes stock
 - `payment_intents` : Suivi paiements Stripe
+- `order_locations` : Commandes de location avec contraintes
+- `order_item_locations` : Articles loués avec inspection détaillée
+- `order_returns` : Retours matériel avec évaluation
+- `cookies` : Gestion consentements GDPR avec migration utilisateur
+
+### Tables de Location Enrichies
+```sql
+-- Table principale des locations
+CREATE TABLE order_locations (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT,
+    status ENUM('pending','confirmed','active','returned','completed','cancelled'),
+    inspection_status ENUM('pending','completed'),
+    start_date DATE,
+    end_date DATE,
+    total_deposit DECIMAL(10,2),
+    late_penalty DECIMAL(10,2) DEFAULT 0,
+    damage_penalty DECIMAL(10,2) DEFAULT 0,
+    refund_amount DECIMAL(10,2),
+    inspection_notes TEXT,
+    inspection_completed_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Articles loués avec inspection détaillée
+CREATE TABLE order_item_locations (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    order_location_id BIGINT,
+    product_id BIGINT,
+    quantity INT,
+    unit_price DECIMAL(10,2),
+    deposit_per_item DECIMAL(10,2),
+    return_condition ENUM('excellent','good','fair','poor','damaged'),
+    damage_details JSON,
+    item_inspection_notes TEXT,
+    penalty_amount DECIMAL(10,2) DEFAULT 0
+);
+
+-- Contraintes de location par produit
+ALTER TABLE products ADD COLUMN min_rental_days INT DEFAULT 1;
+ALTER TABLE products ADD COLUMN max_rental_days INT DEFAULT 7;
+ALTER TABLE products ADD COLUMN available_days JSON DEFAULT '[1,2,3,4,5,6]';
+ALTER TABLE products ADD COLUMN rental_deposit DECIMAL(10,2);
+```
 
 ### Migrations Ajoutées
 ```sql
@@ -120,9 +296,28 @@ ALTER TABLE newsletter_sends ADD COLUMN opened_at TIMESTAMP NULL;
 ALTER TABLE newsletter_sends ADD COLUMN clicked_at TIMESTAMP NULL;
 ALTER TABLE newsletter_sends ADD COLUMN unsubscribed_at TIMESTAMP NULL;
 
+-- Système de cookies GDPR
+CREATE TABLE cookies (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NULL,
+    session_id VARCHAR(255) NULL,
+    ip_address VARCHAR(45),
+    status ENUM('pending','accepted','rejected') DEFAULT 'pending',
+    necessary BOOLEAN DEFAULT true,
+    analytics BOOLEAN DEFAULT false,
+    marketing BOOLEAN DEFAULT false,
+    preferences BOOLEAN DEFAULT false,
+    social_media BOOLEAN DEFAULT false,
+    migrated_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- Index performance
 CREATE INDEX idx_products_stock_status ON products(quantity, critical_threshold);
 CREATE INDEX idx_orders_payment_status ON orders(payment_status, status);
+CREATE INDEX idx_order_locations_status ON order_locations(status, inspection_status);
+CREATE INDEX idx_cookies_user_session ON cookies(user_id, session_id);
 ```
 
 ## Configuration Requise

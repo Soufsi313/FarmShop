@@ -686,3 +686,53 @@ Route::prefix('api/rentals')->name('api.rentals.')->withoutMiddleware(['csrf'])-
     Route::get('/{product}/constraints', [RentalController::class, 'getProductConstraints'])->name('constraints');
     Route::post('/{product}/calculate-cost', [RentalController::class, 'calculateRentalCost'])->name('calculate-cost');
 });
+
+// Route de debug temporaire pour les cookies
+Route::get('/debug-cookies', function() {
+    $cookies = \App\Models\Cookie::orderBy('created_at', 'desc')->get();
+    
+    $output = "<h1>🍪 Debug Cookies System</h1>";
+    $output .= "<h2>État actuel des cookies:</h2><ul>";
+    
+    foreach($cookies as $cookie) {
+        $output .= "<li>";
+        $output .= "<strong>Cookie #{$cookie->id}</strong><br>";
+        $output .= "User ID: " . ($cookie->user_id ?? '<em>NULL (visiteur)</em>') . "<br>";
+        $output .= "Session ID: " . ($cookie->session_id ?? '<em>NULL</em>') . "<br>";
+        $output .= "IP: {$cookie->ip_address}<br>";
+        $output .= "Status: <strong>{$cookie->status}</strong><br>";
+        $output .= "Migrated: " . ($cookie->migrated_at ? $cookie->migrated_at->format('Y-m-d H:i:s') : '<em>Jamais</em>') . "<br>";
+        $output .= "Created: {$cookie->created_at->format('Y-m-d H:i:s')}<br>";
+        $output .= "</li><br>";
+    }
+    
+    $output .= "</ul>";
+    
+    $output .= "<h2>Session actuelle:</h2>";
+    $output .= "Session ID: " . session()->getId() . "<br>";
+    $output .= "User connecté: " . (auth()->check() ? "OUI (ID: " . auth()->id() . ")" : "NON") . "<br>";
+    $output .= "IP: " . request()->ip() . "<br>";
+    
+    $output .= "<h2>Actions de test:</h2>";
+    $output .= "<a href='/reset-cookies' style='background: red; color: white; padding: 10px; text-decoration: none; border-radius: 5px;'>🗑️ Réinitialiser TOUS les cookies</a><br><br>";
+    $output .= "<a href='/reset-local-storage' style='background: orange; color: white; padding: 10px; text-decoration: none; border-radius: 5px;'>🧹 Nettoyer localStorage</a>";
+    
+    return $output;
+});
+
+// Route pour réinitialiser tous les cookies
+Route::get('/reset-cookies', function() {
+    \App\Models\Cookie::truncate();
+    return redirect('/debug-cookies')->with('message', 'Tous les cookies ont été supprimés !');
+});
+
+// Route pour nettoyer le localStorage
+Route::get('/reset-local-storage', function() {
+    return "<script>
+        localStorage.clear();
+        sessionStorage.clear();
+        console.log('🧹 localStorage et sessionStorage nettoyés !');
+        alert('LocalStorage nettoyé ! Retour à la page de debug...');
+        window.location.href = '/debug-cookies';
+    </script>";
+});

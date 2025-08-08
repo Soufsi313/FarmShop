@@ -677,7 +677,7 @@ document.addEventListener('alpine:init', () => {
                 } else {
                     this.calculation.show = false;
                     this.calculation.valid = false;
-                    this.calculationError = data.message || 'Erreur lors du calcul';
+                    this.calculationError = data.message || 'Impossible de calculer le prix pour cette période';
                 }
             }).catch((error) => {
                 this.calculation.loading = false;
@@ -685,13 +685,17 @@ document.addEventListener('alpine:init', () => {
                 this.calculation.show = false;
                 this.calculation.valid = false;
                 
-                // Utiliser le message d'erreur spécifique de l'API si disponible
+                // Messages d'erreur plus explicites selon le type d'erreur
                 if (error.data && error.data.message) {
                     this.calculationError = error.data.message;
+                } else if (error.data && error.data.errors) {
+                    // Erreurs de validation multiples
+                    const errorMessages = Object.values(error.data.errors).flat();
+                    this.calculationError = errorMessages.join(' | ');
                 } else if (error.message) {
                     this.calculationError = error.message;
                 } else {
-                    this.calculationError = 'Erreur lors du calcul';
+                    this.calculationError = 'Impossible de calculer le prix. Vérifiez vos dates et la disponibilité du produit.';
                 }
             });
         },
@@ -723,11 +727,24 @@ document.addEventListener('alpine:init', () => {
                         window.location.href = '/cart-location';
                     }, 1500);
                 } else {
-                    this.rentalError = data.message;
+                    // Utiliser le message spécifique de l'API
+                    this.rentalError = data.message || 'Impossible d\'ajouter ce produit au panier';
                 }
             }).catch((error) => {
                 console.error('Confirm rental error:', error);
-                this.rentalError = 'Erreur lors de l\'ajout au panier';
+                
+                // Messages d'erreur plus explicites pour l'ajout au panier
+                if (error.data && error.data.message) {
+                    this.rentalError = error.data.message;
+                } else if (error.data && error.data.errors) {
+                    // Erreurs de validation multiples
+                    const errorMessages = Object.values(error.data.errors).flat();
+                    this.rentalError = errorMessages.join(' | ');
+                } else if (error.message) {
+                    this.rentalError = error.message;
+                } else {
+                    this.rentalError = 'Impossible d\'ajouter ce produit au panier. Vérifiez vos dates et la disponibilité.';
+                }
             });
         },
         

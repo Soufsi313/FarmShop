@@ -24,6 +24,7 @@ class Cookie extends Model
         'accepted_at',
         'rejected_at',
         'last_updated_at',
+        'migrated_at',
         'preferences_details',
         'consent_version',
         'status',
@@ -41,6 +42,7 @@ class Cookie extends Model
         'accepted_at' => 'datetime',
         'rejected_at' => 'datetime',
         'last_updated_at' => 'datetime',
+        'migrated_at' => 'datetime',
         'preferences_details' => 'array',
         'browser_info' => 'array'
     ];

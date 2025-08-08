@@ -77,23 +77,24 @@ class HandleOrderLocationStatusChange implements ShouldQueue
      */
     private function handleConfirmed($orderLocation)
     {
-        // Éviter les doublons d'emails si déjà confirmé
-        if ($orderLocation->confirmed_at) {
-            Log::info("Location déjà confirmée, pas d'email envoyé: {$orderLocation->order_number}");
+        // Protection contre les doublons avec cache temporaire
+        $cacheKey = "email_confirmed_{$orderLocation->id}";
+        if (Cache::has($cacheKey)) {
+            Log::info("Email de confirmation déjà envoyé récemment pour {$orderLocation->order_number}");
             return;
         }
 
-        // Mettre à jour les timestamps
-        $orderLocation->update([
-            'confirmed_at' => now(),
-        ]);
+        // Marquer comme traité pendant 5 minutes
+        Cache::put($cacheKey, true, 300);
 
-        // Envoyer email de confirmation (une seule fois)
+        // Envoyer email de confirmation (géré automatiquement par le listener)
         try {
             Mail::to($orderLocation->user->email)->send(new RentalOrderConfirmed($orderLocation));
             Log::info("Email de confirmation envoyé pour la commande {$orderLocation->order_number}");
         } catch (\Exception $e) {
             Log::error("Erreur envoi email confirmation: " . $e->getMessage());
+            // Retirer le cache en cas d'erreur pour permettre un nouveau tentative
+            Cache::forget($cacheKey);
         }
 
         // Programmer la transition automatique vers "active" à la date de début
@@ -224,12 +225,24 @@ class HandleOrderLocationStatusChange implements ShouldQueue
             'payment_status' => 'refunded'
         ]);
 
+        // Protection contre les doublons avec cache temporaire
+        $cacheKey = "email_cancelled_{$orderLocation->id}";
+        if (Cache::has($cacheKey)) {
+            Log::info("Email d'annulation déjà envoyé récemment pour {$orderLocation->order_number}");
+            return;
+        }
+
+        // Marquer comme traité pendant 5 minutes
+        Cache::put($cacheKey, true, 300);
+
         // Envoyer email d'annulation
         try {
             Mail::to($orderLocation->user->email)->send(new RentalOrderCancelled($orderLocation));
             Log::info("Email d'annulation envoyé pour {$orderLocation->order_number}");
         } catch (\Exception $e) {
             Log::error("Erreur envoi email annulation: " . $e->getMessage());
+            // Retirer le cache en cas d'erreur
+            Cache::forget($cacheKey);
         }
     }
 

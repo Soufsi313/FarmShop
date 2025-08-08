@@ -620,12 +620,25 @@ document.addEventListener('alpine:init', () => {
                 } else {
                     this.calculation.show = false;
                     this.calculation.valid = false;
-                    this.rentalError = data.message;
+                    // Utiliser le message spécifique de l'API
+                    this.rentalError = data.message || 'Impossible de calculer le prix pour cette période';
                 }
-            }).catch(() => {
+            }).catch((error) => {
                 this.calculation.show = false;
                 this.calculation.valid = false;
-                this.rentalError = 'Erreur lors du calcul';
+                
+                // Messages d'erreur plus explicites selon le type d'erreur
+                if (error.data && error.data.message) {
+                    this.rentalError = error.data.message;
+                } else if (error.data && error.data.errors) {
+                    // Erreurs de validation multiples
+                    const errorMessages = Object.values(error.data.errors).flat();
+                    this.rentalError = errorMessages.join(' | ');
+                } else if (error.message) {
+                    this.rentalError = error.message;
+                } else {
+                    this.rentalError = 'Impossible de calculer le prix. Vérifiez vos dates et la disponibilité du produit.';
+                }
             });
         },
         
@@ -644,15 +657,27 @@ document.addEventListener('alpine:init', () => {
                     this.updateCartLocationCount();
                     this.showRentalModal = false;
                 } else {
-                    this.rentalError = data.message;
+                    // Utiliser le message spécifique de l'API
+                    this.rentalError = data.message || 'Impossible d\'ajouter ce produit au panier';
                 }
             }).catch(error => {
-                // Gérer les erreurs spécifiques du backend
-                if (error.message && error.message.includes('déjà dans votre panier')) {
-                    this.showNotification('ℹ️ ' + error.message, 'info');
-                    this.showRentalModal = false;
+                // Messages d'erreur plus explicites pour l'ajout au panier
+                if (error.data && error.data.message) {
+                    // Cas spécial pour produit déjà dans le panier
+                    if (error.data.message.includes('déjà dans votre panier')) {
+                        this.showNotification('ℹ️ ' + error.data.message, 'info');
+                        this.showRentalModal = false;
+                        return;
+                    }
+                    this.rentalError = error.data.message;
+                } else if (error.data && error.data.errors) {
+                    // Erreurs de validation multiples
+                    const errorMessages = Object.values(error.data.errors).flat();
+                    this.rentalError = errorMessages.join(' | ');
+                } else if (error.message) {
+                    this.rentalError = error.message;
                 } else {
-                    this.rentalError = error.message || 'Erreur lors de l\'ajout au panier';
+                    this.rentalError = 'Impossible d\'ajouter ce produit au panier. Vérifiez vos dates et la disponibilité.';
                 }
             });
         },

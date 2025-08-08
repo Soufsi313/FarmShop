@@ -345,21 +345,25 @@ class BlogCommentReportController extends Controller
         // Vérifier que le signalement peut être traité
         if ($blogCommentReport->status !== 'pending') {
             return response()->json([
-                'status' => 'error',
+                'success' => false,
                 'message' => 'Ce signalement a déjà été traité'
             ], 400);
         }
 
+        $message = '';
+        $actionTaken = 'none';
+
         // Traiter le signalement
         if ($action === 'resolve') {
             $blogCommentReport->status = 'resolved';
-            $message = 'Signalement résolu avec succès';
 
             // Actions sur le commentaire si spécifiées
             if ($commentAction && $blogCommentReport->comment) {
                 switch ($commentAction) {
                     case 'delete':
                         $blogCommentReport->comment->delete();
+                        $actionTaken = 'comment_deleted';
+                        $message = 'Signalement résolu : commentaire supprimé avec succès';
                         break;
                     case 'reject':
                         $blogCommentReport->comment->update([
@@ -367,27 +371,42 @@ class BlogCommentReportController extends Controller
                             'moderated_by' => Auth::id(),
                             'moderated_at' => now()
                         ]);
+                        $actionTaken = 'comment_hidden';
+                        $message = 'Signalement résolu : commentaire masqué du public';
                         break;
                     case 'keep':
-                        // Ne rien faire, garder le commentaire tel quel
+                        // Garder le commentaire, mais marquer comme approuvé pour être sûr
+                        $blogCommentReport->comment->update([
+                            'status' => 'approved',
+                            'moderated_by' => Auth::id(),
+                            'moderated_at' => now()
+                        ]);
+                        $actionTaken = 'none';
+                        $message = 'Signalement résolu : commentaire conservé et approuvé';
+                        break;
+                    default:
+                        $message = 'Signalement résolu sans action sur le commentaire';
                         break;
                 }
+            } else {
+                $message = 'Signalement résolu sans action spécifique sur le commentaire';
             }
         } else {
             $blogCommentReport->status = 'dismissed';
-            $message = 'Signalement rejeté avec succès';
+            $message = 'Signalement rejeté : aucune action requise';
         }
 
         // Mettre à jour le signalement
         $blogCommentReport->update([
             'status' => $blogCommentReport->status,
+            'action_taken' => $actionTaken,
             'reviewed_by' => Auth::id(),
             'reviewed_at' => now(),
             'admin_notes' => $adminNotes
         ]);
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => $message,
             'data' => $blogCommentReport->fresh(['comment.post', 'comment.user', 'reporter', 'reviewer'])
         ]);

@@ -21,6 +21,19 @@ class CookieController extends Controller
     {
         $cookie = $this->findOrCreateCookie($request);
         
+        // Si la requête indique que le localStorage est vide, remettre le statut à pending
+        $forceConsent = $request->has('force_consent') || 
+                       $request->header('X-Force-Cookie-Consent') === 'true';
+        
+        if ($forceConsent && $cookie->status !== 'pending') {
+            $cookie->update(['status' => 'pending']);
+            \Log::info('Statut cookie forcé à pending', [
+                'cookie_id' => $cookie->id,
+                'user_id' => Auth::id(),
+                'reason' => 'localStorage nettoyé'
+            ]);
+        }
+        
         return response()->json([
             'success' => true,
             'data' => [
@@ -275,22 +288,37 @@ class CookieController extends Controller
                            ->latest()
                            ->first();
             
+            // Si on trouve un cookie utilisateur, le retourner
+            if ($cookie) {
+                return $cookie;
+            }
+            
             // Si pas de cookie utilisateur, chercher un cookie visiteur récent avec la même session/IP
-            if (!$cookie) {
-                $guestCookie = Cookie::where('session_id', $sessionId)
-                                   ->where('ip_address', $ipAddress)
-                                   ->whereNull('user_id')
-                                   ->latest()
-                                   ->first();
+            $guestCookie = Cookie::where(function($query) use ($sessionId, $ipAddress) {
+                            $query->where('session_id', $sessionId)
+                                  ->orWhere('ip_address', $ipAddress);
+                        })
+                        ->whereNull('user_id')
+                        ->where('created_at', '>=', now()->subHours(24)) // Cookie récent (24h)
+                        ->latest()
+                        ->first();
+            
+            if ($guestCookie) {
+                // Migrer le cookie visiteur vers l'utilisateur connecté
+                $guestCookie->update([
+                    'user_id' => $userId,
+                    'session_id' => null, // Nettoyer session_id car l'utilisateur est connecté
+                    'migrated_at' => now()
+                ]);
                 
-                if ($guestCookie) {
-                    // Migrer le cookie visiteur vers l'utilisateur connecté
-                    $guestCookie->update([
-                        'user_id' => $userId,
-                        'session_id' => null // Nettoyer session_id car l'utilisateur est connecté
-                    ]);
-                    return $guestCookie;
-                }
+                \Log::info('Cookie visiteur migré vers utilisateur connecté', [
+                    'guest_cookie_id' => $guestCookie->id,
+                    'user_id' => $userId,
+                    'status' => $guestCookie->status,
+                    'session_id' => $sessionId
+                ]);
+                
+                return $guestCookie;
             }
         } else {
             // Pour les visiteurs non connectés
@@ -299,23 +327,33 @@ class CookieController extends Controller
                            ->whereNull('user_id')
                            ->latest()
                            ->first();
+            
+            // Si on trouve un cookie visiteur, le retourner
+            if ($cookie) {
+                return $cookie;
+            }
         }
 
         // Créer un nouveau cookie si aucun n'existe
-        if (!$cookie) {
-            $cookie = Cookie::create([
-                'user_id' => Auth::id(),
-                'session_id' => Auth::guest() ? $sessionId : null,
-                'ip_address' => $ipAddress,
-                'user_agent' => $userAgent,
-                'page_url' => $request->url(),
-                'referer' => $request->header('referer'),
-                'browser_info' => $this->extractBrowserInfo($request),
-                'consent_version' => '1.0',
-                'status' => 'pending',
-                ...Cookie::getDefaultPreferences()
-            ]);
-        }
+        $cookie = Cookie::create([
+            'user_id' => Auth::id(),
+            'session_id' => Auth::guest() ? $sessionId : null,
+            'ip_address' => $ipAddress,
+            'user_agent' => $userAgent,
+            'page_url' => $request->url(),
+            'referer' => $request->header('referer'),
+            'browser_info' => $this->extractBrowserInfo($request),
+            'consent_version' => '1.0',
+            'status' => 'pending',
+            ...Cookie::getDefaultPreferences()
+        ]);
+        
+        \Log::info('Nouveau cookie créé', [
+            'cookie_id' => $cookie->id,
+            'user_id' => Auth::id(),
+            'session_id' => Auth::guest() ? $sessionId : 'null (user connected)',
+            'status' => 'pending'
+        ]);
 
         return $cookie;
     }

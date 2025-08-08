@@ -122,7 +122,7 @@ class BlogCommentController extends Controller
         $comment->replies()->delete();
         
         // Supprimer les signalements associés
-        BlogCommentReport::where('comment_id', $id)->delete();
+        BlogCommentReport::where('blog_comment_id', $id)->delete();
         
         $comment->delete();
         
@@ -158,7 +158,7 @@ class BlogCommentController extends Controller
                     break;
                 case 'delete':
                     // Supprimer les signalements associés
-                    BlogCommentReport::whereIn('comment_id', $commentIds)->delete();
+                    BlogCommentReport::whereIn('blog_comment_id', $commentIds)->delete();
                     // Supprimer les commentaires
                     BlogComment::whereIn('id', $commentIds)->delete();
                     break;
@@ -274,7 +274,7 @@ class BlogCommentController extends Controller
                             // Supprimer les réponses si nécessaire
                             $comment->replies()->delete();
                             // Supprimer les autres signalements de ce commentaire
-                            BlogCommentReport::where('comment_id', $comment->id)
+                            BlogCommentReport::where('blog_comment_id', $comment->id)
                                            ->where('id', '!=', $report->id)
                                            ->delete();
                             $comment->delete();

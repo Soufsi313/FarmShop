@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\OrderLocation;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -14,14 +13,12 @@ class RentalStartedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $orderLocation;
-
     /**
      * Create a new message instance.
      */
-    public function __construct(OrderLocation $orderLocation)
+    public function __construct()
     {
-        $this->orderLocation = $orderLocation;
+        //
     }
 
     /**
@@ -30,7 +27,7 @@ class RentalStartedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '🚀 Votre location a démarré - ' . $this->orderLocation->order_number,
+            subject: 'Rental Started Mail',
         );
     }
 
@@ -40,12 +37,7 @@ class RentalStartedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.rental-started',
-            with: [
-                'orderLocation' => $this->orderLocation,
-                'user' => $this->orderLocation->user,
-                'items' => $this->orderLocation->orderItemLocations,
-            ]
+            view: 'view.name',
         );
     }
 

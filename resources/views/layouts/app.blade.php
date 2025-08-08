@@ -67,7 +67,9 @@
             cookieConsent: {
                 // Vérifier si le consentement est déjà donné localement
                 hasLocalConsent() {
-                    return localStorage.getItem('cookie_consent_given') === 'true';
+                    // Ne plus se fier uniquement au localStorage pour permettre les mises à jour d'état
+                    console.log('🍪 hasLocalConsent() - RETOURNE TOUJOURS FALSE pour forcer vérification serveur');
+                    return false;
                 },
 
                 // Marquer le consentement comme donné localement
@@ -86,39 +88,44 @@
                 },
 
                 async show() {
-                    console.log('🍪 Démarrage vérification consentement cookies...');
+                    console.log('🍪 === DÉMARRAGE VÉRIFICATION CONSENTEMENT ===');
                     
                     // Vérifier d'abord le consentement local
                     if (this.hasLocalConsent()) {
-                        console.log('🍪 Consentement déjà donné localement - pas d\'affichage');
+                        console.log('🍪 ❌ Consentement déjà donné localement - ARRÊT');
                         return;
                     }
+                    
+                    console.log('🍪 ✅ Pas de consentement local - CONTINUER');
 
                     const banner = document.getElementById('cookie-banner');
-                    console.log('🍪 Élément banner trouvé:', banner ? 'OUI' : 'NON');
+                    console.log('🍪 Élément banner trouvé:', banner ? '✅ OUI' : '❌ NON');
                     
                     if (banner) {
                         try {
-                            console.log('🍪 Appel API /api/cookies/preferences...');
+                            console.log('🍪 📡 Appel API /api/cookies/preferences...');
                             // Vérifier l'état du consentement via l'API
                             const response = await this.checkConsentStatus();
-                            console.log('🍪 Réponse API:', response);
+                            console.log('🍪 📨 Réponse API complète:', response);
+                            console.log('🍪 📊 Data:', response.data);
                             
                             if (response.data && response.data.consent_required) {
-                                console.log('🍪 Consentement requis = TRUE -> Affichage du bandeau');
+                                console.log('🍪 ✅ consent_required = TRUE -> AFFICHAGE DU BANDEAU');
                                 banner.classList.remove('hidden');
+                                console.log('🍪 🎯 Bandeau affiché !');
                             } else {
-                                console.log('🍪 Consentement requis = FALSE -> Pas d\'affichage');
+                                console.log('🍪 ❌ consent_required = FALSE -> PAS D\'AFFICHAGE');
+                                console.log('🍪 🔍 Détails consent_required:', response.data?.consent_required);
                                 this.setLocalConsent(); // Marquer comme accepté côté serveur
                             }
                         } catch (error) {
-                            console.error('🍪 Erreur lors de la vérification du consentement:', error);
+                            console.error('🍪 💥 ERREUR lors de la vérification:', error);
                             // Afficher le banner par défaut en cas d'erreur
-                            console.log('🍪 Affichage du bandeau par défaut suite à l\'erreur');
+                            console.log('🍪 🚨 Affichage du bandeau par défaut suite à l\'erreur');
                             banner.classList.remove('hidden');
                         }
                     } else {
-                        console.error('🍪 ERREUR: Élément #cookie-banner non trouvé dans le DOM !');
+                        console.error('🍪 💥 ERREUR: Élément #cookie-banner non trouvé dans le DOM !');
                     }
                 },
                 
@@ -187,11 +194,23 @@
                 },
 
                 async checkConsentStatus() {
-                    const response = await fetch('/api/cookies/preferences', {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    });
+                    // Vérifier si le localStorage est vide pour forcer un nouveau consentement
+                    const localConsent = localStorage.getItem('cookie_consent_given');
+                    const forceConsent = !localConsent || localConsent !== 'true';
+                    
+                    console.log('🍪 checkConsentStatus - localStorage vide:', forceConsent);
+                    
+                    const headers = {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    };
+                    
+                    // Si le localStorage est vide, ajouter un header pour forcer le consentement
+                    if (forceConsent) {
+                        headers['X-Force-Cookie-Consent'] = 'true';
+                        console.log('🍪 Header X-Force-Cookie-Consent ajouté');
+                    }
+                    
+                    const response = await fetch('/api/cookies/preferences', { headers });
                     return await response.json();
                 },
                 
@@ -487,7 +506,7 @@
                                 </a>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <button type="submit" onclick="localStorage.removeItem('cookie_consent_given'); localStorage.removeItem('cookie_consent_date'); console.log('🍪 localStorage des cookies nettoyé à la déconnexion');" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                         Déconnexion
                                     </button>
                                 </form>
@@ -547,7 +566,7 @@
                         <div class="border-t pt-4 mt-4">
                             <form method="POST" action="/logout">
                                 @csrf
-                                <button type="submit" class="text-red-600 hover:text-red-800 block px-3 py-2 rounded-md text-base font-medium w-full text-left">
+                                <button type="submit" onclick="localStorage.removeItem('cookie_consent_given'); localStorage.removeItem('cookie_consent_date'); console.log('🍪 localStorage des cookies nettoyé à la déconnexion mobile');" class="text-red-600 hover:text-red-800 block px-3 py-2 rounded-md text-base font-medium w-full text-left">
                                     Déconnexion
                                 </button>
                             </form>
@@ -987,6 +1006,14 @@
         // Initialisation au chargement de la page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🍪 DOM chargé - Initialisation du système de cookies...');
+            
+            // Nettoyer le localStorage des cookies pour forcer une nouvelle vérification
+            @auth
+            console.log('🍪 Utilisateur connecté - nettoyage du localStorage pour synchronisation');
+            localStorage.removeItem('cookie_consent_given');
+            localStorage.removeItem('cookie_consent_date');
+            @endauth
+            
             console.log('🔍 FarmShop object:', window.FarmShop);
             console.log('🔍 cookieConsent object:', window.FarmShop?.cookieConsent);
             console.log('🔍 show function:', typeof window.FarmShop?.cookieConsent?.show);

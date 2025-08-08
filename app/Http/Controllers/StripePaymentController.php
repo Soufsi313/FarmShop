@@ -105,17 +105,17 @@ class StripePaymentController extends Controller
                 ], 400);
             }
 
-            $paymentIntent = $this->stripeService->createPaymentIntentForRental($orderLocation);
+            $paymentResult = $this->stripeService->createPaymentIntentForRental($orderLocation);
 
             // Pour les tests : confirmer automatiquement le paiement en environnement local
             if (app()->environment('local')) {
-                $confirmedPaymentIntent = \Stripe\PaymentIntent::retrieve($paymentIntent->id);
+                $confirmedPaymentIntent = \Stripe\PaymentIntent::retrieve($paymentResult['rental_payment_intent_id']);
                 $confirmedPaymentIntent->confirm([
                     'payment_method' => 'pm_card_visa', // Carte de test Stripe
                 ]);
                 
                 Log::info('Payment Intent location confirmé automatiquement pour les tests', [
-                    'payment_intent_id' => $paymentIntent->id,
+                    'payment_intent_id' => $paymentResult['rental_payment_intent_id'],
                     'order_location_id' => $orderLocation->id
                 ]);
             }
@@ -124,10 +124,10 @@ class StripePaymentController extends Controller
                 'success' => true,
                 'message' => 'Intention de paiement créée avec succès',
                 'data' => [
-                    'client_secret' => $paymentIntent->client_secret,
-                    'payment_intent_id' => $paymentIntent->id,
-                    'amount' => $this->stripeService->convertFromStripeAmount($paymentIntent->amount),
-                    'currency' => $paymentIntent->currency,
+                    'client_secret' => $paymentResult['rental_client_secret'],
+                    'payment_intent_id' => $paymentResult['rental_payment_intent_id'],
+                    'amount' => $paymentResult['rental_amount'],
+                    'currency' => 'eur',
                     'order' => [
                         'id' => $orderLocation->id,
                         'order_number' => $orderLocation->order_number,

@@ -24,7 +24,7 @@ class BlogCategoryController extends Controller
         $query = BlogCategory::query();
 
         // Filtrage par statut pour les utilisateurs non-admin
-        if (!Auth::user() || Auth::user()->role !== 'admin') {
+        if (!Auth::user() || !in_array(Auth::user()->role, ['admin', 'Admin'])) {
             $query->active();
         }
 
@@ -34,7 +34,7 @@ class BlogCategoryController extends Controller
         }
 
         // Filtrage par statut (admin seulement)
-        if ($request->filled('status') && Auth::user()->role === 'admin') {
+        if ($request->filled('status') && in_array(Auth::user()->role, ['admin', 'Admin'])) {
             if ($request->status === 'active') {
                 $query->active();
             } elseif ($request->status === 'inactive') {
@@ -76,7 +76,7 @@ class BlogCategoryController extends Controller
             ->firstOrFail();
 
         // Vérifier si la catégorie est active pour les non-admin
-        if ((!Auth::user() || Auth::user()->role !== 'admin') && !$category->is_active) {
+        if ((!Auth::user() || !in_array(Auth::user()->role, ['admin', 'Admin'])) && !$category->is_active) {
             abort(404);
         }
 
