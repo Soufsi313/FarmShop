@@ -285,7 +285,7 @@ class Order extends Model
         
         // ✅ RÉACTIVÉ : Programmer la progression automatique du statut (maintenant non-bloquant)
         \App\Jobs\ProcessSingleOrderStatusJob::dispatch($this->id, 'preparing')
-            ->delay(now()->addSeconds(15));
+            ->delay(now()->addSeconds(15)); // 15 secondes exactement
         
         \Log::info("Commande confirmée {$this->order_number} - Transitions automatiques programmées");
     }

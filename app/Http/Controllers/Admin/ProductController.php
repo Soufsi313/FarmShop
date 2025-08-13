@@ -70,12 +70,20 @@ class ProductController extends Controller
         // Récupérer toutes les catégories pour les filtres
         $categories = Category::orderBy('name')->get();
 
+        // Conserver les valeurs des filtres pour l'affichage
+        $filters = [
+            'search' => $request->get('search', ''),
+            'category' => $request->get('category', ''),
+            'type' => $request->get('type', ''),
+            'status' => $request->get('status', ''),
+        ];
+
         // Si c'est une requête AJAX, retourner seulement le contenu du tableau
         if ($request->ajax()) {
             return view('admin.products._table', compact('products'))->render();
         }
 
-        return view('admin.products.index', compact('products', 'categories', 'stats'));
+        return view('admin.products.index', compact('products', 'categories', 'stats', 'filters'));
     }
 
     public function create()
@@ -282,9 +290,25 @@ class ProductController extends Controller
             ->with('success', 'Produit mis à jour avec succès.');
     }
 
-    public function destroy(Product $product)
+    public function destroy($productId)
     {
         try {
+            // Chercher le produit manuellement pour éviter les problèmes de model binding
+            $product = Product::find($productId);
+            
+            if (!$product) {
+                // Si c'est une requête AJAX, retourner une erreur JSON
+                if (request()->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Produit non trouvé.'
+                    ], 404);
+                }
+                
+                return redirect()->route('admin.products.index')
+                    ->with('error', 'Produit non trouvé.');
+            }
+
             // Supprimer les images associées
             if ($product->main_image) {
                 Storage::disk('public')->delete($product->main_image);
@@ -317,13 +341,13 @@ class ProductController extends Controller
                 ->with('success', 'Produit supprimé avec succès.');
                 
         } catch (\Exception $e) {
-            \Log::error('Erreur lors de la suppression du produit ID ' . $product->id . ': ' . $e->getMessage());
+            \Log::error('Erreur lors de la suppression du produit ID ' . $productId . ': ' . $e->getMessage());
             
             // Si c'est une requête AJAX, retourner une erreur JSON
             if (request()->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Erreur lors de la suppression du produit.'
+                    'message' => 'Erreur lors de la suppression du produit: ' . $e->getMessage()
                 ], 500);
             }
 

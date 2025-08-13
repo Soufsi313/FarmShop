@@ -17,6 +17,7 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         // Exclure les webhooks et autres endpoints qui ne nécessitent pas de CSRF
         'api/stripe/webhook',
+        'api/webhook/stripe',
         // Exclure les APIs publiques de location
         'api/rentals/*',
     ];

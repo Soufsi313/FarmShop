@@ -67,8 +67,26 @@
             cookieConsent: {
                 // Vérifier si le consentement est déjà donné localement
                 hasLocalConsent() {
-                    // Ne plus se fier uniquement au localStorage pour permettre les mises à jour d'état
-                    console.log('🍪 hasLocalConsent() - RETOURNE TOUJOURS FALSE pour forcer vérification serveur');
+                    const consent = localStorage.getItem('cookie_consent_given');
+                    const consentDate = localStorage.getItem('cookie_consent_date');
+                    
+                    // Vérifier si le consentement existe et n'est pas trop ancien (30 jours)
+                    if (consent === 'true' && consentDate) {
+                        const thirtyDaysAgo = new Date();
+                        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                        const storedDate = new Date(consentDate);
+                        
+                        if (storedDate > thirtyDaysAgo) {
+                            console.log('🍪 Consentement local valide trouvé');
+                            return true;
+                        } else {
+                            console.log('🍪 Consentement local expiré (>30 jours)');
+                            this.clearLocalConsent();
+                            return false;
+                        }
+                    }
+                    
+                    console.log('🍪 Pas de consentement local trouvé');
                     return false;
                 },
 
@@ -194,24 +212,32 @@
                 },
 
                 async checkConsentStatus() {
-                    // Vérifier si le localStorage est vide pour forcer un nouveau consentement
-                    const localConsent = localStorage.getItem('cookie_consent_given');
-                    const forceConsent = !localConsent || localConsent !== 'true';
+                    // Vérifier d'abord le consentement local
+                    if (this.hasLocalConsent()) {
+                        console.log('🍪 Consentement local trouvé - pas de vérification serveur nécessaire');
+                        return { 
+                            success: true, 
+                            data: { consent_required: false }
+                        };
+                    }
                     
-                    console.log('🍪 checkConsentStatus - localStorage vide:', forceConsent);
+                    console.log('🍪 Pas de consentement local - vérification serveur');
                     
                     const headers = {
                         'X-Requested-With': 'XMLHttpRequest'
                     };
                     
-                    // Si le localStorage est vide, ajouter un header pour forcer le consentement
-                    if (forceConsent) {
-                        headers['X-Force-Cookie-Consent'] = 'true';
-                        console.log('🍪 Header X-Force-Cookie-Consent ajouté');
+                    const response = await fetch('/api/cookies/preferences', { headers });
+                    const result = await response.json();
+                    
+                    // Si le serveur dit que le consentement n'est pas requis, 
+                    // sauvegarder localement pour éviter les futures vérifications
+                    if (result.success && !result.data.consent_required) {
+                        this.setLocalConsent();
+                        console.log('🍪 Consentement serveur OK - sauvegardé localement');
                     }
                     
-                    const response = await fetch('/api/cookies/preferences', { headers });
-                    return await response.json();
+                    return result;
                 },
                 
                 async updatePreferences(preferences) {

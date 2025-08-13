@@ -61,10 +61,10 @@ class ProcessSingleOrderStatusJob implements ShouldQueue
                 // Programmer le prochain changement de statut si nécessaire
                 if ($this->nextStatus === 'preparing') {
                     ProcessSingleOrderStatusJob::dispatch($this->orderId, 'shipped')
-                        ->delay(now()->addSeconds(15));
+                        ->delay(now()->addSeconds(15)); // 15 secondes exactement
                 } elseif ($this->nextStatus === 'shipped') {
                     ProcessSingleOrderStatusJob::dispatch($this->orderId, 'delivered')
-                        ->delay(now()->addSeconds(15));
+                        ->delay(now()->addSeconds(15)); // 15 secondes exactement
                 }
             } else {
                 Log::info("Commande {$order->order_number} statut inattendu: {$currentStatus}, attendu pour: {$this->nextStatus}");

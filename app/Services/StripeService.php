@@ -233,6 +233,9 @@ class StripeService
         // Passer à confirmed et déclencher les transitions automatiques
         $order->updateStatus('confirmed');
         
+        // 🚀 Démarrer automatiquement le worker de queue si nécessaire
+        \App\Services\QueueWorkerService::ensureWorkerIsRunning();
+        
         Log::info("Commande {$order->order_number} confirmée - Transitions automatiques démarrées");
 
         // Décrémenter le stock des produits

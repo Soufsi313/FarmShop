@@ -1,0 +1,1 @@
+DEPLOYMENT TEST - <?= date('Y-m-d H:i:s') ?> - Version minimale déployée

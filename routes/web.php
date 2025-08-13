@@ -444,6 +444,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders/{order}/invoice', [\App\Http\Controllers\OrderController::class, 'downloadInvoice'])->name('orders.invoice');
     Route::get('/orders/{order}/return-confirm', [\App\Http\Controllers\OrderController::class, 'showReturnConfirmation'])->name('orders.return.confirm');
     Route::post('/orders/{order}/return', [\App\Http\Controllers\OrderController::class, 'requestReturn'])->name('orders.return');
+    Route::post('/orders/{order}/reorder', [\App\Http\Controllers\OrderController::class, 'reorder'])->name('orders.reorder');
     
     // Routes pour les commandes de location utilisateur
     Route::get('/rental-orders', [\App\Http\Controllers\OrderLocationController::class, 'index'])->name('rental-orders.index');

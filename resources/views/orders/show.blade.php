@@ -296,8 +296,8 @@
                         @endif
                         
                         <!-- Bouton de téléchargement de facture (si payée) -->
-                        @if($order->payment_status == 'paid')
-                        <a href="#" onclick="alert('Fonctionnalité bientôt disponible')"
+                        @if($order->payment_status == 'paid' && $order->invoice_number)
+                        <a href="{{ route('orders.invoice', $order) }}" 
                            class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-center block">
                             📄 Télécharger la facture
                         </a>
@@ -311,10 +311,14 @@
                         </a>
                         
                         <!-- Renouveler la commande -->
-                        <a href="#" onclick="alert('Fonctionnalité bientôt disponible')"
-                           class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors text-center block">
-                            🔄 Renouveler cette commande
-                        </a>
+                        <form action="{{ route('orders.reorder', $order) }}" method="POST" 
+                              onsubmit="return confirm('Voulez-vous vraiment ajouter tous les produits de cette commande à votre panier ?')">
+                            @csrf
+                            <button type="submit" 
+                                    class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors text-center block">
+                                🔄 Renouveler cette commande
+                            </button>
+                        </form>
                     </div>
                 </div>
 

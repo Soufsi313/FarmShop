@@ -13,6 +13,12 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     /**
+     * Types de produits disponibles
+     */
+    const TYPE_SALE = 'sale';        // Vente uniquement
+    const TYPE_RENTAL = 'rental';    // Location uniquement
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -873,5 +879,40 @@ class Product extends Model
     public function getRouteKeyName()
     {
         return 'slug';
+    }
+
+    /**
+     * Obtenir tous les types de produits disponibles
+     */
+    public static function getAvailableTypes()
+    {
+        return [
+            self::TYPE_SALE => 'Vente uniquement',
+            self::TYPE_RENTAL => 'Location uniquement',
+        ];
+    }
+
+    /**
+     * Vérifier si le produit est disponible à la vente
+     */
+    public function isAvailableForPurchase()
+    {
+        return $this->type === self::TYPE_SALE && $this->quantity > 0;
+    }
+
+    /**
+     * Vérifier si le produit est disponible en location
+     */
+    public function isAvailableForRental()
+    {
+        return $this->type === self::TYPE_RENTAL && $this->rental_stock > 0;
+    }
+
+    /**
+     * Obtenir le libellé du type de produit
+     */
+    public function getTypeLabel()
+    {
+        return self::getAvailableTypes()[$this->type] ?? 'Type inconnu';
     }
 }

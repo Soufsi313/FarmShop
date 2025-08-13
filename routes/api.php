@@ -110,6 +110,7 @@ Route::post('/special-offers/calculate-discount', [App\Http\Controllers\SpecialO
 
 // Route webhook Stripe (publique, sans authentification)
 Route::post('/stripe/webhook', [StripePaymentController::class, 'webhook'])->name('api.stripe.webhook');
+Route::post('/webhook/stripe', [StripePaymentController::class, 'webhook'])->name('api.webhook.stripe');
 
 // Routes protégées nécessitant une authentification
 Route::middleware(['web', 'auth'])->group(function () {

@@ -965,4 +965,113 @@ class OrderController extends Controller
             ]);
         }
     }
+
+    /**
+     * Renouveler une commande en remettant tous ses produits dans le panier
+     */
+    public function reorder(Request $request, Order $order)
+    {
+        try {
+            $user = Auth::user();
+            
+            // Vérifier que la commande appartient à l'utilisateur connecté
+            if ($order->user_id !== $user->id) {
+                return redirect()->route('orders.index')
+                    ->with('error', 'Vous n\'êtes pas autorisé à renouveler cette commande.');
+            }
+
+            // Vérifier que la commande est dans un état valide pour être renouvelée
+            Log::info('Tentative de renouvellement de commande', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'current_status' => $order->status,
+                'payment_status' => $order->payment_status
+            ]);
+            
+            if (!in_array($order->status, ['delivered', 'cancelled', 'shipped', 'confirmed', 'preparing'])) {
+                return redirect()->route('orders.show', $order)
+                    ->with('error', "Cette commande ne peut pas être renouvelée dans son état actuel (statut: {$order->status}).");
+            }
+
+            // Récupérer ou créer le panier actif de l'utilisateur
+            $cart = $user->getOrCreateActiveCart();
+            
+            $addedItems = 0;
+            $unavailableItems = [];
+
+            // Parcourir tous les items de la commande
+            foreach ($order->items as $orderItem) {
+                $product = $orderItem->product;
+                
+                // Vérifier que le produit existe encore et est disponible
+                if (!$product || !$product->is_active) {
+                    $unavailableItems[] = $orderItem->product_name;
+                    continue;
+                }
+
+                // Vérifier le stock disponible
+                $requestedQuantity = $orderItem->quantity;
+                $availableStock = $product->stock_quantity;
+                
+                if ($availableStock < $requestedQuantity) {
+                    // Ajouter la quantité disponible si elle est > 0
+                    if ($availableStock > 0) {
+                        $cart->items()->updateOrCreate(
+                            ['product_id' => $product->id],
+                            ['quantity' => \DB::raw("LEAST(quantity + {$availableStock}, {$availableStock})")]
+                        );
+                        $addedItems++;
+                        $unavailableItems[] = "{$orderItem->product_name} (seulement {$availableStock} disponible au lieu de {$requestedQuantity})";
+                    } else {
+                        $unavailableItems[] = "{$orderItem->product_name} (rupture de stock)";
+                    }
+                } else {
+                    // Ajouter la quantité complète au panier
+                    $existingItem = $cart->items()->where('product_id', $product->id)->first();
+                    
+                    if ($existingItem) {
+                        // Augmenter la quantité si le produit est déjà dans le panier
+                        $newQuantity = min($existingItem->quantity + $requestedQuantity, $availableStock);
+                        $existingItem->update(['quantity' => $newQuantity]);
+                    } else {
+                        // Créer un nouvel item dans le panier
+                        $cart->items()->create([
+                            'product_id' => $product->id,
+                            'quantity' => $requestedQuantity,
+                            'unit_price' => $product->price,
+                        ]);
+                    }
+                    $addedItems++;
+                }
+            }
+
+            // Préparer le message de retour
+            $message = "Commande renouvelée avec succès ! {$addedItems} produit(s) ajouté(s) au panier.";
+            
+            if (!empty($unavailableItems)) {
+                $message .= " Attention : " . implode(', ', $unavailableItems);
+            }
+
+            Log::info('Commande renouvelée', [
+                'original_order_id' => $order->id,
+                'original_order_number' => $order->order_number,
+                'user_id' => $user->id,
+                'added_items' => $addedItems,
+                'unavailable_items' => count($unavailableItems)
+            ]);
+
+            return redirect()->route('cart.index')
+                ->with('success', $message);
+
+        } catch (\Exception $e) {
+            Log::error('Erreur lors du renouvellement de commande', [
+                'order_id' => $order->id,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->route('orders.show', $order)
+                ->with('error', 'Une erreur est survenue lors du renouvellement de la commande.');
+        }
+    }
 }

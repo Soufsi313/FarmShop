@@ -163,6 +163,16 @@
                 </div>
 
                 <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-700">Type de produit</label>
+                    <select x-model="selectedType" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white">
+                        <option value="">Tous les types</option>
+                        <option value="sale">🛒 Vente uniquement</option>
+                        <option value="rental">📅 Location uniquement</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
                     <label class="text-sm font-medium text-gray-700">Statut</label>
                     <select x-model="selectedStatus" 
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white">
@@ -201,22 +211,97 @@
             @include('admin.products._table')
         </div>
     </div>
+
+    <!-- Modal de confirmation de suppression -->
+    <div x-show="showDeleteModal" 
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 overflow-y-auto" 
+         aria-labelledby="modal-title" 
+         role="dialog" 
+         aria-modal="true"
+         style="display: none;">
+        
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Overlay -->
+            <div x-show="showDeleteModal"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                 @click="showDeleteModal = false"></div>
+
+            <!-- Modal -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div x-show="showDeleteModal"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                Confirmer la suppression
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">
+                                    Êtes-vous sûr de vouloir supprimer le produit "<span x-text="productToDelete?.name" class="font-medium text-gray-900"></span>" ?
+                                    Cette action est irréversible.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" 
+                            @click="deleteProduct()" 
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                        Supprimer
+                    </button>
+                    <button type="button" 
+                            @click="showDeleteModal = false" 
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                        Annuler
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Scripts Alpine.js pour la gestion des produits -->
 <script>
 document.addEventListener('alpine:init', () => {
     Alpine.data('productManager', () => ({
-        searchTerm: '',
-        selectedCategory: '',
-        selectedStatus: '',
+        searchTerm: '{{ $filters['search'] ?? '' }}',
+        selectedCategory: '{{ $filters['category'] ?? '' }}',
+        selectedType: '{{ $filters['type'] ?? '' }}',
+        selectedStatus: '{{ $filters['status'] ?? '' }}',
         itemsPerPage: 15,
         loading: false,
         selectedProducts: [],
         showDeleteModal: false,
         productToDelete: null,
         showAdvancedFilters: false,
-        selectedType: '',
         maxPrice: '',
         minStock: '',
 
@@ -232,6 +317,7 @@ document.addEventListener('alpine:init', () => {
             const params = new URLSearchParams();
             if (this.searchTerm) params.append('search', this.searchTerm);
             if (this.selectedCategory) params.append('category', this.selectedCategory);
+            if (this.selectedType) params.append('type', this.selectedType);
             if (this.selectedStatus) params.append('status', this.selectedStatus);
             if (this.itemsPerPage !== 15) params.append('per_page', this.itemsPerPage);
             
@@ -278,18 +364,26 @@ document.addEventListener('alpine:init', () => {
             alert(`Fonctionnalité en cours de développement. Action demandée: ${action === 'activate' ? 'Activer' : 'Désactiver'} ${this.selectedProducts.length} produit(s).`);
         },
 
-        confirmDelete(product) {
-            this.productToDelete = product;
+        confirmDelete(productId, productName) {
+            this.productToDelete = {
+                id: productId,
+                name: productName
+            };
             this.showDeleteModal = true;
         },
 
         deleteProduct() {
             if (!this.productToDelete) return;
 
-            fetch(`{{ route("admin.products.destroy", ":id") }}`.replace(':id', this.productToDelete.id), {
-                method: 'DELETE',
+            // Créer un FormData avec la méthode spoofing DELETE
+            const formData = new FormData();
+            formData.append('_method', 'DELETE');
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+            fetch(`{{ url('admin/products') }}/${this.productToDelete.id}`, {
+                method: 'POST',
+                body: formData,
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
@@ -299,7 +393,17 @@ document.addEventListener('alpine:init', () => {
                     this.showDeleteModal = false;
                     this.productToDelete = null;
                     this.filterProducts();
+                    // Optionnel : afficher un message de succès
+                    alert('Produit supprimé avec succès!');
+                } else {
+                    alert('Erreur lors de la suppression: ' + (data.message || 'Erreur inconnue'));
                 }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la suppression du produit');
+                this.showDeleteModal = false;
+                this.productToDelete = null;
             });
         },
 

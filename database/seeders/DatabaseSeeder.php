@@ -22,23 +22,17 @@ class DatabaseSeeder extends Seeder
         // Créer les catégories
         $this->call(CategorySeeder::class);
         
-        // Créer les produits
-        $this->call(ProductSeeder::class);
-        
-        // Créer les fruits biologiques
-        $this->call(FruitProductSeeder::class);
-        
-        // Créer les légumes biologiques belges
-        $this->call(VegetableProductSeeder::class);
+        // Créer les produits personnalisés
+        $this->call(CustomProductSeeder::class);
         
         // Créer les catégories de location
         $this->call(RentalCategorySeeder::class);
         
+        // Créer les produits de location
+        $this->call(RentalProductSeeder::class);
+        
         // Créer les contraintes de location
         $this->call(RentalConstraintsSeeder::class);
-        
-        // Créer les produits de location agricoles
-        $this->call(RentalProductSeeder::class);
         
         // Créer les messages (datafixture)
         $this->call(MessageSeeder::class);
