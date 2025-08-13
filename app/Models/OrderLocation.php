@@ -58,11 +58,16 @@ class OrderLocation extends Model
         'cancellation_reason',
         'confirmed_at',
         'started_at',
+        'reminder_sent_at',
+        'ended_at',
+        'overdue_notification_sent_at',
         'completed_at',
         'closed_at',
         'cancelled_at',
         'invoice_number',
-        'invoice_generated_at'
+        'invoice_generated_at',
+        'frontend_confirmed',
+        'frontend_confirmed_at'
     ];
 
     protected $casts = [
@@ -86,6 +91,9 @@ class OrderLocation extends Model
         'inspection_completed_at' => 'datetime',
         'confirmed_at' => 'datetime',
         'started_at' => 'datetime',
+        'reminder_sent_at' => 'datetime',
+        'ended_at' => 'datetime',
+        'overdue_notification_sent_at' => 'datetime',
         'completed_at' => 'datetime',
         'closed_at' => 'datetime',
         'cancelled_at' => 'datetime'
@@ -408,15 +416,35 @@ class OrderLocation extends Model
             throw new \Exception('Cette location ne peut plus être annulée.');
         }
         
+        $oldStatus = $this->status;
+        
         $this->update([
             'status' => 'cancelled',
             'cancelled_at' => now(),
             'cancellation_reason' => $reason
         ]);
         
-        // Remettre le stock disponible
-        foreach ($this->items as $item) {
-            $item->product->increaseRentalStock($item->quantity);
+        // Déclencher manuellement l'event pour être sûr qu'il est traité
+        event(new \App\Events\OrderLocationStatusChanged($this, $oldStatus, 'cancelled'));
+        
+        // Remettre le stock disponible SEULEMENT si la commande était confirmée/payée
+        // (c'est-à-dire si le stock avait été décrémenté)
+        if (in_array($this->payment_status, ['paid', 'processing']) || in_array($oldStatus, ['confirmed', 'active', 'ended', 'completed'])) {
+            foreach ($this->items as $item) {
+                $item->product->increaseRentalStock($item->quantity);
+                \Log::info("Stock de location restauré après annulation", [
+                    'product_id' => $item->product_id,
+                    'product_name' => $item->product_name,
+                    'quantity_restored' => $item->quantity,
+                    'order_number' => $this->order_number
+                ]);
+            }
+        } else {
+            \Log::info("Annulation sans restauration de stock (commande non confirmée)", [
+                'order_number' => $this->order_number,
+                'payment_status' => $this->payment_status,
+                'status' => $oldStatus
+            ]);
         }
         
         return $this;
@@ -481,8 +509,8 @@ class OrderLocation extends Model
                 'total_amount' => ($cartItem->product->daily_rental_price * $cartItem->quantity * $rentalDays) * 1.21
             ]);
             
-            // Décrémenter le stock de location
-            $cartItem->product->decreaseRentalStock($cartItem->quantity);
+            // NOTE: Le stock sera décrémenté lors de la confirmation du paiement via webhook
+            // $cartItem->product->decreaseRentalStock($cartItem->quantity);
         }
 
         return $orderLocation;

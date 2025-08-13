@@ -532,6 +532,19 @@ document.addEventListener('alpine:init', () => {
             const weekLater = new Date();
             weekLater.setDate(weekLater.getDate() + 8);
             this.rentalForm.endDate = weekLater.toISOString().split('T')[0];
+            
+            // Sauvegarder automatiquement les dates par défaut quand elles changent
+            this.$watch('rentalForm.startDate', (newStartDate) => {
+                if (newStartDate && this.rentalForm.endDate) {
+                    this.saveDefaultDates();
+                }
+            });
+            
+            this.$watch('rentalForm.endDate', (newEndDate) => {
+                if (newEndDate && this.rentalForm.startDate) {
+                    this.saveDefaultDates();
+                }
+            });
         },
         
         // Gestion des quantités
@@ -694,6 +707,29 @@ document.addEventListener('alpine:init', () => {
                         }
                     }
                 });
+        },
+        
+        // Sauvegarder les dates par défaut dans le panier
+        saveDefaultDates() {
+            if (!this.rentalForm.startDate || !this.rentalForm.endDate) {
+                return;
+            }
+            
+            this.makeApiCall('/api/cart-location/default-dates', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    start_date: this.rentalForm.startDate,
+                    end_date: this.rentalForm.endDate
+                })
+            }).then(data => {
+                if (data.success) {
+                    console.log('✅ Dates par défaut sauvegardées:', data.data);
+                } else {
+                    console.warn('⚠️ Erreur sauvegarde dates:', data.message);
+                }
+            }).catch(error => {
+                console.error('❌ Erreur lors de la sauvegarde des dates:', error);
+            });
         },
         
         // Utilitaires

@@ -110,7 +110,7 @@
                             <input type="date" 
                                    id="start_date" 
                                    name="start_date" 
-                                   value="{{ old('start_date', now()->addDay()->format('Y-m-d')) }}"
+                                   value="{{ old('start_date', $cartLocation->default_start_date ? $cartLocation->default_start_date->format('Y-m-d') : now()->addDay()->format('Y-m-d')) }}"
                                    x-model="rentalDates.start_date"
                                    :min="minStartDate"
                                    required 
@@ -121,7 +121,7 @@
                             <input type="date" 
                                    id="end_date" 
                                    name="end_date" 
-                                   value="{{ old('end_date', now()->addDays(8)->format('Y-m-d')) }}"
+                                   value="{{ old('end_date', $cartLocation->default_end_date ? $cartLocation->default_end_date->format('Y-m-d') : now()->addDays(8)->format('Y-m-d')) }}"
                                    x-model="rentalDates.end_date"
                                    :min="rentalDates.start_date"
                                    required 
@@ -248,10 +248,10 @@
 <script>
 document.addEventListener('alpine:init', () => {
     Alpine.data('checkoutRentalData', () => ({
-        // Données de location
+        // Données de location - utiliser les vraies dates du panier
         rentalDates: {
-            start_date: '{{ now()->addDay()->format("Y-m-d") }}',
-            end_date: '{{ now()->addDays(8)->format("Y-m-d") }}'
+            start_date: '{{ $cartLocation->items->first() ? $cartLocation->items->first()->start_date->format("Y-m-d") : now()->addDay()->format("Y-m-d") }}',
+            end_date: '{{ $cartLocation->items->first() ? $cartLocation->items->first()->end_date->format("Y-m-d") : now()->addDays(8)->format("Y-m-d") }}'
         },
         sameAsPickup: true,
         
@@ -269,7 +269,7 @@ document.addEventListener('alpine:init', () => {
             const start = new Date(this.rentalDates.start_date);
             const end = new Date(this.rentalDates.end_date);
             const diffTime = Math.abs(end - start);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 car inclusif
             
             return diffDays > 0 ? diffDays : 0;
         },
@@ -290,9 +290,9 @@ document.addEventListener('alpine:init', () => {
                 this.toggleSameAddress();
             });
             
-            // Initialiser les valeurs par défaut
-            this.rentalDates.start_date = '{{ now()->addDay()->format("Y-m-d") }}';
-            this.rentalDates.end_date = '{{ now()->addDays(8)->format("Y-m-d") }}';
+            // Initialiser les valeurs avec les vraies dates du panier
+            this.rentalDates.start_date = '{{ $cartLocation->default_start_date ? $cartLocation->default_start_date->format("Y-m-d") : now()->addDay()->format("Y-m-d") }}';
+            this.rentalDates.end_date = '{{ $cartLocation->default_end_date ? $cartLocation->default_end_date->format("Y-m-d") : now()->addDays(8)->format("Y-m-d") }}';
             
             // Synchroniser automatiquement lors de la frappe dans pickup_address
             setTimeout(() => {

@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'check.product.availability' => \App\Http\Middleware\CheckProductAvailability::class,
+            'check.rental.statuses' => \App\Http\Middleware\CheckRentalStatuses::class,
         ]);
     })
     ->withProviders([

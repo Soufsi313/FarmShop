@@ -289,31 +289,14 @@ class StripeService
                 ]
             ]);
 
-            // Décrémenter le stock de location des produits
-            foreach ($orderLocation->items as $item) {
-                $product = $item->product;
-                if ($product && $product->rental_stock >= $item->quantity) {
-                    $newRentalStock = $product->rental_stock - $item->quantity;
-                    $product->update(['rental_stock' => $newRentalStock]);
-                    
-                    Log::info('Stock de location décrémenté', [
-                        'product_id' => $product->id,
-                        'product_name' => $product->name,
-                        'previous_rental_stock' => $product->rental_stock + $item->quantity,
-                        'new_rental_stock' => $newRentalStock,
-                        'decremented_by' => $item->quantity,
-                        'order_location_id' => $orderLocation->id,
-                        'rental_period' => $orderLocation->start_date->format('Y-m-d') . ' - ' . $orderLocation->end_date->format('Y-m-d')
-                    ]);
-                } else {
-                    Log::warning('Stock de location insuffisant', [
-                        'product_id' => $product?->id,
-                        'product_name' => $product?->name,
-                        'available_rental_stock' => $product?->rental_stock,
-                        'requested_quantity' => $item->quantity
-                    ]);
-                }
-            }
+            // ⚠️ IMPORTANT: Le stock sera décrémenté SEULEMENT quand l'utilisateur confirmera côté frontend
+            // Cela évite le décrément prématuré si l'utilisateur quitte avant la page de succès
+            Log::info('Paiement webhook traité - Stock sera décrémenté lors de la confirmation frontend', [
+                'order_location_id' => $orderLocation->id,
+                'payment_confirmed' => true,
+                'frontend_confirmed' => $orderLocation->frontend_confirmed ?? false,
+                'note' => 'Stock NON décrémenté ici - attente confirmation frontend'
+            ]);
 
             // Programmer les tâches automatiques pour cette location
             $this->scheduleRentalTasks($orderLocation);
@@ -829,5 +812,63 @@ class StripeService
             ]);
             return false;
         }
+    }
+
+    /**
+     * Décrémenter le stock quand l'utilisateur confirme côté frontend
+     */
+    public function decrementStockOnFrontendConfirmation(OrderLocation $orderLocation): bool
+    {
+        if ($orderLocation->frontend_confirmed) {
+            Log::info('Stock déjà décrémenté pour cette commande', [
+                'order_location_id' => $orderLocation->id,
+                'order_number' => $orderLocation->order_number
+            ]);
+            return true;
+        }
+
+        $success = true;
+        
+        // Décrémenter le stock de location des produits
+        foreach ($orderLocation->items as $item) {
+            $product = $item->product;
+            if ($product && $product->rental_stock >= $item->quantity) {
+                $newRentalStock = $product->rental_stock - $item->quantity;
+                $product->update(['rental_stock' => $newRentalStock]);
+                
+                Log::info('Stock de location décrémenté (confirmation frontend)', [
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'previous_rental_stock' => $product->rental_stock + $item->quantity,
+                    'new_rental_stock' => $newRentalStock,
+                    'decremented_by' => $item->quantity,
+                    'order_location_id' => $orderLocation->id,
+                    'rental_period' => $orderLocation->start_date->format('Y-m-d') . ' - ' . $orderLocation->end_date->format('Y-m-d')
+                ]);
+            } else {
+                Log::warning('Stock de location insuffisant lors de la confirmation frontend', [
+                    'product_id' => $product?->id,
+                    'product_name' => $product?->name,
+                    'available_rental_stock' => $product?->rental_stock,
+                    'requested_quantity' => $item->quantity
+                ]);
+                $success = false;
+            }
+        }
+
+        if ($success) {
+            // Marquer comme confirmé côté frontend
+            $orderLocation->update([
+                'frontend_confirmed' => true,
+                'frontend_confirmed_at' => now()
+            ]);
+            
+            Log::info('Commande confirmée côté frontend avec décrément de stock', [
+                'order_location_id' => $orderLocation->id,
+                'order_number' => $orderLocation->order_number
+            ]);
+        }
+
+        return $success;
     }
 }

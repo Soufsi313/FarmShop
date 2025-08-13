@@ -35,37 +35,47 @@ class HandleOrderLocationStatusChange implements ShouldQueue
         $oldStatus = $event->oldStatus;
         $newStatus = $event->newStatus;
 
-        Log::info("Changement de statut de location: {$orderLocation->order_number} de {$oldStatus} vers {$newStatus}");
+        Log::info("🔄 Changement de statut de location: {$orderLocation->order_number} de {$oldStatus} vers {$newStatus}");
 
         // Actions automatiques selon le nouveau statut
         switch ($newStatus) {
             case 'confirmed':
+                Log::info("📋 Traitement statut 'confirmed' pour {$orderLocation->order_number}");
                 $this->handleConfirmed($orderLocation);
                 break;
                 
             case 'active':
+                Log::info("📋 Traitement statut 'active' pour {$orderLocation->order_number}");
                 $this->handleActive($orderLocation);
                 break;
                 
             case 'completed':
+                Log::info("📋 Traitement statut 'completed' pour {$orderLocation->order_number}");
                 $this->handleCompleted($orderLocation);
                 break;
                 
             case 'closed':
+                Log::info("📋 Traitement statut 'closed' pour {$orderLocation->order_number}");
                 $this->handleClosed($orderLocation);
                 break;
                 
             case 'inspecting':
+                Log::info("📋 Traitement statut 'inspecting' pour {$orderLocation->order_number}");
                 $this->handleInspecting($orderLocation);
                 break;
                 
             case 'finished':
+                Log::info("📋 Traitement statut 'finished' pour {$orderLocation->order_number}");
                 $this->handleFinished($orderLocation);
                 break;
                 
             case 'cancelled':
+                Log::info("📋 Traitement statut 'cancelled' pour {$orderLocation->order_number}");
                 $this->handleCancelled($orderLocation);
                 break;
+                
+            default:
+                Log::info("❓ Statut non géré: {$newStatus} pour {$orderLocation->order_number}");
         }
 
         // Programmer les vérifications automatiques futures
@@ -106,9 +116,9 @@ class HandleOrderLocationStatusChange implements ShouldQueue
      */
     private function handleActive($orderLocation)
     {
-        $orderLocation->update([
-            'started_at' => now(),
-            'status' => 'active'
+        // Mise à jour sans déclencher l'event pour éviter la boucle
+        $orderLocation->updateQuietly([
+            'started_at' => now()
         ]);
 
         // Programmer la transition automatique vers "completed" à la date de fin
@@ -132,9 +142,9 @@ class HandleOrderLocationStatusChange implements ShouldQueue
         }
 
         try {
-            $orderLocation->update([
-                'completed_at' => now(),
-                'status' => 'completed'
+            // Mise à jour sans déclencher l'event pour éviter la boucle
+            $orderLocation->updateQuietly([
+                'completed_at' => now()
             ]);
 
             // Envoyer email demandant la fermeture
@@ -156,16 +166,19 @@ class HandleOrderLocationStatusChange implements ShouldQueue
      */
     private function handleClosed($orderLocation)
     {
-        $orderLocation->update([
+        // Mise à jour sans déclencher l'event pour éviter la boucle
+        $orderLocation->updateQuietly([
             'closed_at' => now(),
-            'actual_return_date' => now(),
-            'status' => 'inspecting' // Transition automatique vers inspection
+            'actual_return_date' => now()
         ]);
 
-        Log::info("Location fermée et en attente d'inspection: {$orderLocation->order_number}");
+        Log::info("Location fermée: {$orderLocation->order_number}");
         
         // Notifier les admins pour l'inspection
         $this->notifyAdminsForInspection($orderLocation);
+        
+        // Programmer la transition vers inspection (mais ne pas la faire immédiatement)
+        // La transition sera gérée par le système automatique ou manuellement par l'admin
     }
 
     /**
@@ -173,7 +186,8 @@ class HandleOrderLocationStatusChange implements ShouldQueue
      */
     private function handleInspecting($orderLocation)
     {
-        $orderLocation->update([
+        // Mise à jour sans déclencher l'event pour éviter la boucle
+        $orderLocation->updateQuietly([
             'inspection_started_at' => now(),
             'inspection_status' => 'in_progress'
         ]);
@@ -190,7 +204,8 @@ class HandleOrderLocationStatusChange implements ShouldQueue
         $totalPenalties = $orderLocation->orderItemLocations()->sum('penalty_amount');
         $finalAmount = $orderLocation->total_amount + $totalPenalties;
 
-        $orderLocation->update([
+        // Mise à jour sans déclencher l'event pour éviter la boucle
+        $orderLocation->updateQuietly([
             'finished_at' => now(),
             'penalty_amount' => $totalPenalties,
             'final_amount' => $finalAmount,
@@ -220,7 +235,8 @@ class HandleOrderLocationStatusChange implements ShouldQueue
      */
     private function handleCancelled($orderLocation)
     {
-        $orderLocation->update([
+        // Mise à jour sans déclencher l'event pour éviter la boucle
+        $orderLocation->updateQuietly([
             'cancelled_at' => now(),
             'payment_status' => 'refunded'
         ]);

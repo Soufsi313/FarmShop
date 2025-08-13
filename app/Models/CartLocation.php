@@ -295,6 +295,9 @@ class CartLocation extends Model
      */
     public function getSummary(): array
     {
+        // Mettre à jour les totaux avant de les retourner
+        $this->updateTotals();
+        
         return [
             'total_amount' => $this->total_amount,
             'total_deposit' => $this->total_deposit,
@@ -305,6 +308,30 @@ class CartLocation extends Model
             'items_count' => $this->items()->count(),
             'is_empty' => $this->items()->count() === 0
         ];
+    }
+
+    /**
+     * Mettre à jour les totaux du panier basés sur les items
+     */
+    public function updateTotals(): void
+    {
+        $items = $this->items;
+        
+        $totalAmount = $items->sum('subtotal_amount');
+        $totalDeposit = $items->sum('subtotal_deposit');
+        $totalTva = $items->sum('tva_amount');
+        $totalWithTax = $items->sum('total_amount');
+        $totalItems = $items->count();
+        $totalQuantity = $items->sum('quantity');
+        
+        $this->update([
+            'total_amount' => $totalAmount,
+            'total_deposit' => $totalDeposit,
+            'total_tva' => $totalTva,
+            'total_with_tax' => $totalWithTax,
+            'total_items' => $totalItems,
+            'total_quantity' => $totalQuantity
+        ]);
     }
 
     /**

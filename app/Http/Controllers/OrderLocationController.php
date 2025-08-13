@@ -24,6 +24,10 @@ class OrderLocationController extends Controller
         // Filtrage par statut
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        } else {
+            // Par défaut, ne PAS afficher les commandes en attente (pending)
+            // Les commandes pending sont en cours de paiement et ne doivent pas apparaître dans "Mes locations"
+            $query->whereNotIn('status', ['pending']);
         }
 
         // Filtrage par utilisateur (pour l'admin)
@@ -86,15 +90,37 @@ class OrderLocationController extends Controller
     public function showCheckout()
     {
         $user = Auth::user();
+        
+        // Debug: Ajouter des logs pour diagnostiquer
+        \Log::info('DEBUG Checkout - Utilisateur connecté', [
+            'user_id' => $user ? $user->id : 'null',
+            'user_email' => $user ? $user->email : 'null'
+        ]);
+        
         $cartLocation = $user->activeCartLocation;
         
+        \Log::info('DEBUG Checkout - Panier récupéré', [
+            'cart_location_id' => $cartLocation ? $cartLocation->id : 'null',
+            'cart_items_count' => $cartLocation && $cartLocation->items ? $cartLocation->items->count() : 0,
+            'all_carts_count' => \App\Models\CartLocation::where('user_id', $user->id)->count()
+        ]);
+        
         if (!$cartLocation || $cartLocation->items->isEmpty()) {
+            \Log::warning('DEBUG Checkout - Panier vide ou inexistant', [
+                'cart_location' => $cartLocation ? 'exists but empty' : 'null',
+                'redirect_to' => 'cart-location.index'
+            ]);
+            
             return redirect()->route('cart-location.index')
                 ->with('error', 'Votre panier de location est vide.');
         }
         
         // Calculer le résumé du panier
         $summary = $cartLocation->getSummary();
+        
+        \Log::info('DEBUG Checkout - Résumé calculé', [
+            'summary' => $summary
+        ]);
         
         return view('checkout-rental.index', compact('cartLocation', 'summary'));
     }
@@ -556,6 +582,18 @@ class OrderLocationController extends Controller
 
         // Charger les relations nécessaires
         $orderLocation->load(['user', 'items.product']);
+
+        // 🎯 DÉCRÉMENTER LE STOCK lors de la confirmation frontend
+        $stripeService = app(\App\Services\StripeService::class);
+        $stockDecremented = $stripeService->decrementStockOnFrontendConfirmation($orderLocation);
+
+        if (!$stockDecremented) {
+            \Log::error('Échec du décrément de stock lors de la confirmation frontend', [
+                'order_location_id' => $orderLocation->id,
+                'order_number' => $orderLocation->order_number
+            ]);
+            return redirect()->back()->with('error', 'Erreur lors de la confirmation de la commande. Veuillez contacter le support.');
+        }
 
         return view('rental-orders.payment-success', compact('orderLocation'));
     }

@@ -26,7 +26,7 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('check.rental.statuses');
 
 // Page Contact
 Route::get('/contact', function () {
@@ -479,8 +479,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/wishlist', [WishlistController::class, 'showPage'])->name('wishlist.index');
     
     // Mes locations
-    Route::get('/my-rentals', [MyRentalsController::class, 'index'])->name('my-rentals.index');
-    Route::get('/my-rentals/{orderLocation}', [MyRentalsController::class, 'show'])->name('my-rentals.show');
+    Route::get('/my-rentals', [MyRentalsController::class, 'index'])->name('my-rentals.index')->middleware('check.rental.statuses');
+    Route::get('/my-rentals/{orderLocation}', [MyRentalsController::class, 'show'])->name('my-rentals.show')->middleware('check.rental.statuses');
     Route::post('/my-rentals/{orderLocation}/close', [MyRentalsController::class, 'close'])->name('my-rentals.close');
     Route::get('/my-rentals/{orderLocation}/invoice', [MyRentalsController::class, 'downloadInvoice'])->name('my-rentals.invoice');
     

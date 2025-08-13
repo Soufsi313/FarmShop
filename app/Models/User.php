@@ -203,7 +203,7 @@ class User extends Authenticatable
 
     public function activeCartLocation()
     {
-        return $this->hasOne(CartLocation::class)->latest();
+        return $this->hasOne(CartLocation::class)->with('items.product')->latest();
     }
 
     /**
