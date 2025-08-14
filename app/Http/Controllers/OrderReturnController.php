@@ -191,6 +191,90 @@ class OrderReturnController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/returns",
+     *     tags={"Admin", "Returns", "Inspection"},
+     *     summary="Liste des demandes de retour",
+     *     description="Récupère la liste complète des demandes de retour avec système d'inspection (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         description="Recherche par numéro de retour, commande, utilisateur",
+     *         @OA\Schema(type="string", example="RET-2024-001")
+     *     ),
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filtrer par statut",
+     *         @OA\Schema(type="string", enum={"pending", "approved", "rejected", "returned", "refunded", "cancelled"}, example="pending")
+     *     ),
+     *     @OA\Parameter(
+     *         name="return_type",
+     *         in="query",
+     *         description="Filtrer par type de retour",
+     *         @OA\Schema(type="string", enum={"defective", "damaged", "wrong_item", "not_satisfied", "size_issue", "other"}, example="defective")
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_from",
+     *         in="query",
+     *         description="Date de début (YYYY-MM-DD)",
+     *         @OA\Schema(type="string", format="date", example="2024-08-01")
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_to",
+     *         in="query",
+     *         description="Date de fin (YYYY-MM-DD)",
+     *         @OA\Schema(type="string", format="date", example="2024-08-31")
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort_by",
+     *         in="query",
+     *         description="Critère de tri",
+     *         @OA\Schema(type="string", enum={"recent", "oldest", "amount_asc", "amount_desc", "priority"}, example="recent")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Nombre d'éléments par page",
+     *         @OA\Schema(type="integer", minimum=1, maximum=100, example=20)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des retours récupérée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="per_page", type="integer", example=20),
+     *                 @OA\Property(property="total", type="integer", example=145),
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(ref="#/components/schemas/OrderReturn")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="meta",
+     *                 type="object",
+     *                 @OA\Property(property="total_returns", type="integer", example=145),
+     *                 @OA\Property(property="pending_returns", type="integer", example=23),
+     *                 @OA\Property(property="approved_returns", type="integer", example=98),
+     *                 @OA\Property(property="total_refund_amount", type="number", format="float", example=5847.50),
+     *                 @OA\Property(property="pending_inspections", type="integer", example=8),
+     *                 @OA\Property(property="completed_inspections", type="integer", example=112)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Afficher toutes les demandes de retour (Admin seulement)
      */
     public function adminIndex(Request $request)
@@ -258,6 +342,39 @@ class OrderReturnController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/returns/{id}",
+     *     tags={"Admin", "Returns", "Inspection"},
+     *     summary="Détails d'une demande de retour",
+     *     description="Affiche les détails complets d'une demande de retour avec informations d'inspection (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la demande de retour",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Détails de la demande de retour récupérés avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", ref="#/components/schemas/OrderReturn")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Demande de retour non trouvée",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Afficher une demande de retour (Admin)
      */
     public function adminShow(OrderReturn $return)
@@ -275,6 +392,56 @@ class OrderReturnController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/returns/{id}/approve",
+     *     tags={"Admin", "Returns", "Inspection"},
+     *     summary="Approuver une demande de retour",
+     *     description="Approuve une demande de retour et initie le processus d'inspection (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la demande de retour",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="admin_notes", type="string", example="Retour approuvé - produit défectueux confirmé"),
+     *             @OA\Property(property="refund_amount", type="number", format="float", example=149.99, description="Montant du remboursement (optionnel)"),
+     *             @OA\Property(property="inspection_required", type="boolean", example=true, description="Si une inspection physique est requise"),
+     *             @OA\Property(property="return_deadline", type="string", format="date", example="2024-09-15", description="Date limite de retour")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Demande de retour approuvée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Demande de retour approuvée avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/OrderReturn"),
+     *             @OA\Property(
+     *                 property="meta",
+     *                 type="object",
+     *                 @OA\Property(property="return_label_url", type="string", example="https://shipping.com/label/RET-2024-001"),
+     *                 @OA\Property(property="inspection_code", type="string", example="INSP-2024-001"),
+     *                 @OA\Property(property="expected_return_date", type="string", format="date", example="2024-09-15")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Demande ne peut pas être approuvée",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Approuver une demande de retour (Admin seulement)
      */
     public function approve(Request $request, OrderReturn $return)
@@ -315,6 +482,54 @@ class OrderReturnController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/returns/{id}/reject",
+     *     tags={"Admin", "Returns", "Inspection"},
+     *     summary="Rejeter une demande de retour",
+     *     description="Rejette une demande de retour avec justification (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la demande de retour",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"admin_notes", "rejection_reason"},
+     *             @OA\Property(property="admin_notes", type="string", example="Demande refusée - délai de retour dépassé", maxLength=1000),
+     *             @OA\Property(
+     *                 property="rejection_reason",
+     *                 type="string",
+     *                 enum={"condition_not_met", "out_of_deadline", "insufficient_evidence", "policy_violation"},
+     *                 example="out_of_deadline",
+     *                 description="Raison du rejet"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Demande de retour rejetée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Demande de retour rejetée"),
+     *             @OA\Property(property="data", ref="#/components/schemas/OrderReturn")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Demande ne peut pas être rejetée ou données invalides",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Rejeter une demande de retour (Admin seulement)
      */
     public function reject(Request $request, OrderReturn $return)
@@ -347,6 +562,68 @@ class OrderReturnController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/returns/{id}/mark-received",
+     *     tags={"Admin", "Returns", "Inspection"},
+     *     summary="Marquer un retour comme reçu",
+     *     description="Marque un retour comme reçu et évalue l'état du produit pour finaliser le remboursement (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la demande de retour",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"condition_assessment"},
+     *             @OA\Property(property="received_notes", type="string", example="Produit reçu en bon état", maxLength=1000),
+     *             @OA\Property(
+     *                 property="condition_assessment",
+     *                 type="string",
+     *                 enum={"excellent", "good", "fair", "poor"},
+     *                 example="good",
+     *                 description="État du produit retourné"
+     *             ),
+     *             @OA\Property(
+     *                 property="final_refund_amount",
+     *                 type="number",
+     *                 format="float",
+     *                 example=149.99,
+     *                 description="Montant final du remboursement après inspection"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Retour marqué comme reçu avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Retour marqué comme reçu"),
+     *             @OA\Property(property="data", ref="#/components/schemas/OrderReturn"),
+     *             @OA\Property(
+     *                 property="meta",
+     *                 type="object",
+     *                 @OA\Property(property="inspection_completed", type="boolean", example=true),
+     *                 @OA\Property(property="refund_processed", type="boolean", example=false),
+     *                 @OA\Property(property="next_step", type="string", example="process_refund")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Retour n'est pas dans le bon statut ou données invalides",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Marquer un retour comme reçu (Admin seulement)
      */
     public function markAsReceived(Request $request, OrderReturn $return)
@@ -383,6 +660,62 @@ class OrderReturnController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/returns/{id}/process-refund",
+     *     tags={"Admin", "Returns", "Inspection"},
+     *     summary="Finaliser le remboursement",
+     *     description="Traite le remboursement après réception et inspection du produit retourné (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la demande de retour",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"refund_method"},
+     *             @OA\Property(
+     *                 property="refund_method",
+     *                 type="string",
+     *                 enum={"original_payment", "bank_transfer", "store_credit"},
+     *                 example="original_payment",
+     *                 description="Méthode de remboursement"
+     *             ),
+     *             @OA\Property(property="refund_notes", type="string", example="Remboursement traité via le mode de paiement original", maxLength=1000)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Remboursement traité avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Remboursement traité avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/OrderReturn"),
+     *             @OA\Property(
+     *                 property="meta",
+     *                 type="object",
+     *                 @OA\Property(property="refund_id", type="string", example="REF-2024-001"),
+     *                 @OA\Property(property="refund_amount", type="number", format="float", example=149.99),
+     *                 @OA\Property(property="refund_date", type="string", format="datetime", example="2024-08-15T14:30:00Z"),
+     *                 @OA\Property(property="transaction_id", type="string", example="TXN-456789")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Retour n'est pas prêt pour le remboursement ou données invalides",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Finaliser le remboursement (Admin seulement)
      */
     public function processRefund(Request $request, OrderReturn $return)
@@ -415,6 +748,81 @@ class OrderReturnController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/returns/stats",
+     *     tags={"Admin", "Returns", "Statistics", "Analytics"},
+     *     summary="Statistiques des retours",
+     *     description="Récupère les statistiques complètes du système de retours et d'inspection (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="period",
+     *         in="query",
+     *         description="Période d'analyse en jours",
+     *         @OA\Schema(type="integer", example=30, default=30)
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_from",
+     *         in="query",
+     *         description="Date de début (YYYY-MM-DD)",
+     *         @OA\Schema(type="string", format="date", example="2024-08-01")
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_to",
+     *         in="query",
+     *         description="Date de fin (YYYY-MM-DD)",
+     *         @OA\Schema(type="string", format="date", example="2024-08-31")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Statistiques des retours récupérées avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="total_returns", type="integer", example=145),
+     *                 @OA\Property(property="pending_returns", type="integer", example=23),
+     *                 @OA\Property(property="approved_returns", type="integer", example=98),
+     *                 @OA\Property(property="rejected_returns", type="integer", example=15),
+     *                 @OA\Property(property="received_returns", type="integer", example=89),
+     *                 @OA\Property(property="refunded_returns", type="integer", example=87),
+     *                 @OA\Property(property="cancelled_returns", type="integer", example=9),
+     *                 @OA\Property(property="total_refund_amount", type="number", format="float", example=15847.50),
+     *                 @OA\Property(property="average_refund_amount", type="number", format="float", example=182.15),
+     *                 @OA\Property(property="pending_refund_amount", type="number", format="float", example=2145.30),
+     *                 @OA\Property(property="returns_this_month", type="integer", example=34),
+     *                 @OA\Property(property="returns_this_week", type="integer", example=8),
+     *                 @OA\Property(property="approval_rate", type="number", format="float", example=85.2),
+     *                 @OA\Property(property="average_processing_time", type="number", format="float", example=2.5, description="Temps moyen en jours"),
+     *                 @OA\Property(
+     *                     property="return_reasons",
+     *                     type="object",
+     *                     @OA\Property(property="defective", type="integer", example=45),
+     *                     @OA\Property(property="damaged", type="integer", example=32),
+     *                     @OA\Property(property="wrong_item", type="integer", example=28),
+     *                     @OA\Property(property="not_satisfied", type="integer", example=25),
+     *                     @OA\Property(property="size_issue", type="integer", example=15)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="monthly_trend",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="month", type="string", example="2024-08"),
+     *                         @OA\Property(property="returns", type="integer", example=34),
+     *                         @OA\Property(property="refunds", type="number", format="float", example=3847.50)
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Statistiques des retours (Admin seulement)
      */
     public function adminStats(Request $request)

@@ -15,6 +15,52 @@ class CookieController extends Controller
     use AuthorizesRequests;
 
     /**
+     * @OA\Get(
+     *     path="/api/cookies/preferences",
+     *     tags={"Cookies", "GDPR"},
+     *     summary="Obtenir les préférences de cookies",
+     *     description="Récupère les préférences de cookies de l'utilisateur ou visiteur avec statut de consentement",
+     *     @OA\Parameter(
+     *         name="force_consent",
+     *         in="query",
+     *         description="Forcer l'affichage du consentement",
+     *         @OA\Schema(type="boolean", example=false)
+     *     ),
+     *     @OA\Parameter(
+     *         name="X-Force-Cookie-Consent",
+     *         in="header",
+     *         description="Header pour forcer le consentement",
+     *         @OA\Schema(type="string", example="true")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Préférences récupérées avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="cookie_id", type="integer", example=1, description="ID du cookie"),
+     *                 @OA\Property(
+     *                     property="preferences",
+     *                     type="object",
+     *                     @OA\Property(property="essential", type="boolean", example=true, description="Cookies essentiels (toujours activés)"),
+     *                     @OA\Property(property="functional", type="boolean", example=false, description="Cookies fonctionnels"),
+     *                     @OA\Property(property="analytics", type="boolean", example=false, description="Cookies d'analyse"),
+     *                     @OA\Property(property="marketing", type="boolean", example=false, description="Cookies marketing"),
+     *                     @OA\Property(property="personalization", type="boolean", example=false, description="Cookies de personnalisation")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="descriptions",
+     *                     type="object",
+     *                     description="Descriptions des différents types de cookies"
+     *                 ),
+     *                 @OA\Property(property="consent_required", type="boolean", example=true, description="Consentement requis")
+     *             )
+     *         )
+     *     )
+     * )
+     * 
      * Obtenir les préférences de cookies pour le visiteur/utilisateur
      */
     public function getPreferences(Request $request): JsonResponse
@@ -46,6 +92,44 @@ class CookieController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/cookies/preferences",
+     *     tags={"Cookies", "GDPR"},
+     *     summary="Mettre à jour les préférences de cookies",
+     *     description="Met à jour les préférences de consentement aux cookies pour l'utilisateur ou visiteur",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Préférences de cookies",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="necessary", type="boolean", example=true, description="Cookies nécessaires (toujours true)"),
+     *             @OA\Property(property="analytics", type="boolean", example=false, description="Cookies d'analyse (Google Analytics, etc.)"),
+     *             @OA\Property(property="marketing", type="boolean", example=false, description="Cookies marketing (publicités, tracking)"),
+     *             @OA\Property(property="preferences", type="boolean", example=true, description="Cookies de préférences (langue, paramètres)"),
+     *             @OA\Property(property="social_media", type="boolean", example=false, description="Cookies réseaux sociaux (widgets, partage)")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Préférences mises à jour avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Préférences de cookies mises à jour"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="cookie_id", type="integer", example=1),
+     *                 @OA\Property(property="preferences", type="object", description="Préférences actualisées"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", description="Date de mise à jour")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erreurs de validation",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Mettre à jour les préférences de cookies
      */
     public function updatePreferences(Request $request): JsonResponse
@@ -69,6 +153,37 @@ class CookieController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/cookies/accept-all",
+     *     tags={"Cookies", "GDPR"},
+     *     summary="Accepter tous les cookies",
+     *     description="Accepte tous les types de cookies en une seule action",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Tous les cookies acceptés avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Tous les cookies ont été acceptés"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="cookie_id", type="integer", example=1),
+     *                 @OA\Property(
+     *                     property="preferences",
+     *                     type="object",
+     *                     @OA\Property(property="necessary", type="boolean", example=true),
+     *                     @OA\Property(property="analytics", type="boolean", example=true),
+     *                     @OA\Property(property="marketing", type="boolean", example=true),
+     *                     @OA\Property(property="preferences", type="boolean", example=true),
+     *                     @OA\Property(property="social_media", type="boolean", example=true)
+     *                 ),
+     *                 @OA\Property(property="status", type="string", example="accepted"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     )
+     * )
+     * 
      * Accepter tous les cookies
      */
     public function acceptAll(Request $request): JsonResponse
@@ -84,6 +199,37 @@ class CookieController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/cookies/reject-all",
+     *     tags={"Cookies", "GDPR"},
+     *     summary="Rejeter tous les cookies optionnels",
+     *     description="Rejette tous les cookies non-essentiels, garde uniquement les cookies nécessaires",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Cookies optionnels rejetés avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Tous les cookies optionnels ont été rejetés"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="cookie_id", type="integer", example=1),
+     *                 @OA\Property(
+     *                     property="preferences",
+     *                     type="object",
+     *                     @OA\Property(property="necessary", type="boolean", example=true, description="Toujours activé"),
+     *                     @OA\Property(property="analytics", type="boolean", example=false),
+     *                     @OA\Property(property="marketing", type="boolean", example=false),
+     *                     @OA\Property(property="preferences", type="boolean", example=false),
+     *                     @OA\Property(property="social_media", type="boolean", example=false)
+     *                 ),
+     *                 @OA\Property(property="status", type="string", example="rejected"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     )
+     * )
+     * 
      * Rejeter tous les cookies optionnels
      */
     public function rejectAll(Request $request): JsonResponse

@@ -43,7 +43,13 @@ class SpecialOfferController extends Controller
             abort(403, 'Accès non autorisé. Seuls les administrateurs peuvent gérer les offres spéciales.');
         }
 
-        $products = Product::where('is_active', true)->get();
+        // Récupérer uniquement les produits d'achat (pas de location)
+        $products = Product::where('is_active', true)
+            ->where('type', Product::TYPE_SALE)
+            ->with('category')
+            ->orderBy('name')
+            ->get();
+            
         return view('admin.special-offers.create', compact('products'));
     }
 

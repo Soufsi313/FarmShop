@@ -166,7 +166,7 @@ class PaymentController extends Controller
         // Calculer les frais de livraison
         $shippingCost = 0;
         if ($totalHTC < 25) {
-            $shippingCost = 5; // 5€ de frais de livraison si commande < 25€
+            $shippingCost = 2.50; // 2.50€ de frais de livraison si commande < 25€
         }
         
         $totalHTC_withShipping = $totalHTC + $shippingCost;

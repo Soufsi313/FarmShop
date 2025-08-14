@@ -107,12 +107,16 @@ class OrderObserver
      */
     public function deleted(Order $order): void
     {
-        // Restaurer le stock des produits si la commande est supprimée
-        foreach ($order->items as $item) {
-            $item->product->increment('quantity', $item->quantity);
+        // Restaurer le stock des produits SEULEMENT si la commande était payée
+        // (c'est-à-dire si le stock avait été décrémenté)
+        if ($order->payment_status === 'paid') {
+            foreach ($order->items as $item) {
+                $item->product->increment('quantity', $item->quantity);
+            }
+            Log::info("Stock restauré pour la commande supprimée payée {$order->order_number}");
+        } else {
+            Log::info("Commande supprimée non payée {$order->order_number} - Stock non restauré (correct)");
         }
-
-        Log::info("Stock restauré pour la commande supprimée {$order->order_number}");
     }
 
     /**
@@ -120,12 +124,16 @@ class OrderObserver
      */
     public function restored(Order $order): void
     {
-        // Décrémenter à nouveau le stock si la commande est restaurée
-        foreach ($order->items as $item) {
-            $item->product->decrement('quantity', $item->quantity);
+        // Décrémenter à nouveau le stock SEULEMENT si la commande était payée
+        // (pour éviter de décrémenter le stock d'une commande qui n'était pas payée)
+        if ($order->payment_status === 'paid') {
+            foreach ($order->items as $item) {
+                $item->product->decrement('quantity', $item->quantity);
+            }
+            Log::info("Stock décrémenté pour la commande restaurée payée {$order->order_number}");
+        } else {
+            Log::info("Commande restaurée non payée {$order->order_number} - Stock non décrémenté (correct)");
         }
-
-        Log::info("Stock mis à jour pour la commande restaurée {$order->order_number}");
     }
 
     /**
@@ -133,11 +141,15 @@ class OrderObserver
      */
     public function forceDeleted(Order $order): void
     {
-        // Restaurer le stock des produits si la commande est définitivement supprimée
-        foreach ($order->items as $item) {
-            $item->product->increment('quantity', $item->quantity);
+        // Restaurer le stock des produits SEULEMENT si la commande était payée
+        // (c'est-à-dire si le stock avait été décrémenté)
+        if ($order->payment_status === 'paid') {
+            foreach ($order->items as $item) {
+                $item->product->increment('quantity', $item->quantity);
+            }
+            Log::info("Stock restauré pour la commande définitivement supprimée payée {$order->order_number}");
+        } else {
+            Log::info("Commande définitivement supprimée non payée {$order->order_number} - Stock non restauré (correct)");
         }
-
-        Log::info("Stock restauré pour la commande définitivement supprimée {$order->order_number}");
     }
 }

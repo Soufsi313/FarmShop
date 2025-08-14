@@ -68,17 +68,33 @@
                             <select id="product_id" 
                                     name="product_id" 
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    x-on:change="updateProductInfo($event.target.value)"
                                     required>
                                 <option value="">Sélectionnez un produit</option>
                                 @foreach($products as $product)
-                                    <option value="{{ $product->id }}" {{ old('product_id') == $product->id ? 'selected' : '' }}>
-                                        {{ $product->name }} - {{ $product->price }}€
+                                    <option value="{{ $product->id }}" 
+                                            data-unit="{{ $product->unit_symbol }}"
+                                            data-price="{{ $product->price }}"
+                                            data-category="{{ $product->category ? $product->category->name : 'N/A' }}"
+                                            {{ old('product_id') == $product->id ? 'selected' : '' }}>
+                                        {{ $product->name }} - {{ number_format($product->price, 2) }}€/{{ $product->unit_symbol }} 
+                                        @if($product->category) ({{ $product->category->name }}) @endif
                                     </option>
                                 @endforeach
                             </select>
                             @error('product_id')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
+                            
+                            <!-- Informations du produit sélectionné -->
+                            <div x-show="selectedProduct.id" class="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                <h4 class="font-medium text-blue-900 mb-2">Informations du produit sélectionné</h4>
+                                <div class="text-sm text-blue-800 space-y-1">
+                                    <p><strong>Prix:</strong> <span x-text="selectedProduct.price"></span>€</p>
+                                    <p><strong>Unité:</strong> <span x-text="selectedProduct.unit"></span></p>
+                                    <p><strong>Catégorie:</strong> <span x-text="selectedProduct.category"></span></p>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Discount Percentage -->
@@ -115,16 +131,19 @@
                                        name="minimum_quantity" 
                                        value="{{ old('minimum_quantity', 1) }}"
                                        min="1" 
-                                       step="1"
-                                       class="w-full px-4 py-3 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                       step="0.01"
+                                       class="w-full px-4 py-3 pr-16 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                        placeholder="1"
                                        required>
-                                <span class="absolute right-3 top-3 text-gray-500">kg</span>
+                                <span class="absolute right-3 top-3 text-gray-500" x-text="selectedProduct.unit || 'unité'"></span>
                             </div>
                             @error('minimum_quantity')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
-                            <p class="text-sm text-gray-500 mt-1">Quantité minimum pour bénéficier de l'offre</p>
+                            <p class="text-sm text-gray-500 mt-1">
+                                Quantité minimum pour bénéficier de l'offre
+                                <span x-show="selectedProduct.unit">(en <span x-text="selectedProduct.unit"></span>)</span>
+                            </p>
                         </div>
 
                         <!-- Status -->
@@ -263,6 +282,11 @@
 function specialOfferForm() {
     return {
         imagePreview: null,
+        selectedProduct: {
+            unit: '',
+            price: '',
+            category: ''
+        },
         
         previewImage(event) {
             const file = event.target.files[0];
@@ -274,6 +298,23 @@ function specialOfferForm() {
                 reader.readAsDataURL(file);
             } else {
                 this.imagePreview = null;
+            }
+        },
+        
+        updateProductInfo(event) {
+            const selectedOption = event.target.selectedOptions[0];
+            if (selectedOption && selectedOption.value) {
+                this.selectedProduct = {
+                    unit: selectedOption.dataset.unit || '',
+                    price: selectedOption.dataset.price || '',
+                    category: selectedOption.dataset.category || ''
+                };
+            } else {
+                this.selectedProduct = {
+                    unit: '',
+                    price: '',
+                    category: ''
+                };
             }
         }
     };

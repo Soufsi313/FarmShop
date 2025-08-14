@@ -8,6 +8,7 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\MyRentalsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
@@ -461,6 +462,16 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
+// Routes de vérification d'email
+Route::get('/email/verify', [EmailVerificationController::class, 'show'])
+    ->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+    ->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
+    ->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
 // Routes publiques pour les catégories
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
@@ -501,8 +512,12 @@ Route::middleware(['auth'])->group(function () {
     // Export données RGPD
     Route::get('/profile/download-data', [UserController::class, 'downloadData'])->name('users.download-data');
     
-    // Auto-suppression
-    Route::delete('/profile/self-delete', [UserController::class, 'selfDelete'])->name('users.self-delete');
+    // Suppression de compte en 2 étapes
+    Route::post('/profile/request-delete', [UserController::class, 'requestSelfDelete'])->name('users.request-delete');
+    Route::get('/profile/confirm-delete/{user}', [UserController::class, 'confirmSelfDelete'])->name('account.confirm-deletion')->middleware('signed');
+    
+    // Ancien endpoint (pour compatibilité)
+    Route::delete('/profile/self-delete', [UserController::class, 'requestSelfDelete'])->name('users.self-delete');
 });
 
 // Routes administration
@@ -562,6 +577,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/users/{user}/edit', [DashboardController::class, 'editUser'])->name('users.edit');
     Route::put('/users/{user}', [DashboardController::class, 'updateUser'])->name('users.update');
     Route::delete('/users/{user}', [DashboardController::class, 'destroyUser'])->name('users.destroy');
+    Route::post('/users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
     // Gestion des commandes d'achat
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
@@ -625,6 +641,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Gestion des newsletters
     Route::resource('newsletters', AdminNewsletterController::class);
     Route::post('/newsletters/{newsletter}/send', [AdminNewsletterController::class, 'send'])->name('newsletters.send');
+    Route::post('/newsletters/{newsletter}/send-to-me', [AdminNewsletterController::class, 'sendToMe'])->name('newsletters.send-to-me');
     Route::post('/newsletters/{newsletter}/test', [AdminNewsletterController::class, 'sendTest'])->name('newsletters.test');
     Route::get('/newsletters/{newsletter}/subscribers', [AdminNewsletterController::class, 'subscribers'])->name('newsletters.subscribers');
     Route::post('/newsletters/{newsletter}/duplicate', [AdminNewsletterController::class, 'duplicate'])->name('newsletters.duplicate');

@@ -121,6 +121,22 @@ class CartItem extends Model
     public function updateQuantity(int $quantity): void
     {
         $this->quantity = max(1, $quantity); // Minimum 1
+        
+        // Vérifier le stock disponible
+        if ($this->product && $this->quantity > $this->product->quantity) {
+            throw new \Exception("Stock insuffisant. Stock disponible: {$this->product->quantity}");
+        }
+        
+        // Vérifier que le produit est toujours actif
+        if ($this->product && !$this->product->is_active) {
+            throw new \Exception("Ce produit n'est plus disponible");
+        }
+        
+        // Vérifier que le produit n'est pas en rupture de stock
+        if ($this->product && $this->product->is_out_of_stock) {
+            throw new \Exception("Ce produit est en rupture de stock et ne peut pas être modifié");
+        }
+        
         $this->recalculate();
         
         // Recalculer le total du panier

@@ -16,6 +16,79 @@ class BlogCommentReportController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/blog/comment-reports",
+     *     tags={"Admin", "Blog", "Reports"},
+     *     summary="Liste des signalements de commentaires",
+     *     description="Récupère la liste des signalements de commentaires avec filtrage (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         description="Terme de recherche dans le signalement ou commentaire",
+     *         @OA\Schema(type="string", example="spam")
+     *     ),
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filtrer par statut",
+     *         @OA\Schema(type="string", enum={"pending", "reviewing", "resolved", "dismissed"}, example="pending")
+     *     ),
+     *     @OA\Parameter(
+     *         name="reason",
+     *         in="query",
+     *         description="Filtrer par raison du signalement",
+     *         @OA\Schema(type="string", enum={"spam", "inappropriate", "harassment", "hate_speech", "violence", "other"}, example="spam")
+     *     ),
+     *     @OA\Parameter(
+     *         name="priority",
+     *         in="query",
+     *         description="Filtrer par priorité",
+     *         @OA\Schema(type="string", enum={"low", "medium", "high", "urgent"}, example="high")
+     *     ),
+     *     @OA\Parameter(
+     *         name="high_priority",
+     *         in="query",
+     *         description="Afficher uniquement les signalements haute priorité",
+     *         @OA\Schema(type="boolean", example=true)
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort_by",
+     *         in="query",
+     *         description="Critère de tri",
+     *         @OA\Schema(type="string", enum={"recent", "oldest", "priority"}, example="priority")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Nombre d'éléments par page",
+     *         @OA\Schema(type="integer", minimum=1, maximum=100, example=20)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des signalements récupérée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", ref="#/components/schemas/PaginatedResponse"),
+     *             @OA\Property(
+     *                 property="meta",
+     *                 type="object",
+     *                 @OA\Property(property="total_reports", type="integer", example=157),
+     *                 @OA\Property(property="pending_reports", type="integer", example=23),
+     *                 @OA\Property(property="reviewing_reports", type="integer", example=8),
+     *                 @OA\Property(property="resolved_reports", type="integer", example=118),
+     *                 @OA\Property(property="dismissed_reports", type="integer", example=8),
+     *                 @OA\Property(property="high_priority_reports", type="integer", example=5)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Afficher la liste des signalements (Admin seulement)
      */
     public function index(Request $request)
@@ -75,6 +148,39 @@ class BlogCommentReportController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/blog/comment-reports/{blogCommentReport}",
+     *     tags={"Admin", "Blog", "Reports"},
+     *     summary="Détails d'un signalement",
+     *     description="Récupère les détails complets d'un signalement de commentaire (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="blogCommentReport",
+     *         in="path",
+     *         description="ID du signalement",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Détails du signalement récupérés avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", ref="#/components/schemas/BlogCommentReport")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Signalement non trouvé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Afficher un signalement spécifique (Admin seulement)
      */
     public function show(BlogCommentReport $blogCommentReport)
@@ -93,6 +199,52 @@ class BlogCommentReportController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/blog/comments/{blogComment}/report",
+     *     tags={"Blog", "Comments", "Reports"},
+     *     summary="Signaler un commentaire",
+     *     description="Permet à un utilisateur de signaler un commentaire inapproprié",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="blogComment",
+     *         in="path",
+     *         description="ID du commentaire à signaler",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Détails du signalement",
+     *         @OA\JsonContent(
+     *             required={"reason"},
+     *             @OA\Property(property="reason", type="string", enum={"spam", "inappropriate", "harassment", "hate_speech", "violence", "other"}, example="spam", description="Raison du signalement"),
+     *             @OA\Property(property="description", type="string", maxLength=1000, example="Ce commentaire contient des liens publicitaires non pertinents", description="Description détaillée du problème")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Signalement créé avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Signalement créé avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/BlogCommentReport")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=409,
+     *         description="Commentaire déjà signalé par cet utilisateur",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Vous avez déjà signalé ce commentaire")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erreurs de validation",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Signaler un commentaire
      */
     public function store(Request $request, BlogComment $blogComment)
@@ -210,6 +362,41 @@ class BlogCommentReportController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/blog/comment-reports/statistics",
+     *     tags={"Admin", "Blog", "Reports"},
+     *     summary="Statistiques des signalements",
+     *     description="Récupère les statistiques complètes des signalements de commentaires (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Statistiques récupérées avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="total_reports", type="integer", example=157, description="Total des signalements"),
+     *                 @OA\Property(property="pending_reports", type="integer", example=23, description="Signalements en attente"),
+     *                 @OA\Property(property="reviewed_reports", type="integer", example=8, description="Signalements en cours de révision"),
+     *                 @OA\Property(property="resolved_reports", type="integer", example=118, description="Signalements résolus"),
+     *                 @OA\Property(property="dismissed_reports", type="integer", example=8, description="Signalements rejetés"),
+     *                 @OA\Property(property="high_priority_reports", type="integer", example=5, description="Signalements haute priorité"),
+     *                 @OA\Property(property="recent_reports", type="array", @OA\Items(ref="#/components/schemas/BlogCommentReport"), description="Signalements récents"),
+     *                 @OA\Property(property="reports_by_reason", type="array", @OA\Items(type="object", @OA\Property(property="reason", type="string"), @OA\Property(property="count", type="integer")), description="Signalements par raison"),
+     *                 @OA\Property(property="reports_by_day", type="array", @OA\Items(type="object", @OA\Property(property="date", type="string", format="date"), @OA\Property(property="count", type="integer")), description="Signalements par jour (7 derniers jours)"),
+     *                 @OA\Property(property="most_reported_comments", type="array", @OA\Items(ref="#/components/schemas/BlogComment"), description="Commentaires les plus signalés"),
+     *                 @OA\Property(property="top_reporters", type="array", @OA\Items(ref="#/components/schemas/User"), description="Utilisateurs signalant le plus")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Statistiques des signalements (Admin seulement)
      */
     public function statistics()
@@ -328,6 +515,50 @@ class BlogCommentReportController extends Controller
     }
 
     /**
+     * @OA\Patch(
+     *     path="/api/admin/blog/comment-reports/{blogCommentReport}/process",
+     *     tags={"Admin", "Blog", "Reports"},
+     *     summary="Traiter un signalement",
+     *     description="Traite un signalement en le résolvant ou le rejetant avec action sur le commentaire (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="blogCommentReport",
+     *         in="path",
+     *         description="ID du signalement à traiter",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Action de traitement",
+     *         @OA\JsonContent(
+     *             required={"action"},
+     *             @OA\Property(property="action", type="string", enum={"resolve", "dismiss"}, example="resolve", description="Action sur le signalement"),
+     *             @OA\Property(property="comment_action", type="string", enum={"delete", "reject", "keep"}, example="delete", description="Action sur le commentaire signalé"),
+     *             @OA\Property(property="admin_notes", type="string", maxLength=1000, example="Commentaire supprimé pour spam", description="Notes administrateur")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Signalement traité avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Signalement résolu avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/BlogCommentReport")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erreurs de validation",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Signalement non trouvé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Traiter un signalement (résoudre ou rejeter)
      */
     public function process(Request $request, BlogCommentReport $blogCommentReport)

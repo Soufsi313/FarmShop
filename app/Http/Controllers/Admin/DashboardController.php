@@ -34,6 +34,65 @@ class DashboardController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/dashboard",
+     *     tags={"Admin", "Dashboard", "Analytics"},
+     *     summary="Dashboard principal administrateur",
+     *     description="Affiche le tableau de bord principal avec toutes les statistiques du site (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Dashboard récupéré avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="stock_stats",
+     *                     type="object",
+     *                     @OA\Property(property="critical_stock_products", type="integer", example=5),
+     *                     @OA\Property(property="out_of_stock_products", type="integer", example=2),
+     *                     @OA\Property(property="low_stock_rental_products", type="integer", example=3),
+     *                     @OA\Property(property="total_products", type="integer", example=245),
+     *                     @OA\Property(property="active_products", type="integer", example=238)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="analytics_stats",
+     *                     type="object",
+     *                     @OA\Property(property="total_orders", type="integer", example=1247),
+     *                     @OA\Property(property="pending_orders", type="integer", example=23),
+     *                     @OA\Property(property="total_revenue", type="number", format="float", example=85647.50),
+     *                     @OA\Property(property="monthly_revenue", type="number", format="float", example=12847.30),
+     *                     @OA\Property(property="total_users", type="integer", example=456),
+     *                     @OA\Property(property="new_users_this_month", type="integer", example=34)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="newsletter_stats",
+     *                     type="object",
+     *                     @OA\Property(property="total_subscribers", type="integer", example=1856),
+     *                     @OA\Property(property="active_subscribers", type="integer", example=1723),
+     *                     @OA\Property(property="newsletters_sent", type="integer", example=45),
+     *                     @OA\Property(property="avg_open_rate", type="number", format="float", example=68.5)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="rental_stats",
+     *                     type="object",
+     *                     @OA\Property(property="active_rentals", type="integer", example=78),
+     *                     @OA\Property(property="pending_returns", type="integer", example=12),
+     *                     @OA\Property(property="overdue_rentals", type="integer", example=3),
+     *                     @OA\Property(property="monthly_rental_revenue", type="number", format="float", example=4567.80)
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Afficher le dashboard principal
      */
     public function index()
@@ -81,12 +140,27 @@ class DashboardController extends Controller
         
         $query = User::query();
         
+        // Filtre pour les comptes supprimés
+        $showDeleted = $request->get('show_deleted', 'active'); // 'active', 'deleted', 'all'
+        
+        switch ($showDeleted) {
+            case 'deleted':
+                $query->onlyTrashed();
+                break;
+            case 'all':
+                $query->withTrashed();
+                break;
+            default: // 'active'
+                // Par défaut, ne montre que les utilisateurs actifs
+                break;
+        }
+        
         // Tri
         $sortBy = $request->get('sort', 'created_at');
         $sortOrder = $request->get('order', 'desc');
         
         // Validation des champs de tri
-        $allowedSorts = ['name', 'username', 'email', 'role', 'created_at', 'updated_at'];
+        $allowedSorts = ['name', 'username', 'email', 'role', 'created_at', 'updated_at', 'deleted_at'];
         if (!in_array($sortBy, $allowedSorts)) {
             $sortBy = 'created_at';
         }
@@ -101,6 +175,7 @@ class DashboardController extends Controller
             'total' => User::count(),
             'admins' => User::where('role', 'Admin')->count(),
             'users' => User::where('role', 'User')->count(),
+            'deleted' => User::onlyTrashed()->count(),
             'new_users' => User::where('created_at', '>=', now()->subDays(30))->count(),
             'active_users' => User::where('updated_at', '>=', now()->subDays(7))->count(),
         ];
@@ -122,7 +197,7 @@ class DashboardController extends Controller
         
         $users = $query->orderBy($sortBy, $sortOrder)->paginate(20);
         
-        return view('admin.users.index', compact('users', 'stats', 'sortBy', 'sortOrder'));
+        return view('admin.users.index', compact('users', 'stats', 'sortBy', 'sortOrder', 'showDeleted'));
     }
 
     /**
@@ -733,6 +808,97 @@ class DashboardController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/dashboard/statistics",
+     *     tags={"Admin", "Dashboard", "Statistics", "Analytics"},
+     *     summary="Statistiques avancées du site",
+     *     description="Page complète de statistiques avec données détaillées pour tous les modules (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="period",
+     *         in="query",
+     *         description="Période d'analyse",
+     *         @OA\Schema(type="string", enum={"7d", "30d", "90d", "1y"}, example="30d")
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_from",
+     *         in="query",
+     *         description="Date de début (YYYY-MM-DD)",
+     *         @OA\Schema(type="string", format="date", example="2024-08-01")
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_to",
+     *         in="query",
+     *         description="Date de fin (YYYY-MM-DD)",
+     *         @OA\Schema(type="string", format="date", example="2024-08-31")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Statistiques avancées récupérées avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="basic_stats",
+     *                     type="object",
+     *                     @OA\Property(property="users", type="integer", example=456),
+     *                     @OA\Property(property="products", type="integer", example=245),
+     *                     @OA\Property(property="orders", type="integer", example=1247),
+     *                     @OA\Property(property="messages", type="integer", example=89),
+     *                     @OA\Property(property="total_revenue", type="number", format="float", example=85647.50)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="analytics_stats",
+     *                     type="object",
+     *                     @OA\Property(property="conversion_rate", type="number", format="float", example=15.8),
+     *                     @OA\Property(property="average_order_value", type="number", format="float", example=67.45),
+     *                     @OA\Property(property="customer_lifetime_value", type="number", format="float", example=234.67),
+     *                     @OA\Property(property="cart_abandonment_rate", type="number", format="float", example=23.4)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="newsletter_stats",
+     *                     type="object",
+     *                     @OA\Property(property="total_subscribers", type="integer", example=1856),
+     *                     @OA\Property(property="growth_rate", type="number", format="float", example=8.5),
+     *                     @OA\Property(property="engagement_rate", type="number", format="float", example=68.2)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="rental_stats",
+     *                     type="object",
+     *                     @OA\Property(property="utilization_rate", type="number", format="float", example=78.5),
+     *                     @OA\Property(property="average_rental_duration", type="number", format="float", example=7.2),
+     *                     @OA\Property(property="return_rate", type="number", format="float", example=98.7)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="top_products",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="name", type="string", example="Tomates Bio Premium"),
+     *                         @OA\Property(property="views", type="integer", example=342),
+     *                         @OA\Property(property="conversion", type="number", format="float", example=12.5),
+     *                         @OA\Property(property="revenue", type="number", format="float", example=1247.50)
+     *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="trends",
+     *                     type="object",
+     *                     @OA\Property(property="user_growth", type="array", @OA\Items(type="object")),
+     *                     @OA\Property(property="revenue_trend", type="array", @OA\Items(type="object")),
+     *                     @OA\Property(property="order_volume", type="array", @OA\Items(type="object"))
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Page de statistiques avancées
      */
     public function statistics()

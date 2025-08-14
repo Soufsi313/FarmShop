@@ -17,6 +17,58 @@ class BlogCategoryController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/blog/categories",
+     *     tags={"Blog", "Categories"},
+     *     summary="Liste des catégories de blog",
+     *     description="Récupère la liste des catégories de blog avec possibilité de filtrage et tri",
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         description="Terme de recherche dans le nom ou slug",
+     *         @OA\Schema(type="string", example="jardinage")
+     *     ),
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filtrer par statut (admin uniquement)",
+     *         @OA\Schema(type="string", enum={"active", "inactive"}, example="active")
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort_by",
+     *         in="query",
+     *         description="Critère de tri",
+     *         @OA\Schema(type="string", enum={"sort_order", "name", "posts_count", "created_at"}, example="sort_order")
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort_direction",
+     *         in="query",
+     *         description="Direction du tri",
+     *         @OA\Schema(type="string", enum={"asc", "desc"}, example="asc")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Nombre d'éléments par page",
+     *         @OA\Schema(type="integer", minimum=1, maximum=100, example=20)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des catégories récupérée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", ref="#/components/schemas/PaginatedResponse"),
+     *             @OA\Property(
+     *                 property="meta",
+     *                 type="object",
+     *                 @OA\Property(property="total_categories", type="integer", example=15),
+     *                 @OA\Property(property="active_categories", type="integer", example=12),
+     *                 @OA\Property(property="inactive_categories", type="integer", example=3)
+     *             )
+     *         )
+     *     )
+     * )
+     * 
      * Afficher la liste des catégories de blog
      */
     public function index(Request $request)
@@ -67,6 +119,34 @@ class BlogCategoryController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/blog/categories/{slug}",
+     *     tags={"Blog", "Categories"},
+     *     summary="Détails d'une catégorie de blog",
+     *     description="Récupère les détails d'une catégorie avec ses articles",
+     *     @OA\Parameter(
+     *         name="slug",
+     *         in="path",
+     *         description="Slug de la catégorie",
+     *         required=true,
+     *         @OA\Schema(type="string", example="jardinage-bio")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Catégorie récupérée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", ref="#/components/schemas/BlogCategory"),
+     *             @OA\Property(property="posts", ref="#/components/schemas/PaginatedResponse")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Catégorie non trouvée",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Afficher une catégorie spécifique
      */
     public function show($slug)
@@ -99,6 +179,49 @@ class BlogCategoryController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/blog/categories",
+     *     tags={"Admin", "Blog", "Categories"},
+     *     summary="Créer une catégorie de blog",
+     *     description="Crée une nouvelle catégorie de blog (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Données de la catégorie à créer",
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", maxLength=255, example="Jardinage Bio", description="Nom de la catégorie"),
+     *             @OA\Property(property="description", type="string", maxLength=1000, example="Tout sur le jardinage biologique", description="Description de la catégorie"),
+     *             @OA\Property(property="color", type="string", pattern="^#[0-9A-Fa-f]{6}$", example="#4CAF50", description="Couleur de la catégorie (format hexadécimal)"),
+     *             @OA\Property(property="icon", type="string", maxLength=255, example="fa-leaf", description="Icône de la catégorie"),
+     *             @OA\Property(property="image", type="string", format="binary", description="Image de la catégorie (JPEG, PNG, JPG, WebP, max 2MB)"),
+     *             @OA\Property(property="meta_title", type="string", maxLength=60, example="Jardinage Bio - FarmShop", description="Titre SEO"),
+     *             @OA\Property(property="meta_description", type="string", maxLength=160, example="Découvrez nos conseils...", description="Description SEO"),
+     *             @OA\Property(property="is_active", type="boolean", example=true, description="Catégorie active"),
+     *             @OA\Property(property="sort_order", type="integer", example=1, description="Ordre d'affichage")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Catégorie créée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Catégorie créée avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/BlogCategory")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erreurs de validation",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Créer une nouvelle catégorie (Admin seulement)
      */
     public function store(Request $request)
@@ -132,6 +255,56 @@ class BlogCategoryController extends Controller
     }
 
     /**
+     * @OA\Put(
+     *     path="/api/admin/blog/categories/{blogCategory}",
+     *     tags={"Admin", "Blog", "Categories"},
+     *     summary="Modifier une catégorie de blog",
+     *     description="Met à jour une catégorie de blog existante (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="blogCategory",
+     *         in="path",
+     *         description="ID de la catégorie à modifier",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Données de la catégorie à modifier",
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", maxLength=255, example="Jardinage Bio Avancé", description="Nom de la catégorie"),
+     *             @OA\Property(property="description", type="string", maxLength=1000, example="Description mise à jour", description="Description de la catégorie"),
+     *             @OA\Property(property="color", type="string", pattern="^#[0-9A-Fa-f]{6}$", example="#2E7D32", description="Couleur de la catégorie"),
+     *             @OA\Property(property="icon", type="string", maxLength=255, example="fa-seedling", description="Icône de la catégorie"),
+     *             @OA\Property(property="image", type="string", format="binary", description="Nouvelle image de la catégorie"),
+     *             @OA\Property(property="meta_title", type="string", maxLength=60, example="Jardinage Bio Avancé", description="Titre SEO"),
+     *             @OA\Property(property="meta_description", type="string", maxLength=160, example="Description SEO mise à jour", description="Description SEO"),
+     *             @OA\Property(property="is_active", type="boolean", example=true, description="Catégorie active"),
+     *             @OA\Property(property="sort_order", type="integer", example=2, description="Ordre d'affichage")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Catégorie modifiée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Catégorie modifiée avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/BlogCategory")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Catégorie non trouvée",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erreurs de validation",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Mettre à jour une catégorie (Admin seulement)
      */
     public function update(Request $request, BlogCategory $blogCategory)
@@ -170,6 +343,42 @@ class BlogCategoryController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *     path="/api/admin/blog/categories/{blogCategory}",
+     *     tags={"Admin", "Blog", "Categories"},
+     *     summary="Supprimer une catégorie de blog",
+     *     description="Supprime une catégorie de blog si elle ne contient pas d'articles (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="blogCategory",
+     *         in="path",
+     *         description="ID de la catégorie à supprimer",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Catégorie supprimée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Catégorie supprimée avec succès")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Catégorie non trouvée",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Impossible de supprimer (catégorie contient des articles)",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Impossible de supprimer une catégorie contenant des articles")
+     *         )
+     *     )
+     * )
+     * 
      * Supprimer une catégorie (Admin seulement)
      */
     public function destroy(BlogCategory $blogCategory)
@@ -196,6 +405,35 @@ class BlogCategoryController extends Controller
     }
 
     /**
+     * @OA\Patch(
+     *     path="/api/admin/blog/categories/{blogCategory}/toggle-status",
+     *     tags={"Admin", "Blog", "Categories"},
+     *     summary="Activer/Désactiver une catégorie",
+     *     description="Change le statut actif/inactif d'une catégorie de blog (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="blogCategory",
+     *         in="path",
+     *         description="ID de la catégorie",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Statut modifié avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Statut de la catégorie modifié avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/BlogCategory")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Catégorie non trouvée",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Activer/Désactiver une catégorie (Admin seulement)
      */
     public function toggleStatus(BlogCategory $blogCategory)
@@ -214,6 +452,37 @@ class BlogCategoryController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/blog/categories/statistics",
+     *     tags={"Admin", "Blog", "Categories"},
+     *     summary="Statistiques des catégories de blog",
+     *     description="Récupère les statistiques complètes des catégories de blog (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Statistiques récupérées avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="total_categories", type="integer", example=15, description="Total des catégories"),
+     *                 @OA\Property(property="active_categories", type="integer", example=12, description="Catégories actives"),
+     *                 @OA\Property(property="inactive_categories", type="integer", example=3, description="Catégories inactives"),
+     *                 @OA\Property(property="categories_with_posts", type="integer", example=10, description="Catégories avec articles"),
+     *                 @OA\Property(property="most_popular", ref="#/components/schemas/BlogCategory", description="Catégorie la plus populaire"),
+     *                 @OA\Property(property="recent_categories", type="array", @OA\Items(ref="#/components/schemas/BlogCategory"), description="Catégories récentes"),
+     *                 @OA\Property(property="posts_by_category", type="array", @OA\Items(type="object", @OA\Property(property="category", type="string"), @OA\Property(property="posts_count", type="integer")), description="Articles par catégorie")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Statistiques des catégories (Admin seulement)
      */
     public function statistics()
@@ -238,6 +507,50 @@ class BlogCategoryController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/blog/categories/update-order",
+     *     tags={"Admin", "Blog", "Categories"},
+     *     summary="Mettre à jour l'ordre des catégories",
+     *     description="Met à jour l'ordre d'affichage des catégories de blog (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Nouvel ordre des catégories",
+     *         @OA\JsonContent(
+     *             required={"categories"},
+     *             @OA\Property(
+     *                 property="categories",
+     *                 type="array",
+     *                 description="Liste des catégories avec leur nouvel ordre",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     required={"id", "sort_order"},
+     *                     @OA\Property(property="id", type="integer", example=1, description="ID de la catégorie"),
+     *                     @OA\Property(property="sort_order", type="integer", minimum=0, example=1, description="Nouvel ordre d'affichage")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ordre mis à jour avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Ordre des catégories mis à jour avec succès")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erreurs de validation",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Mettre à jour l'ordre des catégories (Admin seulement)
      */
     public function updateOrder(Request $request)

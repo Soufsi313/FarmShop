@@ -370,10 +370,15 @@ class Order extends Model
             'cancellation_reason' => $reason
         ]);
 
-        // ✅ RESTAURER LE STOCK pour chaque produit annulé
-        foreach ($this->items as $item) {
-            $item->product->increment('quantity', $item->quantity);
-            \Log::info("Stock restauré pour le produit {$item->product->name} : +{$item->quantity} unités");
+        // ✅ RESTAURER LE STOCK SEULEMENT si la commande était payée
+        // (c'est-à-dire si le stock avait été décrémenté)
+        if ($this->payment_status === 'paid') {
+            foreach ($this->items as $item) {
+                $item->product->increment('quantity', $item->quantity);
+                \Log::info("Stock restauré pour le produit {$item->product->name} : +{$item->quantity} unités (commande payée)");
+            }
+        } else {
+            \Log::info("Commande annulée non payée {$this->order_number} - Stock non restauré (correct)");
         }
 
         // Traiter le remboursement automatique

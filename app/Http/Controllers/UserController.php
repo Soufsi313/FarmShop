@@ -12,6 +12,7 @@ use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AccountDeletionNotification;
+use App\Notifications\ConfirmAccountDeletionNotification;
 
 class UserController extends Controller
 {
@@ -206,11 +207,8 @@ class UserController extends Controller
         $user = User::withTrashed()->findOrFail($id);
         $user->restore();
 
-        return response()->json([
-            'success' => true,
-            'data' => $user,
-            'message' => 'Utilisateur restauré avec succès'
-        ]);
+        return redirect()->route('admin.users.index')
+            ->with('success', "Utilisateur '{$user->name}' restauré avec succès !");
     }
 
     /**
@@ -391,48 +389,199 @@ class UserController extends Controller
     }
 
     /**
-     * Auto-suppression du compte utilisateur avec notification email
+     * Demander la suppression du compte utilisateur (étape 1)
      */
-    public function selfDelete()
+    public function requestSelfDelete()
     {
         $user = Auth::user();
 
         // Un admin ne peut pas se supprimer lui-même
         if ($user->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Un administrateur ne peut pas supprimer son propre compte'
-            ], 403);
+            return redirect()->back()->with('error', 'Un administrateur ne peut pas supprimer son propre compte');
         }
 
-        // Préparer les données pour l'email avant suppression
-        $userEmail = $user->email;
-        $userName = $user->name;
-        $deletionDate = now()->format('d/m/Y à H:i:s');
-        
         try {
-            // Envoyer l'email de notification avant la suppression
-            Mail::to($userEmail)->send(new AccountDeletionNotification($user, $deletionDate));
+            // Envoyer l'email de confirmation
+            $user->notify(new ConfirmAccountDeletionNotification());
+            
+            return view('auth.account-deletion-requested');
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erreur lors de l\'envoi de l\'email de confirmation : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Confirmer la suppression du compte utilisateur (étape 2)
+     */
+    public function confirmSelfDelete(Request $request, $userId)
+    {
+        // Vérifier la signature de l'URL
+        if (!$request->hasValidSignature()) {
+            abort(403, 'Lien de confirmation invalide ou expiré');
+        }
+
+        $user = User::findOrFail($userId);
+
+        // Vérifier que c'est bien l'utilisateur connecté
+        if (Auth::id() !== $user->id) {
+            abort(403, 'Accès non autorisé');
+        }
+
+        // Un admin ne peut pas se supprimer lui-même
+        if ($user->isAdmin()) {
+            abort(403, 'Un administrateur ne peut pas supprimer son propre compte');
+        }
+
+        try {
+            // Générer le téléchargement GDPR avant suppression
+            $zipPath = $this->generateGdprZip($user);
+            $zipFileName = basename($zipPath);
             
             // Supprimer le compte (soft delete)
             $user->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Votre compte a été supprimé avec succès. Un email de confirmation vous a été envoyé.'
-            ]);
+            // Déconnecter l'utilisateur
+            Auth::logout();
+
+            // Retourner la page de confirmation avec téléchargement automatique
+            return view('auth.account-deleted-success')->with('zipFileName', $zipFileName);
             
         } catch (\Exception $e) {
-            // En cas d'erreur d'envoi d'email, on supprime quand même le compte
-            // mais on informe l'utilisateur
-            $user->delete();
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Votre compte a été supprimé avec succès. L\'email de confirmation n\'a pu être envoyé.',
-                'warning' => 'Erreur d\'envoi d\'email : ' . $e->getMessage()
-            ]);
+            return redirect()->route('dashboard')->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Générer le ZIP GDPR avec toutes les données utilisateur
+     */
+    private function generateGdprZip($user)
+    {
+        $zipFileName = 'donnees_utilisateur_' . $user->id . '_' . date('Y-m-d_H-i-s') . '.zip';
+        $zipPath = storage_path('app/public/gdpr/' . $zipFileName);
+        
+        // Créer le dossier s'il n'existe pas
+        $gdprDir = dirname($zipPath);
+        if (!is_dir($gdprDir)) {
+            mkdir($gdprDir, 0755, true);
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath, \ZipArchive::CREATE) !== TRUE) {
+            throw new \Exception('Impossible de créer le fichier ZIP');
+        }
+
+        // 1. Données de profil
+        $profilePdf = $this->generateProfilePdf($user);
+        $zip->addFile($profilePdf, 'profil_utilisateur.pdf');
+
+        // 2. Historique des commandes
+        if ($user->orders()->exists()) {
+            $ordersPdf = $this->generateOrdersPdf($user);
+            $zip->addFile($ordersPdf, 'historique_commandes.pdf');
+        }
+
+        // 3. Historique des locations
+        if ($user->rentals()->exists()) {
+            $rentalsPdf = $this->generateRentalsPdf($user);
+            $zip->addFile($rentalsPdf, 'historique_locations.pdf');
+        }
+
+        // 4. Messages et communications
+        if ($user->messages()->exists()) {
+            $messagesPdf = $this->generateMessagesPdf($user);
+            $zip->addFile($messagesPdf, 'messages_communications.pdf');
+        }
+
+        // 5. Données de navigation (préférences, newsletter, etc.)
+        $navigationPdf = $this->generateNavigationPdf($user);
+        $zip->addFile($navigationPdf, 'donnees_navigation.pdf');
+
+        $zip->close();
+
+        return $zipPath;
+    }
+
+    /**
+     * Générer le PDF du profil utilisateur
+     */
+    private function generateProfilePdf($user)
+    {
+        $html = view('pdfs.user-profile', compact('user'))->render();
+        $pdf = Pdf::loadHTML($html);
+        
+        $pdfPath = storage_path('app/temp/profile_' . $user->id . '.pdf');
+        $pdf->save($pdfPath);
+        
+        return $pdfPath;
+    }
+
+    /**
+     * Générer le PDF des commandes
+     */
+    private function generateOrdersPdf($user)
+    {
+        $orders = $user->orders()->with('items.product')->get();
+        $html = view('pdfs.user-orders', compact('user', 'orders'))->render();
+        $pdf = Pdf::loadHTML($html);
+        
+        $pdfPath = storage_path('app/temp/orders_' . $user->id . '.pdf');
+        $pdf->save($pdfPath);
+        
+        return $pdfPath;
+    }
+
+    /**
+     * Générer le PDF des locations
+     */
+    private function generateRentalsPdf($user)
+    {
+        $rentals = $user->rentals()->with('product', 'inspections')->get();
+        $html = view('pdfs.user-rentals', compact('user', 'rentals'))->render();
+        $pdf = Pdf::loadHTML($html);
+        
+        $pdfPath = storage_path('app/temp/rentals_' . $user->id . '.pdf');
+        $pdf->save($pdfPath);
+        
+        return $pdfPath;
+    }
+
+    /**
+     * Générer le PDF des messages
+     */
+    private function generateMessagesPdf($user)
+    {
+        $messages = $user->messages()->orderBy('created_at', 'desc')->get();
+        $html = view('pdfs.user-messages', compact('user', 'messages'))->render();
+        $pdf = Pdf::loadHTML($html);
+        
+        $pdfPath = storage_path('app/temp/messages_' . $user->id . '.pdf');
+        $pdf->save($pdfPath);
+        
+        return $pdfPath;
+    }
+
+    /**
+     * Générer le PDF des données de navigation
+     */
+    private function generateNavigationPdf($user)
+    {
+        $data = [
+            'user' => $user,
+            'newsletter_subscribed' => $user->newsletter_subscribed,
+            'email_verified_at' => $user->email_verified_at,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
+            'last_login' => $user->last_login_at ?? 'Jamais connecté'
+        ];
+        
+        $html = view('pdfs.user-navigation', $data)->render();
+        $pdf = Pdf::loadHTML($html);
+        
+        $pdfPath = storage_path('app/temp/navigation_' . $user->id . '.pdf');
+        $pdf->save($pdfPath);
+        
+        return $pdfPath;
     }
 
     /**

@@ -12,6 +12,34 @@ use Illuminate\Support\Facades\DB;
 class ProductLikeController extends Controller
 {
     /**
+     * @OA\Get(
+     *     path="/api/products-likes",
+     *     tags={"Products", "Likes"},
+     *     summary="Produits les plus likés",
+     *     description="Récupère la liste des produits triés par nombre de likes (accessible à tous)",
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Nombre de produits par page",
+     *         @OA\Schema(type="integer", minimum=1, maximum=50, example=15)
+     *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Numéro de page",
+     *         @OA\Schema(type="integer", minimum=1, example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Produits récupérés avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Produits les plus likés récupérés avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/PaginatedResponse")
+     *         )
+     *     )
+     * )
+     * 
      * Afficher les produits les plus likés (accessible à tous)
      */
     public function index(Request $request): JsonResponse
@@ -30,6 +58,49 @@ class ProductLikeController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/products/{product}/likes",
+     *     tags={"Products", "Likes"},
+     *     summary="Likes d'un produit",
+     *     description="Récupère la liste des likes d'un produit spécifique avec détails des utilisateurs",
+     *     @OA\Parameter(
+     *         name="product",
+     *         in="path",
+     *         description="ID du produit",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Nombre de likes par page",
+     *         @OA\Schema(type="integer", minimum=1, maximum=50, example=20)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Likes récupérés avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Likes du produit récupérés avec succès"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="product", ref="#/components/schemas/Product"),
+     *                 @OA\Property(property="likes_count", type="integer", example=47, description="Nombre total de likes"),
+     *                 @OA\Property(property="likes", ref="#/components/schemas/PaginatedResponse", description="Liste paginée des likes")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Produit non disponible",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Produit non disponible")
+     *         )
+     *     )
+     * )
+     * 
      * Afficher les likes d'un produit spécifique (accessible à tous)
      */
     public function show(Product $product, Request $request): JsonResponse

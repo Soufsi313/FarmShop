@@ -16,6 +16,104 @@ use Illuminate\Validation\Rule;
 class ProductController extends Controller
 {
     /**
+     * @OA\Get(
+     *     path="/api/products",
+     *     operationId="getProducts",
+     *     tags={"Products"},
+     *     summary="Récupérer la liste des produits",
+     *     description="Récupère une liste paginée de produits avec possibilité de filtrage et tri",
+     *     @OA\Parameter(
+     *         name="category_id",
+     *         in="query",
+     *         description="ID de la catégorie pour filtrer",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="type",
+     *         in="query",
+     *         description="Type de produit (sale, rental, both)",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string",
+     *             enum={"sale", "rental", "both"}
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="stock_status",
+     *         in="query",
+     *         description="Statut du stock",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string",
+     *             enum={"in_stock", "low_stock", "out_of_stock"}
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         description="Terme de recherche",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort_by",
+     *         in="query",
+     *         description="Critère de tri",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string",
+     *             enum={"name", "price", "created_at", "popularity"}
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort_direction",
+     *         in="query",
+     *         description="Direction du tri",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string",
+     *             enum={"asc", "desc"}
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Nombre d'éléments par page",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, maximum=100, default=15)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des produits récupérée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Produits récupérés avec succès"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="per_page", type="integer"),
+     *                 @OA\Property(property="total", type="integer"),
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(ref="#/components/schemas/Product")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erreur de validation",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Erreur de validation"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     * 
      * Affichage public des produits avec pagination, tri et filtres
      */
     public function index(Request $request): JsonResponse
@@ -285,6 +383,47 @@ class ProductController extends Controller
     // ==================== MÉTHODES ADMIN ====================
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/products",
+     *     tags={"Admin", "Products"},
+     *     summary="Liste des produits (Admin)",
+     *     description="Récupère tous les produits avec statut et filtres pour l'administration",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filtrer par statut du produit",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"active", "inactive", "deleted"}, example="active")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Nombre d'éléments par page",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=20)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des produits récupérée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Produits récupérés (admin)"),
+     *             @OA\Property(property="data", ref="#/components/schemas/PaginatedResponse")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès refusé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Non authentifié",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Liste admin avec tous les produits (actifs et supprimés)
      */
     public function adminIndex(Request $request): JsonResponse
@@ -317,6 +456,40 @@ class ProductController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/products/{product}",
+     *     tags={"Admin", "Products"},
+     *     summary="Détails d'un produit (Admin)",
+     *     description="Récupère les détails complets d'un produit pour l'administration",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="product",
+     *         in="path",
+     *         description="ID du produit",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Détails du produit récupérés avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Produit récupéré (admin)"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Product")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Produit non trouvé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès refusé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Affichage admin d'un produit
      */
     public function adminShow(Product $product): JsonResponse
@@ -331,6 +504,60 @@ class ProductController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/products",
+     *     tags={"Admin", "Products"},
+     *     summary="Créer un produit",
+     *     description="Crée un nouveau produit avec toutes ses propriétés",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "price", "quantity", "type", "category_id"},
+     *             @OA\Property(property="name", type="string", maxLength=255, example="Tomates Bio"),
+     *             @OA\Property(property="short_description", type="string", maxLength=500, example="Tomates biologiques fraîches"),
+     *             @OA\Property(property="description", type="string", example="Tomates cultivées sans pesticides..."),
+     *             @OA\Property(property="price", type="number", format="float", minimum=0, example=3.50),
+     *             @OA\Property(property="rental_price_per_day", type="number", format="float", minimum=0, example=0.50),
+     *             @OA\Property(property="quantity", type="integer", minimum=0, example=100),
+     *             @OA\Property(property="type", type="string", enum={"sale", "rental", "both"}, example="sale"),
+     *             @OA\Property(property="category_id", type="integer", example=1),
+     *             @OA\Property(property="sku", type="string", example="TOM-BIO-001"),
+     *             @OA\Property(property="weight_kg", type="number", format="float", minimum=0, example=0.5),
+     *             @OA\Property(property="min_rental_days", type="integer", minimum=1, example=1),
+     *             @OA\Property(property="max_rental_days", type="integer", minimum=1, example=30),
+     *             @OA\Property(property="deposit_amount", type="number", format="float", minimum=0, example=10.0),
+     *             @OA\Property(property="is_organic", type="boolean", example=true),
+     *             @OA\Property(property="is_active", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="images",
+     *                 type="array",
+     *                 @OA\Items(type="string", format="binary"),
+     *                 description="Images du produit"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Produit créé avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Produit créé avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Product")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Données de validation invalides",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès refusé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Création d'un produit (Admin)
      */
     public function store(Request $request): JsonResponse
@@ -394,6 +621,76 @@ class ProductController extends Controller
     }
 
     /**
+     * @OA\Put(
+     *     path="/api/admin/products/{product}",
+     *     tags={"Admin", "Products"},
+     *     summary="Mettre à jour un produit",
+     *     description="Met à jour les informations d'un produit existant",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="product",
+     *         in="path",
+     *         description="ID du produit",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", maxLength=255, example="Tomates Bio Premium"),
+     *             @OA\Property(property="short_description", type="string", maxLength=500, example="Tomates biologiques premium"),
+     *             @OA\Property(property="description", type="string", example="Description mise à jour..."),
+     *             @OA\Property(property="price", type="number", format="float", minimum=0, example=4.00),
+     *             @OA\Property(property="rental_price_per_day", type="number", format="float", minimum=0, example=0.60),
+     *             @OA\Property(property="quantity", type="integer", minimum=0, example=150),
+     *             @OA\Property(property="type", type="string", enum={"sale", "rental", "both"}, example="sale"),
+     *             @OA\Property(property="category_id", type="integer", example=2),
+     *             @OA\Property(property="sku", type="string", example="TOM-BIO-002"),
+     *             @OA\Property(property="weight", type="number", format="float", minimum=0, example=0.6),
+     *             @OA\Property(property="dimensions", type="string", example="10x10x5 cm"),
+     *             @OA\Property(property="low_stock_threshold", type="integer", minimum=0, example=10),
+     *             @OA\Property(property="out_of_stock_threshold", type="integer", minimum=0, example=0),
+     *             @OA\Property(property="is_active", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="new_images",
+     *                 type="array",
+     *                 @OA\Items(type="string", format="binary"),
+     *                 description="Nouvelles images à ajouter"
+     *             ),
+     *             @OA\Property(
+     *                 property="remove_images",
+     *                 type="array",
+     *                 @OA\Items(type="string"),
+     *                 description="Noms des images à supprimer"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Produit mis à jour avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Produit mis à jour avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Product")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Produit non trouvé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Données de validation invalides",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès refusé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Mise à jour d'un produit (Admin)
      */
     public function update(Request $request, Product $product): JsonResponse
@@ -468,6 +765,39 @@ class ProductController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *     path="/api/admin/products/{product}",
+     *     tags={"Admin", "Products"},
+     *     summary="Supprimer un produit",
+     *     description="Supprime un produit (soft delete)",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="product",
+     *         in="path",
+     *         description="ID du produit",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Produit supprimé avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Produit supprimé avec succès")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Produit non trouvé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès refusé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Suppression d'un produit (Admin)
      */
     public function destroy(Product $product): JsonResponse
@@ -481,6 +811,40 @@ class ProductController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/products/{id}/restore",
+     *     tags={"Admin", "Products"},
+     *     summary="Restaurer un produit",
+     *     description="Restaure un produit supprimé",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID du produit supprimé",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Produit restauré avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Produit restauré avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Product")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Produit non trouvé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès refusé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Restauration d'un produit (Admin)
      */
     public function restore($id): JsonResponse
@@ -496,6 +860,40 @@ class ProductController extends Controller
     }
 
     /**
+     * @OA\Patch(
+     *     path="/api/admin/products/{product}/toggle-status",
+     *     tags={"Admin", "Products"},
+     *     summary="Basculer le statut du produit",
+     *     description="Active ou désactive un produit",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="product",
+     *         in="path",
+     *         description="ID du produit",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Statut du produit modifié avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Produit activé avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Product")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Produit non trouvé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès refusé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Toggle du statut actif/inactif
      */
     public function toggleStatus(Product $product): JsonResponse
@@ -512,6 +910,60 @@ class ProductController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/products/stock/alerts",
+     *     tags={"Admin", "Products", "Stock"},
+     *     summary="Alertes de stock",
+     *     description="Récupère les alertes de stock pour le dashboard admin",
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Alertes de stock récupérées avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Alertes de stock récupérées"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="summary",
+     *                     type="object",
+     *                     @OA\Property(property="total_products", type="integer", example=250),
+     *                     @OA\Property(property="out_of_stock", type="integer", example=5),
+     *                     @OA\Property(property="critical_stock", type="integer", example=12),
+     *                     @OA\Property(property="low_stock", type="integer", example=23)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="alerts_by_type",
+     *                     type="object",
+     *                     @OA\Property(
+     *                         property="out_of_stock",
+     *                         type="array",
+     *                         @OA\Items(ref="#/components/schemas/Product")
+     *                     ),
+     *                     @OA\Property(
+     *                         property="critical_stock",
+     *                         type="array",
+     *                         @OA\Items(ref="#/components/schemas/Product")
+     *                     ),
+     *                     @OA\Property(
+     *                         property="low_stock",
+     *                         type="array",
+     *                         @OA\Items(ref="#/components/schemas/Product")
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="total_alerts", type="integer", example=40),
+     *                 @OA\Property(property="urgent_alerts", type="integer", example=17)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès refusé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Obtenir les alertes de stock pour le dashboard admin
      */
     public function getStockAlerts(Request $request): JsonResponse
@@ -541,6 +993,67 @@ class ProductController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/products/stock/dashboard",
+     *     tags={"Admin", "Products", "Stock", "Dashboard"},
+     *     summary="Dashboard de stock",
+     *     description="Récupère les statistiques globales de stock pour le dashboard admin",
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Statistiques de stock récupérées avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Statistiques de stock récupérées"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="overview",
+     *                     type="object",
+     *                     @OA\Property(property="total_products", type="integer", example=250),
+     *                     @OA\Property(property="active_products", type="integer", example=235),
+     *                     @OA\Property(property="inactive_products", type="integer", example=15),
+     *                     @OA\Property(property="total_stock_value", type="number", format="float", example=125000.50)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="stock_status",
+     *                     type="object",
+     *                     @OA\Property(property="in_stock", type="integer", example=210),
+     *                     @OA\Property(property="low_stock", type="integer", example=23),
+     *                     @OA\Property(property="critical_stock", type="integer", example=12),
+     *                     @OA\Property(property="out_of_stock", type="integer", example=5)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="movement_trends",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="period", type="string", example="2024-01"),
+     *                         @OA\Property(property="stock_movements", type="integer", example=150)
+     *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="recent_activities",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="product_name", type="string", example="Tomates Bio"),
+     *                         @OA\Property(property="action", type="string", example="stock_update"),
+     *                         @OA\Property(property="quantity_change", type="integer", example=-5),
+     *                         @OA\Property(property="timestamp", type="string", format="datetime")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès refusé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Obtenir les statistiques globales de stock pour le dashboard
      */
     public function getStockDashboard(Request $request): JsonResponse

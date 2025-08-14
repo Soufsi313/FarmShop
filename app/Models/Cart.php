@@ -97,12 +97,31 @@ class Cart extends Model
      */
     public function addProduct(Product $product, int $quantity = 1)
     {
+        // Vérifier que le produit n'est pas en rupture de stock
+        if ($product->is_out_of_stock) {
+            throw new \Exception("Ce produit est en rupture de stock et ne peut pas être acheté");
+        }
+
+        // Vérifier que le produit est actif
+        if (!$product->is_active) {
+            throw new \Exception("Ce produit n'est plus disponible");
+        }
+
         $existingItem = $this->items()->where('product_id', $product->id)->first();
 
         if ($existingItem) {
+            // Vérifier le stock total (existant + nouveau)
+            $totalQuantity = $existingItem->quantity + $quantity;
+            if ($totalQuantity > $product->quantity) {
+                throw new \Exception("Stock insuffisant. Stock disponible: {$product->quantity}, déjà dans le panier: {$existingItem->quantity}");
+            }
             $existingItem->increaseQuantity($quantity);
             return $existingItem;
         } else {
+            // Vérifier le stock pour un nouvel article
+            if ($quantity > $product->quantity) {
+                throw new \Exception("Stock insuffisant. Stock disponible: {$product->quantity}");
+            }
             $item = CartItem::createFromProduct($this, $product, $quantity);
             $this->calculateTotal();
             return $item;
@@ -219,8 +238,8 @@ class Cart extends Model
             return 0.00;
         }
         
-        // Sinon, frais de livraison de 5€
-        return 5.00;
+        // Sinon, frais de livraison de 2.50€
+        return 2.50;
     }
 
     /**

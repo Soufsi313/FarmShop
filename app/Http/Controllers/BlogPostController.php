@@ -20,6 +20,64 @@ class BlogPostController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/blog/posts",
+     *     tags={"Blog", "Posts"},
+     *     summary="Liste des articles de blog",
+     *     description="Récupère la liste des articles de blog publiés avec filtres et pagination",
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         description="Recherche dans le titre et contenu",
+     *         required=false,
+     *         @OA\Schema(type="string", example="jardinage")
+     *     ),
+     *     @OA\Parameter(
+     *         name="category",
+     *         in="query",
+     *         description="Slug de la catégorie",
+     *         required=false,
+     *         @OA\Schema(type="string", example="jardinage-bio")
+     *     ),
+     *     @OA\Parameter(
+     *         name="author",
+     *         in="query",
+     *         description="ID de l'auteur",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="tag",
+     *         in="query",
+     *         description="Tag pour filtrer",
+     *         required=false,
+     *         @OA\Schema(type="string", example="bio")
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort",
+     *         in="query",
+     *         description="Tri des résultats",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"latest", "oldest", "popular", "trending"}, example="latest")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Nombre d'articles par page",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=12)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des articles récupérée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Articles récupérés avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/PaginatedResponse")
+     *         )
+     *     )
+     * )
+     * 
      * Afficher la liste des articles de blog
      */
     public function index(Request $request)
@@ -113,6 +171,40 @@ class BlogPostController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/blog/posts/{slug}",
+     *     tags={"Blog", "Posts"},
+     *     summary="Détails d'un article de blog",
+     *     description="Récupère les détails complets d'un article de blog par son slug",
+     *     @OA\Parameter(
+     *         name="slug",
+     *         in="path",
+     *         description="Slug de l'article",
+     *         required=true,
+     *         @OA\Schema(type="string", example="guide-jardinage-bio")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Article récupéré avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", ref="#/components/schemas/BlogPost"),
+     *             @OA\Property(
+     *                 property="meta",
+     *                 type="object",
+     *                 @OA\Property(property="related_posts", type="array", @OA\Items(ref="#/components/schemas/BlogPost")),
+     *                 @OA\Property(property="previous_post", type="object", nullable=true),
+     *                 @OA\Property(property="next_post", type="object", nullable=true)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Article non trouvé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Afficher un article spécifique
      */
     public function show($slug)
@@ -197,6 +289,54 @@ class BlogPostController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/blog/posts",
+     *     tags={"Admin", "Blog", "Posts"},
+     *     summary="Créer un article de blog",
+     *     description="Crée un nouvel article de blog avec toutes ses propriétés",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"blog_category_id", "title", "content", "status"},
+     *             @OA\Property(property="blog_category_id", type="integer", example=1, description="ID de la catégorie"),
+     *             @OA\Property(property="title", type="string", maxLength=255, example="Guide du jardinage bio", description="Titre de l'article"),
+     *             @OA\Property(property="slug", type="string", maxLength=255, example="guide-jardinage-bio", description="Slug URL (généré automatiquement si absent)"),
+     *             @OA\Property(property="excerpt", type="string", maxLength=500, example="Découvrez les secrets...", description="Extrait de l'article"),
+     *             @OA\Property(property="content", type="string", example="Contenu complet de l'article...", description="Contenu principal"),
+     *             @OA\Property(property="featured_image", type="string", format="binary", description="Image principale"),
+     *             @OA\Property(property="gallery", type="array", @OA\Items(type="string", format="binary"), description="Images de galerie"),
+     *             @OA\Property(property="status", type="string", enum={"draft", "published", "scheduled"}, example="draft", description="Statut de publication"),
+     *             @OA\Property(property="scheduled_for", type="string", format="date-time", example="2024-12-25 10:00:00", description="Date de publication programmée"),
+     *             @OA\Property(property="meta_title", type="string", maxLength=255, example="Guide complet du jardinage bio", description="Titre SEO"),
+     *             @OA\Property(property="meta_description", type="string", maxLength=500, example="Apprenez les techniques...", description="Description SEO"),
+     *             @OA\Property(property="meta_keywords", type="string", maxLength=255, example="jardinage, bio, écologie", description="Mots-clés SEO"),
+     *             @OA\Property(property="tags", type="array", @OA\Items(type="string"), example={"bio", "jardinage", "écologie"}, description="Tags de l'article"),
+     *             @OA\Property(property="allow_comments", type="boolean", example=true, description="Autoriser les commentaires"),
+     *             @OA\Property(property="is_featured", type="boolean", example=false, description="Article mis en avant")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Article créé avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Article créé avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/BlogPost")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Données de validation invalides",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Créer un nouvel article (Admin seulement)
      */
     public function store(Request $request)
@@ -268,6 +408,65 @@ class BlogPostController extends Controller
     }
 
     /**
+     * @OA\Put(
+     *     path="/api/admin/blog/posts/{blogPost}",
+     *     tags={"Admin", "Blog", "Posts"},
+     *     summary="Modifier un article de blog",
+     *     description="Met à jour un article de blog existant (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="blogPost",
+     *         in="path",
+     *         description="ID de l'article à modifier",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Données de l'article à modifier",
+     *         @OA\JsonContent(
+     *             required={"blog_category_id", "title", "content"},
+     *             @OA\Property(property="blog_category_id", type="integer", example=1, description="ID de la catégorie"),
+     *             @OA\Property(property="title", type="string", maxLength=255, example="Guide jardinage bio mis à jour", description="Titre de l'article"),
+     *             @OA\Property(property="slug", type="string", maxLength=255, example="guide-jardinage-bio-nouveau", description="Slug personnalisé (optionnel)"),
+     *             @OA\Property(property="excerpt", type="string", maxLength=500, example="Description courte mise à jour", description="Extrait de l'article"),
+     *             @OA\Property(property="content", type="string", example="Contenu de l'article mis à jour...", description="Contenu complet en HTML"),
+     *             @OA\Property(property="featured_image", type="string", format="binary", description="Image à la une (JPEG, PNG, JPG, WebP, max 5MB)"),
+     *             @OA\Property(property="gallery", type="array", @OA\Items(type="string", format="binary"), description="Galerie d'images"),
+     *             @OA\Property(property="tags", type="array", @OA\Items(type="string"), example={"jardinage", "bio", "écologie"}, description="Tags de l'article"),
+     *             @OA\Property(property="meta_title", type="string", maxLength=60, example="Guide jardinage bio - FarmShop", description="Titre SEO"),
+     *             @OA\Property(property="meta_description", type="string", maxLength=160, example="Découvrez notre guide complet...", description="Description SEO"),
+     *             @OA\Property(property="is_featured", type="boolean", example=true, description="Article en vedette"),
+     *             @OA\Property(property="status", type="string", enum={"draft", "published", "scheduled"}, example="published", description="Statut de publication"),
+     *             @OA\Property(property="published_at", type="string", format="date-time", nullable=true, example="2024-12-19T10:00:00Z", description="Date de publication (pour scheduled)")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Article modifié avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Article modifié avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/BlogPost")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Article non trouvé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erreurs de validation",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Mettre à jour un article (Admin seulement)
      */
     public function update(Request $request, BlogPost $blogPost)
@@ -338,6 +537,39 @@ class BlogPostController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *     path="/api/admin/blog/posts/{blogPost}",
+     *     tags={"Admin", "Blog", "Posts"},
+     *     summary="Supprimer un article de blog",
+     *     description="Supprime définitivement un article de blog (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="blogPost",
+     *         in="path",
+     *         description="ID de l'article à supprimer",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Article supprimé avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Article supprimé avec succès")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Article non trouvé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Supprimer un article (Admin seulement)
      */
     public function destroy(BlogPost $blogPost)
@@ -370,6 +602,40 @@ class BlogPostController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/blog/posts/{blogPost}/publish",
+     *     tags={"Admin", "Blog", "Posts"},
+     *     summary="Publier un article de blog",
+     *     description="Publie un article de blog (passe le statut à 'published') (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="blogPost",
+     *         in="path",
+     *         description="ID de l'article à publier",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Article publié avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Article publié avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/BlogPost")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Article non trouvé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Publier un article (Admin seulement)
      */
     public function publish(BlogPost $blogPost)
@@ -384,6 +650,40 @@ class BlogPostController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/blog/posts/{blogPost}/unpublish",
+     *     tags={"Admin", "Blog", "Posts"},
+     *     summary="Dépublier un article de blog",
+     *     description="Dépublie un article de blog (passe le statut à 'draft') (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="blogPost",
+     *         in="path",
+     *         description="ID de l'article à dépublier",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Article dépublié avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Article dépublié avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/BlogPost")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Article non trouvé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Dépublier un article (Admin seulement)
      */
     public function unpublish(BlogPost $blogPost)
@@ -398,6 +698,48 @@ class BlogPostController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/blog/posts/{blogPost}/schedule",
+     *     tags={"Admin", "Blog", "Posts"},
+     *     summary="Programmer la publication d'un article",
+     *     description="Programme la publication automatique d'un article à une date donnée (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="blogPost",
+     *         in="path",
+     *         description="ID de l'article à programmer",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Date de publication programmée",
+     *         @OA\JsonContent(
+     *             required={"published_at"},
+     *             @OA\Property(property="published_at", type="string", format="date-time", example="2024-12-25T10:00:00Z", description="Date et heure de publication (ISO 8601)")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Article programmé avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Article programmé pour publication le 25/12/2024 à 10:00"),
+     *             @OA\Property(property="data", ref="#/components/schemas/BlogPost")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erreurs de validation",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Programmer un article (Admin seulement)
      */
     public function schedule(Request $request, BlogPost $blogPost)
@@ -416,6 +758,42 @@ class BlogPostController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/blog/posts/statistics",
+     *     tags={"Admin", "Blog", "Posts"},
+     *     summary="Statistiques des articles de blog",
+     *     description="Récupère les statistiques complètes des articles de blog (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Statistiques récupérées avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="total_posts", type="integer", example=125, description="Total des articles"),
+     *                 @OA\Property(property="published_posts", type="integer", example=98, description="Articles publiés"),
+     *                 @OA\Property(property="draft_posts", type="integer", example=20, description="Articles en brouillon"),
+     *                 @OA\Property(property="scheduled_posts", type="integer", example=7, description="Articles programmés"),
+     *                 @OA\Property(property="total_views", type="integer", example=25847, description="Total des vues"),
+     *                 @OA\Property(property="total_comments", type="integer", example=1239, description="Total des commentaires"),
+     *                 @OA\Property(property="most_viewed", ref="#/components/schemas/BlogPost", description="Article le plus vu"),
+     *                 @OA\Property(property="most_commented", ref="#/components/schemas/BlogPost", description="Article le plus commenté"),
+     *                 @OA\Property(property="recent_posts", type="array", @OA\Items(ref="#/components/schemas/BlogPost"), description="Articles récents"),
+     *                 @OA\Property(property="popular_tags", type="array", @OA\Items(type="object", @OA\Property(property="tag", type="string"), @OA\Property(property="count", type="integer")), description="Tags populaires"),
+     *                 @OA\Property(property="posts_by_category", type="array", @OA\Items(type="object", @OA\Property(property="category", type="string"), @OA\Property(property="count", type="integer")), description="Articles par catégorie"),
+     *                 @OA\Property(property="monthly_growth", type="object", @OA\Property(property="current_month", type="integer"), @OA\Property(property="previous_month", type="integer"), @OA\Property(property="growth_rate", type="number", format="float"), description="Croissance mensuelle")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     * 
      * Statistiques des articles (Admin seulement)
      */
     public function statistics()

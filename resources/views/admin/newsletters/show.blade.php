@@ -256,8 +256,17 @@
                     <input type="hidden" name="action" value="send_now">
                     <button type="submit" 
                             class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors"
-                            onclick="return confirm('Êtes-vous sûr de vouloir envoyer cette newsletter maintenant ?')">
+                            onclick="return confirm('Êtes-vous sûr de vouloir envoyer cette newsletter à TOUS les abonnés ?')">
                         Envoyer maintenant
+                    </button>
+                </form>
+                
+                <form method="POST" action="{{ route('admin.newsletters.send-to-me', $newsletter) }}" class="inline">
+                    @csrf
+                    <button type="submit" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
+                            onclick="return confirm('Envoyer cette newsletter uniquement à votre adresse ?')">
+                        📧 Envoyer à moi
                     </button>
                 </form>
                 @endif

@@ -115,8 +115,51 @@ class OrderController extends Controller
         return view('orders.show', ['order' => $order]);
     }
 
-    /**
-     * Afficher les commandes de l'utilisateur connecté (API)
+        /**
+     * @OA\Get(
+     *     path="/api/orders",
+     *     tags={"Orders"},
+     *     summary="Liste des commandes utilisateur",
+     *     description="Récupère la liste des commandes de l'utilisateur connecté avec filtres et tri",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filtrer par statut de commande",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"pending", "confirmed", "shipped", "delivered", "cancelled"}, example="confirmed")
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort_by",
+     *         in="query",
+     *         description="Trier les résultats",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"recent", "oldest", "total_asc", "total_desc"}, example="recent")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Nombre d'éléments par page",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=15)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des commandes récupérée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Commandes récupérées avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/PaginatedResponse")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Non authentifié",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
+     * Afficher la liste des commandes de l'utilisateur (API)
      */
     public function index(Request $request)
     {
@@ -172,6 +215,44 @@ class OrderController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/orders/{order}",
+     *     tags={"Orders"},
+     *     summary="Détails d'une commande",
+     *     description="Récupère les détails complets d'une commande spécifique",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="order",
+     *         in="path",
+     *         description="ID de la commande",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Détails de la commande récupérés avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Order")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé à cette commande",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Commande non trouvée",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Non authentifié",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Afficher une commande spécifique de l'utilisateur
      */
     public function show(Order $order)
@@ -194,6 +275,65 @@ class OrderController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/orders",
+     *     tags={"Orders", "Checkout"},
+     *     summary="Créer une nouvelle commande",
+     *     description="Crée une nouvelle commande à partir du panier actuel avec paiement",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"payment_method", "delivery_address"},
+     *             @OA\Property(property="payment_method", type="string", example="stripe", description="Méthode de paiement"),
+     *             @OA\Property(
+     *                 property="delivery_address",
+     *                 type="object",
+     *                 required={"street", "city", "postal_code", "country"},
+     *                 @OA\Property(property="street", type="string", example="123 Rue de la Paix"),
+     *                 @OA\Property(property="street_2", type="string", example="Appartement 4B"),
+     *                 @OA\Property(property="city", type="string", example="Paris"),
+     *                 @OA\Property(property="postal_code", type="string", example="75001"),
+     *                 @OA\Property(property="country", type="string", example="France"),
+     *                 @OA\Property(property="phone", type="string", example="+33123456789")
+     *             ),
+     *             @OA\Property(property="billing_address", type="object", description="Adresse de facturation (optionnelle, utilise l'adresse de livraison par défaut)"),
+     *             @OA\Property(property="notes", type="string", example="Livrer après 18h"),
+     *             @OA\Property(property="stripe_payment_method_id", type="string", example="pm_1234567890", description="ID de la méthode de paiement Stripe")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Commande créée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Commande créée avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Order"),
+     *             @OA\Property(
+     *                 property="payment",
+     *                 type="object",
+     *                 @OA\Property(property="client_secret", type="string", example="pi_1234567890_secret_abc"),
+     *                 @OA\Property(property="payment_intent_id", type="string", example="pi_1234567890")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Erreur de validation ou panier vide",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Données de validation invalides",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Non authentifié",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Créer une nouvelle commande à partir du panier
      */
     public function store(Request $request)
@@ -306,6 +446,56 @@ class OrderController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/orders/{order}/cancel",
+     *     tags={"Orders"},
+     *     summary="Annuler une commande",
+     *     description="Annule une commande si elle est éligible à l'annulation",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="order",
+     *         in="path",
+     *         description="ID de la commande",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="reason", type="string", maxLength=500, example="Changement d'avis", description="Raison de l'annulation")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Commande annulée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Commande annulée avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Order")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Commande ne peut plus être annulée",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Commande non trouvée",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Non authentifié",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Annuler une commande
      */
     public function cancel(Request $request, Order $order)

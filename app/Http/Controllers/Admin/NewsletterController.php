@@ -236,18 +236,142 @@ class NewsletterController extends Controller
                            ->with('error', 'Cette newsletter a déjà été envoyée.');
         }
 
-        // Mettre à jour le statut et programmer l'envoi immédiat
-        $newsletter->update([
-            'status' => 'scheduled',
-            'scheduled_at' => now(),
-            'recipients_count' => User::where('newsletter_subscribed', true)->count()
-        ]);
+        try {
+            // Récupérer les abonnés
+            $subscribers = User::where('newsletter_subscribed', true)->get();
+            
+            if ($subscribers->isEmpty()) {
+                return redirect()->route('admin.newsletters.show', $newsletter)
+                               ->with('error', 'Aucun abonné trouvé pour l\'envoi.');
+            }
 
-        // Programmer l'envoi immédiat
-        \App\Jobs\SendNewsletterJob::dispatch($newsletter);
+            $successCount = 0;
+            $failureCount = 0;
 
-        return redirect()->route('admin.newsletters.show', $newsletter)
-                        ->with('success', 'Newsletter programmée pour envoi immédiat !');
+            foreach ($subscribers as $subscriber) {
+                try {
+                    // Créer un enregistrement de suivi
+                    $send = \App\Models\NewsletterSend::create([
+                        'newsletter_id' => $newsletter->id,
+                        'user_id' => $subscriber->id,
+                        'email' => $subscriber->email,
+                        'status' => 'pending',
+                        'tracking_token' => \Illuminate\Support\Str::uuid(),
+                        'unsubscribe_token' => \Illuminate\Support\Str::uuid(),
+                    ]);
+
+                    // Générer les URLs de suivi
+                    $send->tracking_url = route('newsletter.track', ['token' => $send->tracking_token]);
+                    $send->unsubscribe_url = route('newsletter.unsubscribe.token', ['token' => $send->unsubscribe_token]);
+                    $send->save();
+
+                    // Envoyer l'email directement (synchrone)
+                    \Mail::to($subscriber->email)->send(new \App\Mail\NewsletterMail($newsletter, $subscriber, $send));
+
+                    // Marquer comme envoyé
+                    $send->update([
+                        'status' => 'sent',
+                        'sent_at' => now()
+                    ]);
+
+                    $successCount++;
+
+                } catch (\Exception $e) {
+                    $failureCount++;
+                    
+                    // Marquer comme échoué
+                    if (isset($send)) {
+                        $send->update([
+                            'status' => 'failed',
+                            'error_message' => $e->getMessage(),
+                            'sent_at' => now()
+                        ]);
+                    }
+
+                    \Log::error('Erreur envoi newsletter', [
+                        'newsletter_id' => $newsletter->id,
+                        'user_id' => $subscriber->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            // Mettre à jour le statut de la newsletter
+            $newsletter->update([
+                'status' => 'sent',
+                'sent_at' => now(),
+                'recipients_count' => $successCount + $failureCount,
+                'sent_count' => $successCount,
+                'failed_count' => $failureCount
+            ]);
+
+            $message = "Newsletter envoyée ! Succès: {$successCount}, Échecs: {$failureCount}";
+            
+            return redirect()->route('admin.newsletters.show', $newsletter)
+                           ->with('success', $message);
+
+        } catch (\Exception $e) {
+            \Log::error('Erreur générale envoi newsletter', [
+                'newsletter_id' => $newsletter->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->route('admin.newsletters.show', $newsletter)
+                           ->with('error', 'Erreur lors de l\'envoi : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Envoyer la newsletter uniquement à l'utilisateur connecté (pour test)
+     */
+    public function sendToMe(Newsletter $newsletter)
+    {
+        if ($newsletter->status === 'sent') {
+            return redirect()->route('admin.newsletters.show', $newsletter)
+                           ->with('error', 'Cette newsletter a déjà été envoyée.');
+        }
+
+        try {
+            $currentUser = Auth::user();
+            
+            // Créer un enregistrement de suivi unique pour cet utilisateur
+            $send = \App\Models\NewsletterSend::firstOrCreate([
+                'newsletter_id' => $newsletter->id,
+                'user_id' => $currentUser->id,
+            ], [
+                'email' => $currentUser->email,
+                'status' => 'pending',
+                'tracking_token' => \Illuminate\Support\Str::uuid(),
+                'unsubscribe_token' => \Illuminate\Support\Str::uuid(),
+            ]);
+
+            // Générer les URLs de suivi
+            $send->tracking_url = route('newsletter.track', ['token' => $send->tracking_token]);
+            $send->unsubscribe_url = route('newsletter.unsubscribe.token', ['token' => $send->unsubscribe_token]);
+            $send->save();
+
+            // Envoyer l'email uniquement à l'utilisateur connecté
+            \Mail::to($currentUser->email)->send(new \App\Mail\NewsletterMail($newsletter, $currentUser, $send));
+
+            // Marquer comme envoyé
+            $send->update([
+                'status' => 'sent',
+                'sent_at' => now()
+            ]);
+
+            return redirect()->route('admin.newsletters.show', $newsletter)
+                           ->with('success', "Newsletter envoyée uniquement à votre adresse : {$currentUser->email}");
+
+        } catch (\Exception $e) {
+            \Log::error('Erreur envoi newsletter à l\'utilisateur connecté', [
+                'newsletter_id' => $newsletter->id,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->route('admin.newsletters.show', $newsletter)
+                           ->with('error', 'Erreur lors de l\'envoi : ' . $e->getMessage());
+        }
     }
 
     /**

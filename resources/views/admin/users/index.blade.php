@@ -5,6 +5,31 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
+    <!-- Messages de notification -->
+    @if(session('success'))
+        <div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
+            <svg class="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div>
+                <h4 class="text-green-800 font-medium">Succès !</h4>
+                <p class="text-green-700">{{ session('success') }}</p>
+            </div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
+            <svg class="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"/>
+            </svg>
+            <div>
+                <h4 class="text-red-800 font-medium">Erreur !</h4>
+                <p class="text-red-700">{{ session('error') }}</p>
+            </div>
+        </div>
+    @endif
+
     <!-- Entête avec style moderne -->
     <div class="mb-8">
         <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white shadow-lg">
@@ -29,7 +54,7 @@
     </div>
 
     <!-- Statistiques rapides -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
         <div class="bg-green-50 border border-green-200 rounded-lg p-4">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -56,6 +81,20 @@
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-blue-600">{{ $stats['admins'] }}</div>
                     <div class="text-sm text-blue-700">Administrateurs</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <div class="text-2xl font-bold text-red-600">{{ $stats['deleted'] }}</div>
+                    <div class="text-sm text-red-700">Supprimés</div>
                 </div>
             </div>
         </div>
@@ -101,7 +140,7 @@
         </div>
         
         <form method="GET" action="{{ route('admin.users.index') }}" class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 <!-- Recherche générale -->
                 <div class="space-y-2">
                     <label class="flex items-center text-sm font-medium text-gray-700">
@@ -135,6 +174,23 @@
                     </select>
                 </div>
 
+                <!-- Filtre par statut de suppression -->
+                <div class="space-y-2">
+                    <label class="flex items-center text-sm font-medium text-gray-700">
+                        <svg class="inline w-4 h-4 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Statut des comptes
+                    </label>
+                    <select 
+                        name="show_deleted"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-colors">
+                        <option value="active" {{ ($showDeleted ?? 'active') === 'active' ? 'selected' : '' }}>✅ Comptes actifs uniquement</option>
+                        <option value="deleted" {{ ($showDeleted ?? 'active') === 'deleted' ? 'selected' : '' }}>🗑️ Comptes supprimés uniquement</option>
+                        <option value="all" {{ ($showDeleted ?? 'active') === 'all' ? 'selected' : '' }}>📋 Tous les comptes</option>
+                    </select>
+                </div>
+
                 <div class="space-y-2">
                     <label class="flex items-center text-sm font-medium text-gray-700">
                         <svg class="inline w-4 h-4 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,6 +207,7 @@
                         <option value="email" {{ $sortBy === 'email' ? 'selected' : '' }}>📧 Email</option>
                         <option value="role" {{ $sortBy === 'role' ? 'selected' : '' }}>⚡ Rôle</option>
                         <option value="updated_at" {{ $sortBy === 'updated_at' ? 'selected' : '' }}>🔄 Dernière modification</option>
+                        <option value="deleted_at" {{ $sortBy === 'deleted_at' ? 'selected' : '' }}>🗑️ Date de suppression</option>
                     </select>
                 </div>
 
@@ -199,6 +256,9 @@
                                 Rôle
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Statut
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Newsletter
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -211,7 +271,7 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @foreach($users as $user)
-                            <tr class="hover:bg-gray-50">
+                            <tr class="hover:bg-gray-50 {{ $user->trashed() ? 'bg-red-50' : '' }}">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium text-sm">
@@ -233,12 +293,26 @@
                                             'User' => 'bg-green-100 text-green-800',
                                         ];
                                     @endphp
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $roleColors[$user->role] ?? 'bg-gray-100 text-gray-800' }}">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $roleColors[$user->role] ?? 'bg-gray-100 text-gray-800' }} {{ $user->trashed() ? 'opacity-75' : '' }}">
                                         @if($user->role === 'Admin') 👑 @else 👤 @endif {{ $user->role }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $user->newsletter_subscribed ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
+                                    @if($user->trashed())
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            🗑️ Supprimé
+                                        </span>
+                                        @if($user->deleted_at)
+                                            <div class="text-xs text-gray-500 mt-1">{{ $user->deleted_at->format('d/m/Y H:i') }}</div>
+                                        @endif
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            ✅ Actif
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $user->newsletter_subscribed ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }} {{ $user->trashed() ? 'opacity-75' : '' }}">
                                         @if($user->newsletter_subscribed) 📧 Abonné @else ❌ Non abonné @endif
                                     </span>
                                 </td>
@@ -247,40 +321,58 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                     <div class="flex items-center justify-center space-x-2">
-                                        <!-- Bouton Voir -->
-                                        <a href="{{ route('admin.users.show', $user) }}" 
-                                           class="text-blue-600 hover:text-blue-900 transition-colors"
-                                           title="Voir les détails">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                            </svg>
-                                        </a>
-
-                                        <!-- Bouton Modifier -->
-                                        <a href="{{ route('admin.users.edit', $user) }}" 
-                                           class="text-yellow-600 hover:text-yellow-900 transition-colors"
-                                           title="Modifier l'utilisateur">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                            </svg>
-                                        </a>
-
-                                        <!-- Bouton Supprimer -->
-                                        @if($user->id !== auth()->id())
+                                        @if($user->trashed())
+                                            <!-- Bouton Restaurer pour les comptes supprimés -->
                                             <form method="POST" 
-                                                  action="{{ route('admin.users.destroy', $user) }}" 
-                                                  class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.')">
+                                                  action="{{ route('admin.users.restore', $user->id) }}" 
+                                                  class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir restaurer cet utilisateur ?')">
                                                 @csrf
-                                                @method('DELETE')
                                                 <button type="submit" 
-                                                        class="text-red-600 hover:text-red-900 transition-colors" 
-                                                        title="Supprimer l'utilisateur">
-                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                        class="text-green-600 hover:text-green-900 transition-colors bg-green-50 hover:bg-green-100 px-3 py-2 rounded-lg border border-green-200" 
+                                                        title="Restaurer l'utilisateur">
+                                                    <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0V9a8 8 0 1115.356 2M15 13l-3-3-3 3m3-3v9"/>
                                                     </svg>
+                                                    Restaurer
                                                 </button>
                                             </form>
+                                        @else
+                                            <!-- Actions pour les comptes actifs -->
+                                            <!-- Bouton Voir -->
+                                            <a href="{{ route('admin.users.show', $user) }}" 
+                                               class="text-blue-600 hover:text-blue-900 transition-colors"
+                                               title="Voir les détails">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                </svg>
+                                            </a>
+
+                                            <!-- Bouton Modifier -->
+                                            <a href="{{ route('admin.users.edit', $user) }}" 
+                                               class="text-yellow-600 hover:text-yellow-900 transition-colors"
+                                               title="Modifier l'utilisateur">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                            </a>
+
+                                            <!-- Bouton Supprimer -->
+                                            @if($user->id !== auth()->id())
+                                                <form method="POST" 
+                                                      action="{{ route('admin.users.destroy', $user) }}" 
+                                                      class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action peut être annulée en restaurant le compte.')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            class="text-red-600 hover:text-red-900 transition-colors" 
+                                                            title="Supprimer l'utilisateur">
+                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         @endif
                                     </div>
                                 </td>
@@ -311,4 +403,18 @@
         @endif
     </div>
 </div>
+
+@if(session('success'))
+<script>
+// Faire disparaître automatiquement le message de succès après 5 secondes
+setTimeout(function() {
+    const successAlert = document.querySelector('.bg-green-50');
+    if (successAlert) {
+        successAlert.style.transition = 'opacity 0.5s ease-out';
+        successAlert.style.opacity = '0';
+        setTimeout(() => successAlert.remove(), 500);
+    }
+}, 5000);
+</script>
+@endif
 @endsection

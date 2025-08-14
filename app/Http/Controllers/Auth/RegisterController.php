@@ -61,9 +61,9 @@ class RegisterController extends Controller
             'newsletter_subscribed' => $request->has('newsletter'),
         ]);
 
-        // Connecter automatiquement l'utilisateur
-        Auth::login($user);
+        // Envoyer l'email de vérification (synchrone pour éviter les problèmes de queue)
+        $user->sendEmailVerificationNotification();
 
-        return redirect('/')->with('success', 'Votre compte a été créé avec succès ! Bienvenue sur FarmShop.');
+        return redirect('/login')->with('success', 'Votre compte a été créé avec succès ! Veuillez vérifier votre email pour activer votre compte.');
     }
 }

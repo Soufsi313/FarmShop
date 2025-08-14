@@ -11,6 +11,41 @@ use Illuminate\Validation\Rule;
 class CategoryController extends Controller
 {
     /**
+     * @OA\Get(
+     *     path="/api/categories",
+     *     tags={"Categories"},
+     *     summary="Liste des catégories",
+     *     description="Récupère la liste des catégories. Les administrateurs voient toutes les catégories, les autres utilisateurs ne voient que les catégories actives.",
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Numéro de page pour la pagination",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Nombre d'éléments par page",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=15)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des catégories récupérée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Liste des catégories récupérée avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/PaginatedResponse")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erreur serveur",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Afficher la liste des catégories
      */
     public function index()
@@ -31,6 +66,42 @@ class CategoryController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/categories",
+     *     tags={"Admin", "Categories"},
+     *     summary="Créer une nouvelle catégorie",
+     *     description="Crée une nouvelle catégorie. Accès réservé aux administrateurs.",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", example="Outils de jardinage", description="Nom de la catégorie"),
+     *             @OA\Property(property="description", type="string", example="Tous les outils pour le jardinage", description="Description de la catégorie"),
+     *             @OA\Property(property="is_active", type="boolean", example=true, description="Statut actif de la catégorie")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Catégorie créée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Catégorie créée avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Category")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès refusé",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erreurs de validation",
+     *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
+     *     )
+     * )
+     * 
      * Créer une nouvelle catégorie (Admin seulement)
      */
     public function store(Request $request)

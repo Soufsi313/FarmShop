@@ -304,60 +304,81 @@
 
                                     <!-- Actions pour les produits d'achat -->
                                     @if($product->type === 'sale' || $product->type === 'both')
-                                        <div class="space-y-3">
-                                            <!-- Quantité -->
-                                            <div class="flex items-center space-x-2">
-                                                <label class="text-sm font-medium text-gray-700">Quantité :</label>
-                                                <div class="flex items-center">
-                                                    <button type="button" 
-                                                            onclick="decreaseQuantity({{ $product->id }})"
-                                                            class="px-2 py-1 border border-gray-300 rounded-l-md hover:bg-gray-50">
-                                                        -
+                                        @if($product->quantity > 0)
+                                            <div class="space-y-3">
+                                                <!-- Quantité -->
+                                                <div class="flex items-center space-x-2">
+                                                    <label class="text-sm font-medium text-gray-700">Quantité :</label>
+                                                    <div class="flex items-center">
+                                                        <button type="button" 
+                                                                onclick="decreaseQuantity({{ $product->id }})"
+                                                                class="px-2 py-1 border border-gray-300 rounded-l-md hover:bg-gray-50">
+                                                            -
+                                                        </button>
+                                                        <input type="number" 
+                                                               id="quantity_{{ $product->id }}" 
+                                                               value="1" 
+                                                               min="1" 
+                                                               max="{{ $product->quantity }}"
+                                                               class="w-16 px-2 py-1 border-t border-b border-gray-300 text-center focus:outline-none">
+                                                        <button type="button" 
+                                                                onclick="increaseQuantity({{ $product->id }})"
+                                                                class="px-2 py-1 border border-gray-300 rounded-r-md hover:bg-gray-50">
+                                                            +
+                                                        </button>
+                                                    </div>
+                                                    <span class="text-sm text-gray-500">({{ $product->quantity }} disponible{{ $product->quantity > 1 ? 's' : '' }})</span>
+                                                </div>
+
+                                                <!-- Boutons d'action -->
+                                                <div class="flex space-x-2">
+                                                    <!-- Ajouter au panier -->
+                                                    @auth
+                                                        <button onclick="addToCart({{ $product->id }})" 
+                                                                class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                                            Ajouter au panier
+                                                        </button>
+                                                    @else
+                                                        <a href="{{ route('login') }}" 
+                                                           class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium text-center transition-colors">
+                                                            Ajouter au panier
+                                                        </a>
+                                                    @endauth
+
+                                                    <!-- Acheter maintenant -->
+                                                    @auth
+                                                        <button onclick="buyNow({{ $product->id }})" 
+                                                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                                            Acheter
+                                                        </button>
+                                                    @else
+                                                        <a href="{{ route('login') }}" 
+                                                           class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium text-center transition-colors">
+                                                            Acheter
+                                                        </a>
+                                                    @endauth
+                                                </div>
+                                            </div>
+                                        @else
+                                            <!-- Produit en rupture de stock -->
+                                            <div class="space-y-3">
+                                                <div class="flex items-center justify-center p-3 bg-red-50 border border-red-200 rounded-md">
+                                                    <span class="text-red-600 font-medium">🚫 Rupture de stock</span>
+                                                </div>
+                                                
+                                                <!-- Boutons désactivés -->
+                                                <div class="flex space-x-2">
+                                                    <button disabled 
+                                                            class="flex-1 bg-gray-300 text-gray-500 px-3 py-2 rounded-md text-sm font-medium cursor-not-allowed">
+                                                        Indisponible
                                                     </button>
-                                                    <input type="number" 
-                                                           id="quantity_{{ $product->id }}" 
-                                                           value="1" 
-                                                           min="1" 
-                                                           max="{{ $product->quantity }}"
-                                                           class="w-16 px-2 py-1 border-t border-b border-gray-300 text-center focus:outline-none">
-                                                    <button type="button" 
-                                                            onclick="increaseQuantity({{ $product->id }})"
-                                                            class="px-2 py-1 border border-gray-300 rounded-r-md hover:bg-gray-50">
-                                                        +
+                                                    <button disabled 
+                                                            class="flex-1 bg-gray-300 text-gray-500 px-3 py-2 rounded-md text-sm font-medium cursor-not-allowed">
+                                                        Indisponible
                                                     </button>
                                                 </div>
-                                                <span class="text-sm text-gray-500">({{ $product->quantity }} disponible{{ $product->quantity > 1 ? 's' : '' }})</span>
                                             </div>
-
-                                            <!-- Boutons d'action -->
-                                            <div class="flex space-x-2">
-                                                <!-- Ajouter au panier -->
-                                                @auth
-                                                    <button onclick="addToCart({{ $product->id }})" 
-                                                            class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                                        Ajouter au panier
-                                                    </button>
-                                                @else
-                                                    <a href="{{ route('login') }}" 
-                                                       class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium text-center transition-colors">
-                                                        Ajouter au panier
-                                                    </a>
-                                                @endauth
-
-                                                <!-- Acheter maintenant -->
-                                                @auth
-                                                    <button onclick="buyNow({{ $product->id }})" 
-                                                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                                        Acheter
-                                                    </button>
-                                                @else
-                                                    <a href="{{ route('login') }}" 
-                                                       class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium text-center transition-colors">
-                                                        Acheter
-                                                    </a>
-                                                @endauth
-                                            </div>
-                                        </div>
+                                        @endif
                                     @endif
 
                                     <!-- Boutons généraux -->
@@ -467,7 +488,27 @@ function decreaseQuantity(productId) {
 
 // Actions produits
 async function addToCart(productId) {
-    const quantity = document.getElementById(`quantity_${productId}`).value;
+    const quantityInput = document.getElementById(`quantity_${productId}`);
+    
+    // Vérifier si l'input existe (produit en stock)
+    if (!quantityInput) {
+        showNotification('Ce produit est en rupture de stock', 'error');
+        return;
+    }
+    
+    const quantity = parseInt(quantityInput.value);
+    const maxQuantity = parseInt(quantityInput.getAttribute('max'));
+    
+    // Vérifier la quantité disponible
+    if (maxQuantity <= 0) {
+        showNotification('Ce produit est en rupture de stock', 'error');
+        return;
+    }
+    
+    if (quantity > maxQuantity) {
+        showNotification(`Quantité maximale disponible: ${maxQuantity}`, 'error');
+        return;
+    }
     
     try {
         const response = await fetch(`/cart/add-product/${productId}`, {
@@ -479,7 +520,7 @@ async function addToCart(productId) {
                 'X-Requested-With': 'XMLHttpRequest'
             },
             credentials: 'same-origin',
-            body: JSON.stringify({ quantity: parseInt(quantity) })
+            body: JSON.stringify({ quantity: quantity })
         });
 
         if (!response.ok) {
@@ -506,6 +547,22 @@ async function addToCart(productId) {
 }
 
 async function buyNow(productId) {
+    const quantityInput = document.getElementById(`quantity_${productId}`);
+    
+    // Vérifier si l'input existe (produit en stock)
+    if (!quantityInput) {
+        showNotification('Ce produit est en rupture de stock', 'error');
+        return;
+    }
+    
+    const maxQuantity = parseInt(quantityInput.getAttribute('max'));
+    
+    // Vérifier la quantité disponible
+    if (maxQuantity <= 0) {
+        showNotification('Ce produit est en rupture de stock', 'error');
+        return;
+    }
+    
     try {
         // Ajouter le produit au panier avec quantité 1
         const response = await fetch(`/cart/add-product/${productId}`, {

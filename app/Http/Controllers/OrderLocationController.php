@@ -372,6 +372,44 @@ class OrderLocationController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/rentals/{id}/start-inspection",
+     *     tags={"Admin", "Rentals", "Inspection"},
+     *     summary="Démarrer l'inspection d'une location",
+     *     description="Initie le processus d'inspection d'un matériel retourné (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la commande de location",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Inspection démarrée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Inspection démarrée"),
+     *             @OA\Property(property="data", ref="#/components/schemas/OrderLocation")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Commande pas prête pour inspection",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Cette commande n'est pas prête pour l'inspection")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Non autorisé")
+     *         )
+     *     )
+     * )
+     * 
      * Démarrer l'inspection (Admin seulement)
      */
     public function startInspection(OrderLocation $orderLocation)
@@ -394,6 +432,82 @@ class OrderLocationController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/rentals/{id}/finish-inspection",
+     *     tags={"Admin", "Rentals", "Inspection"},
+     *     summary="Finaliser l'inspection d'une location",
+     *     description="Termine le processus d'inspection avec évaluation des conditions des équipements retournés (Admin uniquement)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la commande de location",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"items"},
+     *             @OA\Property(
+     *                 property="items",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     required={"id", "return_condition"},
+     *                     @OA\Property(property="id", type="integer", example=1, description="ID de l'article de location"),
+     *                     @OA\Property(
+     *                         property="return_condition",
+     *                         type="string",
+     *                         enum={"good", "damaged", "lost"},
+     *                         example="good",
+     *                         description="État de retour de l'équipement"
+     *                     ),
+     *                     @OA\Property(property="damage_description", type="string", example="Rayure légère sur le côté", description="Description des dommages si applicable"),
+     *                     @OA\Property(property="penalty_amount", type="number", format="float", example=25.00, description="Montant de pénalité si applicable"),
+     *                     @OA\Property(property="inspection_photos", type="array", @OA\Items(type="string"), description="Photos d'inspection")
+     *                 )
+     *             ),
+     *             @OA\Property(property="global_notes", type="string", example="Inspection complète terminée, matériel en bon état général", description="Notes générales d'inspection"),
+     *             @OA\Property(property="total_penalty", type="number", format="float", example=0.00, description="Total des pénalités")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Inspection finalisée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Inspection terminée et caution mise à jour"),
+     *             @OA\Property(property="data", ref="#/components/schemas/OrderLocation"),
+     *             @OA\Property(
+     *                 property="inspection_summary",
+     *                 type="object",
+     *                 @OA\Property(property="items_inspected", type="integer", example=3),
+     *                 @OA\Property(property="items_in_good_condition", type="integer", example=3),
+     *                 @OA\Property(property="items_damaged", type="integer", example=0),
+     *                 @OA\Property(property="items_lost", type="integer", example=0),
+     *                 @OA\Property(property="total_penalties", type="number", format="float", example=0.00),
+     *                 @OA\Property(property="deposit_refunded", type="number", format="float", example=75.00),
+     *                 @OA\Property(property="inspection_completed_at", type="string", format="date-time", example="2024-08-15T16:30:00Z")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Commande pas en cours d'inspection ou données invalides",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Cette commande n'est pas en cours d'inspection")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Accès non autorisé",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Non autorisé")
+     *         )
+     *     )
+     * )
+     * 
      * Finaliser l'inspection et terminer la commande (Admin seulement)
      */
     public function finishInspection(OrderLocation $orderLocation, Request $request)
