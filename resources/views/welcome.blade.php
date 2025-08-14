@@ -23,16 +23,106 @@
             </div>
             
             @guest
-            <!-- Raccourci connexion/inscription pour visiteurs -->
-            <div class="mt-8 p-4 bg-white/80 backdrop-blur-sm rounded-lg max-w-md mx-auto">
-                <p class="text-farm-green-700 font-medium mb-3">👤 Nouveau client ?</p>
-                <div class="flex gap-3">
-                    <a href="{{ route('register') }}" class="flex-1 bg-farm-orange-500 hover:bg-farm-orange-600 text-white px-4 py-2 rounded-lg text-center font-medium transition-colors">
-                        Créer un compte
-                    </a>
-                    <a href="{{ route('login') }}" class="flex-1 border border-farm-green-500 text-farm-green-700 hover:bg-farm-green-500 hover:text-white px-4 py-2 rounded-lg text-center font-medium transition-colors">
-                        Se connecter
-                    </a>
+            <!-- Encart connexion/inscription premium -->
+            <div class="mt-12 relative max-w-lg mx-auto z-10">
+                <!-- Fond avec effet glassmorphism -->
+                <div class="absolute inset-0 bg-gradient-to-br from-white/40 via-orange-100/30 to-green-100/40 backdrop-blur-xl rounded-3xl -z-10"></div>
+                <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent rounded-3xl -z-10"></div>
+                
+                <!-- Contenu principal -->
+                <div class="relative z-20 p-8 space-y-6">
+                    <!-- Titre avec icône animée -->
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-400 via-orange-500 to-red-500 rounded-2xl shadow-xl shadow-orange-200/50 mb-4 animate-pulse">
+                            <svg class="w-8 h-8 text-white animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold bg-gradient-to-r from-orange-600 via-red-500 to-green-600 bg-clip-text text-transparent mb-2">
+                            Rejoignez FarmShop
+                        </h3>
+                        <p class="text-gray-600 text-sm">Votre partenaire agricole de confiance depuis 2020</p>
+                    </div>
+                    
+                    <!-- Statistiques -->
+                    <div class="grid grid-cols-3 gap-4 py-4">
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-orange-600">1.2k+</div>
+                            <div class="text-xs text-gray-500">Agriculteurs</div>
+                        </div>
+                        <div class="text-center border-x border-gray-200">
+                            <div class="text-xl font-bold text-green-600">500+</div>
+                            <div class="text-xs text-gray-500">Équipements</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-blue-600">98%</div>
+                            <div class="text-xs text-gray-500">Satisfaction</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Boutons avec design moderne -->
+                    <div class="space-y-4 relative z-30">
+                        <!-- Bouton principal inscription -->
+                        <a href="{{ route('register') }}" class="block w-full relative z-40 group overflow-hidden rounded-2xl bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 p-0.5 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-orange-200/50">
+                            <div class="relative rounded-2xl bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 px-6 py-4 text-white transition-all duration-300">
+                                <div class="flex items-center justify-center space-x-3">
+                                    <svg class="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="font-semibold">Créer mon compte gratuit</span>
+                                </div>
+                                <div class="absolute top-1 right-1 bg-yellow-400 text-orange-900 text-xs px-2 py-1 rounded-bl-lg rounded-tr-xl font-bold shadow-sm">
+                                    GRATUIT
+                                </div>
+                            </div>
+                        </a>
+                        
+                        <!-- Séparateur avec animation -->
+                        <div class="relative flex items-center justify-center py-2 z-30">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="w-full border-t border-gray-300"></div>
+                            </div>
+                            <div class="relative bg-gradient-to-br from-white via-orange-50 to-green-50">
+                                <span class="bg-white px-4 py-1 text-sm text-gray-500 rounded-full border border-gray-200 shadow-sm">
+                                    Déjà membre ?
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Bouton secondaire connexion -->
+                        <a href="{{ route('login') }}" class="block w-full relative z-40 group overflow-hidden rounded-2xl border-2 border-green-400/50 bg-white/90 backdrop-blur-sm p-3 transition-all duration-300 hover:scale-105 hover:border-green-500 hover:shadow-xl hover:shadow-green-200/50 hover:bg-white">
+                            <div class="flex items-center justify-center space-x-3 text-green-700 group-hover:text-green-800 transition-colors">
+                                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                                </svg>
+                                <span class="font-semibold">Me connecter</span>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <!-- Footer avec garanties -->
+                    <div class="pt-4 border-t border-gray-200/50 relative z-30">
+                        <div class="flex items-center justify-center space-x-6 text-xs text-gray-500">
+                            <div class="flex items-center space-x-1">
+                                <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>100% Sécurisé</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Certifié Bio</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <svg class="w-4 h-4 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                </svg>
+                                <span>Support 24/7</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             @endguest
