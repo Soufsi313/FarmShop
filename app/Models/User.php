@@ -316,6 +316,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Messages de l'utilisateur
+     */
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    /**
      * Méthodes utilitaires pour les adresses
      */
 

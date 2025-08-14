@@ -448,7 +448,7 @@ class UserController extends Controller
             return view('auth.account-deleted-success')->with('zipFileName', $zipFileName);
             
         } catch (\Exception $e) {
-            return redirect()->route('dashboard')->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
+            return redirect()->route('home')->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
 
@@ -482,16 +482,19 @@ class UserController extends Controller
         }
 
         // 3. Historique des locations
-        if ($user->rentals()->exists()) {
+        if ($user->orderLocations()->exists()) {
             $rentalsPdf = $this->generateRentalsPdf($user);
             $zip->addFile($rentalsPdf, 'historique_locations.pdf');
         }
 
-        // 4. Messages et communications
+        // 4. Messages et communications - DÉSACTIVÉ temporairement
+        // La relation messages() n'existe pas dans le modèle User
+        /*
         if ($user->messages()->exists()) {
             $messagesPdf = $this->generateMessagesPdf($user);
             $zip->addFile($messagesPdf, 'messages_communications.pdf');
         }
+        */
 
         // 5. Données de navigation (préférences, newsletter, etc.)
         $navigationPdf = $this->generateNavigationPdf($user);
@@ -536,7 +539,7 @@ class UserController extends Controller
      */
     private function generateRentalsPdf($user)
     {
-        $rentals = $user->rentals()->with('product', 'inspections')->get();
+        $rentals = $user->orderLocations()->with('product', 'inspections')->get();
         $html = view('pdfs.user-rentals', compact('user', 'rentals'))->render();
         $pdf = Pdf::loadHTML($html);
         
