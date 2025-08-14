@@ -308,8 +308,8 @@
                                 </button>
                                 @endif
 
-                                @if($order->status === 'completed')
-                                <!-- Bouton Clôturer pour les locations terminées -->
+                                @if($order->status === 'completed' && $order->inspection_status !== 'completed')
+                                <!-- Bouton Clôturer pour les locations terminées (non inspectées) -->
                                 <button onclick="updateStatus({{ $order->id }}, 'closed')" 
                                         class="inline-flex items-center px-3 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition duration-200"
                                         title="Clôturer la location">
@@ -317,6 +317,24 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                 </button>
+                                @elseif($order->status === 'completed' && $order->inspection_status === 'completed')
+                                <!-- Message pour les locations déjà inspectées -->
+                                <span class="inline-flex items-center px-3 py-2 bg-green-100 text-green-800 text-sm font-medium rounded-md"
+                                      title="Inspection terminée">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Inspection terminée
+                                </span>
+                                @elseif($order->status === 'finished')
+                                <!-- Message pour les locations complètement terminées -->
+                                <span class="inline-flex items-center px-3 py-2 bg-gray-100 text-gray-800 text-sm font-medium rounded-md"
+                                      title="Location terminée">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Terminée
+                                </span>
                                 @endif
                                 
                                 @if(in_array($order->status, ['completed', 'closed', 'inspecting']))

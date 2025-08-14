@@ -158,6 +158,13 @@ class MyRentalsController extends Controller
                     'can_close' => false
                 ];
                 
+            case 'finished':
+                return [
+                    'label' => 'Finalisée',
+                    'class' => 'bg-green-100 text-green-800',
+                    'can_close' => false
+                ];
+                
             default:
                 return [
                     'label' => 'Statut inconnu',
