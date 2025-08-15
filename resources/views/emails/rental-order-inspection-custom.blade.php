@@ -172,7 +172,7 @@
             <h3>💰 Récapitulatif financier</h3>
             <table class="financial-table">
                 <tr>
-                    <th>Description</th>
+                    <th>{{ __("app.forms.description") }}</th>
                     <th>Montant</th>
                 </tr>
                 <tr>

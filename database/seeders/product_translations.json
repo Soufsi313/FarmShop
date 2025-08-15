@@ -1,0 +1,58 @@
+{
+    "fr": {
+        "Semences de blé": {
+            "en": "Wheat Seeds",
+            "nl": "Tarwezaden"
+        },
+        "Engrais bio": {
+            "en": "Organic Fertilizer",
+            "nl": "Biologische meststof"
+        },
+        "Tracteur compact": {
+            "en": "Compact Tractor",
+            "nl": "Compacte tractor"
+        },
+        "Moissonneuse": {
+            "en": "Harvester",
+            "nl": "Maaidorser"
+        },
+        "Pulvérisateur": {
+            "en": "Sprayer",
+            "nl": "Spuit"
+        },
+        "Charrue": {
+            "en": "Plow",
+            "nl": "Ploeg"
+        },
+        "Semoir": {
+            "en": "Seeder",
+            "nl": "Zaaimachine"
+        },
+        "Cultivateur": {
+            "en": "Cultivator",
+            "nl": "Cultivator"
+        },
+        "Faucheuse": {
+            "en": "Mower",
+            "nl": "Maaier"
+        },
+        "Épandeur": {
+            "en": "Spreader",
+            "nl": "Strooier"
+        }
+    },
+    "descriptions": {
+        "Semences de haute qualité pour une production optimale": {
+            "en": "High quality seeds for optimal production",
+            "nl": "Hoogwaardige zaden voor optimale productie"
+        },
+        "Matériel agricole professionnel": {
+            "en": "Professional agricultural equipment",
+            "nl": "Professionele landbouwuitrusting"
+        },
+        "Location d'équipement avec service complet": {
+            "en": "Equipment rental with full service",
+            "nl": "Uitrusting verhuur met volledige service"
+        }
+    }
+}

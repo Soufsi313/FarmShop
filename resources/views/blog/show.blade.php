@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', $post->title . ' - Blog FarmShop')
-@section('meta_description', $post->meta_description ?: $post->excerpt)
+@section('title', $post->getTranslatedTitle() . ' - Blog FarmShop')
+@section('meta_description', $post->meta_description ?: $post->getTranslatedExcerpt())
 
 @section('content')
 <div class="min-h-screen bg-gray-50">
@@ -9,17 +9,17 @@
     <div class="bg-white border-b">
         <div class="container mx-auto px-4 py-4">
             <nav class="flex text-sm text-gray-600">
-                <a href="{{ route('home') }}" class="hover:text-green-600">Accueil</a>
+                <a href="{{ route('home') }}" class="hover:text-green-600">{{ __("app.nav.home") }}</a>
                 <span class="mx-2">/</span>
-                <a href="{{ route('blog.index') }}" class="hover:text-green-600">Blog</a>
+                <a href="{{ route('blog.index') }}" class="hover:text-green-600">{{ __("app.nav.blog") }}</a>
                 <span class="mx-2">/</span>
                 @if($post->category)
                     <a href="{{ route('blog.index', ['category' => $post->category->slug]) }}" class="hover:text-green-600">
-                        {{ $post->category->name }}
+                        {{ __('categories.' . $post->category->slug) }}
                     </a>
                     <span class="mx-2">/</span>
                 @endif
-                <span class="text-gray-900">{{ Str::limit($post->title, 50) }}</span>
+                <span class="text-gray-900">{{ Str::limit($post->getTranslatedTitle(), 50) }}</span>
             </nav>
         </div>
     </div>
@@ -33,7 +33,7 @@
                     @if($post->featured_image)
                         <div class="aspect-video bg-gray-200">
                             <img src="{{ Storage::url($post->featured_image) }}" 
-                                 alt="{{ $post->title }}"
+                                 alt="{{ $post->getTranslatedTitle() }}"
                                  class="w-full h-full object-cover">
                         </div>
                     @endif
@@ -45,7 +45,7 @@
                             <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
                                 @if($post->category)
                                     <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
-                                        {{ $post->category->name }}
+                                        {{ __('categories.' . $post->category->slug) }}
                                     </span>
                                 @endif
                                 <time datetime="{{ $post->published_at->format('Y-m-d') }}">
@@ -60,11 +60,11 @@
                             </div>
 
                             <!-- Titre -->
-                            <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">{{ $post->title }}</h1>
+                            <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">{{ $post->getTranslatedTitle() }}</h1>
 
                             <!-- Extrait -->
-                            @if($post->excerpt)
-                                <p class="text-xl text-gray-600 leading-relaxed">{{ $post->excerpt }}</p>
+                            @if($post->getTranslatedExcerpt())
+                                <p class="text-xl text-gray-600 leading-relaxed">{{ $post->getTranslatedExcerpt() }}</p>
                             @endif
 
                             <!-- Statistiques et actions -->
@@ -114,7 +114,7 @@
 
                         <!-- Contenu de l'article -->
                         <div class="prose prose-lg max-w-none">
-                            {!! $post->content !!}
+                            {!! $post->getTranslatedContent() !!}
                         </div>
 
                         <!-- Tags -->
@@ -313,7 +313,7 @@ function shareOnFacebook() {
 
 function shareOnTwitter() {
     const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent('{{ $post->title }}');
+    const text = encodeURIComponent('{{ $post->getTranslatedTitle() }}');
     window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank', 'width=600,height=400');
 }
 

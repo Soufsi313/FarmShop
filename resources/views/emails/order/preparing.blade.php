@@ -70,7 +70,7 @@
                 <p>✅ <strong>Commande confirmée</strong></p>
                 <p>📦 <strong>Préparation en cours</strong> - Maintenant</p>
                 <p>🚚 <strong>Expédition</strong> - Prochainement</p>
-                <p>🏠 <strong>Livraison</strong> - Estimée dans 2-3 jours ouvrés</p>
+                <p>🏠 <strong>{{ __("app.ecommerce.shipping") }}</strong> - Estimée dans 2-3 jours ouvrés</p>
             </div>
             
             <p>Nos équipes préparent soigneusement votre commande pour vous garantir des produits frais et de qualité. Vous recevrez un nouvel email dès que votre colis sera expédié avec votre numéro de suivi.</p>

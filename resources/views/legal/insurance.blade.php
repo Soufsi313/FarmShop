@@ -507,12 +507,12 @@
                                         <label class="flex items-center">
                                             <input type="radio" name="police_prevenue" value="oui" 
                                                    class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
-                                            <span class="ml-2 text-sm text-gray-700">Oui</span>
+                                            <span class="ml-2 text-sm text-gray-700">{{ __("app.common.yes") }}</span>
                                         </label>
                                         <label class="flex items-center">
                                             <input type="radio" name="police_prevenue" value="non" 
                                                    class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
-                                            <span class="ml-2 text-sm text-gray-700">Non</span>
+                                            <span class="ml-2 text-sm text-gray-700">{{ __("app.common.no") }}</span>
                                         </label>
                                         <label class="flex items-center">
                                             <input type="radio" name="police_prevenue" value="non_applicable" 

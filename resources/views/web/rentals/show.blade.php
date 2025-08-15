@@ -160,7 +160,7 @@
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                        {{ $product->rental_stock > 10 ? 'bg-green-100 text-green-800' : 
                                           ($product->rental_stock > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
-                                {{ $product->rental_stock > 0 ? $product->rental_stock . ' en stock' : 'Rupture de stock' }}
+                                {{ $product->rental_stock > 0 ? $product->rental_stock . ' en stock' : __("app.ecommerce.out_of_stock") }}
                             </span>
                         </div>
                     </div>
@@ -394,7 +394,7 @@
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">📅 Confirmer la location</h3>
                 <button x-on:click="showRentalModal = false" class="text-gray-400 hover:text-gray-600">
-                    <span class="sr-only">Fermer</span>
+                    <span class="sr-only">{{ __("app.buttons.close") }}</span>
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>

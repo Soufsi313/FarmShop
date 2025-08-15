@@ -77,7 +77,7 @@
         <h3>Statut du Compte</h3>
         <div class="info-row">
             <div class="info-label">Email vérifié :</div>
-            <div class="info-value">{{ $user->email_verified_at ? 'Oui (' . $user->email_verified_at->format('d/m/Y H:i') . ')' : 'Non' }}</div>
+            <div class="info-value">{{ $user->email_verified_at ? 'Oui (' . $user->email_verified_at->format('d/m/Y H:i') . ')' : {{ __("app.common.no") }} }}</div>
         </div>
         <div class="info-row">
             <div class="info-label">Newsletter :</div>

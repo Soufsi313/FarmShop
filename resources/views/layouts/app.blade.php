@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" class="h-full">
+<html lang="{{ app()->getLocale() }}" class="h-full">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -397,25 +397,25 @@
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                             </svg>
-                            <span>Accueil</span>
+                            <span>{{ __('app.nav.home') }}</span>
                         </a>
                         <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                             </svg>
-                            <span>Nos produits</span>
+                            <span>{{ __('app.nav.products') }}</span>
                         </a>
                         <a href="{{ route('rentals.index') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            <span>Nos locations</span>
+                            <span>{{ __('app.nav.rentals') }}</span>
                         </a>
                         <a href="{{ route('blog.index') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
                             </svg>
-                            <span>Blog</span>
+                            <span>{{ __('app.nav.blog') }}</span>
                         </a>
                         
                         <!-- Sections visibles seulement si connecté -->
@@ -481,19 +481,32 @@
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                             </svg>
-                            <span>Contact</span>
+                            <span>{{ __('app.nav.contact') }}</span>
                         </a>
                     </div>
                 </div>
 
                 <!-- Actions utilisateur -->
                 <div class="hidden md:flex items-center space-x-4">
+                    <!-- Sélecteur de langue -->
+                    <div class="flex items-center space-x-2">
+                        <a href="{{ request()->fullUrlWithQuery(['lang' => 'fr']) }}" title="Français" class="hover:opacity-80 transition-opacity">
+                            <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-5 w-5 rounded border {{ app()->getLocale() === 'fr' ? 'ring-2 ring-green-500' : '' }}" />
+                        </a>
+                        <a href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" title="English" class="hover:opacity-80 transition-opacity">
+                            <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-5 w-5 rounded border {{ app()->getLocale() === 'en' ? 'ring-2 ring-green-500' : '' }}" />
+                        </a>
+                        <a href="{{ request()->fullUrlWithQuery(['lang' => 'nl']) }}" title="Nederlands" class="hover:opacity-80 transition-opacity">
+                            <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-5 w-5 rounded border {{ app()->getLocale() === 'nl' ? 'ring-2 ring-green-500' : '' }}" />
+                        </a>
+                    </div>
+
                     @guest
                         <a href="{{ route('login') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors">
-                            Connexion
+                            {{ __('app.nav.login') }}
                         </a>
                         <a href="{{ route('register') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                            Inscription
+                            {{ __('app.nav.register') }}
                         </a>
                     @else
                         <div class="relative" x-data="{ userMenuOpen: false }">
@@ -563,10 +576,10 @@
                  x-transition:leave-end="opacity-0 scale-95"
                  class="md:hidden">
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
-                    <a href="/" class="text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Accueil</a>
-                    <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Nos produits</a>
-                    <a href="{{ route('rentals.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Nos locations</a>
-                    <a href="{{ route('blog.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Blog</a>
+                    <a href="/" class="text-gray-900 block px-3 py-2 rounded-md text-base font-medium">{{ __('app.nav.home') }}</a>
+                    <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">{{ __('app.nav.products') }}</a>
+                    <a href="{{ route('rentals.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">{{ __('app.nav.rentals') }}</a>
+                    <a href="{{ route('blog.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">{{ __('app.nav.blog') }}</a>
                     
                     <!-- Sections visibles seulement si connecté -->
                     @auth
@@ -581,7 +594,7 @@
                         <a href="{{ route('users.profile') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Mon profil</a>
                     @endauth
                     
-                    <a href="{{ route('contact') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Contact</a>
+                    <a href="{{ route('contact') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">{{ __('app.nav.contact') }}</a>
                     
                     @guest
                         <div class="border-t pt-4 mt-4">
@@ -673,15 +686,14 @@
                         <span class="ml-2 text-xl font-bold text-white">FarmShop</span>
                     </div>
                     <p class="text-gray-300 text-base">
-                        Votre partenaire de confiance pour le matériel agricole en Belgique. 
-                        Achat et location d'équipements de qualité pour professionnels et particuliers.
+                        {{ __('app.footer.company_description') }}
                     </p>
                     <div class="text-gray-300">
-                        <p class="font-medium text-white mb-2">Siège social:</p>
-                        <p>Avenue de la ferme 123</p>
-                        <p>1000 Bruxelles, Belgique</p>
-                        <p>Tel: +32 2 123 45 67</p>
-                        <p>Email: s.mef2703@gmail.com</p>
+                        <p class="font-medium text-white mb-2">{{ __('app.footer.headquarters') }}</p>
+                        <p>{{ __('app.footer.address_line1') }}</p>
+                        <p>{{ __('app.footer.address_line2') }}</p>
+                        <p>{{ __('app.footer.tel') }}</p>
+                        <p>{{ __('app.footer.email') }}</p>
                     </div>
                 </div>
 
@@ -690,34 +702,34 @@
                     <div class="md:grid md:grid-cols-3 md:gap-8">
                         <!-- Mentions légales -->
                         <div>
-                            <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Mentions légales</h3>
+                            <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">{{ __('app.footer.legal_mentions') }}</h3>
                             <ul class="mt-4 space-y-3">
-                                <li><a href="{{ route('legal.mentions') }}" class="text-base text-gray-300 hover:text-white transition-colors">Mentions légales</a></li>
-                                <li><a href="{{ route('legal.cgv') }}" class="text-base text-gray-300 hover:text-white transition-colors">CGV</a></li>
-                                <li><a href="{{ route('legal.cgu') }}" class="text-base text-gray-300 hover:text-white transition-colors">CGU</a></li>
-                                <li><a href="{{ route('legal.cgl') }}" class="text-base text-gray-300 hover:text-white transition-colors">Conditions Location</a></li>
+                                <li><a href="{{ route('legal.mentions') }}" class="text-base text-gray-300 hover:text-white transition-colors">{{ __('app.footer.legal_mentions') }}</a></li>
+                                <li><a href="{{ route('legal.cgv') }}" class="text-base text-gray-300 hover:text-white transition-colors">{{ __('app.footer.terms_of_sale') }}</a></li>
+                                <li><a href="{{ route('legal.cgu') }}" class="text-base text-gray-300 hover:text-white transition-colors">{{ __('app.footer.terms_of_use') }}</a></li>
+                                <li><a href="{{ route('legal.cgl') }}" class="text-base text-gray-300 hover:text-white transition-colors">{{ __('app.footer.rental_conditions') }}</a></li>
                             </ul>
                         </div>
 
                         <!-- Protection des données -->
                         <div>
-                            <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Données personnelles</h3>
+                            <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">{{ __('app.footer.personal_data') }}</h3>
                             <ul class="mt-4 space-y-3">
-                                <li><a href="{{ route('legal.privacy') }}" class="text-base text-gray-300 hover:text-white transition-colors">Politique de confidentialité</a></li>
-                                <li><a href="{{ route('legal.gdpr-rights') }}" class="text-base text-gray-300 hover:text-white transition-colors">Droits RGPD</a></li>
-                                <li><a href="{{ route('legal.cookies') }}" class="text-base text-gray-300 hover:text-white transition-colors">Politique des cookies</a></li>
-                                <li><a href="{{ route('legal.data-request') }}" class="text-base text-gray-300 hover:text-white transition-colors">Demande de données</a></li>
+                                <li><a href="{{ route('legal.privacy') }}" class="text-base text-gray-300 hover:text-white transition-colors">{{ __('app.footer.privacy_policy') }}</a></li>
+                                <li><a href="{{ route('legal.gdpr-rights') }}" class="text-base text-gray-300 hover:text-white transition-colors">{{ __('app.footer.gdpr_rights') }}</a></li>
+                                <li><a href="{{ route('legal.cookies') }}" class="text-base text-gray-300 hover:text-white transition-colors">{{ __('app.footer.cookie_policy') }}</a></li>
+                                <li><a href="{{ route('legal.data-request') }}" class="text-base text-gray-300 hover:text-white transition-colors">{{ __('app.footer.data_request') }}</a></li>
                             </ul>
                         </div>
 
                         <!-- Conformité secteur -->
                         <div>
-                            <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Conformité</h3>
+                            <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">{{ __('app.footer.compliance') }}</h3>
                             <ul class="mt-4 space-y-3">
-                                <li><a href="https://www.afsca.be" target="_blank" rel="noopener noreferrer" class="text-base text-gray-300 hover:text-white transition-colors">AFSCA <svg class="inline w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path></svg></a></li>
-                                <li><a href="{{ route('legal.returns') }}" class="text-base text-gray-300 hover:text-white transition-colors">Droit de rétractation</a></li>
-                                <li><a href="{{ route('legal.warranties') }}" class="text-base text-gray-300 hover:text-white transition-colors">Garanties légales</a></li>
-                                <li><a href="{{ route('legal.mediation') }}" class="text-base text-gray-300 hover:text-white transition-colors">Médiation</a></li>
+                                <li><a href="https://www.afsca.be" target="_blank" rel="noopener noreferrer" class="text-base text-gray-300 hover:text-white transition-colors">{{ __('app.footer.afsca') }} <svg class="inline w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path></svg></a></li>
+                                <li><a href="{{ route('legal.returns') }}" class="text-base text-gray-300 hover:text-white transition-colors">{{ __('app.footer.return_right') }}</a></li>
+                                <li><a href="{{ route('legal.warranties') }}" class="text-base text-gray-300 hover:text-white transition-colors">{{ __('app.footer.legal_warranties') }}</a></li>
+                                <li><a href="{{ route('legal.mediation') }}" class="text-base text-gray-300 hover:text-white transition-colors">{{ __('app.footer.mediation') }}</a></li>
                             </ul>
                         </div>
                     </div>
@@ -728,12 +740,12 @@
             <div class="mt-12 border-t border-gray-700 pt-8">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div class="text-sm text-gray-400 space-y-1">
-                        <p>&copy; {{ date('Y') }} FarmShop SPRL. Tous droits réservés.</p>
+                        <p>&copy; {{ date('Y') }} FarmShop SPRL. {{ __('app.footer.all_rights_reserved') }}</p>
                         <p>BCE: 0XXX.XXX.XXX | TVA: BE 0XXX.XXX.XXX</p>
-                        <p>Siège social: Avenue de la ferme 123, 1000 Bruxelles</p>
+                        <p>{{ __('app.footer.headquarters') }} {{ __('app.footer.address_line1') }}, {{ __('app.footer.address_line2') }}</p>
                         <p class="text-xs">
-                            Assurance RC Professionnelle: Police n° XXX - 
-                            <a href="{{ route('legal.insurance') }}" class="hover:text-white transition-colors">Détails couverture</a>
+                            {{ __('app.footer.insurance_text') }} 
+                            <a href="{{ route('legal.insurance') }}" class="hover:text-white transition-colors">{{ __('app.footer.insurance_details') }}</a>
                         </p>
                     </div>
                     <div class="mt-4 md:mt-0 flex space-x-6">
@@ -764,22 +776,22 @@
             <div class="text-sm flex-1">
                 <p class="mb-2 flex items-center">
                     <span class="text-2xl mr-2 animate-bounce">🍪</span>
-                    <strong class="text-green-400">Ce site utilise des cookies</strong>
+                    <strong class="text-green-400">{{ __('app.cookies.banner_title') }}</strong>
                 </p>
-                <p class="text-gray-300">Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser le contenu. Vous pouvez choisir quels cookies accepter.</p>
+                <p class="text-gray-300">{{ __('app.cookies.banner_description') }}</p>
             </div>
             <div class="flex flex-col sm:flex-row gap-3 min-w-fit">
                 <button onclick="FarmShop.cookieConsent.showCookieSettings()" 
                         class="px-4 py-2 text-sm border border-gray-600 rounded hover:bg-gray-700 hover:border-green-500 transition-all duration-300 whitespace-nowrap">
-                    ⚙️ Personnaliser
+                    ⚙️ {{ __('app.cookies.customize') }}
                 </button>
                 <button onclick="FarmShop.cookieConsent.decline()" 
                         class="px-4 py-2 text-sm border border-red-500 rounded hover:bg-red-600 hover:border-red-400 transition-all duration-300 whitespace-nowrap">
-                    ❌ Refuser
+                    ❌ {{ __('app.cookies.decline') }}
                 </button>
                 <button onclick="FarmShop.cookieConsent.accept()" 
                         class="px-6 py-2 text-sm bg-green-600 hover:bg-green-700 rounded transition-all duration-300 whitespace-nowrap font-semibold shadow-lg hover:shadow-green-500/50">
-                    ✅ Tout accepter
+                    ✅ {{ __('app.cookies.accept_all') }}
                 </button>
             </div>
         </div>
@@ -792,8 +804,8 @@
             <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white p-6 rounded-t-lg">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-2xl font-bold">🍪 Préférences de cookies</h2>
-                        <p class="text-green-100 mt-2">Choisissez quels cookies vous souhaitez autoriser</p>
+                        <h2 class="text-2xl font-bold">🍪 {{ __('app.cookies.preferences_title') }}</h2>
+                        <p class="text-green-100 mt-2">{{ __('app.cookies.preferences_subtitle') }}</p>
                     </div>
                     <button onclick="closeCookieSettings()" class="text-white hover:text-gray-200 text-2xl">
                         ✕
@@ -809,18 +821,18 @@
                         <div class="flex items-center">
                             <span class="text-2xl mr-3">🔧</span>
                             <div>
-                                <h3 class="text-lg font-semibold text-green-800">Cookies essentiels</h3>
-                                <p class="text-sm text-green-600">Nécessaires au fonctionnement du site</p>
+                                <h3 class="text-lg font-semibold text-green-800">{{ __('app.cookies.essential_title') }}</h3>
+                                <p class="text-sm text-green-600">{{ __('app.cookies.essential_subtitle') }}</p>
                             </div>
                         </div>
                         <div class="flex items-center">
                             <span class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                                Toujours actifs
+                                {{ __('app.cookies.always_active') }}
                             </span>
                         </div>
                     </div>
                     <p class="text-sm text-green-700">
-                        Ces cookies sont indispensables pour assurer le bon fonctionnement du site, la sécurité des transactions et mémoriser votre panier.
+                        {{ __('app.cookies.essential_description') }}
                     </p>
                 </div>
 
@@ -830,8 +842,8 @@
                         <div class="flex items-center">
                             <span class="text-2xl mr-3">📊</span>
                             <div>
-                                <h3 class="text-lg font-semibold text-blue-800">Cookies analytiques</h3>
-                                <p class="text-sm text-blue-600">Analyse et amélioration du site</p>
+                                <h3 class="text-lg font-semibold text-blue-800">{{ __('app.cookies.analytics_title') }}</h3>
+                                <p class="text-sm text-blue-600">{{ __('app.cookies.analytics_subtitle') }}</p>
                             </div>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
@@ -840,7 +852,7 @@
                         </label>
                     </div>
                     <p class="text-sm text-gray-700">
-                        Ces cookies nous aident à comprendre comment vous utilisez notre site pour l'améliorer.
+                        {{ __('app.cookies.analytics_description') }}
                     </p>
                 </div>
 
@@ -850,8 +862,8 @@
                         <div class="flex items-center">
                             <span class="text-2xl mr-3">🎯</span>
                             <div>
-                                <h3 class="text-lg font-semibold text-purple-800">Cookies marketing</h3>
-                                <p class="text-sm text-purple-600">Publicité personnalisée</p>
+                                <h3 class="text-lg font-semibold text-purple-800">{{ __('app.cookies.marketing_title') }}</h3>
+                                <p class="text-sm text-purple-600">{{ __('app.cookies.marketing_subtitle') }}</p>
                             </div>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
@@ -870,8 +882,8 @@
                         <div class="flex items-center">
                             <span class="text-2xl mr-3">⚙️</span>
                             <div>
-                                <h3 class="text-lg font-semibold text-orange-800">Cookies de préférences</h3>
-                                <p class="text-sm text-orange-600">Personnalisation de l'expérience</p>
+                                <h3 class="text-lg font-semibold text-orange-800">{{ __('app.cookies.preferences_cookie_title') }}</h3>
+                                <p class="text-sm text-orange-600">{{ __('app.cookies.preferences_cookie_subtitle') }}</p>
                             </div>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
@@ -880,7 +892,7 @@
                         </label>
                     </div>
                     <p class="text-sm text-gray-700">
-                        Ces cookies mémorisent vos préférences (langue, région, etc.) pour personnaliser votre expérience.
+                        {{ __('app.cookies.preferences_cookie_description') }}
                     </p>
                 </div>
 
@@ -890,8 +902,8 @@
                         <div class="flex items-center">
                             <span class="text-2xl mr-3">📱</span>
                             <div>
-                                <h3 class="text-lg font-semibold text-pink-800">Cookies réseaux sociaux</h3>
-                                <p class="text-sm text-pink-600">Partage et intégrations sociales</p>
+                                <h3 class="text-lg font-semibold text-pink-800">{{ __('app.cookies.social_title') }}</h3>
+                                <p class="text-sm text-pink-600">{{ __('app.cookies.social_subtitle') }}</p>
                             </div>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
@@ -900,7 +912,7 @@
                         </label>
                     </div>
                     <p class="text-sm text-gray-700">
-                        Ces cookies permettent le partage sur les réseaux sociaux et l'affichage de contenu social.
+                        {{ __('app.cookies.social_description') }}
                     </p>
                 </div>
             </div>
@@ -910,17 +922,17 @@
                 <div class="flex gap-3">
                     <a href="{{ route('legal.cookies') }}" target="_blank" 
                        class="text-sm text-blue-600 hover:text-blue-800 underline">
-                        📄 En savoir plus sur les cookies
+                        📄 {{ __('app.cookies.learn_more') }}
                     </a>
                 </div>
                 <div class="flex gap-3">
                     <button onclick="rejectAllCookies()" 
                             class="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-100 transition-colors">
-                        Tout refuser
+                        {{ __('app.cookies.reject_all') }}
                     </button>
                     <button onclick="saveCookiePreferences()" 
                             class="px-6 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded transition-colors font-medium">
-                        Sauvegarder mes choix
+                        {{ __('app.cookies.save_choices') }}
                     </button>
                 </div>
             </div>

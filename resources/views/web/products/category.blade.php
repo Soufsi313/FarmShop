@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Catégorie : ' . $category->name)
+@section('title', '{{ __("app.pages.category") }} : ' . $category->name)
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -8,18 +8,18 @@
     <div class="mb-8">
         <nav class="text-sm breadcrumbs mb-4">
             <ol class="flex items-center space-x-2 text-gray-600">
-                <li><a href="{{ url('/') }}" class="hover:text-green-600">Accueil</a></li>
+                <li><a href="{{ url('/') }}" class="hover:text-green-600">{{ __("app.nav.home") }}</a></li>
                 <li><span class="mx-2">/</span></li>
                 <li><a href="{{ route('products.index') }}" class="hover:text-green-600">Nos produits</a></li>
                 <li><span class="mx-2">/</span></li>
-                <li class="text-green-600 font-semibold">{{ $category->name }}</li>
+                <li class="text-green-600 font-semibold">{{ trans_category($category, "name") }}</li>
             </ol>
         </nav>
         
         <div class="text-center">
-            <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ $category->name }}</h1>
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ trans_category($category, "name") }}</h1>
             @if($category->description)
-                <p class="text-lg text-gray-600 max-w-3xl mx-auto">{{ $category->description }}</p>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">{{ trans_category($category, "description") }}</p>
             @endif
             <div class="mt-4">
                 <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold">
@@ -38,7 +38,7 @@
                 <form method="GET" action="{{ route('products.category', $category) }}" id="filter-form">
                     <!-- Recherche -->
                     <div class="mb-6">
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Rechercher</label>
+                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">{{ __("app.buttons.search") }}<//label>
                         <input type="text" 
                                id="search" 
                                name="search" 
@@ -53,7 +53,7 @@
                         <div class="space-y-2">
                             <label class="flex items-center">
                                 <input type="radio" name="type" value="" {{ !request('type') ? 'checked' : '' }} class="text-green-600">
-                                <span class="ml-2 text-sm">Tous</span>
+                                <span class="ml-2 text-sm">{{ __("app.common.all") }}</span>
                             </label>
                             <label class="flex items-center">
                                 <input type="radio" name="type" value="sale" {{ request('type') === 'sale' ? 'checked' : '' }} class="text-green-600">
@@ -61,7 +61,7 @@
                             </label>
                             <label class="flex items-center">
                                 <input type="radio" name="type" value="rental" {{ request('type') === 'rental' ? 'checked' : '' }} class="text-green-600">
-                                <span class="ml-2 text-sm">Location</span>
+                                <span class="ml-2 text-sm">{{ __("app.ecommerce.rental") }}</span>
                             </label>
                         </div>
                     </div>
@@ -96,7 +96,7 @@
 
                     <!-- Tri -->
                     <div class="mb-6">
-                        <label for="sort" class="block text-sm font-medium text-gray-700 mb-2">Trier par</label>
+                        <label for="sort" class="block text-sm font-medium text-gray-700 mb-2">{{ __("app.buttons.sort_by") }}<//label>
                         <select name="sort" id="sort" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
                             <option value="created_at" {{ request('sort') === 'created_at' ? 'selected' : '' }}>Plus récent</option>
                             <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Nom A-Z</option>
@@ -141,7 +141,7 @@
                                 <!-- Badge type -->
                                 <div class="absolute top-2 left-2">
                                     <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $product->type === 'sale' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
-                                        {{ $product->type === 'sale' ? 'Vente' : 'Location' }}
+                                        {{ $product->type === 'sale' ? 'Vente' : {{ __("app.ecommerce.rental") }} }}
                                     </span>
                                 </div>
 

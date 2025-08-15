@@ -7,7 +7,7 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white shadow-lg rounded-lg p-8">
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-900 mb-4">Mentions légales</h1>
+                <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ __("app.legal.legal_notices") }}</h1>
                 <p class="text-gray-600">Informations légales obligatoires selon le Code de droit économique belge</p>
             </div>
 
@@ -54,7 +54,7 @@
                             </p>
                         </div>
                         <div>
-                            <h3 class="font-semibold text-gray-800 mb-2">Contact</h3>
+                            <h3 class="font-semibold text-gray-800 mb-2">{{ __("app.nav.contact") }}</h3>
                             <p class="text-gray-600">
                                 Téléphone: +32 2 123 45 67<br>
                                 Email: contact@farmshop.be<br>

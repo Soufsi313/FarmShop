@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'FarmShop - Votre marketplace agricole')
+@section('title', __('welcome.hero_title'))
 
 @section('content')
 <div x-data="farmShopHome">
@@ -8,17 +8,17 @@
     <section class="hero-bg bg-gradient-to-br from-orange-200 via-green-100 to-orange-300 py-20">
         <div class="container mx-auto px-6 text-center">
             <h1 class="text-5xl md:text-6xl font-bold text-farm-green-800 mb-6">
-                🌾 Bienvenue chez FarmShop
+                🌾 {{ __('welcome.hero_title') }}
             </h1>
             <p class="text-xl md:text-2xl text-farm-orange-700 mb-8 max-w-3xl mx-auto">
-                Votre marketplace agricole de confiance pour acheter et louer du matériel agricole de qualité
+                {{ __('welcome.hero_subtitle') }}
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('products.index') }}" class="bg-farm-green-600 hover:bg-farm-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg hover:shadow-xl">
-                    🛒 Découvrir nos produits
+                    🛒 {{ __('welcome.shop_now') }}
                 </a>
                 <a href="{{ route('rentals.index') }}" class="border-2 border-farm-orange-500 text-farm-orange-600 hover:bg-farm-orange-500 hover:text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors">
-                    📅 Louer du matériel
+                    📅 {{ __('welcome.rent_equipment') }}
                 </a>
             </div>
             
@@ -39,24 +39,24 @@
                             </svg>
                         </div>
                         <h3 class="text-2xl font-bold bg-gradient-to-r from-orange-600 via-red-500 to-green-600 bg-clip-text text-transparent mb-2">
-                            Rejoignez FarmShop
+                            {{ __('welcome.join_farmshop') }}
                         </h3>
-                        <p class="text-gray-600 text-sm">Votre partenaire agricole de confiance depuis 2020</p>
+                        <p class="text-gray-600 text-sm">{{ __('welcome.trusted_partner') }}</p>
                     </div>
                     
                     <!-- Statistiques -->
                     <div class="grid grid-cols-3 gap-4 py-4">
                         <div class="text-center">
                             <div class="text-xl font-bold text-orange-600">1.2k+</div>
-                            <div class="text-xs text-gray-500">Agriculteurs</div>
+                            <div class="text-xs text-gray-500">{{ __('welcome.farmers') }}</div>
                         </div>
                         <div class="text-center border-x border-gray-200">
                             <div class="text-xl font-bold text-green-600">500+</div>
-                            <div class="text-xs text-gray-500">Équipements</div>
+                            <div class="text-xs text-gray-500">{{ __('welcome.equipment') }}</div>
                         </div>
                         <div class="text-center">
                             <div class="text-xl font-bold text-blue-600">98%</div>
-                            <div class="text-xs text-gray-500">Satisfaction</div>
+                            <div class="text-xs text-gray-500">{{ __('welcome.satisfaction') }}</div>
                         </div>
                     </div>
                     
@@ -69,10 +69,10 @@
                                     <svg class="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
                                     </svg>
-                                    <span class="font-semibold">Créer mon compte gratuit</span>
+                                    <span class="font-semibold">{{ __('welcome.create_account') }}</span>
                                 </div>
                                 <div class="absolute top-1 right-1 bg-yellow-400 text-orange-900 text-xs px-2 py-1 rounded-bl-lg rounded-tr-xl font-bold shadow-sm">
-                                    GRATUIT
+                                    {{ __('welcome.free_badge') }}
                                 </div>
                             </div>
                         </a>
@@ -84,7 +84,7 @@
                             </div>
                             <div class="relative bg-gradient-to-br from-white via-orange-50 to-green-50">
                                 <span class="bg-white px-4 py-1 text-sm text-gray-500 rounded-full border border-gray-200 shadow-sm">
-                                    Déjà membre ?
+                                    {{ __('welcome.already_member') }}
                                 </span>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                                 <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
                                 </svg>
-                                <span class="font-semibold">Me connecter</span>
+                                <span class="font-semibold">{{ __('welcome.login_button') }}</span>
                             </div>
                         </a>
                     </div>
@@ -107,19 +107,19 @@
                                 <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                 </svg>
-                                <span>100% Sécurisé</span>
+                                <span>{{ __('welcome.secured') }}</span>
                             </div>
                             <div class="flex items-center space-x-1">
                                 <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                 </svg>
-                                <span>Certifié Bio</span>
+                                <span>{{ __('welcome.certified_bio') }}</span>
                             </div>
                             <div class="flex items-center space-x-1">
                                 <svg class="w-4 h-4 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                                 </svg>
-                                <span>Support 24/7</span>
+                                <span>{{ __('welcome.support_24_7') }}</span>
                             </div>
                         </div>
                     </div>
@@ -133,28 +133,28 @@
     <section class="py-16 bg-gradient-to-r from-green-100 via-orange-50 to-green-100">
         <div class="container mx-auto px-6">
             <h2 class="text-4xl font-bold text-center text-farm-green-800 mb-12">
-                Pourquoi choisir FarmShop ?
+                {{ __('welcome.why_choose_title') }}
             </h2>
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="text-center p-6 rounded-lg shadow-md border border-farm-green-200 hover:border-farm-orange-300 transition-colors">
                     <div class="text-5xl mb-4">🚜</div>
-                    <h3 class="text-2xl font-semibold text-farm-green-700 mb-4">Matériel de Qualité</h3>
+                    <h3 class="text-2xl font-semibold text-farm-green-700 mb-4">{{ __('welcome.quality_material_title') }}</h3>
                     <p class="text-farm-orange-600">
-                        Tous nos équipements sont rigoureusement sélectionnés et entretenus pour garantir performance et fiabilité.
+                        {{ __('welcome.quality_material_desc') }}
                     </p>
                 </div>
                 <div class="text-center p-6 rounded-lg shadow-md border border-farm-orange-200 hover:border-farm-green-300 transition-colors">
                     <div class="text-5xl mb-4">⚡</div>
-                    <h3 class="text-2xl font-semibold text-farm-orange-700 mb-4">Disponibilité Rapide</h3>
+                    <h3 class="text-2xl font-semibold text-farm-orange-700 mb-4">{{ __('welcome.fast_availability_title') }}</h3>
                     <p class="text-farm-green-600">
-                        Achat immédiat ou location flexible selon vos besoins. Livraison rapide dans toute la région.
+                        {{ __('welcome.fast_availability_desc') }}
                     </p>
                 </div>
                 <div class="text-center p-6 rounded-lg shadow-md border border-farm-green-200 hover:border-farm-orange-300 transition-colors">
                     <div class="text-5xl mb-4">🛡️</div>
-                    <h3 class="text-2xl font-semibold text-farm-green-700 mb-4">Paiement Sécurisé</h3>
+                    <h3 class="text-2xl font-semibold text-farm-green-700 mb-4">{{ __('welcome.secure_payment_title') }}</h3>
                     <p class="text-farm-orange-600">
-                        Transactions sécurisées avec Stripe. Vos données personnelles et bancaires sont protégées.
+                        {{ __('welcome.secure_payment_desc') }}
                     </p>
                 </div>
             </div>
@@ -165,10 +165,10 @@
     <section class="py-16 bg-gradient-to-br from-orange-100 via-green-50 to-orange-200">
         <div class="container mx-auto px-6">
             <h2 class="text-4xl font-bold text-center text-farm-green-800 mb-4">
-                🌱 Les produits que nous vous proposons
+                🌱 {{ __('welcome.our_products_title') }}
             </h2>
             <p class="text-center text-farm-orange-600 mb-12 text-lg">
-                Découvrez notre sélection de produits fermiers de qualité
+                {{ __('welcome.our_products_subtitle') }}
             </p>
             @if($randomProducts->count() > 0)
             <!-- Carrousel de produits -->
@@ -200,11 +200,11 @@
                                             @elseif($product->type === 'rental') bg-purple-600  
                                             @else bg-indigo-600 @endif">
                                             @if($product->type === 'sale') 
-                                                🛒 Achat
+                                                🛒 {{ __('welcome.purchase') }}
                                             @elseif($product->type === 'rental')
-                                                📅 Location
+                                                📅 {{ __("app.content.rental") }}
                                             @else 
-                                                🔄 Achat/Location
+                                                🔄 {{ __('welcome.purchase') }}/{{ __("app.content.rental") }}
                                             @endif
                                         </span>
                                     </div>
@@ -231,7 +231,7 @@
                                             </div>
                                             <div class="text-lg text-gray-500">
                                                 @if($product->type === 'rental')
-                                                    / jour
+                                                    / {{ __('welcome.per_day') }}
                                                 @elseif($product->type === 'both')
                                                     / {{ $product->unit_symbol }}
                                                 @else
@@ -243,7 +243,7 @@
                                         @if($product->type === 'rental' && $product->deposit_amount)
                                         <!-- Caution pour les locations -->
                                         <div class="text-sm text-gray-600 mb-3">
-                                            💳 Caution: {{ number_format($product->deposit_amount, 2) }}€
+                                            💳 {{ __('welcome.deposit') }}: {{ number_format($product->deposit_amount, 2) }}€
                                         </div>
                                         @endif
                                         
@@ -251,15 +251,15 @@
                                         <div class="flex items-center mb-6">
                                             @if($product->quantity > $product->low_stock_threshold)
                                                 <span class="inline-flex items-center text-sm text-green-700 bg-green-100 px-3 py-1 rounded-full">
-                                                    ✅ En stock ({{ $product->quantity }})
+                                                    ✅ {{ __("app.content.in_stock") }} ({{ $product->quantity }})
                                                 </span>
                                             @elseif($product->quantity > $product->out_of_stock_threshold)
                                                 <span class="inline-flex items-center text-sm text-orange-700 bg-orange-100 px-3 py-1 rounded-full">
-                                                    ⚠️ Stock limité ({{ $product->quantity }})
+                                                    ⚠️ {{ __("app.content.limited_stock") }} ({{ $product->quantity }})
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center text-sm text-red-700 bg-red-100 px-3 py-1 rounded-full">
-                                                    ❌ Stock faible ({{ $product->quantity }})
+                                                    ❌ {{ __("app.content.low_stock") }} ({{ $product->quantity }})
                                                 </span>
                                             @endif
                                         </div>
@@ -268,11 +268,11 @@
                                         <a href="{{ route('products.show', $product) }}" 
                                            class="inline-flex items-center justify-center bg-farm-green-600 hover:bg-farm-green-700 text-white px-6 py-3 rounded-lg text-lg font-semibold transition-colors">
                                             @if($product->type === 'sale')
-                                                🛒 Acheter ce produit
+                                                🛒 {{ __("app.content.buy_product") }}
                                             @elseif($product->type === 'rental')
-                                                📅 Louer ce produit
+                                                📅 {{ __("app.content.rent_product") }}
                                             @else
-                                                🔍 Voir les options
+                                                🔍 {{ __("app.content.view_options") }}
                                             @endif
                                             <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -300,7 +300,7 @@
             <div class="text-center mt-12">
                 <a href="{{ route('products.index') }}" 
                    class="inline-flex items-center bg-farm-green-700 hover:bg-farm-green-800 text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors shadow-lg hover:shadow-xl border-2 border-white">
-                    <span class="text-white font-bold">📖 Accéder au catalogue</span>
+                    <span class="text-white font-bold">📖 {{ __("app.welcome.view_catalog") }}</span>
                     <svg class="w-5 h-5 ml-2 text-white" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
@@ -311,11 +311,11 @@
             <!-- Fallback si aucun produit -->
             <div class="text-center py-12">
                 <div class="text-6xl mb-4">🌱</div>
-                <h3 class="text-xl font-semibold text-farm-green-700 mb-2">Produits en préparation</h3>
-                <p class="text-farm-orange-600">Nos produits seront bientôt disponibles !</p>
+                <h3 class="text-xl font-semibold text-farm-green-700 mb-2">{{ __("app.content.products_in_preparation") }}</h3>
+                <p class="text-farm-orange-600">{{ __("app.content.products_coming_soon") }}</p>
                 <a href="{{ route('products.index') }}" 
                    class="inline-block mt-4 bg-farm-green-600 hover:bg-farm-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
-                    Voir tous nos produits
+                    {{ __("app.content.view_all_products") }}
                 </a>
             </div>
             @endif
@@ -401,17 +401,17 @@
     <section class="py-16 bg-gradient-to-r from-orange-600 via-green-600 to-orange-700 text-white">
         <div class="container mx-auto px-6 text-center">
             <h2 class="text-4xl font-bold mb-6">
-                Prêt à moderniser votre exploitation ? 🚀
+                {{ __("app.welcome.ready_to_modernize_title") }}
             </h2>
             <p class="text-xl mb-8 max-w-2xl mx-auto">
-                Rejoignez des milliers d'agriculteurs qui font confiance à FarmShop pour leurs équipements agricoles.
+                {{ __("app.welcome.ready_to_modernize_subtitle") }}
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="/register" class="bg-white text-farm-green-600 hover:bg-gray-100 px-8 py-4 rounded-lg text-lg font-semibold transition-colors">
-                    📝 Créer un compte
+                    📝 {{ __("app.welcome.create_account_action") }}
                 </a>
                 <a href="{{ route('products.index') }}" class="border-2 border-white text-white hover:bg-white hover:text-farm-orange-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors">
-                    🔍 Explorer le catalogue
+                    🔍 {{ __("app.welcome.explore_catalog") }}
                 </a>
             </div>
         </div>
@@ -423,19 +423,19 @@
             <div class="grid md:grid-cols-4 gap-8 text-center">
                 <div>
                     <div class="text-4xl font-bold text-farm-green-600 mb-2">500+</div>
-                    <p class="text-farm-orange-600">Équipements disponibles</p>
+                    <p class="text-farm-orange-600">{{ __("app.welcome.available_equipment") }}</p>
                 </div>
                 <div>
                     <div class="text-4xl font-bold text-farm-orange-600 mb-2">1200+</div>
-                    <p class="text-farm-green-600">Clients satisfaits</p>
+                    <p class="text-farm-green-600">{{ __("app.welcome.satisfied_customers") }}</p>
                 </div>
                 <div>
                     <div class="text-4xl font-bold text-farm-green-600 mb-2">98%</div>
-                    <p class="text-farm-orange-600">Taux de satisfaction</p>
+                    <p class="text-farm-orange-600">{{ __("app.welcome.satisfaction_rate") }}</p>
                 </div>
                 <div>
                     <div class="text-4xl font-bold text-farm-orange-600 mb-2">24h</div>
-                    <p class="text-farm-green-600">Support client</p>
+                    <p class="text-farm-green-600">{{ __("app.welcome.customer_support") }}</p>
                 </div>
             </div>
         </div>
@@ -445,29 +445,29 @@
     <section class="py-16 bg-gradient-to-br from-orange-100 via-green-50 to-orange-100">
         <div class="container mx-auto px-6">
             <h2 class="text-4xl font-bold text-center text-farm-green-800 mb-12">
-                Ce que disent nos clients
+                {{ __("app.welcome.customer_testimonials_title") }}
             </h2>
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-farm-green-500">
                     <div class="text-farm-orange-400 text-xl mb-4">⭐⭐⭐⭐⭐</div>
                     <p class="text-gray-600 mb-4">
-                        "Excellent service ! J'ai trouvé exactement le tracteur qu'il me fallait. Livraison rapide et matériel en parfait état."
+                        {{ __("app.testimonials.testimonial_1") }}
                     </p>
-                    <div class="font-semibold text-farm-green-700">- Pierre Martin, Agriculteur</div>
+                    <div class="font-semibold text-farm-green-700">{{ __("app.testimonials.author_1") }}</div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-farm-orange-500">
                     <div class="text-farm-orange-400 text-xl mb-4">⭐⭐⭐⭐⭐</div>
                     <p class="text-gray-600 mb-4">
-                        "La location m'a permis d'essayer avant d'acheter. Très pratique pour les gros équipements !"
+                        {{ __("app.testimonials.testimonial_2") }}
                     </p>
-                    <div class="font-semibold text-farm-orange-700">- Marie Dubois, Exploitante</div>
+                    <div class="font-semibold text-farm-orange-700">{{ __("app.testimonials.author_2") }}</div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-farm-green-500">
                     <div class="text-farm-orange-400 text-xl mb-4">⭐⭐⭐⭐⭐</div>
                     <p class="text-gray-600 mb-4">
-                        "Support client réactif et professionnel. Je recommande FarmShop à tous mes collègues."
+                        "{{ __("app.welcome.customer_support") }} réactif et professionnel. Je recommande FarmShop à tous mes collègues."
                     </p>
-                    <div class="font-semibold text-farm-green-700">- Jean Lefebvre, GAEC</div>
+                    <div class="font-semibold text-farm-green-700">{{ __("app.testimonials.author_3") }}</div>
                 </div>
             </div>
         </div>
@@ -479,41 +479,41 @@
         <div class="container mx-auto px-6 text-center">
             <div class="max-w-3xl mx-auto">
                 <h2 class="text-4xl font-bold text-farm-green-800 mb-6">
-                    🚀 Rejoignez la communauté FarmShop
+                    {{ __("app.welcome.join_community_title") }}
                 </h2>
                 <p class="text-xl text-farm-orange-700 mb-8">
-                    Créez votre compte gratuit et profitez de tous nos services : achats, locations, wishlist et bien plus encore !
+                    {{ __("app.welcome.join_community_subtitle") }}
                 </p>
                 
                 <div class="grid md:grid-cols-3 gap-6 mb-8">
                     <div class="p-4 bg-white rounded-lg shadow-md">
                         <div class="text-3xl mb-3">💝</div>
-                        <h3 class="font-semibold text-farm-green-700 mb-2">Offres exclusives</h3>
-                        <p class="text-gray-600 text-sm">Accédez à des prix préférentiels et des promotions réservées aux membres</p>
+                        <h3 class="font-semibold text-farm-green-700 mb-2">{{ __("app.welcome.exclusive_offers_title") }}</h3>
+                        <p class="text-gray-600 text-sm">{{ __("app.welcome.exclusive_offers_desc") }}</p>
                     </div>
                     <div class="p-4 bg-white rounded-lg shadow-md">
                         <div class="text-3xl mb-3">📋</div>
-                        <h3 class="font-semibold text-farm-green-700 mb-2">Suivi des commandes</h3>
-                        <p class="text-gray-600 text-sm">Gérez facilement vos achats et locations depuis votre espace personnel</p>
+                        <h3 class="font-semibold text-farm-green-700 mb-2">{{ __("app.welcome.order_tracking_title") }}</h3>
+                        <p class="text-gray-600 text-sm">{{ __("app.welcome.order_tracking_desc") }}</p>
                     </div>
                     <div class="p-4 bg-white rounded-lg shadow-md">
                         <div class="text-3xl mb-3">❤️</div>
-                        <h3 class="font-semibold text-farm-green-700 mb-2">Liste de souhaits</h3>
-                        <p class="text-gray-600 text-sm">Sauvegardez vos produits favoris et recevez des alertes de disponibilité</p>
+                        <h3 class="font-semibold text-farm-green-700 mb-2">{{ __("app.welcome.wishlist_title") }}</h3>
+                        <p class="text-gray-600 text-sm">{{ __("app.welcome.wishlist_desc") }}</p>
                     </div>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a href="{{ route('register') }}" class="bg-farm-green-600 hover:bg-farm-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg hover:shadow-xl">
-                        🔥 Créer mon compte gratuit
+                        🔥 {{ __("app.welcome.create_free_account") }}
                     </a>
                     <a href="{{ route('login') }}" class="border-2 border-farm-orange-500 text-farm-orange-600 hover:bg-farm-orange-500 hover:text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors">
-                        J'ai déjà un compte
+                        {{ __("app.auth.already_have_account") }}
                     </a>
                 </div>
                 
                 <p class="text-sm text-gray-600 mt-4">
-                    ⚡ Inscription rapide • 🔒 100% sécurisé • 📧 Pas de spam
+                    {{ __("app.auth.registration_benefits") }}
                 </p>
             </div>
         </div>
@@ -524,15 +524,15 @@
     <section class="py-16 bg-gradient-to-r from-farm-green-700 to-farm-orange-700 text-white">
         <div class="container mx-auto px-6 text-center">
             <h2 class="text-3xl font-bold mb-4">
-                📧 Restez informé des nouveautés
+                {{ __("app.welcome.newsletter_title") }}
             </h2>
             <p class="text-lg mb-8">
-                Recevez en avant-première nos nouveaux produits et nos offres exclusives
+                {{ __("app.welcome.newsletter_subtitle") }}
             </p>
             <div class="max-w-md mx-auto flex gap-4">
-                <input type="email" placeholder="Votre adresse email" class="flex-1 px-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-farm-orange-400">
+                <input type="email" placeholder="{{ __("app.form.email_placeholder") }}" class="flex-1 px-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-farm-orange-400">
                 <button class="bg-farm-orange-500 hover:bg-farm-orange-600 px-6 py-3 rounded-lg font-semibold transition-colors">
-                    S'abonner
+                    {{ __("app.form.subscribe") }}
                 </button>
             </div>
         </div>

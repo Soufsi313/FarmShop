@@ -62,7 +62,7 @@
                                     <table class="min-w-full bg-white border border-green-200 rounded">
                                         <thead class="bg-green-100">
                                             <tr>
-                                                <th class="border-b px-4 py-2 text-left text-sm font-semibold text-green-800">Nom</th>
+                                                <th class="border-b px-4 py-2 text-left text-sm font-semibold text-green-800">{{ __("app.forms.name") }}</th>
                                                 <th class="border-b px-4 py-2 text-left text-sm font-semibold text-green-800">Finalité</th>
                                                 <th class="border-b px-4 py-2 text-left text-sm font-semibold text-green-800">Durée</th>
                                             </tr>
@@ -129,7 +129,7 @@
                                     <table class="min-w-full bg-white border border-blue-200 rounded">
                                         <thead class="bg-blue-100">
                                             <tr>
-                                                <th class="border-b px-4 py-2 text-left text-sm font-semibold text-blue-800">Nom</th>
+                                                <th class="border-b px-4 py-2 text-left text-sm font-semibold text-blue-800">{{ __("app.forms.name") }}</th>
                                                 <th class="border-b px-4 py-2 text-left text-sm font-semibold text-blue-800">Finalité</th>
                                                 <th class="border-b px-4 py-2 text-left text-sm font-semibold text-blue-800">Durée</th>
                                             </tr>

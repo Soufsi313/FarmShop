@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'personal_data' => 'Données personnelles',
+    'compliance' => 'Conformité',
+    'about' => 'À propos',
+    'about_description' => 'FarmShop est votre partenaire de confiance pour tous vos besoins agricoles. Nous proposons une large gamme de produits et services de qualité.',
+    'links' => 'Liens utiles',
+    'products' => 'Produits',
+    'rentals' => 'Locations',
+    'blog' => 'Blog',
+    'contact' => 'Contact',
+    'account' => 'Mon compte',
+    'orders' => 'Mes commandes',
+    'privacy' => 'Politique de confidentialité',
+    'terms' => 'Conditions générales',
+    'cookies_policy' => 'Politique des cookies',
+    'legal_notice' => 'Mentions légales',
+    'gdpr' => 'RGPD',
+    'newsletter' => 'Newsletter',
+    'newsletter_description' => 'Restez informé de nos nouveautés et offres spéciales',
+    'newsletter_placeholder' => 'Votre adresse email',
+    'newsletter_subscribe' => 'S\'abonner',
+    'follow_us' => 'Suivez-nous',
+    'copyright' => 'Tous droits réservés',
+];

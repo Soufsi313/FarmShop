@@ -98,10 +98,10 @@
             <table class="items-table">
                 <thead>
                     <tr>
-                        <th>Produit</th>
-                        <th>Quantité</th>
+                        <th>{{ __("app.ecommerce.product") }}</th>
+                        <th>{{ __("app.ecommerce.quantity") }}</th>
                         <th>Prix unitaire</th>
-                        <th>Total</th>
+                        <th>{{ __("app.ecommerce.total") }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -116,7 +116,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="3"><strong>Total</strong></td>
+                        <td colspan="3"><strong>{{ __("app.ecommerce.total") }}</strong></td>
                         <td class="total">{{ number_format($order->total_amount, 2, ',', ' ') }} €</td>
                     </tr>
                 </tfoot>

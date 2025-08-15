@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'personal_data' => 'Personal Data',
+    'compliance' => 'Compliance',
+    'about' => 'About',
+    'about_description' => 'FarmShop is your trusted partner for all your agricultural needs. We offer a wide range of quality products and services.',
+    'links' => 'Useful Links',
+    'products' => 'Products',
+    'rentals' => 'Rentals',
+    'blog' => 'Blog',
+    'contact' => 'Contact',
+    'account' => 'My Account',
+    'orders' => 'My Orders',
+    'privacy' => 'Privacy Policy',
+    'terms' => 'Terms & Conditions',
+    'cookies_policy' => 'Cookie Policy',
+    'legal_notice' => 'Legal Notice',
+    'gdpr' => 'GDPR',
+    'newsletter' => 'Newsletter',
+    'newsletter_description' => 'Stay informed about our latest news and special offers',
+    'newsletter_placeholder' => 'Your email address',
+    'newsletter_subscribe' => 'Subscribe',
+    'follow_us' => 'Follow Us',
+    'copyright' => 'All rights reserved',
+];

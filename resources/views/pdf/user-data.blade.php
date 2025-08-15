@@ -155,10 +155,10 @@
             <thead>
                 <tr>
                     <th>N° Commande</th>
-                    <th>Date</th>
+                    <th>{{ __("app.time.date") }}</th>
                     <th>Statut</th>
-                    <th>Total</th>
-                    <th>Paiement</th>
+                    <th>{{ __("app.ecommerce.total") }}</th>
+                    <th>{{ __("app.ecommerce.payment") }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -186,7 +186,7 @@
                     <th>N° Commande</th>
                     <th>Période</th>
                     <th>Statut</th>
-                    <th>Total</th>
+                    <th>{{ __("app.ecommerce.total") }}</th>
                     <th>Caution</th>
                 </tr>
             </thead>
@@ -212,9 +212,9 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Produit</th>
-                    <th>Catégorie</th>
-                    <th>Prix</th>
+                    <th>{{ __("app.ecommerce.product") }}</th>
+                    <th>{{ __("app.ecommerce.category") }}</th>
+                    <th>{{ __("app.ecommerce.price") }}</th>
                     <th>Date d'ajout</th>
                 </tr>
             </thead>
@@ -239,9 +239,9 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Produit</th>
-                    <th>Catégorie</th>
-                    <th>Prix</th>
+                    <th>{{ __("app.ecommerce.product") }}</th>
+                    <th>{{ __("app.ecommerce.category") }}</th>
+                    <th>{{ __("app.ecommerce.price") }}</th>
                     <th>Date d'ajout</th>
                 </tr>
             </thead>
@@ -292,7 +292,7 @@
                 <tr>
                     <th>Type</th>
                     <th>Articles</th>
-                    <th>Total</th>
+                    <th>{{ __("app.ecommerce.total") }}</th>
                     <th>Dernière modification</th>
                 </tr>
             </thead>
@@ -307,7 +307,7 @@
                 @endforeach
                 @foreach($activeCartLocations as $cartLocation)
                 <tr>
-                    <td>Location</td>
+                    <td>{{ __("app.ecommerce.rental") }}</td>
                     <td>{{ $cartLocation->total_items ?? 0 }}</td>
                     <td>{{ number_format($cartLocation->total_with_tax ?? 0, 2) }}€</td>
                     <td>{{ $cartLocation->updated_at->format('d/m/Y à H:i') }}</td>

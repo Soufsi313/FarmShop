@@ -20,7 +20,7 @@
                     <select id="status-filter" onchange="filterByStatus(this.value)" 
                             class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         <option value="">Tous les statuts</option>
-                        <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>En attente</option>
+                        <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>{{ __("app.status.pending") }}<//option>
                         <option value="confirmed" {{ $currentStatus == 'confirmed' ? 'selected' : '' }}>Confirmées</option>
                         <option value="shipped" {{ $currentStatus == 'shipped' ? 'selected' : '' }}>Expédiées</option>
                         <option value="delivered" {{ $currentStatus == 'delivered' ? 'selected' : '' }}>Livrées</option>
@@ -31,7 +31,7 @@
                 </div>
                 
                 <div>
-                    <label for="sort-filter" class="block text-sm font-medium text-gray-700 mb-1">Trier par</label>
+                    <label for="sort-filter" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.buttons.sort_by") }}<//label>
                     <select id="sort-filter" onchange="sortBy(this.value)"
                             class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         <option value="recent" {{ $currentSort == 'recent' ? 'selected' : '' }}>Plus récentes</option>

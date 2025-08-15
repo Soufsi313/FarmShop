@@ -125,7 +125,7 @@ function displayCart(data) {
                                         </div>
                                         <div class="text-lg font-bold text-gray-900">${item.total_formatted}</div>
                                         <button onclick="removeItem(${item.id})" 
-                                                class="text-red-600 hover:text-red-800 text-xs mt-1">Supprimer</button>
+                                                class="text-red-600 hover:text-red-800 text-xs mt-1">{{ __("app.buttons.delete") }}<//button>
                                     </div>
                                 </div>
                             </div>
@@ -225,7 +225,7 @@ function displayCart(data) {
                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">Panier vide</h3>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __("app.messages.cart_empty") }}<//h3>
                 <p class="mt-1 text-sm text-gray-500">Votre panier est actuellement vide.</p>
             </div>
         `;

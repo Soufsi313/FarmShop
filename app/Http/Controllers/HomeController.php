@@ -11,7 +11,7 @@ class HomeController extends Controller
     /**
      * Afficher la page d'accueil avec des produits aléatoires
      */
-    public function index()
+    public function index(Request $request)
     {
         // Récupérer 5 produits aléatoires de toutes les catégories (achat ET location)
         $randomProducts = Product::with(['category'])

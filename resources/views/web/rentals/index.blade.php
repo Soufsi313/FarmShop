@@ -267,7 +267,7 @@
                                                         onclick="toggleWishlist('{{ $product->slug }}')" 
                                                         class="flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors {{ $product->isInUserWishlist() ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-600 hover:bg-yellow-50 hover:text-yellow-500' }}">
                                                     <span class="text-lg">{{ $product->isInUserWishlist() ? '⭐' : '☆' }}</span>
-                                                    <span>{{ $product->isInUserWishlist() ? 'En favoris' : 'Favoris' }}</span>
+                                                    <span>{{ $product->isInUserWishlist() ? 'En favoris' : __("app.buttons.favorites") }}</span>
                                                 </button>
                                             </div>
                                         @endauth
@@ -352,7 +352,7 @@
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">📅 Choisir les dates de location</h3>
                 <button x-on:click="showRentalModal = false" class="text-gray-400 hover:text-gray-600">
-                    <span class="sr-only">Fermer</span>
+                    <span class="sr-only">{{ __("app.buttons.close") }}</span>
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -376,7 +376,7 @@
 
                 <!-- Quantité -->
                 <div>
-                    <label for="modal-quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantité</label>
+                    <label for="modal-quantity" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.ecommerce.quantity") }}<//label>
                     <input type="number" 
                            x-model="rentalForm.quantity" 
                            min="1" 
@@ -472,7 +472,7 @@
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">📋 Panier de location</h3>
                 <button x-on:click="showCartLocation = false" class="text-gray-400 hover:text-gray-600">
-                    <span class="sr-only">Fermer</span>
+                    <span class="sr-only">{{ __("app.buttons.close") }}</span>
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -861,7 +861,7 @@ function toggleWishlist(productSlug) {
             } else {
                 button.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors bg-gray-100 text-gray-600 hover:bg-yellow-50 hover:text-yellow-500';
                 icon.textContent = '☆';
-                text.textContent = 'Favoris';
+                text.textContent = __("app.buttons.favorites");
             }
         } else {
             alert(data.message || 'Erreur lors de la mise à jour');

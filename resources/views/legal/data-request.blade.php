@@ -510,7 +510,7 @@
                         
                         <a href="{{ route('legal.privacy') }}" 
                            class="bg-white p-4 rounded border hover:border-blue-300 transition-colors block">
-                            <h4 class="font-medium text-gray-800 mb-2">Politique de confidentialité</h4>
+                            <h4 class="font-medium text-gray-800 mb-2">{{ __("app.legal.privacy_policy") }}</h4>
                             <p class="text-sm text-gray-600">
                                 Comprendre comment nous traitons vos données personnelles
                             </p>

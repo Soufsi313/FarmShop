@@ -15,6 +15,7 @@
         "laravel/tinker": "^2.9",
         "phpoffice/phpspreadsheet": "^4.4",
         "phpoffice/phpword": "^1.4",
+        "spatie/laravel-translatable": "^6.11",
         "stripe/stripe-php": "^17.4"
     },
     "require-dev": {
@@ -31,7 +32,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers/translation_helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

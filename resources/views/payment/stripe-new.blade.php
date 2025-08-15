@@ -53,7 +53,7 @@
                 <!-- Récapitulatif des totaux -->
                 <div class="border-t pt-4 space-y-2">
                     <div class="flex justify-between text-sm">
-                        <span>Sous-total</span>
+                        <span>{{ __("app.ecommerce.subtotal") }}</span>
                         <span>{{ number_format($orderDetails['subtotal'], 2) }}€</span>
                     </div>
                     
@@ -93,7 +93,7 @@
                             </div>
                         </div>
                         <div>
-                            <h3 class="font-medium text-gray-900 mb-2">Adresse de livraison</h3>
+                            <h3 class="font-medium text-gray-900 mb-2">{{ __("app.forms.delivery_address") }}<//h3>
                             <div class="text-sm text-gray-600">
                                 <p>{{ $order->shipping_address['name'] }}</p>
                                 <p>{{ $order->shipping_address['address'] }}</p>

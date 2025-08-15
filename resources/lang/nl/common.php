@@ -1,0 +1,61 @@
+<?php
+
+return [
+    // Common words
+    'yes' => 'Ja',
+    'no' => 'Nee',
+    'cancel' => 'Annuleren',
+    'confirm' => 'Bevestigen',
+    'save' => 'Opslaan',
+    'edit' => 'Bewerken',
+    'delete' => 'Verwijderen',
+    'create' => 'Aanmaken',
+    'update' => 'Bijwerken',
+    'close' => 'Sluiten',
+    'submit' => 'Verzenden',
+    'reset' => 'Resetten',
+    'back' => 'Terug',
+    'next' => 'Volgende',
+    'previous' => 'Vorige',
+    'continue' => 'Doorgaan',
+    'loading' => 'Laden...',
+    'error' => 'Fout',
+    'success' => 'Succes',
+    'warning' => 'Waarschuwing',
+    'info' => 'Informatie',
+    
+    // Units and measurements
+    'per_day' => 'per dag',
+    'per_week' => 'per week',
+    'per_month' => 'per maand',
+    'per_year' => 'per jaar',
+    'kg' => 'kg',
+    'g' => 'g',
+    'l' => 'l',
+    'ml' => 'ml',
+    'm' => 'm',
+    'cm' => 'cm',
+    'piece' => 'stuk',
+    'pieces' => 'stuks',
+    
+    // Status
+    'active' => 'Actief',
+    'inactive' => 'Inactief',
+    'pending' => 'In behandeling',
+    'approved' => 'Goedgekeurd',
+    'rejected' => 'Afgewezen',
+    'published' => 'Gepubliceerd',
+    'draft' => 'Concept',
+    'archived' => 'Gearchiveerd',
+    
+    // Time
+    'today' => 'Vandaag',
+    'yesterday' => 'Gisteren',
+    'tomorrow' => 'Morgen',
+    'this_week' => 'Deze week',
+    'last_week' => 'Vorige week',
+    'this_month' => 'Deze maand',
+    'last_month' => 'Vorige maand',
+    'this_year' => 'Dit jaar',
+    'last_year' => 'Vorig jaar',
+];

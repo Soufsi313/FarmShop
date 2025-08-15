@@ -235,7 +235,7 @@
                                 <table class="min-w-full border border-gray-200 rounded">
                                     <thead class="bg-gray-100">
                                         <tr>
-                                            <th class="border-b px-4 py-2 text-left text-sm font-semibold text-gray-800">Catégorie</th>
+                                            <th class="border-b px-4 py-2 text-left text-sm font-semibold text-gray-800">{{ __("app.ecommerce.category") }}</th>
                                             <th class="border-b px-4 py-2 text-left text-sm font-semibold text-gray-800">Durée typique</th>
                                             <th class="border-b px-4 py-2 text-left text-sm font-semibold text-gray-800">Couverture</th>
                                         </tr>

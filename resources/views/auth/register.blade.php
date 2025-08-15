@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Inscription - FarmShop')
+@section('title', '{{ smart_translate("Inscription") }} - FarmShop')
 @section('description', 'Créez votre compte FarmShop pour accéder à nos produits agricoles et services de location.')
 
 @section('content')
@@ -26,10 +26,10 @@
             <form class="space-y-6" method="POST" action="{{ route('register') }}">
                 @csrf
                 
-                <!-- Nom d'utilisateur -->
+                <!-- {{ smart_translate("Nom") }} d'utilisateur -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-farm-green-700">
-                        Nom d'utilisateur
+                        {{ smart_translate("Nom") }} d'utilisateur
                     </label>
                     <div class="mt-1">
                         <input id="username" 
@@ -49,10 +49,10 @@
                     </p>
                 </div>
 
-                <!-- Nom complet -->
+                <!-- {{ smart_translate("Nom") }} complet -->
                 <div>
                     <label for="name" class="block text-sm font-medium text-farm-green-700">
-                        Nom complet (optionnel)
+                        {{ smart_translate("Nom") }} complet (optionnel)
                     </label>
                     <div class="mt-1">
                         <input id="name" 
@@ -68,7 +68,7 @@
                     </div>
                 </div>
 
-                <!-- Email -->
+                <!-- {{ smart_translate("Email") }} -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-farm-green-700">
                         Adresse email
@@ -88,10 +88,10 @@
                     </div>
                 </div>
 
-                <!-- Mot de passe -->
+                <!-- {{ smart_translate("Mot de passe") }} -->
                 <div>
                     <label for="password" class="block text-sm font-medium text-farm-green-700">
-                        Mot de passe
+                        {{ smart_translate("Mot de passe") }}
                     </label>
                     <div class="mt-1">
                         <input id="password" 
@@ -113,7 +113,7 @@
                 <!-- Confirmation mot de passe -->
                 <div>
                     <label for="password_confirmation" class="block text-sm font-medium text-farm-green-700">
-                        Confirmer le mot de passe
+                        {{ smart_translate("Confirmer le mot de passe") }}
                     </label>
                     <div class="mt-1">
                         <input id="password_confirmation" 
@@ -195,7 +195,7 @@
                 <div class="mt-6">
                     <a href="{{ route('login') }}" 
                        class="w-full flex justify-center py-2 px-4 border border-farm-orange-500 rounded-md shadow-sm text-sm font-medium text-farm-orange-600 bg-white/80 hover:bg-farm-orange-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-farm-orange-500 transition-colors">
-                        Se connecter
+                        {{ smart_translate("Se connecter") }}
                     </a>
                 </div>
             </div>

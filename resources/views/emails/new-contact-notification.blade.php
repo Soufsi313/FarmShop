@@ -114,7 +114,7 @@
         </div>
 
         <div class="info-box">
-            <h3>Message</h3>
+            <h3>{{ __("app.forms.message") }}</h3>
             <div class="message-content">{{ $contact->message }}</div>
         </div>
 

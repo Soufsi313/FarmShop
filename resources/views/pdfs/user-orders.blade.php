@@ -85,10 +85,10 @@
                 <table class="items-table">
                     <thead>
                         <tr>
-                            <th>Produit</th>
-                            <th>Quantité</th>
+                            <th>{{ __("app.ecommerce.product") }}</th>
+                            <th>{{ __("app.ecommerce.quantity") }}</th>
                             <th>Prix unitaire</th>
-                            <th>Total</th>
+                            <th>{{ __("app.ecommerce.total") }}</th>
                         </tr>
                     </thead>
                     <tbody>

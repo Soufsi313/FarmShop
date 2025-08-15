@@ -105,7 +105,7 @@
                 <p>✅ <strong>Commande confirmée</strong></p>
                 <p>✅ <strong>Préparation terminée</strong></p>
                 <p>🚚 <strong>Expédition en cours</strong> - Maintenant</p>
-                <p>🏠 <strong>Livraison</strong> - Dans 1-2 jours ouvrés</p>
+                <p>🏠 <strong>{{ __("app.ecommerce.shipping") }}</strong> - Dans 1-2 jours ouvrés</p>
             </div>
             
             <p>Votre colis devrait arriver dans les prochains jours. Vous recevrez un email de confirmation dès la livraison.</p>

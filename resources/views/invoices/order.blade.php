@@ -263,10 +263,10 @@
     <table class="items-table">
         <thead>
             <tr>
-                <th style="width: 50%;">Produit</th>
-                <th style="width: 15%;" class="text-center">Quantité</th>
+                <th style="width: 50%;">{{ __("app.ecommerce.product") }}</th>
+                <th style="width: 15%;" class="text-center">{{ __("app.ecommerce.quantity") }}</th>
                 <th style="width: 15%;" class="text-right">Prix unitaire</th>
-                <th style="width: 20%;" class="text-right">Total</th>
+                <th style="width: 20%;" class="text-right">{{ __("app.ecommerce.total") }}</th>
             </tr>
         </thead>
         <tbody>

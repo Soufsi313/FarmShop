@@ -44,7 +44,7 @@
                 </div>
                 
                 <div>
-                    <h3 class="font-medium text-gray-900 mb-2">Total</h3>
+                    <h3 class="font-medium text-gray-900 mb-2">{{ __("app.ecommerce.total") }}</h3>
                     <p class="text-2xl font-bold text-gray-900">{{ number_format($order->total_amount, 2) }}€</p>
                 </div>
             </div>

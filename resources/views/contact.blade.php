@@ -126,21 +126,21 @@
                         <div class="flex items-start space-x-3">
                             <div class="text-orange-500 text-xl">🏢</div>
                             <div>
-                                <h4 class="font-medium text-gray-900">Adresse</h4>
+                                <h4 class="font-medium text-gray-900">{{ __("app.forms.address") }}<//h4>
                                 <p class="text-gray-600">Avenue de la ferme 123<br>1000 Bruxelles, Belgique</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
                             <div class="text-orange-500 text-xl">📞</div>
                             <div>
-                                <h4 class="font-medium text-gray-900">Téléphone</h4>
+                                <h4 class="font-medium text-gray-900">{{ __("app.forms.phone") }}<//h4>
                                 <p class="text-gray-600">+32 2 123 45 67</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
                             <div class="text-orange-500 text-xl">✉️</div>
                             <div>
-                                <h4 class="font-medium text-gray-900">Email</h4>
+                                <h4 class="font-medium text-gray-900">{{ __("app.forms.email") }}<//h4>
                                 <p class="text-gray-600">s.mef2703@gmail.com</p>
                             </div>
                         </div>

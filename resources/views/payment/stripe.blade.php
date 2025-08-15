@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Paiement')
+@section('title', {{ __("app.ecommerce.payment") }})
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -30,7 +30,7 @@
                 
                 <div class="pt-4 border-t mt-4">
                     <div class="flex justify-between font-bold text-lg">
-                        <span>Total</span>
+                        <span>{{ __("app.ecommerce.total") }}</span>
                         <span>{{ number_format($order->total_amount, 2) }} €</span>
                     </div>
                 </div>
@@ -38,7 +38,7 @@
 
             <!-- Formulaire -->
             <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-xl font-semibold mb-4">Paiement</h2>
+                <h2 class="text-xl font-semibold mb-4">{{ __("app.ecommerce.payment") }}</h2>
                 
                 <div x-data="paymentForm()">
                     <form @submit.prevent="processPayment()">

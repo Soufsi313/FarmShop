@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Spatie\Translatable\HasTranslations;
 
 class Product extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasTranslations;
 
     /**
      * Types de produits disponibles
@@ -54,6 +55,20 @@ class Product extends Model
         'meta_title',
         'meta_description',
         'meta_keywords',
+    ];
+
+    /**
+     * The attributes that are translatable.
+     *
+     * @var array
+     */
+    public $translatable = [
+        'name',
+        'description', 
+        'short_description',
+        'meta_title',
+        'meta_description',
+        'meta_keywords'
     ];
 
     /**

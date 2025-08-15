@@ -1,0 +1,61 @@
+<?php
+
+return [
+    // Common words
+    'yes' => 'Oui',
+    'no' => 'Non',
+    'cancel' => 'Annuler',
+    'confirm' => 'Confirmer',
+    'save' => 'Enregistrer',
+    'edit' => 'Modifier',
+    'delete' => 'Supprimer',
+    'create' => 'Créer',
+    'update' => 'Mettre à jour',
+    'close' => 'Fermer',
+    'submit' => 'Valider',
+    'reset' => 'Réinitialiser',
+    'back' => 'Retour',
+    'next' => 'Suivant',
+    'previous' => 'Précédent',
+    'continue' => 'Continuer',
+    'loading' => 'Chargement...',
+    'error' => 'Erreur',
+    'success' => 'Succès',
+    'warning' => 'Attention',
+    'info' => 'Information',
+    
+    // Units and measurements
+    'per_day' => 'par jour',
+    'per_week' => 'par semaine',
+    'per_month' => 'par mois',
+    'per_year' => 'par an',
+    'kg' => 'kg',
+    'g' => 'g',
+    'l' => 'l',
+    'ml' => 'ml',
+    'm' => 'm',
+    'cm' => 'cm',
+    'piece' => 'pièce',
+    'pieces' => 'pièces',
+    
+    // Status
+    'active' => 'Actif',
+    'inactive' => 'Inactif',
+    'pending' => 'En attente',
+    'approved' => 'Approuvé',
+    'rejected' => 'Rejeté',
+    'published' => 'Publié',
+    'draft' => 'Brouillon',
+    'archived' => 'Archivé',
+    
+    // Time
+    'today' => 'Aujourd\'hui',
+    'yesterday' => 'Hier',
+    'tomorrow' => 'Demain',
+    'this_week' => 'Cette semaine',
+    'last_week' => 'La semaine dernière',
+    'this_month' => 'Ce mois',
+    'last_month' => 'Le mois dernier',
+    'this_year' => 'Cette année',
+    'last_year' => 'L\'année dernière',
+];

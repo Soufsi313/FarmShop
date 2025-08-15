@@ -145,7 +145,7 @@
                 </div>
                 <div class="info-row">
                     <span class="info-label">Date de retour :</span>
-                    <span class="info-value">{{ $orderLocation->actual_return_date ? $orderLocation->actual_return_date->format('d/m/Y à H:i') : 'En attente' }}</span>
+                    <span class="info-value">{{ $orderLocation->actual_return_date ? $orderLocation->actual_return_date->format('d/m/Y à H:i') : {{ __("app.status.pending") }} }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Statut :</span>

@@ -149,7 +149,7 @@
 
                 <!-- Informations de livraison -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Adresse de livraison</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __("app.forms.delivery_address") }}<//h2>
                     <div class="text-sm">
                         <p class="font-medium">{{ $order->shipping_address['name'] }}</p>
                         <p>{{ $order->shipping_address['address'] }}</p>
@@ -190,13 +190,13 @@
                     
                     <div class="space-y-3">
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Sous-total</span>
+                            <span class="text-gray-600">{{ __("app.ecommerce.subtotal") }}</span>
                             <span>{{ number_format($order->subtotal, 2) }} €</span>
                         </div>
                         
                         @if($order->tax_amount > 0)
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">TVA</span>
+                            <span class="text-gray-600">{{ __("app.ecommerce.tax") }}<//span>
                             <span>{{ number_format($order->tax_amount, 2) }} €</span>
                         </div>
                         @endif
@@ -210,14 +210,14 @@
                         
                         @if($order->discount_amount > 0)
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Remise</span>
+                            <span class="text-gray-600">{{ __("app.ecommerce.discount") }}<//span>
                             <span class="text-green-600">-{{ number_format($order->discount_amount, 2) }} €</span>
                         </div>
                         @endif
                         
                         <div class="border-t pt-3">
                             <div class="flex justify-between text-lg font-semibold">
-                                <span>Total</span>
+                                <span>{{ __("app.ecommerce.total") }}<//span>
                                 <span>{{ number_format($order->total_amount, 2) }} €</span>
                             </div>
                         </div>
@@ -226,7 +226,7 @@
 
                 <!-- Statut du paiement -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Paiement</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __("app.ecommerce.payment") }}<//h2>
                     
                     <div class="space-y-3">
                         <div class="flex justify-between text-sm">

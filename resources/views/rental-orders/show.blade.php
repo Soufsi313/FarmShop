@@ -59,9 +59,9 @@
                             ];
                             
                             $statusLabels = [
-                                'pending' => 'En attente',
+                                'pending' => __("app.status.pending"),
                                 'confirmed' => 'Confirmée',
-                                'active' => 'En cours',
+                                'active' => __("app.status.in_progress"),
                                 'completed' => 'Terminée',
                                 'cancelled' => 'Annulée'
                             ];

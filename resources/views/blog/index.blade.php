@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Blog - FarmShop')
+@section('title', __('blog.page_title') . ' - FarmShop')
 
 @section('content')
 <div class="min-h-screen bg-gray-50">
@@ -8,10 +8,9 @@
     <div class="bg-white shadow-sm">
         <div class="container mx-auto px-4 py-8">
             <div class="text-center">
-                <h1 class="text-4xl font-bold text-gray-900 mb-4">Blog FarmShop</h1>
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ __("blog.title") }}</h1>
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    Découvrez nos conseils d'experts, actualités agricoles et guides pratiques 
-                    pour réussir vos cultures et optimiser vos pratiques agricoles.
+                    {{ __('blog.subtitle') }}
                 </p>
             </div>
         </div>
@@ -30,17 +29,17 @@
                                 <input type="text" 
                                        name="search" 
                                        value="{{ request('search') }}"
-                                       placeholder="Rechercher un article..." 
+                                       placeholder="{{ __("app.blog.search_placeholder") }}" 
                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                             </div>
                             
                             <!-- Catégorie -->
                             <div class="w-full md:w-48">
                                 <select name="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                                    <option value="">Toutes les catégories</option>
+                                    <option value="">{{ __("app.blog.all_categories") }}</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->slug }}" {{ request('category') == $category->slug ? 'selected' : '' }}>
-                                            {{ $category->name }}
+                                            {{ __('categories.' . $category->slug) }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -49,15 +48,15 @@
                             <!-- Tri -->
                             <div class="w-full md:w-48">
                                 <select name="sort_by" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                                    <option value="recent" {{ request('sort_by') == 'recent' ? 'selected' : '' }}>Plus récents</option>
-                                    <option value="popular" {{ request('sort_by') == 'popular' ? 'selected' : '' }}>Plus populaires</option>
-                                    <option value="views" {{ request('sort_by') == 'views' ? 'selected' : '' }}>Plus vus</option>
-                                    <option value="comments" {{ request('sort_by') == 'comments' ? 'selected' : '' }}>Plus commentés</option>
+                                    <option value="recent" {{ request('sort_by') == 'recent' ? 'selected' : '' }}>{{ __('blog.sort.recent') }}</option>
+                                    <option value="popular" {{ request('sort_by') == 'popular' ? 'selected' : '' }}>{{ __('blog.sort.popular') }}</option>
+                                    <option value="views" {{ request('sort_by') == 'views' ? 'selected' : '' }}>{{ __('blog.sort.views') }}</option>
+                                    <option value="comments" {{ request('sort_by') == 'comments' ? 'selected' : '' }}>{{ __('blog.sort.comments') }}</option>
                                 </select>
                             </div>
                             
                             <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                                Filtrer
+                                {{ __('blog.filter_button') }}
                             </button>
                         </div>
                     </form>
@@ -73,7 +72,7 @@
                                     @if($post->featured_image)
                                         <div class="aspect-video bg-gray-200 overflow-hidden">
                                             <img src="{{ Storage::url($post->featured_image) }}" 
-                                                 alt="{{ $post->title }}"
+                                                 alt="{{ $post->translated_title ?? $post->title }}"
                                                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                         </div>
                                     @else
@@ -89,7 +88,7 @@
                                         <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
                                             @if($post->category)
                                                 <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                                                    {{ $post->category->name }}
+                                                    {{ __('categories.' . $post->category->slug) }}
                                                 </span>
                                             @endif
                                             <time datetime="{{ $post->published_at->format('Y-m-d') }}">
@@ -99,12 +98,12 @@
 
                                         <!-- Titre -->
                                         <h2 class="text-xl font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-green-600 transition-colors">
-                                            {{ $post->title }}
+                                            {{ $post->getTranslatedTitle() }}
                                         </h2>
 
                                         <!-- Extrait -->
-                                        @if($post->excerpt)
-                                            <p class="text-gray-600 mb-4 line-clamp-3">{{ $post->excerpt }}</p>
+                                        @if($post->getTranslatedExcerpt())
+                                            <p class="text-gray-600 mb-4 line-clamp-3">{{ $post->getTranslatedExcerpt() }}</p>
                                         @endif
 
                                         <!-- Métadonnées -->
@@ -144,7 +143,7 @@
                         <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
                         </svg>
-                        <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun article trouvé</h3>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __("app.blog.no_articles_found") }}</h3>
                         <p class="text-gray-600">
                             @if(request()->hasAny(['search', 'category', 'tag']))
                                 Aucun article ne correspond à vos critères de recherche.
@@ -161,9 +160,9 @@
 
             <!-- Sidebar -->
             <div class="w-full lg:w-80">
-                <!-- Articles populaires -->
+                <!-- {{ __("app.blog.popular_articles") }} -->
                 <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Articles populaires</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __("app.blog.popular_articles") }}</h3>
                     @php
                         $popularPosts = \App\Models\BlogPost::published()
                             ->orderBy('views_count', 'desc')
@@ -177,38 +176,38 @@
                                 <div class="flex space-x-3">
                                     @if($popularPost->featured_image)
                                         <img src="{{ Storage::url($popularPost->featured_image) }}" 
-                                             alt="{{ $popularPost->title }}"
+                                             alt="{{ $popularPost->getTranslatedTitle(app()->getLocale()) }}"
                                              class="w-16 h-16 object-cover rounded-lg flex-shrink-0">
                                     @else
                                         <div class="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0"></div>
                                     @endif
                                     <div class="flex-1 min-w-0">
                                         <h4 class="text-sm font-medium text-gray-900 line-clamp-2 mb-1">
-                                            <a href="{{ route('blog.show', $popularPost->slug) }}" class="hover:text-green-600">
-                                                {{ $popularPost->title }}
+                                            <a href="{{ route('blog.show', $popularPost->getTranslatedSlug(app()->getLocale())) }}?lang={{ app()->getLocale() }}" class="hover:text-green-600">
+                                                {{ $popularPost->getTranslatedTitle(app()->getLocale()) }}
                                             </a>
                                         </h4>
                                         <p class="text-xs text-gray-500">
-                                            {{ $popularPost->published_at->format('d M Y') }} • {{ $popularPost->views_count }} vues
+                                            {{ $popularPost->published_at->format('d M Y') }} • {{ $popularPost->views_count }} {{ __('app.blog.views') }}
                                         </p>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
                     @else
-                        <p class="text-gray-500 text-sm">Aucun article populaire pour le moment.</p>
+                        <p class="text-gray-500 text-sm">{{ __('app.blog.no_popular_articles') }}</p>
                     @endif
                 </div>
 
-                <!-- Catégories -->
+                <!-- {{ __("app.blog.categories") }} -->
                 @if($categories->count() > 0)
                     <div class="bg-white rounded-lg shadow-sm p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Catégories</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __("app.blog.categories") }}</h3>
                         <div class="space-y-2">
                             @foreach($categories as $category)
-                                <a href="{{ route('blog.index', ['category' => $category->slug]) }}" 
+                                <a href="{{ route('blog.index', ['category' => $category->slug, 'lang' => app()->getLocale()]) }}" 
                                    class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                                    <span class="text-gray-700">{{ $category->name }}</span>
+                                    <span class="text-gray-700">{{ __('app.categories.' . $category->name, [], app()->getLocale()) ?: $category->name }}</span>
                                     <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
                                         {{ $category->posts->count() }}
                                     </span>

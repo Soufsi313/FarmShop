@@ -1,0 +1,61 @@
+<?php
+
+return [
+    // Common words
+    'yes' => 'Yes',
+    'no' => 'No',
+    'cancel' => 'Cancel',
+    'confirm' => 'Confirm',
+    'save' => 'Save',
+    'edit' => 'Edit',
+    'delete' => 'Delete',
+    'create' => 'Create',
+    'update' => 'Update',
+    'close' => 'Close',
+    'submit' => 'Submit',
+    'reset' => 'Reset',
+    'back' => 'Back',
+    'next' => 'Next',
+    'previous' => 'Previous',
+    'continue' => 'Continue',
+    'loading' => 'Loading...',
+    'error' => 'Error',
+    'success' => 'Success',
+    'warning' => 'Warning',
+    'info' => 'Information',
+    
+    // Units and measurements
+    'per_day' => 'per day',
+    'per_week' => 'per week',
+    'per_month' => 'per month',
+    'per_year' => 'per year',
+    'kg' => 'kg',
+    'g' => 'g',
+    'l' => 'l',
+    'ml' => 'ml',
+    'm' => 'm',
+    'cm' => 'cm',
+    'piece' => 'piece',
+    'pieces' => 'pieces',
+    
+    // Status
+    'active' => 'Active',
+    'inactive' => 'Inactive',
+    'pending' => 'Pending',
+    'approved' => 'Approved',
+    'rejected' => 'Rejected',
+    'published' => 'Published',
+    'draft' => 'Draft',
+    'archived' => 'Archived',
+    
+    // Time
+    'today' => 'Today',
+    'yesterday' => 'Yesterday',
+    'tomorrow' => 'Tomorrow',
+    'this_week' => 'This week',
+    'last_week' => 'Last week',
+    'this_month' => 'This month',
+    'last_month' => 'Last month',
+    'this_year' => 'This year',
+    'last_year' => 'Last year',
+];

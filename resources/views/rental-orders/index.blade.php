@@ -19,7 +19,7 @@
                     <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Filtrer par statut</label>
                     <select name="status" id="status" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         <option value="">Tous les statuts</option>
-                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>En attente</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>{{ __("app.status.pending") }}<//option>
                         <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmée</option>
                         <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
                         <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Terminée</option>

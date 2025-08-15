@@ -60,15 +60,15 @@
                         </div>
                         <div class="flex items-center space-x-1">
                             <span>📦</span>
-                            <span>Louer du matériel</span>
+                            <span>{{ __("app.welcome.rent_equipment") }}</span>
                         </div>
                         <div class="flex items-center space-x-1">
                             <span>❤️</span>
-                            <span>Liste de souhaits</span>
+                            <span>{{ __("app.nav.wishlist") }}</span>
                         </div>
                         <div class="flex items-center space-x-1">
                             <span>📧</span>
-                            <span>Newsletter</span>
+                            <span>{{ __("app.forms.newsletter") }}<//span>
                         </div>
                     </div>
 

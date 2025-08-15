@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Nos Produits - FarmShop')
+@section('title', __('products.page_title') . ' - FarmShop')
 
 @push('styles')
 <style>
@@ -59,9 +59,9 @@
     <div class="bg-gradient-to-r from-green-600 to-green-800 text-white py-16">
         <div class="container mx-auto px-4">
             <div class="text-center">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">Nos Produits</h1>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ __('products.title') }}</h1>
                 <p class="text-xl text-green-100 max-w-2xl mx-auto">
-                    Découvrez notre sélection de produits biologiques et d'équipements de qualité
+                    {{ __('products.subtitle') }}
                 </p>
             </div>
         </div>
@@ -73,49 +73,49 @@
             <!-- Sidebar Filtres -->
             <aside class="lg:w-1/4">
                 <div class="bg-white rounded-lg shadow p-6 sticky top-8">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Filtres</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('products.filters') }}</h3>
                     
                     <form id="filterForm" method="GET" action="{{ route('products.index') }}">
                         <!-- Recherche -->
                         <div class="mb-6">
                             <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
-                                Rechercher
+                                {{ __('products.search') }}
                             </label>
                             <input type="text" 
                                    id="search" 
                                    name="search" 
                                    value="{{ request('search') }}"
-                                   placeholder="Nom du produit..."
+                                   placeholder="{{ __('products.search_placeholder') }}"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         </div>
 
                         <!-- Catégories -->
                         <div class="mb-6">
                             <label for="category" class="block text-sm font-medium text-gray-700 mb-2">
-                                Catégorie
+                                {{ __('products.category') }}
                             </label>
                             <select id="category" 
                                     name="category" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                                <option value="">Toutes les catégories</option>
+                                <option value="">{{ __('products.all_categories') }}</option>
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
+                                        {{ trans_category($category, "name") }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <!-- Prix -->
+                        <!-- {{ __("app.products.price_range") }} -->
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Prix (€)
+                                {{ __("app.products.price_range") }} (€)
                             </label>
                             <div class="grid grid-cols-2 gap-2 mb-2">
                                 <input type="number" 
                                        name="price_min" 
                                        value="{{ request('price_min') }}"
-                                       placeholder="Min"
+                                       placeholder="{{ __('products.min_price') }}"
                                        step="0.01"
                                        min="0"
                                        max="{{ $priceRange->max_price ?? 100 }}"
@@ -123,14 +123,14 @@
                                 <input type="number" 
                                        name="price_max" 
                                        value="{{ request('price_max') }}"
-                                       placeholder="Max"
+                                       placeholder="{{ __('products.max_price') }}"
                                        step="0.01"
                                        min="0"
                                        max="{{ $priceRange->max_price ?? 100 }}"
                                        class="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-green-500">
                             </div>
                             <div class="text-xs text-gray-500">
-                                De {{ number_format($priceRange->min_price ?? 0, 2) }}€ à {{ number_format($priceRange->max_price ?? 100, 2) }}€
+                                {{ __('products.price_from') }} {{ number_format($priceRange->min_price ?? 0, 2) }}€ {{ __('products.price_to') }} {{ number_format($priceRange->max_price ?? 100, 2) }}€
                             </div>
                         </div>
 
@@ -138,11 +138,11 @@
                         <div class="flex space-x-2">
                             <button type="submit" 
                                     class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors">
-                                Filtrer
+                                {{ __("app.products.filter") }}
                             </button>
                             <a href="{{ route('products.index') }}" 
                                class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md text-center transition-colors">
-                                Réinitialiser
+                                {{ __("app.products.reset_filters") }}
                             </a>
                         </div>
                     </form>
@@ -161,16 +161,16 @@
                         </div>
                         
                         <div class="flex items-center space-x-4">
-                            <label for="sort" class="text-sm font-medium text-gray-700">Trier par :</label>
+                            <label for="sort" class="text-sm font-medium text-gray-700">{{ smart_translate("Trier par") }} :</label>
                             <select id="sort" 
                                     name="sort" 
                                     onchange="updateSort(this.value)"
                                     class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                                <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Plus récents</option>
+                                <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>{{ smart_translate("Plus récent") }}s</option>
                                 <option value="featured" {{ request('sort') == 'featured' ? 'selected' : '' }}>En vedette</option>
-                                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Nom A-Z</option>
-                                <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Prix croissant</option>
-                                <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Prix décroissant</option>
+                                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>{{ smart_translate("Nom A-Z") }}</option>
+                                <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>{{ __("app.content.price") }} croissant</option>
+                                <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>{{ __("app.content.price") }} décroissant</option>
                             </select>
                         </div>
                     </div>
@@ -185,7 +185,7 @@
                                 <a href="{{ route('products.show', $product->slug) }}" class="block relative h-48 bg-gray-200 hover:opacity-95 transition-opacity">
                                     @if($product->main_image)
                                         <img src="{{ asset('storage/' . $product->main_image) }}" 
-                                             alt="{{ $product->name }}"
+                                             alt="{{ trans_product($product, "name") }}"
                                              class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center">
@@ -216,7 +216,7 @@
                                         @endif
                                         @if($product->is_featured)
                                             <span class="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                                                ⭐ Vedette
+                                                ⭐ {{ __('products.featured') }}
                                             </span>
                                         @endif
                                     </div>
@@ -225,7 +225,7 @@
                                     @if($product->quantity <= $product->critical_threshold)
                                         <div class="absolute top-2 right-2">
                                             <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                                                Stock faible
+                                                {{ __('products.low_stock') }}
                                             </span>
                                         </div>
                                     @endif
@@ -236,19 +236,19 @@
                                     <!-- Nom et catégorie - Cliquables -->
                                     <div class="mb-2">
                                         <a href="{{ route('products.show', $product->slug) }}" class="block hover:text-green-600 transition-colors">
-                                            <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ $product->name }}</h3>
+                                            <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ trans_product($product, "name") }}</h3>
                                         </a>
-                                        <span class="text-sm text-gray-500">{{ $product->category->name }}</span>
+                                        <span class="text-sm text-gray-500">{{ trans_category($product->category, "name") }}</span>
                                     </div>
 
                                     <!-- Description courte -->
                                     @if($product->short_description)
                                         <p class="text-sm text-gray-600 mb-3 line-clamp-2">
-                                            {{ $product->short_description }}
+                                            {{ trans_product($product, "short_description") }}
                                         </p>
                                     @endif
 
-                                    <!-- Prix -->
+                                    <!-- {{ __("app.content.price") }} -->
                                     <div class="mb-4">
                                         @php
                                             // Chercher s'il y a une offre spéciale disponible (même si pas encore applicable)
@@ -268,17 +268,17 @@
                                             <!-- Badge offre spéciale -->
                                             <div class="mb-2">
                                                 <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                                                    🔥 -{{ $availableOffer->discount_percentage }}% dès {{ $availableOffer->minimum_quantity }}{{ $product->unit_symbol }}
+                                                    🔥 -{{ $availableOffer->discount_percentage }}% {{ __('products.starting_at') }} {{ $availableOffer->minimum_quantity }}{{ $product->unit_symbol }}
                                                 </span>
                                             </div>
                                             
-                                            <!-- Prix avec offre potentielle -->
+                                            <!-- {{ __("app.content.price") }} avec offre potentielle -->
                                             <div class="flex items-center space-x-2">
                                                 <div class="text-2xl font-bold text-red-600">
                                                     {{ number_format($product->getPriceForQuantity($availableOffer->minimum_quantity) / $availableOffer->minimum_quantity, 2) }}€
                                                 </div>
                                                 <div class="text-lg text-gray-500 line-through">
-                                                    {{ number_format($product->price, 2) }}€
+                                                    {{ format_price($product->price) }}
                                                 </div>
                                             </div>
                                             <span class="text-sm font-normal text-gray-500">/ {{ $product->unit_symbol }}</span>
@@ -288,16 +288,16 @@
                                                 {{ $availableOffer->name }}
                                             </div>
                                         @else
-                                            <!-- Prix normal -->
+                                            <!-- {{ __("app.content.price") }} normal -->
                                             <div class="text-2xl font-bold text-green-600">
-                                                {{ number_format($product->price, 2) }}€
+                                                {{ format_price($product->price) }}
                                                 <span class="text-sm font-normal text-gray-500">/ {{ $product->unit_symbol }}</span>
                                             </div>
                                         @endif
                                         
                                         @if($product->rental_price_per_day && ($product->type === 'rental' || $product->type === 'both'))
                                             <div class="text-sm text-gray-500">
-                                                Location : {{ number_format($product->rental_price_per_day, 2) }}€/jour
+                                                {{ __("products.type_rental") }} : {{ number_format($product->rental_price_per_day, 2) }}€{{ __('products.price_per_day') }}
                                             </div>
                                         @endif
                                     </div>
@@ -306,9 +306,9 @@
                                     @if($product->type === 'sale' || $product->type === 'both')
                                         @if($product->quantity > 0)
                                             <div class="space-y-3">
-                                                <!-- Quantité -->
+                                                <!-- {{ __("app.products.quantity") }} -->
                                                 <div class="flex items-center space-x-2">
-                                                    <label class="text-sm font-medium text-gray-700">Quantité :</label>
+                                                    <label class="text-sm font-medium text-gray-700">{{ __('products.quantity') }} :</label>
                                                     <div class="flex items-center">
                                                         <button type="button" 
                                                                 onclick="decreaseQuantity({{ $product->id }})"
@@ -327,21 +327,21 @@
                                                             +
                                                         </button>
                                                     </div>
-                                                    <span class="text-sm text-gray-500">({{ $product->quantity }} disponible{{ $product->quantity > 1 ? 's' : '' }})</span>
+                                                    <span class="text-sm text-gray-500">({{ $product->quantity }} {{ __('products.available') }})</span>
                                                 </div>
 
                                                 <!-- Boutons d'action -->
                                                 <div class="flex space-x-2">
-                                                    <!-- Ajouter au panier -->
+                                                    <!-- {{ __("app.content.add_to_cart") }} -->
                                                     @auth
                                                         <button onclick="addToCart({{ $product->id }})" 
                                                                 class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                                            Ajouter au panier
+                                                            {{ __("app.content.add_to_cart") }}
                                                         </button>
                                                     @else
                                                         <a href="{{ route('login') }}" 
                                                            class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium text-center transition-colors">
-                                                            Ajouter au panier
+                                                            {{ __("app.content.add_to_cart") }}
                                                         </a>
                                                     @endauth
 
@@ -363,7 +363,7 @@
                                             <!-- Produit en rupture de stock -->
                                             <div class="space-y-3">
                                                 <div class="flex items-center justify-center p-3 bg-red-50 border border-red-200 rounded-md">
-                                                    <span class="text-red-600 font-medium">🚫 Rupture de stock</span>
+                                                    <span class="text-red-600 font-medium">🚫 {{ __("app.content.out_of_stock") }}</span>
                                                 </div>
                                                 
                                                 <!-- Boutons désactivés -->
@@ -438,7 +438,7 @@
                         <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                         </svg>
-                        <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun produit trouvé</h3>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ smart_translate("Aucun produit trouvé") }}</h3>
                         <p class="text-gray-500 mb-4">Essayez de modifier vos critères de recherche.</p>
                         <a href="{{ route('products.index') }}" 
                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
@@ -643,7 +643,7 @@ async function toggleLike(productSlug) {
             
             showNotification(data.message, 'success');
         } else {
-            showNotification(data.message || 'Erreur', 'error');
+            showNotification(data.message || __("app.messages.error"), 'error');
         }
     } catch (error) {
         console.error('Erreur:', error);
@@ -684,7 +684,7 @@ async function toggleWishlist(productSlug) {
             
             showNotification(data.message, 'success');
         } else {
-            showNotification(data.message || 'Erreur', 'error');
+            showNotification(data.message || __("app.messages.error"), 'error');
         }
     } catch (error) {
         console.error('Erreur:', error);

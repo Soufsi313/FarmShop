@@ -7,16 +7,16 @@
 <meta name="keywords" content="{{ $product->meta_keywords }}">
 
 <!-- Open Graph -->
-<meta property="og:title" content="{{ $product->name }}">
-<meta property="og:description" content="{{ $product->short_description }}">
+<meta property="og:title" content="{{ trans_product($product, "name") }}">
+<meta property="og:description" content="{{ trans_product($product, "short_description") }}">
 <meta property="og:image" content="{{ $product->main_image ? asset('storage/' . $product->main_image) : '' }}">
 <meta property="og:url" content="{{ url()->current() }}">
 <meta property="og:type" content="product">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ $product->name }}">
-<meta name="twitter:description" content="{{ $product->short_description }}">
+<meta name="twitter:title" content="{{ trans_product($product, "name") }}">
+<meta name="twitter:description" content="{{ trans_product($product, "short_description") }}">
 <meta name="twitter:image" content="{{ $product->main_image ? asset('storage/' . $product->main_image) : '' }}">
 @endpush
 
@@ -58,7 +58,7 @@
                             <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                             </svg>
-                            <a href="{{ route('products.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-green-600 md:ml-2">Produits</a>
+                            <a href="{{ route('products.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-green-600 md:ml-2">{{ __("app.nav.products") }}<//a>
                         </div>
                     </li>
                     <li>
@@ -66,7 +66,7 @@
                             <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                             </svg>
-                            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">{{ $product->name }}</span>
+                            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">{{ trans_product($product, "name") }}</span>
                         </div>
                     </li>
                 </ol>
@@ -84,7 +84,7 @@
                     @if($product->main_image)
                         <img id="mainImage" 
                              src="{{ asset('storage/' . $product->main_image) }}" 
-                             alt="{{ $product->name }}"
+                             alt="{{ trans_product($product, "name") }}"
                              class="w-full h-full object-cover">
                     @else
                         <div class="w-full h-full flex items-center justify-center bg-gray-200">
@@ -103,7 +103,7 @@
                             <button onclick="changeMainImage('{{ asset('storage/' . $product->main_image) }}')"
                                     class="aspect-square bg-white rounded-lg shadow overflow-hidden border-2 border-green-500">
                                 <img src="{{ asset('storage/' . $product->main_image) }}" 
-                                     alt="{{ $product->name }}"
+                                     alt="{{ trans_product($product, "name") }}"
                                      class="w-full h-full object-cover">
                             </button>
                         @endif
@@ -113,7 +113,7 @@
                             <button onclick="changeMainImage('{{ asset('storage/' . $image) }}')"
                                     class="aspect-square bg-white rounded-lg shadow overflow-hidden border-2 border-transparent hover:border-green-500 transition-colors">
                                 <img src="{{ asset('storage/' . $image) }}" 
-                                     alt="{{ $product->name }}"
+                                     alt="{{ trans_product($product, "name") }}"
                                      class="w-full h-full object-cover">
                             </button>
                         @endforeach
@@ -129,7 +129,7 @@
                                 <button onclick="changeMainImage('{{ asset('storage/' . $image) }}')"
                                         class="aspect-square bg-white rounded-lg shadow overflow-hidden border-2 border-transparent hover:border-green-500 transition-colors">
                                     <img src="{{ asset('storage/' . $image) }}" 
-                                         alt="{{ $product->name }}"
+                                         alt="{{ trans_product($product, "name") }}"
                                          class="w-full h-full object-cover">
                                 </button>
                             @endforeach
@@ -138,7 +138,7 @@
                 @endif
             </div>
 
-            <!-- Informations produit -->
+            <!-- {{ __("app.content.information") }} produit -->
             <div class="space-y-6">
                 <!-- En-tête -->
                 <div>
@@ -168,14 +168,14 @@
                         @endif
                     </div>
 
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $product->name }}</h1>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ trans_product($product, "name") }}</h1>
                     
                     @if($product->short_description)
-                        <p class="text-lg text-gray-600">{{ $product->short_description }}</p>
+                        <p class="text-lg text-gray-600">{{ trans_product($product, "short_description") }}</p>
                     @endif
                 </div>
 
-                <!-- Prix -->
+                <!-- {{ __("app.content.price") }} -->
                 <div class="bg-gray-50 rounded-lg p-4" x-data="productPricing">
                     @php
                         // Chercher s'il y a une offre spéciale disponible (même si pas encore applicable)
@@ -201,7 +201,7 @@
                             </span>
                         </div>
                         
-                        <!-- Prix avec réduction -->
+                        <!-- {{ __("app.content.price") }} avec réduction -->
                         <div class="flex items-center space-x-3 mb-2">
                             <div class="text-3xl font-bold" :class="hasDiscount ? 'text-red-600' : 'text-green-600'">
                                 <span x-text="formatPrice(finalPrice)"></span>
@@ -221,7 +221,7 @@
                                 {{ $specialOffer->description }}
                             </div>
                             <div class="text-xs text-red-600 mt-1">
-                                Quantité minimum: {{ $specialOffer->minimum_quantity }} {{ $product->unit_symbol }}
+                                {{ __("app.content.quantity") }} minimum: {{ $specialOffer->minimum_quantity }} {{ $product->unit_symbol }}
                                 @if($specialOffer->end_date)
                                     - Valide jusqu'au {{ $specialOffer->end_date->format('d/m/Y') }}
                                 @endif
@@ -235,7 +235,7 @@
                             </div>
                         </div>
                     @else
-                        <!-- Prix normal -->
+                        <!-- {{ __("app.content.price") }} normal -->
                         <div class="text-3xl font-bold text-green-600 mb-2">
                             <span x-text="formatPrice(finalPrice)"></span>
                             <span class="text-lg font-normal text-gray-500">/ {{ $product->unit_symbol }}</span>
@@ -266,7 +266,7 @@
                             @endif
                         @else
                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                Rupture de stock
+                                {{ __("app.content.out_of_stock") }}
                             </span>
                         @endif
                     </div>
@@ -275,12 +275,12 @@
                 <!-- Actions d'achat (pour les produits d'achat) -->
                 @if(($product->type === 'sale' || $product->type === 'both') && $product->quantity > 0)
                     <div class="bg-white border border-gray-200 rounded-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Commander ce produit</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __("app.content.order") }} ce produit</h3>
                         
                         <!-- Sélection de quantité -->
                         <div class="mb-4">
                             <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
-                                Quantité
+                                {{ __("app.content.quantity") }}
                             </label>
                             <div class="flex items-center space-x-3">
                                 <button type="button" 
@@ -306,7 +306,7 @@
                         <!-- Total -->
                         <div class="mb-4 p-3 bg-gray-50 rounded-lg">
                             <div class="flex justify-between items-center">
-                                <span class="text-sm font-medium text-gray-700">Total</span>
+                                <span class="text-sm font-medium text-gray-700">{{ __("app.ecommerce.total") }}<//span>
                                 <span class="text-lg font-bold text-green-600" x-text="formatPrice(finalPrice)"></span>
                             </div>
                             <div x-show="hasDiscount" class="text-xs text-gray-600 mt-1">
@@ -319,12 +319,12 @@
                             @auth
                                 <button onclick="addToCart({{ $product->id }})" 
                                         class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
-                                    🛒 Ajouter au panier
+                                    🛒 {{ __("app.content.add_to_cart") }}
                                 </button>
                                 
                                 <button onclick="buyNow({{ $product->id }})" 
                                         class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
-                                    ⚡ Acheter maintenant
+                                    ⚡ {{ __("app.content.buy") }} maintenant
                                 </button>
                             @else
                                 <a href="{{ route('login') }}" 
@@ -400,20 +400,20 @@
 
         <!-- Détails du produit -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-            <!-- Description -->
+            <!-- {{ __("app.content.description") }} -->
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Description</h2>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ __("app.forms.description") }}<//h2>
                     <div class="prose prose-green max-w-none">
                         {!! nl2br(e($product->description)) !!}
                     </div>
                 </div>
             </div>
 
-            <!-- Informations complémentaires -->
+            <!-- {{ __("app.content.information") }} complémentaires -->
             <div>
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Informations</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __("app.content.information") }}</h3>
                     <dl class="space-y-3">
                         <div>
                             <dt class="text-sm font-medium text-gray-500">SKU</dt>
@@ -421,7 +421,7 @@
                         </div>
                         
                         <div>
-                            <dt class="text-sm font-medium text-gray-500">Catégorie</dt>
+                            <dt class="text-sm font-medium text-gray-500">{{ __("app.ecommerce.category") }}<//dt>
                             <dd class="text-sm text-gray-900">{{ $product->category->name }}</dd>
                         </div>
                         
@@ -440,12 +440,12 @@
                         @endif
                         
                         <div>
-                            <dt class="text-sm font-medium text-gray-500">Disponibilité</dt>
+                            <dt class="text-sm font-medium text-gray-500">{{ __("app.content.availability") }}</dt>
                             <dd class="text-sm">
                                 @if($product->quantity > 0)
-                                    <span class="text-green-600 font-medium">En stock ({{ $product->quantity }})</span>
+                                    <span class="text-green-600 font-medium">{{ __("app.content.in_stock") }} ({{ $product->quantity }})</span>
                                 @else
-                                    <span class="text-red-600 font-medium">Rupture de stock</span>
+                                    <span class="text-red-600 font-medium">{{ __("app.ecommerce.out_of_stock") }}<//span>
                                 @endif
                             </dd>
                         </div>
@@ -454,10 +454,10 @@
             </div>
         </div>
 
-        <!-- Produits similaires -->
+        <!-- {{ __("app.content.similar_products") }} -->
         @if($similarProducts->count() > 0)
             <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Produits similaires</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __("app.content.similar_products") }}</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach($similarProducts as $similarProduct)
@@ -607,7 +607,7 @@ async function addToCart(productId) {
         const response = await fetch(`/cart/add-product/${productId}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-{{ smart_translate("Type") }}': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -642,7 +642,7 @@ async function buyNow(productId) {
         const response = await fetch(`/cart/add-product/${productId}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-{{ smart_translate("Type") }}': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -683,7 +683,7 @@ async function toggleLike(productSlug) {
         const response = await fetch(`/web/likes/products/${productSlug}/toggle`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-{{ smart_translate("Type") }}': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 'Accept': 'application/json'
             },
@@ -766,7 +766,7 @@ async function toggleWishlist(productSlug) {
         const response = await fetch(`/web/wishlist/products/${productSlug}/toggle`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-{{ smart_translate("Type") }}': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 'Accept': 'application/json'
             },
@@ -823,13 +823,13 @@ async function toggleWishlist(productSlug) {
 // Fonctions de partage
 function shareOnFacebook() {
     const url = encodeURIComponent(window.location.href);
-    const title = encodeURIComponent('{{ $product->name }}');
+    const title = encodeURIComponent('{{ trans_product($product, "name") }}');
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&t=${title}`, '_blank', 'width=600,height=400');
 }
 
 function shareOnTwitter() {
     const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent('{{ $product->name }} - {{ $product->short_description }}');
+    const text = encodeURIComponent('{{ trans_product($product, "name") }} - {{ trans_product($product, "short_description") }}');
     window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank', 'width=600,height=400');
 }
 

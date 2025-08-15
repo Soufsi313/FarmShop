@@ -70,7 +70,7 @@
                 <p>✅ <strong>Commande confirmée</strong> - Maintenant</p>
                 <p>📦 <strong>Préparation</strong> - Dans les prochaines heures</p>
                 <p>🚚 <strong>Expédition</strong> - Sous 24-48h</p>
-                <p>🏠 <strong>Livraison</strong> - Estimée dans 2-3 jours ouvrés</p>
+                <p>🏠 <strong>{{ __("app.ecommerce.shipping") }}</strong> - Estimée dans 2-3 jours ouvrés</p>
             </div>
             
             <p>Nous préparons votre commande avec soin pour vous garantir des produits de qualité.</p>

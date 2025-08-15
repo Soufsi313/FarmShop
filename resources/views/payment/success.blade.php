@@ -56,7 +56,7 @@
                 </div>
                 
                 <div>
-                    <h3 class="font-medium text-gray-900 mb-2">Adresse de livraison</h3>
+                    <h3 class="font-medium text-gray-900 mb-2">{{ __("app.forms.delivery_address") }}<//h3>
                     <div class="text-sm text-gray-600">
                         <p>{{ $order->shipping_address['name'] }}</p>
                         <p>{{ $order->shipping_address['address'] }}</p>
@@ -85,7 +85,7 @@
                 
                 <div class="border-t pt-4 mt-4">
                     <div class="flex justify-between font-bold text-lg">
-                        <span>Total</span>
+                        <span>{{ __("app.ecommerce.total") }}</span>
                         <span>{{ number_format($order->total_amount, 2) }}€</span>
                     </div>
                 </div>

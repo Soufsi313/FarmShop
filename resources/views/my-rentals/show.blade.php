@@ -38,7 +38,7 @@
                     if ($now->isBefore($orderLocation->start_date)) {
                         $status = ['label' => 'À venir', 'class' => 'bg-blue-100 text-blue-800'];
                     } elseif ($now->between($orderLocation->start_date, $orderLocation->end_date)) {
-                        $status = ['label' => 'En cours', 'class' => 'bg-green-100 text-green-800'];
+                        $status = ['label' => __("app.status.in_progress"), 'class' => 'bg-green-100 text-green-800'];
                         $canClose = true;
                     } else {
                         $status = ['label' => 'En retard', 'class' => 'bg-red-100 text-red-800'];
@@ -49,7 +49,7 @@
                     if ($now->isAfter($orderLocation->end_date)) {
                         $status = ['label' => 'En retard', 'class' => 'bg-red-100 text-red-800'];
                     } else {
-                        $status = ['label' => 'En cours', 'class' => 'bg-green-100 text-green-800'];
+                        $status = ['label' => __("app.status.in_progress"), 'class' => 'bg-green-100 text-green-800'];
                     }
                     $canClose = true;
                     break;
@@ -225,7 +225,7 @@
                         <hr class="my-3">
                         
                         <div class="flex justify-between text-lg font-bold">
-                            <span>Total</span>
+                            <span>{{ __("app.ecommerce.total") }}</span>
                             <span>{{ number_format($orderLocation->total_amount + ($orderLocation->late_fees ?? 0), 2) }} €</span>
                         </div>
                     </div>

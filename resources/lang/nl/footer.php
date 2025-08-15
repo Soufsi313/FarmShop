@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'personal_data' => 'Persoonsgegevens',
+    'compliance' => 'Naleving',
+    'about' => 'Over ons',
+    'about_description' => 'FarmShop is uw betrouwbare partner voor al uw landbouwbehoeften. Wij bieden een breed scala aan kwaliteitsproducten en -diensten.',
+    'links' => 'Nuttige Links',
+    'products' => 'Producten',
+    'rentals' => 'Verhuur',
+    'blog' => 'Blog',
+    'contact' => 'Contact',
+    'account' => 'Mijn Account',
+    'orders' => 'Mijn Bestellingen',
+    'privacy' => 'Privacybeleid',
+    'terms' => 'Algemene Voorwaarden',
+    'cookies_policy' => 'Cookiebeleid',
+    'legal_notice' => 'Juridische Kennisgeving',
+    'gdpr' => 'AVG',
+    'newsletter' => 'Nieuwsbrief',
+    'newsletter_description' => 'Blijf op de hoogte van ons laatste nieuws en speciale aanbiedingen',
+    'newsletter_placeholder' => 'Uw e-mailadres',
+    'newsletter_subscribe' => 'Abonneren',
+    'follow_us' => 'Volg Ons',
+    'copyright' => 'Alle rechten voorbehouden',
+];

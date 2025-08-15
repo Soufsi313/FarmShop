@@ -78,12 +78,12 @@
                             </div>
                             @if($orderLocation->delivery_fee > 0)
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-gray-600">Livraison</span>
+                                <span class="text-gray-600">{{ __("app.ecommerce.delivery") }}<//span>
                                 <span class="font-medium">{{ number_format($orderLocation->delivery_fee, 2) }}€</span>
                             </div>
                             @endif
                             <div class="flex items-center justify-between border-t pt-2">
-                                <span class="text-gray-600 font-medium">Total</span>
+                                <span class="text-gray-600 font-medium">{{ __("app.ecommerce.total") }}</span>
                                 <span class="font-bold text-green-600">{{ number_format($orderLocation->total_amount, 2) }}€</span>
                             </div>
                         </div>

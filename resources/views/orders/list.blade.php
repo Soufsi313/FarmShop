@@ -20,8 +20,8 @@
                     <select id="status" name="status" 
                             onchange="window.location.href = updateQueryParam('status', this.value)"
                             class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <option value="">Tous</option>
-                        <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>En attente</option>
+                        <option value="">{{ __("app.common.all") }}</option>
+                        <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>{{ __("app.status.pending") }}<//option>
                         <option value="confirmed" {{ $currentStatus == 'confirmed' ? 'selected' : '' }}>Confirmée</option>
                         <option value="shipped" {{ $currentStatus == 'shipped' ? 'selected' : '' }}>Expédiée</option>
                         <option value="delivered" {{ $currentStatus == 'delivered' ? 'selected' : '' }}>Livrée</option>

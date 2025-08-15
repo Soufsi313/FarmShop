@@ -351,12 +351,12 @@
     <table class="items-table">
         <thead>
             <tr>
-                <th style="width: 40%;">Produit</th>
+                <th style="width: 40%;">{{ __("app.ecommerce.product") }}</th>
                 <th style="width: 10%;" class="text-center">Qté</th>
                 <th style="width: 15%;" class="text-right">Prix/jour</th>
                 <th style="width: 10%;" class="text-center">Jours</th>
                 <th style="width: 15%;" class="text-right">Caution</th>
-                <th style="width: 10%;" class="text-right">Total</th>
+                <th style="width: 10%;" class="text-right">{{ __("app.ecommerce.total") }}</th>
             </tr>
         </thead>
         <tbody>

@@ -21,7 +21,7 @@
                 <!-- Adresses de livraison -->
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-lg font-semibold text-gray-900">Adresse de livraison</h2>
+                        <h2 class="text-lg font-semibold text-gray-900">{{ __("app.forms.delivery_address") }}<//h2>
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" 
                                    name="use_profile_addresses" 
@@ -55,14 +55,14 @@
                                 <h3 class="font-medium text-gray-900 mb-3">Adresse de facturation</h3>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label for="billing_name" class="block text-sm font-medium text-gray-700 mb-1">Nom complet</label>
+                                        <label for="billing_name" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.forms.full_name") }}<//label>
                                         <input type="text" id="billing_name" name="billing_address[name]" 
                                                value="{{ old('billing_address.name', $user->name) }}"
                                                required 
                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                                     </div>
                                     <div>
-                                        <label for="billing_phone" class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                                        <label for="billing_phone" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.forms.phone") }}<//label>
                                         <input type="tel" id="billing_phone" name="billing_address[phone]" 
                                                value="{{ old('billing_address.phone', $user->phone) }}"
                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
@@ -70,7 +70,7 @@
                                 </div>
                                 
                                 <div class="mt-4">
-                                    <label for="billing_address" class="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
+                                    <label for="billing_address" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.forms.address") }}<//label>
                                     <input type="text" id="billing_address" name="billing_address[address]" 
                                            value="{{ old('billing_address.address', $user->address) }}"
                                            required 
@@ -79,14 +79,14 @@
                                 
                                 <div class="grid grid-cols-2 gap-4 mt-4">
                                     <div>
-                                        <label for="billing_postal_code" class="block text-sm font-medium text-gray-700 mb-1">Code postal</label>
+                                        <label for="billing_postal_code" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.forms.postal_code") }}<//label>
                                         <input type="text" id="billing_postal_code" name="billing_address[postal_code]" 
                                                value="{{ old('billing_address.postal_code', $user->postal_code) }}"
                                                required 
                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                                     </div>
                                     <div>
-                                        <label for="billing_city" class="block text-sm font-medium text-gray-700 mb-1">Ville</label>
+                                        <label for="billing_city" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.forms.city") }}<//label>
                                         <input type="text" id="billing_city" name="billing_address[city]" 
                                                value="{{ old('billing_address.city', $user->city) }}"
                                                required 
@@ -95,7 +95,7 @@
                                 </div>
                                 
                                 <div class="mt-4">
-                                    <label for="billing_country" class="block text-sm font-medium text-gray-700 mb-1">Pays</label>
+                                    <label for="billing_country" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.forms.country") }}<//label>
                                     <select id="billing_country" name="billing_address[country]" 
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                                         <option value="France" {{ old('billing_address.country', $user->country ?? 'France') == 'France' ? 'selected' : '' }}>France</option>
@@ -119,17 +119,17 @@
 
                             <!-- Adresse de livraison (si différente) -->
                             <div x-show="!sameShippingAddress">
-                                <h3 class="font-medium text-gray-900 mb-3 mt-6">Adresse de livraison</h3>
+                                <h3 class="font-medium text-gray-900 mb-3 mt-6">{{ __("app.forms.delivery_address") }}<//h3>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label for="shipping_name" class="block text-sm font-medium text-gray-700 mb-1">Nom complet</label>
+                                        <label for="shipping_name" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.forms.full_name") }}<//label>
                                         <input type="text" id="shipping_name" name="shipping_address[name]" 
                                                x-model="shippingAddress.name"
                                                required 
                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                                     </div>
                                     <div>
-                                        <label for="shipping_phone" class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                                        <label for="shipping_phone" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.forms.phone") }}<//label>
                                         <input type="tel" id="shipping_phone" name="shipping_address[phone]" 
                                                x-model="shippingAddress.phone"
                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
@@ -137,7 +137,7 @@
                                 </div>
                                 
                                 <div class="mt-4">
-                                    <label for="shipping_address" class="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
+                                    <label for="shipping_address" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.forms.address") }}<//label>
                                     <input type="text" id="shipping_address" name="shipping_address[address]" 
                                            x-model="shippingAddress.address"
                                            required 
@@ -146,14 +146,14 @@
                                 
                                 <div class="grid grid-cols-2 gap-4 mt-4">
                                     <div>
-                                        <label for="shipping_postal_code" class="block text-sm font-medium text-gray-700 mb-1">Code postal</label>
+                                        <label for="shipping_postal_code" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.forms.postal_code") }}<//label>
                                         <input type="text" id="shipping_postal_code" name="shipping_address[postal_code]" 
                                                x-model="shippingAddress.postal_code"
                                                required 
                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                                     </div>
                                     <div>
-                                        <label for="shipping_city" class="block text-sm font-medium text-gray-700 mb-1">Ville</label>
+                                        <label for="shipping_city" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.forms.city") }}<//label>
                                         <input type="text" id="shipping_city" name="shipping_address[city]" 
                                                x-model="shippingAddress.city"
                                                required 
@@ -162,7 +162,7 @@
                                 </div>
                                 
                                 <div class="mt-4">
-                                    <label for="shipping_country" class="block text-sm font-medium text-gray-700 mb-1">Pays</label>
+                                    <label for="shipping_country" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.forms.country") }}<//label>
                                     <select id="shipping_country" name="shipping_address[country]" 
                                             x-model="shippingAddress.country"
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
@@ -256,7 +256,7 @@
                             <span>{{ $cartSummary['formatted']['subtotal_ht'] }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">TVA</span>
+                            <span class="text-gray-600">{{ __("app.ecommerce.tax") }}<//span>
                             <span>{{ $cartSummary['formatted']['tax_amount'] }}</span>
                         </div>
                         <div class="flex justify-between text-sm">

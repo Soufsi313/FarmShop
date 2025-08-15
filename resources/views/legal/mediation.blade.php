@@ -197,7 +197,7 @@
                                         <option value="">Sélectionnez votre qualité</option>
                                         <option value="particulier">Particulier/Consommateur</option>
                                         <option value="agriculteur">Agriculteur</option>
-                                        <option value="entreprise">Entreprise</option>
+                                        <option value="entreprise">{{ __("app.forms.company") }}<//option>
                                         <option value="association">Association</option>
                                         <option value="collectivite">Collectivité</option>
                                     </select>

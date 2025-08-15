@@ -178,12 +178,12 @@
             <tr>
                 <th style="width: 12%;">N° Commande</th>
                 <th style="width: 20%;">Client</th>
-                <th style="width: 15%;">Email</th>
+                <th style="width: 15%;">{{ __("app.forms.email") }}</th>
                 <th style="width: 8%;">Statut</th>
-                <th style="width: 8%;">Paiement</th>
+                <th style="width: 8%;">{{ __("app.ecommerce.payment") }}</th>
                 <th style="width: 10%;" class="text-right">Montant</th>
                 <th style="width: 12%;">Date commande</th>
-                <th style="width: 15%;">Produits</th>
+                <th style="width: 15%;">{{ __("app.nav.products") }}</th>
             </tr>
         </thead>
         <tbody>

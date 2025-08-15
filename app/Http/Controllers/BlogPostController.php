@@ -82,6 +82,14 @@ class BlogPostController extends Controller
      */
     public function index(Request $request)
     {
+        // Détection et application de la langue
+        if ($request->has('lang')) {
+            $locale = $request->get('lang');
+            if (in_array($locale, ['fr', 'en', 'nl'])) {
+                app()->setLocale($locale);
+            }
+        }
+
         $query = BlogPost::with(['category', 'author'])
             ->withCount(['approvedComments as comments_count']);
 
@@ -255,9 +263,39 @@ class BlogPostController extends Controller
      */
     public function showWeb(Request $request, $slug)
     {
-        $post = BlogPost::where('slug', $slug)
-            ->with(['category', 'author', 'lastEditor'])
-            ->firstOrFail();
+        // Détection de la langue
+        if ($request->has('lang') && in_array($request->get('lang'), ['fr', 'en', 'nl'])) {
+            app()->setLocale($request->get('lang'));
+        }
+        
+        $currentLang = app()->getLocale();
+        
+        // Rechercher l'article par slug selon la langue
+        $post = null;
+        
+        switch ($currentLang) {
+            case 'en':
+                $post = BlogPost::where('slug_en', $slug)
+                    ->orWhere('slug', $slug)
+                    ->with(['category', 'author', 'lastEditor'])
+                    ->first();
+                break;
+            case 'nl':
+                $post = BlogPost::where('slug_nl', $slug)
+                    ->orWhere('slug', $slug)
+                    ->with(['category', 'author', 'lastEditor'])
+                    ->first();
+                break;
+            default:
+                $post = BlogPost::where('slug', $slug)
+                    ->with(['category', 'author', 'lastEditor'])
+                    ->first();
+                break;
+        }
+        
+        if (!$post) {
+            abort(404);
+        }
 
         // Vérifier si l'article est publié pour les non-admin
         if ((!Auth::check() || !Auth::user()->isAdmin()) && $post->status !== 'published') {

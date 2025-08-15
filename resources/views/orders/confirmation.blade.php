@@ -78,7 +78,7 @@
                         <span>{{ number_format($order->subtotal, 2) }} €</span>
                     </div>
                     <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">TVA</span>
+                        <span class="text-gray-600">{{ __("app.ecommerce.tax") }}</span>
                         <span>{{ number_format($order->tax_amount, 2) }} €</span>
                     </div>
                     <div class="flex justify-between text-sm">
@@ -120,7 +120,7 @@
 
             <!-- Adresse de livraison -->
             <div class="bg-white rounded-lg shadow-sm p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Adresse de livraison</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __("app.forms.delivery_address") }}<//h3>
                 <div class="text-sm text-gray-600 space-y-1">
                     <p class="font-medium text-gray-900">{{ $order->shipping_address['name'] ?? $order->shipping_address['firstName'] . ' ' . $order->shipping_address['lastName'] }}</p>
                     @if(!empty($order->shipping_address['company']))

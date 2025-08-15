@@ -78,11 +78,38 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'fr'),
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'fr'),
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale' => env('APP_FAKER_LOCALE', 'fr_FR'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    |
+    | List of supported locales for the application
+    |
+    */
+
+    'supported_locales' => [
+        'fr' => [
+            'name' => 'Français',
+            'flag' => '🇫🇷',
+            'country_code' => 'FR'
+        ],
+        'en' => [
+            'name' => 'English',
+            'flag' => '🇬🇧',
+            'country_code' => 'GB'
+        ],
+        'nl' => [
+            'name' => 'Nederlands',
+            'flag' => '🇳🇱',
+            'country_code' => 'NL'
+        ]
+    ],
 
     /*
     |--------------------------------------------------------------------------

@@ -39,6 +39,22 @@ class BlogPost extends Model
         'author_id',
         'last_edited_by',
         'last_edited_at',
+        // English translations
+        'title_en',
+        'slug_en',
+        'excerpt_en',
+        'content_en',
+        'meta_title_en',
+        'meta_description_en',
+        'meta_keywords_en',
+        // Dutch translations
+        'title_nl',
+        'slug_nl',
+        'excerpt_nl',
+        'content_nl',
+        'meta_title_nl',
+        'meta_description_nl',
+        'meta_keywords_nl',
     ];
 
     protected $casts = [
@@ -335,5 +351,62 @@ class BlogPost extends Model
                 $post->category->decrementPostsCount();
             }
         });
+    }
+    
+    // Helper methods for translations
+    public function getTranslatedTitle($lang = null)
+    {
+        $lang = $lang ?? app()->getLocale();
+        
+        switch ($lang) {
+            case 'en':
+                return $this->title_en ?? $this->title;
+            case 'nl':
+                return $this->title_nl ?? $this->title;
+            default:
+                return $this->title;
+        }
+    }
+    
+    public function getTranslatedExcerpt($lang = null)
+    {
+        $lang = $lang ?? app()->getLocale();
+        
+        switch ($lang) {
+            case 'en':
+                return $this->excerpt_en ?? $this->excerpt;
+            case 'nl':
+                return $this->excerpt_nl ?? $this->excerpt;
+            default:
+                return $this->excerpt;
+        }
+    }
+    
+    public function getTranslatedContent($lang = null)
+    {
+        $lang = $lang ?? app()->getLocale();
+        
+        switch ($lang) {
+            case 'en':
+                return $this->content_en ?? $this->content;
+            case 'nl':
+                return $this->content_nl ?? $this->content;
+            default:
+                return $this->content;
+        }
+    }
+    
+    public function getTranslatedSlug($lang = null)
+    {
+        $lang = $lang ?? app()->getLocale();
+        
+        switch ($lang) {
+            case 'en':
+                return $this->slug_en ?? $this->slug;
+            case 'nl':
+                return $this->slug_nl ?? $this->slug;
+            default:
+                return $this->slug;
+        }
     }
 }
