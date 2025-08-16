@@ -197,7 +197,7 @@
                         <!-- Badge offre spéciale -->
                         <div class="mb-3">
                             <span class="bg-red-500 text-white px-3 py-2 rounded-lg text-sm font-bold">
-                                🔥 Offre Spéciale: -{{ $specialOffer->discount_percentage }}%
+                                🔥 {{ __('app.products.special_offer') }}: -{{ $specialOffer->discount_percentage }}%
                             </span>
                         </div>
                         
@@ -223,15 +223,21 @@
                             <div class="text-xs text-red-600 mt-1">
                                 {{ __("app.content.quantity") }} minimum: {{ $specialOffer->minimum_quantity }} {{ $product->unit_symbol }}
                                 @if($specialOffer->end_date)
-                                    - Valide jusqu'au {{ $specialOffer->end_date->format('d/m/Y') }}
+                                    - {{ __('app.products.valid_until') }} {{ $specialOffer->end_date->format('d/m/Y') }}
                                 @endif
                             </div>
                             <!-- Indicateur de déclenchement de l'offre -->
                             <div x-show="!hasDiscount && quantity < {{ $specialOffer->minimum_quantity }}" class="text-xs text-orange-600 mt-1 font-semibold">
-                                Ajoutez <span x-text="{{ $specialOffer->minimum_quantity }} - quantity"></span> {{ $product->unit_symbol }} de plus pour bénéficier de l'offre !
+                                @if(app()->getLocale() === 'fr')
+                                    Ajoutez <span x-text="{{ $specialOffer->minimum_quantity }} - quantity"></span> {{ $product->unit_symbol }} de plus pour bénéficier de l'offre !
+                                @elseif(app()->getLocale() === 'en')
+                                    Add <span x-text="{{ $specialOffer->minimum_quantity }} - quantity"></span> more {{ $product->unit_symbol }} to benefit from the offer!
+                                @else
+                                    Voeg nog <span x-text="{{ $specialOffer->minimum_quantity }} - quantity"></span> {{ $product->unit_symbol }} toe om van de aanbieding te profiteren!
+                                @endif
                             </div>
                             <div x-show="hasDiscount" class="text-xs text-green-600 mt-1 font-semibold">
-                                ✓ Offre spéciale appliquée !
+                                ✓ {{ __('app.products.special_offer_applied') }}
                             </div>
                         </div>
                     @else
@@ -275,7 +281,7 @@
                 <!-- Actions d'achat (pour les produits d'achat) -->
                 @if(($product->type === 'sale' || $product->type === 'both') && $product->quantity > 0)
                     <div class="bg-white border border-gray-200 rounded-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __("app.content.order") }} ce produit</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __("app.content.order_this_product") }}</h3>
                         
                         <!-- Sélection de quantité -->
                         <div class="mb-4">
@@ -324,12 +330,12 @@
                                 
                                 <button onclick="buyNow({{ $product->id }})" 
                                         class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
-                                    ⚡ {{ __("app.content.buy") }} maintenant
+                                    ⚡ {{ __("app.content.buy_now") }}
                                 </button>
                             @else
                                 <a href="{{ route('login') }}" 
                                    class="block w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium text-center transition-colors">
-                                    🛒 Se connecter pour acheter
+                                    🛒 {{ __('app.content.login_to_buy') }}
                                 </a>
                             @endauth
                         </div>
@@ -342,7 +348,13 @@
                         <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                     </svg>
                     <span id="likes_count_{{ $product->slug }}" class="font-semibold">{{ $product->getLikesCount() }}</span>
-                    <span>{{ $product->getLikesCount() === 1 ? 'personne aime ce produit' : 'personnes aiment ce produit' }}</span>
+                    <span>
+                        @if($product->getLikesCount() === 1)
+                            {{ __('app.products.person_likes') }}
+                        @else
+                            {{ __('app.products.people_like') }}
+                        @endif
+                    </span>
                 </div>
 
                 <!-- Actions utilisateur -->
@@ -356,7 +368,7 @@
                                 <svg class="w-5 h-5 {{ $isLiked ? 'text-red-500' : 'text-gray-400' }}" fill="{{ $isLiked ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                 </svg>
-                                <span>{{ $isLiked ? 'J\'aime' : 'Aimer' }}</span>
+                                <span>{{ $isLiked ? __('app.products.liked') : __('app.products.like') }}</span>
                             </button>
 
                             <!-- Wishlist -->
@@ -366,7 +378,7 @@
                                 <svg class="w-5 h-5 {{ $isInWishlist ? 'text-blue-500' : 'text-gray-400' }}" fill="{{ $isInWishlist ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
                                 </svg>
-                                <span>{{ $isInWishlist ? 'Dans ma wishlist' : 'Ajouter à ma wishlist' }}</span>
+                                <span>{{ $isInWishlist ? __('app.products.in_wishlist') : __('app.products.add_to_wishlist') }}</span>
                             </button>
                         </div>
                     @endauth
@@ -403,9 +415,9 @@
             <!-- {{ __("app.content.description") }} -->
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ __("app.forms.description") }}<//h2>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ __("app.content.description") }}</h2>
                     <div class="prose prose-green max-w-none">
-                        {!! nl2br(e($product->description)) !!}
+                        {!! nl2br(e(trans_product($product, 'description'))) !!}
                     </div>
                 </div>
             </div>
@@ -466,7 +478,7 @@
                             <a href="{{ route('products.show', $similarProduct->slug) }}" class="block aspect-square bg-gray-200 hover:opacity-95 transition-opacity">
                                 @if($similarProduct->main_image)
                                     <img src="{{ asset('storage/' . $similarProduct->main_image) }}" 
-                                         alt="{{ $similarProduct->name }}"
+                                         alt="{{ trans_product($similarProduct, 'name') }}"
                                          class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center">
@@ -480,15 +492,15 @@
                             <!-- Contenu -->
                             <div class="p-4">
                                 <a href="{{ route('products.show', $similarProduct->slug) }}" class="block hover:text-green-600 transition-colors">
-                                    <h3 class="font-semibold text-gray-900 mb-1">{{ $similarProduct->name }}</h3>
+                                    <h3 class="font-semibold text-gray-900 mb-1">{{ trans_product($similarProduct, 'name') }}</h3>
                                 </a>
-                                <p class="text-sm text-gray-500 mb-2">{{ $similarProduct->category->name }}</p>
+                                <p class="text-sm text-gray-500 mb-2">{{ trans_category($similarProduct->category) }}</p>
                                 <div class="text-lg font-bold text-green-600 mb-3">
                                     {{ number_format($similarProduct->price, 2) }}€
                                 </div>
                                 <a href="{{ route('products.show', $similarProduct->slug) }}" 
                                    class="block w-full text-center bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
-                                    Voir le produit
+                                    {{ __('app.products.view_product') }}
                                 </a>
                             </div>
                         </div>

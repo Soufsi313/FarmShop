@@ -337,7 +337,7 @@
             <div class="mt-12 bg-white rounded-lg shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">📝 Description détaillée</h2>
                 <div class="prose max-w-none text-gray-600">
-                    {!! nl2br(e($product->description)) !!}
+                    {!! nl2br(e(trans_product($product, 'description'))) !!}
                 </div>
             </div>
         @endif

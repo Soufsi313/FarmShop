@@ -488,20 +488,20 @@
 
                 <!-- Actions utilisateur -->
                 <div class="hidden md:flex items-center space-x-4">
-                    <!-- Sélecteur de langue -->
-                    <div class="flex items-center space-x-2">
-                        <a href="{{ request()->fullUrlWithQuery(['lang' => 'fr']) }}" title="Français" class="hover:opacity-80 transition-opacity">
-                            <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-5 w-5 rounded border {{ app()->getLocale() === 'fr' ? 'ring-2 ring-green-500' : '' }}" />
-                        </a>
-                        <a href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" title="English" class="hover:opacity-80 transition-opacity">
-                            <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-5 w-5 rounded border {{ app()->getLocale() === 'en' ? 'ring-2 ring-green-500' : '' }}" />
-                        </a>
-                        <a href="{{ request()->fullUrlWithQuery(['lang' => 'nl']) }}" title="Nederlands" class="hover:opacity-80 transition-opacity">
-                            <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-5 w-5 rounded border {{ app()->getLocale() === 'nl' ? 'ring-2 ring-green-500' : '' }}" />
-                        </a>
-                    </div>
-
                     @guest
+                        <!-- Sélecteur de langue pour invités -->
+                        <div class="flex items-center space-x-2 mr-4">
+                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'fr']) }}" title="Français" class="hover:opacity-80 transition-opacity">
+                                <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-5 w-5 rounded border {{ app()->getLocale() === 'fr' ? 'ring-2 ring-green-500' : '' }}" />
+                            </a>
+                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" title="English" class="hover:opacity-80 transition-opacity">
+                                <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-5 w-5 rounded border {{ app()->getLocale() === 'en' ? 'ring-2 ring-green-500' : '' }}" />
+                            </a>
+                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'nl']) }}" title="Nederlands" class="hover:opacity-80 transition-opacity">
+                                <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-5 w-5 rounded border {{ app()->getLocale() === 'nl' ? 'ring-2 ring-green-500' : '' }}" />
+                            </a>
+                        </div>
+
                         <a href="{{ route('login') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors">
                             {{ __('app.nav.login') }}
                         </a>
@@ -509,6 +509,19 @@
                             {{ __('app.nav.register') }}
                         </a>
                     @else
+                        <!-- Sélecteur de langue pour utilisateurs connectés -->
+                        <div class="flex items-center space-x-2 mr-4">
+                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'fr']) }}" title="Français" class="hover:opacity-80 transition-opacity">
+                                <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-5 w-5 rounded border {{ app()->getLocale() === 'fr' ? 'ring-2 ring-green-500' : '' }}" />
+                            </a>
+                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" title="English" class="hover:opacity-80 transition-opacity">
+                                <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-5 w-5 rounded border {{ app()->getLocale() === 'en' ? 'ring-2 ring-green-500' : '' }}" />
+                            </a>
+                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'nl']) }}" title="Nederlands" class="hover:opacity-80 transition-opacity">
+                                <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-5 w-5 rounded border {{ app()->getLocale() === 'nl' ? 'ring-2 ring-green-500' : '' }}" />
+                            </a>
+                        </div>
+
                         <div class="relative" x-data="{ userMenuOpen: false }">
                             <button @click="userMenuOpen = !userMenuOpen" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-green-500">
                                 <span class="sr-only">Ouvrir menu utilisateur</span>
@@ -595,6 +608,25 @@
                     @endauth
                     
                     <a href="{{ route('contact') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">{{ __('app.nav.contact') }}</a>
+                    
+                    <!-- Sélecteur de langue mobile -->
+                    <div class="border-t pt-4 mt-4">
+                        <div class="px-3 py-2 text-sm font-medium text-gray-500 uppercase tracking-wider">Langue / Language</div>
+                        <div class="flex items-center space-x-4 px-3 py-2">
+                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'fr']) }}" title="Français" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+                                <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-6 w-6 rounded border {{ app()->getLocale() === 'fr' ? 'ring-2 ring-green-500' : '' }}" />
+                                <span class="text-sm">Français</span>
+                            </a>
+                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" title="English" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+                                <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-6 w-6 rounded border {{ app()->getLocale() === 'en' ? 'ring-2 ring-green-500' : '' }}" />
+                                <span class="text-sm">English</span>
+                            </a>
+                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'nl']) }}" title="Nederlands" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+                                <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-6 w-6 rounded border {{ app()->getLocale() === 'nl' ? 'ring-2 ring-green-500' : '' }}" />
+                                <span class="text-sm">Nederlands</span>
+                            </a>
+                        </div>
+                    </div>
                     
                     @guest
                         <div class="border-t pt-4 mt-4">

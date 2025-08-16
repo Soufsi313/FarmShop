@@ -206,7 +206,7 @@
                                     <div onclick="event.stopPropagation()">
                                         <button onclick="window.location.href='{{ route('products.show', $product) }}'" 
                                                 class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 text-sm transition-colors">
-                                            Voir les détails
+                                            {{ __("app.content.view_details") }}
                                         </button>
                                     </div>
                                 @endif

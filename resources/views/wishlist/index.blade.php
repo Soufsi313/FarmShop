@@ -234,7 +234,7 @@
                                     
                                     <a href="{{ route('products.show', $product->slug) }}" 
                                        class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium text-center transition-colors">
-                                        Voir les détails
+                                        {{ __("app.content.view_details") }}
                                     </a>
                                 </div>
                             </div>

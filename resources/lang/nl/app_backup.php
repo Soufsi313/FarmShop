@@ -103,7 +103,6 @@ return array (
   'ecommerce' => 
   array (
     'total' => 'Total',
-    'category' => 'Catégorie',
   ),
   'pages' => 
   array (
@@ -252,6 +251,18 @@ return array (
     'learn_more' => 'En savoir plus sur les cookies',
     'reject_all' => 'Tout refuser',
     'save_choices' => 'Sauvegarder mes choix',
+  ),
+  'footer' => 
+  array (
+    'all_rights_reserved' => 'Tous droits réservés',
+    'personal_data' => 'Données personnelles',
+    'gdpr_rights' => 'Droits RGPD',
+    'cookie_policy' => 'Politique des cookies',
+    'data_request' => 'Demande de données',
+    'compliance' => 'Conformité',
+    'return_rights' => 'Droit de rétractation',
+    'legal_warranties' => 'Garanties légales',
+    'mediation' => 'Médiation'
   ),
   'cookies' => 
   array (

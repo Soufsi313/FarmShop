@@ -105,7 +105,7 @@
                                 <div class="space-y-2">
                                     <a href="{{ route('orders.show', $order) }}" 
                                        class="inline-block px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
-                                        Voir les détails
+                                        {{ __("app.content.view_details") }}
                                     </a>
                                     
                                     @if($order->can_be_cancelled_now)

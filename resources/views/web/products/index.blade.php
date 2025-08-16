@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('products.page_title') . ' - FarmShop')
+@section('title', __('app.products.title') . ' - FarmShop')
 
 @push('styles')
 <style>
@@ -161,16 +161,16 @@
                         </div>
                         
                         <div class="flex items-center space-x-4">
-                            <label for="sort" class="text-sm font-medium text-gray-700">{{ smart_translate("Trier par") }} :</label>
+                            <label for="sort" class="text-sm font-medium text-gray-700">{{ __("app.products.sort_by") }} :</label>
                             <select id="sort" 
                                     name="sort" 
                                     onchange="updateSort(this.value)"
                                     class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                                <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>{{ smart_translate("Plus récent") }}s</option>
-                                <option value="featured" {{ request('sort') == 'featured' ? 'selected' : '' }}>En vedette</option>
-                                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>{{ smart_translate("Nom A-Z") }}</option>
-                                <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>{{ __("app.content.price") }} croissant</option>
-                                <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>{{ __("app.content.price") }} décroissant</option>
+                                <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>{{ __("app.products.sort_newest") }}</option>
+                                <option value="featured" {{ request('sort') == 'featured' ? 'selected' : '' }}>{{ __("app.products.featured") }}</option>
+                                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>{{ __("app.products.sort_name_asc") }}</option>
+                                <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>{{ __("app.products.sort_price_asc") }}</option>
+                                <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>{{ __("app.products.sort_price_desc") }}</option>
                             </select>
                         </div>
                     </div>
@@ -349,12 +349,12 @@
                                                     @auth
                                                         <button onclick="buyNow({{ $product->id }})" 
                                                                 class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                                            Acheter
+                                                            {{ __('app.content.buy') }}
                                                         </button>
                                                     @else
                                                         <a href="{{ route('login') }}" 
                                                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium text-center transition-colors">
-                                                            Acheter
+                                                            {{ __('app.content.buy') }}
                                                         </a>
                                                     @endauth
                                                 </div>
@@ -386,7 +386,7 @@
                                         <!-- Voir le détail -->
                                         <a href="{{ route('products.show', $product->slug) }}" 
                                            class="text-green-600 hover:text-green-700 font-medium text-sm transition-colors">
-                                            Voir le détail →
+                                            {{ __("app.content.view_detail") }}
                                         </a>
 
                                         <!-- Compteur de likes (visible par tous) -->

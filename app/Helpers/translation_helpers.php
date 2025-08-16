@@ -11,22 +11,48 @@ if (!function_exists('trans_product')) {
     {
         $locale = $locale ?: App::getLocale();
         
-        // Si c'est le français (langue par défaut), retourner directement
-        if ($locale === 'fr') {
-            return $product->$field ?? '';
-        }
-        
-        // Chercher la traduction
-        $translation = DB::table('product_translations')
-            ->where('product_id', $product->id)
-            ->where('locale', $locale)
-            ->first();
+        // Pour le champ 'name', utiliser le système de traduction par slug
+        if ($field === 'name') {
+            // Vérifier si on a une traduction pour ce slug
+            $translationKey = "app.product_names.{$product->slug}";
+            $translation = __($translationKey, [], $locale);
             
-        if ($translation && isset($translation->$field)) {
-            return $translation->$field;
+            // Si la traduction existe (n'est pas égale à la clé), l'utiliser
+            if ($translation !== $translationKey) {
+                return $translation;
+            }
+            
+            // Sinon, utiliser le champ original ou fallback intelligent
+            if (!empty($product->$field)) {
+                return $product->$field;
+            }
+            
+            // Fallback: convertir le slug en nom lisible
+            return ucwords(str_replace('-', ' ', $product->slug));
         }
         
-        // Fallback vers le français
+        // Pour le champ 'description', utiliser le système de traduction par slug
+        if ($field === 'description') {
+            // Vérifier si on a une traduction pour ce slug
+            $translationKey = "app.product_descriptions.{$product->slug}";
+            $translation = __($translationKey, [], $locale);
+            
+            // Si la traduction existe (n'est pas égale à la clé), l'utiliser
+            if ($translation !== $translationKey) {
+                return $translation;
+            }
+            
+            // Sinon, utiliser le champ original si disponible
+            if (!empty($product->$field)) {
+                return $product->$field;
+            }
+            
+            // Fallback: description générique basée sur le nom du produit
+            $productName = trans_product($product, 'name', $locale);
+            return "Description détaillée de {$productName}. Produit de qualité sélectionné avec soin pour vous offrir le meilleur de nos terroirs.";
+        }
+        
+        // Pour les autres champs, retourner le champ original
         return $product->$field ?? '';
     }
 }
@@ -39,20 +65,67 @@ if (!function_exists('trans_category')) {
     {
         $locale = $locale ?: App::getLocale();
         
+        // Utiliser le slug si le name est vide
+        $categoryIdentifier = !empty($category->name) ? $category->name : $category->slug;
+        
+        // Si c'est le français (langue par défaut), retourner le nom français
         if ($locale === 'fr') {
-            return $category->$field ?? '';
-        }
-        
-        $translation = DB::table('category_translations')
-            ->where('category_id', $category->id)
-            ->where('locale', $locale)
-            ->first();
+            // Si on a un nom, l'utiliser, sinon utiliser le slug formaté
+            if (!empty($category->name)) {
+                return $category->name;
+            }
             
-        if ($translation && isset($translation->$field)) {
-            return $translation->$field;
+            // Convertir le slug en nom lisible français
+            $slugToFrench = [
+                'fruits' => 'Fruits',
+                'legumes' => 'Légumes',
+                'cereales' => 'Céréales',
+                'feculents' => 'Féculents',
+                'produits-laitiers' => 'Produits Laitiers',
+                'outils-agricoles' => 'Outils Agricoles',
+                'machines' => 'Machines',
+                'equipement' => 'Équipement',
+                'semences' => 'Semences',
+                'engrais' => 'Engrais',
+                'irrigation' => 'Irrigation',
+                'protections' => 'Protections',
+            ];
+            
+            return $slugToFrench[$category->slug] ?? ucfirst(str_replace('-', ' ', $category->slug));
         }
         
-        return $category->$field ?? '';
+        // Pour les autres langues, utiliser le système de traduction Laravel
+        $translationKey = 'app.categories.' . $category->slug;
+        $translation = __($translationKey, [], $locale);
+        
+        // Si la traduction existe et n'est pas la clé elle-même
+        if ($translation !== $translationKey) {
+            return $translation;
+        }
+        
+        // Fallback français pour le cas où la traduction n'existe pas
+        $slugToFrench = [
+            'fruits' => 'Fruits',
+            'legumes' => 'Légumes',
+            'cereales' => 'Céréales',
+            'feculents' => 'Féculents',
+            'produits-laitiers' => 'Produits Laitiers',
+            'outils-agricoles' => 'Outils Agricoles',
+            'machines' => 'Machines',
+            'equipement' => 'Équipement',
+            'semences' => 'Semences',
+            'engrais' => 'Engrais',
+            'irrigation' => 'Irrigation',
+            'protections' => 'Protections',
+        ];
+        
+        return $slugToFrench[$category->slug] ?? ucfirst(str_replace('-', ' ', $category->slug));
+        if ($translation !== $translationKey) {
+            return $translation;
+        }
+        
+        // Fallback vers le nom formaté du slug
+        return ucfirst(str_replace('-', ' ', $category->slug));
     }
 }
 
