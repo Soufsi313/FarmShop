@@ -898,4 +898,53 @@ return array (
     'serre-tunnel-3x2m-7259' => 'Gegalvaniseerde tunnelkas 3x2m hoogte 2m. Ø25mm buisstructuur bestand tegen windkracht 80km/u. 200 micron UV-bestendige polyethyleen bekleding. 2 deuren met muggenramen. Perfect voor vroege gewassen en overwintering.',
     'composteur-rotatif-3230' => 'Roterende composter 160L dubbele kamer voor snelle compostering. 360° rotatie vergemakkelijkt mengen en beluchting. UV- en weerbestendig gerecycled materiaal. Rijpe compostproductie in 6-8 weken. Stabiele basis inbegrepen.',
   ),
+  
+  'messages' => 
+  array (
+    'thank_you' => 'Bedankt voor uw bericht',
+    'reply_soon' => 'We zullen u snel antwoorden',
+    'error_occurred' => 'Er is een fout opgetreden',
+    'cart_empty' => 'Uw winkelwagen is leeg',
+    'cart_empty_description' => 'Uw winkelwagen is momenteel leeg.',
+    'loading_cart' => 'Winkelwagen laden...',
+    'cart_load_error' => 'Fout bij het laden van winkelwagen',
+    'clear_cart_confirm' => 'Weet u zeker dat u uw winkelwagen wilt legen?',
+  ),
+  
+  'cart' => 
+  array (
+    'title' => 'Mijn Winkelwagen',
+    'continue_shopping' => 'Verder winkelen',
+    'clear_cart' => 'Winkelwagen legen',
+    'checkout' => 'Bestellen',
+    'subtotal_ht' => 'Subtotaal (excl. btw):',
+    'subtotal_ttc' => 'Subtotaal (incl. btw):',
+    'tax' => 'BTW',
+    'tax_rate' => 'BTW (%s%)',
+    'shipping_cost' => 'Verzendkosten:',
+    'free_shipping' => 'GRATIS',
+    'remaining_free_shipping' => 'Nog %s voor gratis verzending!',
+    'total_savings' => '🎉 Totale besparingen:',
+    'total_ttc' => 'Totaal (incl. btw):',
+    'total_items' => '%d artikel(en)',
+    'discount_offer' => '🔥 %s',
+    'discount_percentage' => '%s%% korting',
+    'normal_price' => 'Normale prijs (incl. btw): %s',
+    'discounted_price' => 'Kortingsprijs (incl. btw): %s',
+    'unit_price_ht' => 'Eenheidsprijs (excl. btw): %s',
+    'tax_amount' => 'BTW %s: %s €',
+    'subtotal' => 'Subtotaal (excl. btw): %s',
+    'tax_total' => 'BTW: %s',
+    'total' => 'Totaal (incl. btw): %s',
+    'savings' => 'Besparing: %s',
+    'delete' => 'Verwijderen',
+  ),
+  
+  'buttons' => 
+  array (
+    'delete' => 'Verwijderen',
+    'update' => 'Bijwerken',
+    'add' => 'Toevoegen',
+    'remove' => 'Weghalen',
+  ),
 );

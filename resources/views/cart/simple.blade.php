@@ -1,42 +1,61 @@
 @extends('layouts.app')
 
-@section('title', 'Mon Panier - FarmShop')
+@section('title', __('app.cart.title') . ' - FarmShop')
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-8">Mon Panier</h1>
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">{{ __('app.cart.title') }}</h1>
 
     <div id="cart-content">
         <!-- Le contenu sera chargé ici via JavaScript -->
         <div class="text-center py-8">
             <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600 mx-auto"></div>
-            <p class="mt-4 text-gray-600">Chargement du panier...</p>
+            <p class="mt-4 text-gray-600">{{ __('app.messages.loading_cart') }}</p>
         </div>
     </div>
 
     <!-- Boutons d'action -->
     <div class="mt-8 flex justify-between">
         <a href="{{ route('products.index') }}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-            Continuer les achats
+            {{ __('app.cart.continue_shopping') }}
         </a>
         <div id="cart-actions" style="display: none;">
             <button id="clear-cart" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-4">
-                Vider le panier
+                {{ __('app.cart.clear_cart') }}
             </button>
             <a href="{{ route('checkout.index') }}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                Passer commande
+                {{ __('app.cart.checkout') }}
             </a>
         </div>
     </div>
 </div>
 
 <script>
+// Variables de traduction
+const translations = {
+    discountPercentage: '{{ __("app.cart.discount_percentage") }}',
+    normalPriceTtc: '{{ __("app.cart.normal_price") }}',
+    discountedPriceTtc: '{{ __("app.cart.discounted_price") }}',
+    unitPriceHt: '{{ __("app.cart.unit_price_ht") }}',
+    taxAmount: '{{ __("app.cart.tax_amount") }}',
+    subtotalHt: '{{ __("app.cart.subtotal_ht") }}',
+    taxTotal: '{{ __("app.cart.tax") }}',
+    shippingCost: '{{ __("app.cart.shipping_cost") }}',
+    freeShipping: '{{ __("app.cart.free_shipping") }}',
+    remainingFreeShipping: '{{ __("app.cart.remaining_free_shipping") }}',
+    totalSavings: '{{ __("app.cart.total_savings") }}',
+    totalTtc: '{{ __("app.cart.total_ttc") }}',
+    totalItems: '{{ __("app.cart.total_items") }}',
+    discountOffer: '{{ __("app.cart.discount_offer") }}',
+    savings: '{{ __("app.cart.savings") }}'
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     loadCart();
 
     // Bouton vider le panier
     document.getElementById('clear-cart').addEventListener('click', function() {
-        if (confirm('Êtes-vous sûr de vouloir vider votre panier ?')) {
+        if (confirm('{{ __("app.messages.clear_cart_confirm") }}')) {
             clearCart();
         }
     });
@@ -51,7 +70,7 @@ function loadCart() {
         .catch(error => {
             console.error('Erreur:', error);
             document.getElementById('cart-content').innerHTML = 
-                '<div class="text-center text-red-600">Erreur lors du chargement du panier</div>';
+                '<div class="text-center text-red-600">{{ __("app.messages.cart_load_error") }}</div>';
         });
 }
 
@@ -125,7 +144,7 @@ function displayCart(data) {
                                         </div>
                                         <div class="text-lg font-bold text-gray-900">${item.total_formatted}</div>
                                         <button onclick="removeItem(${item.id})" 
-                                                class="text-red-600 hover:text-red-800 text-xs mt-1">{{ __("app.buttons.delete") }}<//button>
+                                                class="text-red-600 hover:text-red-800 text-xs mt-1">{{ __("app.buttons.delete") }}</button>
                                     </div>
                                 </div>
                             </div>
@@ -225,8 +244,8 @@ function displayCart(data) {
                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __("app.messages.cart_empty") }}<//h3>
-                <p class="mt-1 text-sm text-gray-500">Votre panier est actuellement vide.</p>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __("app.messages.cart_empty") }}</h3>
+                <p class="mt-1 text-sm text-gray-500">{{ __("app.messages.cart_empty_description") }}</p>
             </div>
         `;
         cartActions.style.display = 'none';

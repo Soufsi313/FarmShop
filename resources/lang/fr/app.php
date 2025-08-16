@@ -555,6 +555,48 @@ return array (
     'thank_you' => 'Merci pour votre message',
     'reply_soon' => 'Nous vous répondrons rapidement',
     'error_occurred' => 'Une erreur s\'est produite',
+    'cart_empty' => 'Votre panier est vide',
+    'cart_empty_description' => 'Votre panier est actuellement vide.',
+    'loading_cart' => 'Chargement du panier...',
+    'cart_load_error' => 'Erreur lors du chargement du panier',
+    'clear_cart_confirm' => 'Êtes-vous sûr de vouloir vider votre panier ?',
+  ),
+  
+  'cart' => 
+  array (
+    'title' => 'Mon Panier',
+    'continue_shopping' => 'Continuer les achats',
+    'clear_cart' => 'Vider le panier',
+    'checkout' => 'Passer commande',
+    'subtotal_ht' => 'Sous-total HT:',
+    'subtotal_ttc' => 'Sous-total TTC:',
+    'tax' => 'TVA',
+    'tax_rate' => 'TVA (%s%)',
+    'shipping_cost' => 'Frais de livraison:',
+    'free_shipping' => 'GRATUIT',
+    'remaining_free_shipping' => 'Plus que %s pour la livraison gratuite !',
+    'total_savings' => '🎉 Économies totales:',
+    'total_ttc' => 'Total TTC:',
+    'total_items' => '%d article(s)',
+    'discount_offer' => '🔥 %s',
+    'discount_percentage' => '%s%% de réduction',
+    'normal_price' => 'Prix normal TTC: %s',
+    'discounted_price' => 'Prix réduit TTC: %s',
+    'unit_price_ht' => 'Prix unitaire HT: %s',
+    'tax_amount' => 'TVA %s: %s €',
+    'subtotal' => 'Sous-total HT: %s',
+    'tax_total' => 'TVA: %s',
+    'total' => 'Total TTC: %s',
+    'savings' => 'Économie: %s',
+    'delete' => 'Supprimer',
+  ),
+  
+  'buttons' => 
+  array (
+    'delete' => 'Supprimer',
+    'update' => 'Mettre à jour',
+    'add' => 'Ajouter',
+    'remove' => 'Retirer',
   ),
   
   // Traductions des produits par slug

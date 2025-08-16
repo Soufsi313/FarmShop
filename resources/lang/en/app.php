@@ -589,6 +589,48 @@ return array (
     'thank_you' => 'Thank you for your message',
     'reply_soon' => 'We will reply to you soon',
     'error_occurred' => 'An error occurred',
+    'cart_empty' => 'Your cart is empty',
+    'cart_empty_description' => 'Your cart is currently empty.',
+    'loading_cart' => 'Loading cart...',
+    'cart_load_error' => 'Error loading cart',
+    'clear_cart_confirm' => 'Are you sure you want to clear your cart?',
+  ),
+  
+  'cart' => 
+  array (
+    'title' => 'My Cart',
+    'continue_shopping' => 'Continue shopping',
+    'clear_cart' => 'Clear cart',
+    'checkout' => 'Checkout',
+    'subtotal_ht' => 'Subtotal (excl. tax):',
+    'subtotal_ttc' => 'Subtotal (incl. tax):',
+    'tax' => 'VAT',
+    'tax_rate' => 'VAT (%s%)',
+    'shipping_cost' => 'Shipping cost:',
+    'free_shipping' => 'FREE',
+    'remaining_free_shipping' => 'Just %s more for free shipping!',
+    'total_savings' => '🎉 Total savings:',
+    'total_ttc' => 'Total (incl. tax):',
+    'total_items' => '%d item(s)',
+    'discount_offer' => '🔥 %s',
+    'discount_percentage' => '%s%% discount',
+    'normal_price' => 'Normal price (incl. tax): %s',
+    'discounted_price' => 'Discounted price (incl. tax): %s',
+    'unit_price_ht' => 'Unit price (excl. tax): %s',
+    'tax_amount' => 'VAT %s: %s €',
+    'subtotal' => 'Subtotal (excl. tax): %s',
+    'tax_total' => 'VAT: %s',
+    'total' => 'Total (incl. tax): %s',
+    'savings' => 'Savings: %s',
+    'delete' => 'Delete',
+  ),
+  
+  'buttons' => 
+  array (
+    'delete' => 'Delete',
+    'update' => 'Update',
+    'add' => 'Add',
+    'remove' => 'Remove',
   ),
   
   // Product translations by slug
