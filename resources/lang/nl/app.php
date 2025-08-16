@@ -940,6 +940,33 @@ return array (
     'delete' => 'Verwijderen',
   ),
   
+  'wishlist' => 
+  array (
+    'title' => 'Mijn Verlanglijst',
+    'product_singular' => 'product in uw lijst',
+    'products_plural' => 'producten in uw lijst',
+    'clear_list' => 'Lijst legen',
+    'add_all_to_cart' => 'Alles toevoegen aan winkelwagen',
+    'added_on' => 'Toegevoegd op',
+    'remove_from_wishlist' => 'Van lijst verwijderen',
+    'add_to_cart' => 'Toevoegen aan winkelwagen',
+    'buy_now' => 'Nu kopen',
+    'rent_now' => 'Nu huren',
+    'view_product' => 'Product bekijken',
+    'empty_title' => 'Uw verlanglijst is leeg',
+    'empty_description' => 'Ontdek onze producten en voeg uw favorieten toe door op het hart te klikken',
+    'browse_products' => 'Producten bekijken',
+    'per_day' => 'per dag',
+    'deposit' => 'Borg',
+    'in_stock' => 'Op voorraad',
+    'limited_stock' => 'Beperkte voorraad',
+    'low_stock' => 'Lage voorraad',
+    'out_of_stock' => 'Uitverkocht',
+    'product_unavailable' => 'Product niet beschikbaar',
+    'added_to_cart_success' => 'Product toegevoegd aan winkelwagen!',
+    'add_to_cart_error' => 'Fout bij toevoegen aan winkelwagen',
+  ),
+  
   'buttons' => 
   array (
     'delete' => 'Verwijderen',

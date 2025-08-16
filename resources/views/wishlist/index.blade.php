@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Ma Liste de Souhaits - FarmShop')
+@section('title', __('app.wishlist.title') . ' - FarmShop')
 
 @push('styles')
 <style>
@@ -50,20 +50,20 @@
                         <svg class="w-8 h-8 text-red-500 mr-3" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
-                        Ma Liste de Souhaits
+                        {{ __('app.wishlist.title') }}
                     </h1>
-                    <p class="text-gray-600 mt-1">{{ $wishlist->total() }} produit(s) dans votre liste</p>
+                    <p class="text-gray-600 mt-1">{{ $wishlist->total() }} {{ $wishlist->total() > 1 ? __('app.wishlist.products_plural') : __('app.wishlist.product_singular') }}</p>
                 </div>
                 
                 @if($wishlist->count() > 0)
                 <div class="flex space-x-3">
                     <button @click="clearWishlist" 
                             class="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg transition-colors font-medium">
-                        Vider la liste
+                        {{ __('app.wishlist.clear_list') }}
                     </button>
                     <button @click="addAllToCart" 
                             class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors font-medium">
-                        Tout ajouter au panier
+                        {{ __('app.wishlist.add_all_to_cart') }}
                     </button>
                 </div>
                 @endif
@@ -113,21 +113,21 @@
                                         {{ $product->category->name }}
                                     </span>
                                     <span class="text-xs text-gray-500">
-                                        Ajouté le {{ $wishlistItem->created_at->format('d/m/Y') }}
+                                        {{ __('app.wishlist.added_on') }} {{ $wishlistItem->created_at->format('d/m/Y') }}
                                     </span>
                                 </div>
 
                                 <!-- Nom du produit -->
                                 <h3 class="text-lg font-semibold text-gray-900 mb-2 hover:text-green-600 transition-colors">
                                     <a href="{{ route('products.show', $product->slug) }}">
-                                        {{ $product->name }}
+                                        {{ __('app.product_names.' . $product->slug) ?: $product->name }}
                                     </a>
                                 </h3>
 
                                 <!-- Description courte -->
                                 @if($product->short_description)
                                     <p class="text-sm text-gray-600 mb-3 line-clamp-2">
-                                        {{ $product->short_description }}
+                                        {{ __('app.product_descriptions.' . $product->slug) ?: $product->short_description }}
                                     </p>
                                 @endif
 
@@ -196,39 +196,39 @@
                                         @if($product->type === 'rental')
                                             <button @click="addToRentalCart({{ $product->id }})"
                                                     class="add-to-cart-button w-full bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
-                                                Ajouter au panier location
+                                                {{ __('app.wishlist.add_to_cart') }}
                                             </button>
                                         @elseif($product->type === 'sale')
                                             <div class="flex space-x-2">
                                                 <button onclick="addToCartFromWishlist({{ $product->id }})" 
                                                         class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
-                                                    Ajouter au panier
+                                                    {{ __('app.wishlist.add_to_cart') }}
                                                 </button>
                                                 <button onclick="buyNowFromWishlist({{ $product->id }})" 
                                                         class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
-                                                    Acheter
+                                                    {{ __('app.wishlist.buy_now') }}
                                                 </button>
                                             </div>
                                         @elseif($product->type === 'both')
                                             <div class="flex space-x-2">
                                                 <button onclick="addToCartFromWishlist({{ $product->id }})" 
                                                         class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
-                                                    Ajouter au panier
+                                                    {{ __('app.wishlist.add_to_cart') }}
                                                 </button>
                                                 <button onclick="buyNowFromWishlist({{ $product->id }})" 
                                                         class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
-                                                    Acheter
+                                                    {{ __('app.wishlist.buy_now') }}
                                                 </button>
                                             </div>
                                             <button @click="addToRentalCart({{ $product->id }})"
                                                     class="add-to-cart-button w-full bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all">
-                                                Louer
+                                                {{ __('app.wishlist.rent_now') }}
                                             </button>
                                         @endif
                                     @else
                                         <button disabled 
                                                 class="w-full bg-gray-300 text-gray-500 py-2 px-4 rounded-lg text-sm font-medium cursor-not-allowed">
-                                            Produit indisponible
+                                            {{ __('app.wishlist.product_unavailable') }}
                                         </button>
                                     @endif
                                     
@@ -258,10 +258,10 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
                     <h3 class="text-xl font-semibold text-gray-900 mb-2">
-                        Votre liste de souhaits est vide
+                        {{ __('app.wishlist.empty_title') }}
                     </h3>
                     <p class="text-gray-600 mb-6">
-                        Découvrez nos produits et ajoutez vos favoris en cliquant sur le cœur
+                        {{ __('app.wishlist.empty_description') }}
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
                         <a href="{{ route('products.index') }}" 
@@ -269,14 +269,14 @@
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                             </svg>
-                            Voir tous les produits
+                            {{ __('app.products.view_all_products') }}
                         </a>
                         <a href="{{ route('rentals.index') }}" 
                            class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            Locations disponibles
+                            {{ __('app.rentals.available_rentals') }}
                         </a>
                     </div>
                 </div>
@@ -514,13 +514,13 @@ window.addToCartFromWishlist = async function(productId) {
             updateCartCount(data.cart_count);
             
             // Afficher message de succès
-            showNotification('Produit ajouté au panier !', 'success');
+            showNotification('{{ __('app.wishlist.added_to_cart_success') }}', 'success');
         } else {
-            showNotification(data.message || 'Erreur lors de l\'ajout au panier', 'error');
+            showNotification(data.message || '{{ __('app.wishlist.add_to_cart_error') }}', 'error');
         }
     } catch (error) {
         console.error('Erreur:', error);
-        showNotification('Erreur lors de l\'ajout au panier', 'error');
+        showNotification('{{ __('app.wishlist.add_to_cart_error') }}', 'error');
     }
 }
 
@@ -554,11 +554,11 @@ window.buyNowFromWishlist = async function(productId) {
             // Rediriger vers le panier
             window.location.href = '/cart';
         } else {
-            showNotification(data.message || 'Erreur lors de l\'ajout au panier', 'error');
+            showNotification(data.message || '{{ __('app.wishlist.add_to_cart_error') }}', 'error');
         }
     } catch (error) {
         console.error('Erreur:', error);
-        showNotification('Erreur lors de l\'ajout au panier', 'error');
+        showNotification('{{ __('app.wishlist.add_to_cart_error') }}', 'error');
     }
 }
 

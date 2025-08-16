@@ -591,6 +591,33 @@ return array (
     'delete' => 'Supprimer',
   ),
   
+  'wishlist' => 
+  array (
+    'title' => 'Ma Liste de Souhaits',
+    'product_singular' => 'produit dans votre liste',
+    'products_plural' => 'produits dans votre liste',
+    'clear_list' => 'Vider la liste',
+    'add_all_to_cart' => 'Tout ajouter au panier',
+    'added_on' => 'Ajouté le',
+    'remove_from_wishlist' => 'Retirer de la liste',
+    'add_to_cart' => 'Ajouter au panier',
+    'buy_now' => 'Acheter maintenant',
+    'rent_now' => 'Louer maintenant',
+    'view_product' => 'Voir le produit',
+    'empty_title' => 'Votre liste de souhaits est vide',
+    'empty_description' => 'Découvrez nos produits et ajoutez vos favoris en cliquant sur le cœur',
+    'browse_products' => 'Parcourir les produits',
+    'per_day' => 'par jour',
+    'deposit' => 'Caution',
+    'in_stock' => 'En stock',
+    'limited_stock' => 'Stock limité',
+    'low_stock' => 'Stock faible',
+    'out_of_stock' => 'Rupture de stock',
+    'product_unavailable' => 'Produit indisponible',
+    'added_to_cart_success' => 'Produit ajouté au panier !',
+    'add_to_cart_error' => 'Erreur lors de l\'ajout au panier',
+  ),
+  
   'buttons' => 
   array (
     'delete' => 'Supprimer',

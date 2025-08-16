@@ -625,6 +625,33 @@ return array (
     'delete' => 'Delete',
   ),
   
+  'wishlist' => 
+  array (
+    'title' => 'My Wishlist',
+    'product_singular' => 'product in your list',
+    'products_plural' => 'products in your list',
+    'clear_list' => 'Clear list',
+    'add_all_to_cart' => 'Add all to cart',
+    'added_on' => 'Added on',
+    'remove_from_wishlist' => 'Remove from list',
+    'add_to_cart' => 'Add to cart',
+    'buy_now' => 'Buy now',
+    'rent_now' => 'Rent now',
+    'view_product' => 'View product',
+    'empty_title' => 'Your wishlist is empty',
+    'empty_description' => 'Discover our products and add your favorites by clicking on the heart',
+    'browse_products' => 'Browse products',
+    'per_day' => 'per day',
+    'deposit' => 'Deposit',
+    'in_stock' => 'In stock',
+    'limited_stock' => 'Limited stock',
+    'low_stock' => 'Low stock',
+    'out_of_stock' => 'Out of stock',
+    'product_unavailable' => 'Product unavailable',
+    'added_to_cart_success' => 'Product added to cart!',
+    'add_to_cart_error' => 'Error adding to cart',
+  ),
+  
   'buttons' => 
   array (
     'delete' => 'Delete',
