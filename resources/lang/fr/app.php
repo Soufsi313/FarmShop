@@ -444,6 +444,73 @@ return array (
     'out_of_stock' => 'Rupture de stock',
     'limited_stock' => 'Stock limité',
   ),
+  'contact' => 
+  array (
+    'page_title' => 'Contactez-nous',
+    'page_subtitle' => 'Une question ? Un projet ? Notre équipe est là pour vous accompagner dans tous vos besoins agricoles.',
+    'form_title' => 'Envoyez-nous un message',
+    
+    // Formulaire
+    'full_name' => 'Nom complet',
+    'full_name_required' => 'Nom complet *',
+    'email' => 'Email',
+    'email_required' => 'Email *',
+    'phone' => 'Téléphone',
+    'reason' => 'Motif de contact',
+    'reason_required' => 'Motif de contact *',
+    'priority' => 'Priorité',
+    'subject' => 'Sujet',
+    'subject_required' => 'Sujet *',
+    'subject_placeholder' => 'Résumez votre demande en quelques mots',
+    'message' => 'Message',
+    'message_required' => 'Message *',
+    'message_placeholder' => 'Décrivez votre demande en détail (minimum 10 caractères)',
+    'character_count' => 'caractères',
+    'send_message' => 'Envoyer le message',
+    'sending' => 'Envoi en cours...',
+    
+    // Options du formulaire
+    'select_reason' => '-- Sélectionnez un motif --',
+    'reason_profile' => 'Mon profil',
+    'reason_purchases' => 'Mes achats',
+    'reason_rentals' => 'Mes locations',
+    'reason_data' => 'Mes données personnelles',
+    'reason_technical' => 'Support technique',
+    'reason_partnership' => 'Partenariat',
+    'reason_other' => 'Autre demande',
+    
+    'priority_normal' => 'Normale',
+    'priority_low' => 'Faible',
+    'priority_high' => 'Élevée',
+    'priority_urgent' => 'Urgente',
+    
+    // Informations de contact
+    'coordinates_title' => 'Nos coordonnées',
+    'address' => 'Adresse',
+    'address_value' => 'Avenue de la ferme 123<br>1000 Bruxelles, Belgique',
+    'phone_value' => '+32 2 123 45 67',
+    'email_value' => 's.mef2703@gmail.com',
+    
+    // Horaires
+    'opening_hours_title' => 'Horaires d\'ouverture',
+    'monday_friday' => 'Lundi - Vendredi',
+    'saturday' => 'Samedi',
+    'sunday' => 'Dimanche',
+    'closed' => 'Fermé',
+    'hours_weekdays' => '8h00 - 18h00',
+    'hours_saturday' => '9h00 - 12h00',
+    
+    // Temps de réponse
+    'response_time_title' => 'Temps de réponse',
+    'response_time_text' => 'Nous nous engageons à vous répondre dans les <strong>24 à 48 heures</strong> suivant la réception de votre message.',
+    'urgent_note' => 'Pour les demandes urgentes, n\'hésitez pas à nous appeler directement.',
+    
+    // Messages JavaScript
+    'error_title' => 'Erreur',
+    'connection_error_title' => 'Erreur de connexion',
+    'form_error' => 'Une erreur est survenue',
+    'connection_error' => 'Impossible d\'envoyer le message. Veuillez réessayer.',
+  ),
   'messages' => 
   array (
     'thank_you' => 'Merci pour votre message',

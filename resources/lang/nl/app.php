@@ -508,6 +508,73 @@ return array (
     'reject_all' => 'Alles weigeren',
     'save_choices' => 'Mijn keuzes opslaan',
   ),
+  'contact' => 
+  array (
+    'page_title' => 'Neem contact met ons op',
+    'page_subtitle' => 'Een vraag? Een project? Ons team staat klaar om u te ondersteunen bij al uw landbouwbehoeften.',
+    'form_title' => 'Stuur ons een bericht',
+    
+    // Formulier
+    'full_name' => 'Volledige naam',
+    'full_name_required' => 'Volledige naam *',
+    'email' => 'E-mail',
+    'email_required' => 'E-mail *',
+    'phone' => 'Telefoon',
+    'reason' => 'Contactreden',
+    'reason_required' => 'Contactreden *',
+    'priority' => 'Prioriteit',
+    'subject' => 'Onderwerp',
+    'subject_required' => 'Onderwerp *',
+    'subject_placeholder' => 'Vat uw verzoek samen in enkele woorden',
+    'message' => 'Bericht',
+    'message_required' => 'Bericht *',
+    'message_placeholder' => 'Beschrijf uw verzoek in detail (minimaal 10 tekens)',
+    'character_count' => 'tekens',
+    'send_message' => 'Bericht verzenden',
+    'sending' => 'Verzenden...',
+    
+    // Formulieropties
+    'select_reason' => '-- Selecteer een reden --',
+    'reason_profile' => 'Mijn profiel',
+    'reason_purchases' => 'Mijn aankopen',
+    'reason_rentals' => 'Mijn verhuur',
+    'reason_data' => 'Mijn persoonlijke gegevens',
+    'reason_technical' => 'Technische ondersteuning',
+    'reason_partnership' => 'Partnerschap',
+    'reason_other' => 'Ander verzoek',
+    
+    'priority_normal' => 'Normaal',
+    'priority_low' => 'Laag',
+    'priority_high' => 'Hoog',
+    'priority_urgent' => 'Urgent',
+    
+    // Contactinformatie
+    'coordinates_title' => 'Onze coördinaten',
+    'address' => 'Adres',
+    'address_value' => 'Boerderij Laan 123<br>1000 Brussel, België',
+    'phone_value' => '+32 2 123 45 67',
+    'email_value' => 's.mef2703@gmail.com',
+    
+    // Openingstijden
+    'opening_hours_title' => 'Openingstijden',
+    'monday_friday' => 'Maandag - Vrijdag',
+    'saturday' => 'Zaterdag',
+    'sunday' => 'Zondag',
+    'closed' => 'Gesloten',
+    'hours_weekdays' => '8:00 - 18:00',
+    'hours_saturday' => '9:00 - 12:00',
+    
+    // Reactietijd
+    'response_time_title' => 'Reactietijd',
+    'response_time_text' => 'Wij verbinden ons ertoe om u binnen <strong>24 tot 48 uur</strong> na ontvangst van uw bericht te antwoorden.',
+    'urgent_note' => 'Voor urgente verzoeken kunt u ons gerust rechtstreeks bellen.',
+    
+    // JavaScript berichten
+    'error_title' => 'Fout',
+    'connection_error_title' => 'Verbindingsfout',
+    'form_error' => 'Er is een fout opgetreden',
+    'connection_error' => 'Kan bericht niet verzenden. Probeer het opnieuw.',
+  ),
   
   // Product vertalingen per slug
   'product_names' => [

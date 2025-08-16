@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Contact - FarmShop')
+@section('title', __('app.contact.page_title') . ' - FarmShop')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-orange-100 via-green-50 to-orange-100 py-12">
@@ -8,10 +8,10 @@
         <!-- En-tête -->
         <div class="text-center mb-12">
             <h1 class="text-4xl font-bold text-green-800 mb-4">
-                📞 Contactez-nous
+                📞 {{ __('app.contact.page_title') }}
             </h1>
             <p class="text-xl text-orange-600 max-w-2xl mx-auto">
-                Une question ? Un projet ? Notre équipe est là pour vous accompagner dans tous vos besoins agricoles.
+                {{ __('app.contact.page_subtitle') }}
             </p>
         </div>
 
@@ -19,7 +19,7 @@
             <!-- Formulaire de contact -->
             <div class="bg-white rounded-xl shadow-lg p-8">
                 <h2 class="text-2xl font-bold text-green-700 mb-6">
-                    ✉️ Envoyez-nous un message
+                    ✉️ {{ __('app.contact.form_title') }}
                 </h2>
                 
                 <form id="contactForm" action="/api/contact" method="POST">
@@ -29,14 +29,14 @@
                     <div class="grid md:grid-cols-2 gap-6 mb-6">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                                Nom complet *
+                                {{ __('app.contact.full_name_required') }}
                             </label>
                             <input type="text" id="name" name="name" required
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                         </div>
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                                Email *
+                                {{ __('app.contact.email_required') }}
                             </label>
                             <input type="email" id="email" name="email" required
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
@@ -45,7 +45,7 @@
 
                     <div class="mb-6">
                         <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                            Téléphone
+                            {{ __('app.contact.phone') }}
                         </label>
                         <input type="tel" id="phone" name="phone"
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
@@ -55,52 +55,52 @@
                     <div class="grid md:grid-cols-2 gap-6 mb-6">
                         <div>
                             <label for="reason" class="block text-sm font-medium text-gray-700 mb-2">
-                                Motif de contact *
+                                {{ __('app.contact.reason_required') }}
                             </label>
                             <select id="reason" name="reason" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                                <option value="">-- Sélectionnez un motif --</option>
-                                <option value="mon_profil">Mon profil</option>
-                                <option value="mes_achats">Mes achats</option>
-                                <option value="mes_locations">Mes locations</option>
-                                <option value="mes_donnees">Mes données personnelles</option>
-                                <option value="support_technique">Support technique</option>
-                                <option value="partenariat">Partenariat</option>
-                                <option value="autre">Autre demande</option>
+                                <option value="">{{ __('app.contact.select_reason') }}</option>
+                                <option value="mon_profil">{{ __('app.contact.reason_profile') }}</option>
+                                <option value="mes_achats">{{ __('app.contact.reason_purchases') }}</option>
+                                <option value="mes_locations">{{ __('app.contact.reason_rentals') }}</option>
+                                <option value="mes_donnees">{{ __('app.contact.reason_data') }}</option>
+                                <option value="support_technique">{{ __('app.contact.reason_technical') }}</option>
+                                <option value="partenariat">{{ __('app.contact.reason_partnership') }}</option>
+                                <option value="autre">{{ __('app.contact.reason_other') }}</option>
                             </select>
                         </div>
                         <div>
                             <label for="priority" class="block text-sm font-medium text-gray-700 mb-2">
-                                Priorité
+                                {{ __('app.contact.priority') }}
                             </label>
                             <select id="priority" name="priority"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                                <option value="normal">Normale</option>
-                                <option value="low">Faible</option>
-                                <option value="high">Élevée</option>
-                                <option value="urgent">Urgente</option>
+                                <option value="normal">{{ __('app.contact.priority_normal') }}</option>
+                                <option value="low">{{ __('app.contact.priority_low') }}</option>
+                                <option value="high">{{ __('app.contact.priority_high') }}</option>
+                                <option value="urgent">{{ __('app.contact.priority_urgent') }}</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="mb-6">
                         <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">
-                            Sujet *
+                            {{ __('app.contact.subject_required') }}
                         </label>
                         <input type="text" id="subject" name="subject" required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                               placeholder="Résumez votre demande en quelques mots">
+                               placeholder="{{ __('app.contact.subject_placeholder') }}">
                     </div>
 
                     <div class="mb-6">
                         <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
-                            Message *
+                            {{ __('app.contact.message_required') }}
                         </label>
                         <textarea id="message" name="message" rows="6" required
                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                  placeholder="Décrivez votre demande en détail (minimum 10 caractères)"></textarea>
+                                  placeholder="{{ __('app.contact.message_placeholder') }}"></textarea>
                         <div class="text-sm text-gray-500 mt-1">
-                            <span id="charCount">0</span>/2000 caractères
+                            <span id="charCount">0</span>/2000 {{ __('app.contact.character_count') }}
                         </div>
                     </div>
 
@@ -109,8 +109,8 @@
 
                     <button type="submit" id="submitBtn"
                             class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                        <span id="submitText">📤 Envoyer le message</span>
-                        <span id="loadingText" class="hidden">⏳ Envoi en cours...</span>
+                        <span id="submitText">📤 {{ __('app.contact.send_message') }}</span>
+                        <span id="loadingText" class="hidden">⏳ {{ __('app.contact.sending') }}</span>
                     </button>
                 </form>
             </div>
@@ -120,28 +120,28 @@
                 <!-- Coordonnées -->
                 <div class="bg-white rounded-xl shadow-lg p-8">
                     <h3 class="text-xl font-bold text-green-700 mb-6">
-                        📍 Nos coordonnées
+                        📍 {{ __('app.contact.coordinates_title') }}
                     </h3>
                     <div class="space-y-4">
                         <div class="flex items-start space-x-3">
                             <div class="text-orange-500 text-xl">🏢</div>
                             <div>
-                                <h4 class="font-medium text-gray-900">{{ __("app.forms.address") }}<//h4>
-                                <p class="text-gray-600">Avenue de la ferme 123<br>1000 Bruxelles, Belgique</p>
+                                <h4 class="font-medium text-gray-900">{{ __('app.contact.address') }}</h4>
+                                <p class="text-gray-600">{!! __('app.contact.address_value') !!}</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
                             <div class="text-orange-500 text-xl">📞</div>
                             <div>
-                                <h4 class="font-medium text-gray-900">{{ __("app.forms.phone") }}<//h4>
-                                <p class="text-gray-600">+32 2 123 45 67</p>
+                                <h4 class="font-medium text-gray-900">{{ __('app.contact.phone') }}</h4>
+                                <p class="text-gray-600">{{ __('app.contact.phone_value') }}</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
                             <div class="text-orange-500 text-xl">✉️</div>
                             <div>
-                                <h4 class="font-medium text-gray-900">{{ __("app.forms.email") }}<//h4>
-                                <p class="text-gray-600">s.mef2703@gmail.com</p>
+                                <h4 class="font-medium text-gray-900">{{ __('app.contact.email') }}</h4>
+                                <p class="text-gray-600">{{ __('app.contact.email_value') }}</p>
                             </div>
                         </div>
                     </div>
@@ -150,20 +150,20 @@
                 <!-- Horaires -->
                 <div class="bg-white rounded-xl shadow-lg p-8">
                     <h3 class="text-xl font-bold text-green-700 mb-6">
-                        🕒 Horaires d'ouverture
+                        🕒 {{ __('app.contact.opening_hours_title') }}
                     </h3>
                     <div class="space-y-3">
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Lundi - Vendredi</span>
-                            <span class="font-medium">8h00 - 18h00</span>
+                            <span class="text-gray-600">{{ __('app.contact.monday_friday') }}</span>
+                            <span class="font-medium">{{ __('app.contact.hours_weekdays') }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Samedi</span>
-                            <span class="font-medium">9h00 - 12h00</span>
+                            <span class="text-gray-600">{{ __('app.contact.saturday') }}</span>
+                            <span class="font-medium">{{ __('app.contact.hours_saturday') }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Dimanche</span>
-                            <span class="text-red-500">Fermé</span>
+                            <span class="text-gray-600">{{ __('app.contact.sunday') }}</span>
+                            <span class="text-red-500">{{ __('app.contact.closed') }}</span>
                         </div>
                     </div>
                 </div>
@@ -171,13 +171,13 @@
                 <!-- Temps de réponse -->
                 <div class="bg-gradient-to-r from-green-500 to-orange-500 rounded-xl shadow-lg p-8 text-white">
                     <h3 class="text-xl font-bold mb-4">
-                        ⚡ Temps de réponse
+                        ⚡ {{ __('app.contact.response_time_title') }}
                     </h3>
                     <p class="mb-4">
-                        Nous nous engageons à vous répondre dans les <strong>24 à 48 heures</strong> suivant la réception de votre message.
+                        {!! __('app.contact.response_time_text') !!}
                     </p>
                     <p class="text-sm opacity-90">
-                        Pour les demandes urgentes, n'hésitez pas à nous appeler directement.
+                        {{ __('app.contact.urgent_note') }}
                     </p>
                 </div>
             </div>
@@ -244,10 +244,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Rediriger vers la page de confirmation
                 window.location.href = '/contact/confirmation';
             } else {
-                showAlert('error', '❌ Erreur', result.message || 'Une erreur est survenue');
+                showAlert('error', '❌ {{ __('app.contact.error_title') }}', result.message || '{{ __('app.contact.form_error') }}');
             }
         } catch (error) {
-            showAlert('error', '❌ Erreur de connexion', 'Impossible d\'envoyer le message. Veuillez réessayer.');
+            showAlert('error', '❌ {{ __('app.contact.connection_error_title') }}', '{{ __('app.contact.connection_error') }}');
         } finally {
             // Réactiver le bouton
             submitBtn.disabled = false;

@@ -478,6 +478,73 @@ return array (
     'out_of_stock' => 'Out of stock',
     'limited_stock' => 'Limited stock',
   ),
+  'contact' => 
+  array (
+    'page_title' => 'Contact Us',
+    'page_subtitle' => 'Have a question? A project? Our team is here to support you with all your agricultural needs.',
+    'form_title' => 'Send us a message',
+    
+    // Form
+    'full_name' => 'Full name',
+    'full_name_required' => 'Full name *',
+    'email' => 'Email',
+    'email_required' => 'Email *',
+    'phone' => 'Phone',
+    'reason' => 'Contact reason',
+    'reason_required' => 'Contact reason *',
+    'priority' => 'Priority',
+    'subject' => 'Subject',
+    'subject_required' => 'Subject *',
+    'subject_placeholder' => 'Summarize your request in a few words',
+    'message' => 'Message',
+    'message_required' => 'Message *',
+    'message_placeholder' => 'Describe your request in detail (minimum 10 characters)',
+    'character_count' => 'characters',
+    'send_message' => 'Send message',
+    'sending' => 'Sending...',
+    
+    // Form options
+    'select_reason' => '-- Select a reason --',
+    'reason_profile' => 'My profile',
+    'reason_purchases' => 'My purchases',
+    'reason_rentals' => 'My rentals',
+    'reason_data' => 'My personal data',
+    'reason_technical' => 'Technical support',
+    'reason_partnership' => 'Partnership',
+    'reason_other' => 'Other request',
+    
+    'priority_normal' => 'Normal',
+    'priority_low' => 'Low',
+    'priority_high' => 'High',
+    'priority_urgent' => 'Urgent',
+    
+    // Contact information
+    'coordinates_title' => 'Our coordinates',
+    'address' => 'Address',
+    'address_value' => 'Farm Avenue 123<br>1000 Brussels, Belgium',
+    'phone_value' => '+32 2 123 45 67',
+    'email_value' => 's.mef2703@gmail.com',
+    
+    // Opening hours
+    'opening_hours_title' => 'Opening hours',
+    'monday_friday' => 'Monday - Friday',
+    'saturday' => 'Saturday',
+    'sunday' => 'Sunday',
+    'closed' => 'Closed',
+    'hours_weekdays' => '8:00 AM - 6:00 PM',
+    'hours_saturday' => '9:00 AM - 12:00 PM',
+    
+    // Response time
+    'response_time_title' => 'Response time',
+    'response_time_text' => 'We are committed to responding to you within <strong>24 to 48 hours</strong> of receiving your message.',
+    'urgent_note' => 'For urgent requests, please feel free to call us directly.',
+    
+    // JavaScript messages
+    'error_title' => 'Error',
+    'connection_error_title' => 'Connection error',
+    'form_error' => 'An error occurred',
+    'connection_error' => 'Unable to send message. Please try again.',
+  ),
   'messages' => 
   array (
     'thank_you' => 'Thank you for your message',
