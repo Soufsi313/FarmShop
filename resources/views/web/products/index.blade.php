@@ -370,11 +370,11 @@
                                                 <div class="flex space-x-2">
                                                     <button disabled 
                                                             class="flex-1 bg-gray-300 text-gray-500 px-3 py-2 rounded-md text-sm font-medium cursor-not-allowed">
-                                                        Indisponible
+                                                        {{ __('app.content.unavailable') }}
                                                     </button>
                                                     <button disabled 
                                                             class="flex-1 bg-gray-300 text-gray-500 px-3 py-2 rounded-md text-sm font-medium cursor-not-allowed">
-                                                        Indisponible
+                                                        {{ __('app.content.unavailable') }}
                                                     </button>
                                                 </div>
                                             </div>

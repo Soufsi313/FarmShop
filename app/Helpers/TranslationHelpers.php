@@ -19,7 +19,7 @@ if (!function_exists('trans_db')) {
 
 if (!function_exists('trans_product')) {
     /**
-     * Traduit un produit
+     * Traduit un produit en utilisant les fichiers de langue Laravel
      */
     function trans_product($product, $field = 'name', $locale = null)
     {
@@ -29,6 +29,20 @@ if (!function_exists('trans_product')) {
             return $product->{$field};
         }
         
+        // Utiliser les fichiers de langue Laravel pour les traductions
+        if ($field === 'name') {
+            $translation = __('app.product_names.' . $product->slug, [], $locale);
+            if ($translation !== 'app.product_names.' . $product->slug) {
+                return $translation;
+            }
+        } elseif ($field === 'description') {
+            $translation = __('app.product_descriptions.' . $product->slug, [], $locale);
+            if ($translation !== 'app.product_descriptions.' . $product->slug) {
+                return $translation;
+            }
+        }
+        
+        // Fallback vers l'ancienne méthode base de données si pas de traduction dans les fichiers
         $translation = DB::table('product_translations')
             ->where('product_id', $product->id)
             ->where('locale', $locale)

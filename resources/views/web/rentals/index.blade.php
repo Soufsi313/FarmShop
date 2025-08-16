@@ -45,9 +45,14 @@
     <div class="bg-gradient-to-r from-purple-600 to-purple-800 text-white py-16">
         <div class="container mx-auto px-4">
             <div class="text-center">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">🚜 Nos Locations</h1>
-                <p class="text-xl text-purple-100 max-w-2xl mx-auto">
-                    Découvrez notre gamme complète d'équipements agricoles à louer
+                <h1 class="text-4xl font-bold text-white mb-4">
+                    {{ __('app.rentals.title') }}
+                </h1>
+                <p class="text-xl text-purple-100 mb-8">
+                    {{ __('app.rentals.subtitle') }}
+                </p>
+                <p class="text-lg text-purple-200">
+                    {{ __('app.rentals.hero_description') }}
                 </p>
             </div>
         </div>
@@ -59,34 +64,34 @@
             <!-- Sidebar Filtres -->
             <aside class="lg:w-1/4">
                 <div class="bg-white rounded-lg shadow p-6 sticky top-8">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Filtres</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.rentals.filters') }}</h3>
                     
                     <form id="filterForm" method="GET" action="{{ route('rentals.index') }}">
                         <!-- Recherche -->
                         <div class="mb-6">
                             <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
-                                Rechercher
+                                {{ __('app.rentals.search') }}
                             </label>
                             <input type="text" 
                                    id="search" 
                                    name="search" 
                                    value="{{ request('search') }}"
-                                   placeholder="Nom du produit..."
+                                   placeholder="{{ __('app.rentals.search_placeholder') }}"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
                         </div>
 
                         <!-- Catégories de location -->
                         <div class="mb-6">
                             <label for="rental_category" class="block text-sm font-medium text-gray-700 mb-2">
-                                Catégorie
+                                {{ __('app.rentals.category') }}
                             </label>
                             <select id="rental_category" 
                                     name="rental_category" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                <option value="">Toutes les catégories</option>
+                                <option value="">{{ __('app.rentals.all_categories') }}</option>
                                 @foreach($rentalCategories as $category)
                                     <option value="{{ $category->id }}" {{ request('rental_category') == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
+                                        {{ __('app.rental_categories.' . $category->slug, [], null) ?? $category->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -95,19 +100,19 @@
                         <!-- Prix par jour -->
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Prix par jour
+                                {{ __('app.rentals.price_per_day') }}
                             </label>
                             <div class="grid grid-cols-2 gap-2">
                                 <input type="number" 
                                        name="min_price" 
                                        value="{{ request('min_price') }}"
-                                       placeholder="Min €"
+                                       placeholder="{{ __('app.rentals.min_price') }}"
                                        step="0.01"
                                        class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
                                 <input type="number" 
                                        name="max_price" 
                                        value="{{ request('max_price') }}"
-                                       placeholder="Max €"
+                                       placeholder="{{ __('app.rentals.max_price') }}"
                                        step="0.01"
                                        class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
                             </div>
@@ -116,25 +121,26 @@
                         <!-- Tri -->
                         <div class="mb-6">
                             <label for="sort" class="block text-sm font-medium text-gray-700 mb-2">
-                                Trier par
+                                {{ __('app.rentals.sort_by') }}
                             </label>
                             <select id="sort" 
                                     name="sort" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Nom A-Z</option>
-                                <option value="price" {{ request('sort') == 'price' ? 'selected' : '' }}>Prix croissant</option>
-                                <option value="popularity" {{ request('sort') == 'popularity' ? 'selected' : '' }}>Popularité</option>
-                                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Plus récents</option>
+                                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>{{ __('app.rentals.sort_name') }}</option>
+                                <option value="price" {{ request('sort') == 'price' ? 'selected' : '' }}>{{ __('app.rentals.sort_price') }}</option>
+                                <option value="popularity" {{ request('sort') == 'popularity' ? 'selected' : '' }}>{{ __('app.rentals.sort_popularity') }}</option>
+                                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>{{ __('app.rentals.sort_newest') }}</option>
                             </select>
                         </div>
 
                         <div class="flex space-x-2">
                             <button type="submit" 
                                     class="flex-1 bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
-                                🔍 Filtrer
+                                🔍 {{ __('app.rentals.filter_button') }}
                             </button>
                             <a href="{{ route('rentals.index') }}" 
-                               class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors">
+                               class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
+                               title="{{ __('app.rentals.reset_filters') }}">
                                 ↻
                             </a>
                         </div>
@@ -148,9 +154,9 @@
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <p class="text-gray-600">
-                            <strong>{{ $products->total() }}</strong> produit(s) trouvé(s)
+                            <strong>{{ $products->total() }}</strong> {{ __('app.rentals.products_found') }}
                             @if(request()->hasAny(['search', 'rental_category', 'min_price', 'max_price']))
-                                <span class="text-sm">(filtrés)</span>
+                                <span class="text-sm">{{ __('app.rentals.filtered') }}</span>
                             @endif
                         </p>
                     </div>
@@ -158,12 +164,12 @@
                     @auth
                         <div class="flex items-center space-x-4">
                             <a href="{{ route('products.index') }}" class="text-green-600 hover:text-green-800 transition-colors">
-                                🛒 Produits d'achat
+                                🛒 {{ __('app.rentals.purchase_products') }}
                             </a>
                             <button id="cart-location-btn" 
                                     class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
                                     x-on:click="showCartLocation = true">
-                                📋 Panier location (<span x-text="cartLocationCount">0</span>)
+                                📋 {{ __('app.rentals.cart_rental') }} (<span x-text="cartLocationCount">0</span>)
                             </button>
                         </div>
                     @endauth
@@ -190,7 +196,7 @@
                                         <!-- Badge catégorie -->
                                         @if($product->rentalCategory)
                                             <div class="absolute top-2 left-2 bg-purple-600 text-white px-2 py-1 rounded-md text-xs font-medium">
-                                                {{ $product->rentalCategory->name }}
+                                                {{ __('app.rental_categories.' . $product->rentalCategory->slug, [], null) ?? $product->rentalCategory->name }}
                                             </div>
                                         @endif
 
@@ -198,13 +204,13 @@
                                         <div class="absolute top-2 right-2 px-2 py-1 rounded-md text-xs font-medium
                                                    {{ $product->rental_stock > 10 ? 'bg-green-100 text-green-800' : 
                                                       ($product->rental_stock > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
-                                            Stock: {{ $product->rental_stock }}
+                                            {{ __('app.rentals.stock') }}: {{ $product->rental_stock }}
                                         </div>
 
                                         <!-- Overlay "Voir détails" -->
                                         <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
                                             <span class="text-white font-semibold opacity-0 hover:opacity-100 transition-opacity duration-200">
-                                                👁️ Voir détails
+                                                👁️ {{ __('app.rentals.view_details') }}
                                             </span>
                                         </div>
                                     </div>
@@ -213,7 +219,7 @@
                                 <!-- Contenu -->
                                 <div class="p-4">
                                     <a href="{{ route('rentals.show', $product) }}" class="block">
-                                        <h3 class="font-semibold text-lg text-gray-900 mb-2 line-clamp-2 hover:text-purple-600 transition-colors">{{ $product->name }}</h3>
+                                        <h3 class="font-semibold text-lg text-gray-900 mb-2 line-clamp-2 hover:text-purple-600 transition-colors">{{ trans_product($product) }}</h3>
                                     </a>
                                     
                                     @if($product->short_description)
@@ -226,11 +232,11 @@
                                             <span class="text-2xl font-bold text-purple-600">
                                                 {{ number_format($product->rental_price_per_day, 2) }}€
                                             </span>
-                                            <span class="text-sm text-gray-500">/ jour</span>
+                                            <span class="text-sm text-gray-500">{{ __('app.rentals.per_day') }}</span>
                                         </div>
                                         @if($product->deposit_amount > 0)
                                             <p class="text-sm text-amber-600">
-                                                Caution : {{ number_format($product->deposit_amount, 2) }}€
+                                                {{ __('app.rentals.deposit') }} : {{ number_format($product->deposit_amount, 2) }}€
                                             </p>
                                         @endif
                                     </div>
@@ -238,7 +244,7 @@
                                     <!-- Contraintes -->
                                     <div class="text-xs text-gray-500 mb-3 space-y-1">
                                         @if($product->min_rental_days && $product->max_rental_days)
-                                            <p>📅 {{ $product->min_rental_days }}-{{ $product->max_rental_days }} jours</p>
+                                            <p>📅 {{ $product->min_rental_days }}-{{ $product->max_rental_days }} {{ __('app.rentals.days') }}</p>
                                         @endif
                                     </div>
 
@@ -248,7 +254,7 @@
                                             <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                         </svg>
                                         <span id="likes_count_{{ $product->slug }}">{{ $product->getLikesCount() }}</span>
-                                        <span>{{ $product->getLikesCount() === 1 ? 'like' : 'likes' }}</span>
+                                        <span>{{ $product->getLikesCount() === 1 ? __('app.rentals.like') : __('app.rentals.likes') }}</span>
                                     </div>
 
                                     <!-- Actions -->
@@ -260,14 +266,14 @@
                                                         onclick="toggleLike('{{ $product->slug }}')" 
                                                         class="flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors {{ $product->isLikedByUser() ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500' }}">
                                                     <span class="text-lg">{{ $product->isLikedByUser() ? '❤️' : '🤍' }}</span>
-                                                    <span>{{ $product->isLikedByUser() ? 'Aimé' : 'Aimer' }}</span>
+                                                    <span>{{ $product->isLikedByUser() ? __('app.rentals.liked') : __('app.rentals.like_action') }}</span>
                                                 </button>
                                                 
                                                 <button id="wishlist_btn_{{ $product->slug }}" 
                                                         onclick="toggleWishlist('{{ $product->slug }}')" 
                                                         class="flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors {{ $product->isInUserWishlist() ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-600 hover:bg-yellow-50 hover:text-yellow-500' }}">
                                                     <span class="text-lg">{{ $product->isInUserWishlist() ? '⭐' : '☆' }}</span>
-                                                    <span>{{ $product->isInUserWishlist() ? 'En favoris' : __("app.buttons.favorites") }}</span>
+                                                    <span>{{ $product->isInUserWishlist() ? __('app.rentals.favorites') : __('app.rentals.add_to_favorites') }}</span>
                                                 </button>
                                             </div>
                                         @endauth
@@ -294,17 +300,17 @@
                                                     data-product-slug="{{ $product->slug }}"
                                                     data-product-data="{{ json_encode(['id' => $product->id, 'slug' => $product->slug]) }}"
                                                     x-on:click="addToCartLocation('{{ $product->slug }}')">
-                                                ➕ Panier
+                                                ➕ {{ __('app.rentals.add_to_cart') }}
                                             </button>
 
                                             <button class="rent-now-btn px-3 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors text-sm font-medium"
                                                     x-on:click="rentNow({{ json_encode($product) }})">
-                                                🏠 Louer
+                                                🏠 {{ __('app.rentals.rent_now') }}
                                             </button>
                                         @else
                                             <a href="{{ route('login') }}" 
                                                class="w-full px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-center text-sm">
-                                                Se connecter pour louer
+                                                {{ __('app.rentals.login_to_rent') }}
                                             </a>
                                         @endauth
                                         </div>
@@ -324,11 +330,11 @@
                     <!-- Aucun résultat -->
                     <div class="text-center py-12">
                         <div class="text-6xl mb-4">🔍</div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Aucun produit trouvé</h3>
-                        <p class="text-gray-600 mb-4">Essayez de modifier vos critères de recherche</p>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ __('app.rentals.no_products') }}</h3>
+                        <p class="text-gray-600 mb-4">{{ __('app.rentals.no_products_message') }}</p>
                         <a href="{{ route('rentals.index') }}" 
                            class="inline-block px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors">
-                            Voir tous les produits
+                            {{ __('app.rentals.view_all_products') }}
                         </a>
                     </div>
                 @endif
@@ -350,7 +356,7 @@
         <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
              x-on:click.away="showRentalModal = false">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">📅 Choisir les dates de location</h3>
+                <h3 class="text-lg font-semibold text-gray-900">📅 {{ __('app.rentals.rental_period') }}</h3>
                 <button x-on:click="showRentalModal = false" class="text-gray-400 hover:text-gray-600">
                     <span class="sr-only">{{ __("app.buttons.close") }}</span>
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -364,13 +370,13 @@
                 <div class="bg-gray-50 p-3 rounded-md">
                     <h4 x-text="selectedProduct.name" class="font-medium text-gray-900"></h4>
                     <p class="text-sm text-gray-600">
-                        Prix: <span x-text="selectedProduct.rental_price_per_day" class="font-semibold text-purple-600"></span>€/jour
+                        {{ __('app.rentals.price_per_day') }}: <span x-text="selectedProduct.rental_price_per_day" class="font-semibold text-purple-600"></span>€{{ __('app.rentals.per_day') }}
                     </p>
                     <p class="text-sm text-gray-600">
-                        Caution: <span x-text="selectedProduct.deposit_amount" class="font-semibold text-amber-600"></span>€
+                        {{ __('app.rentals.deposit') }}: <span x-text="selectedProduct.deposit_amount" class="font-semibold text-amber-600"></span>€
                     </p>
                     <p class="text-sm text-gray-600">
-                        Durée: <span x-text="selectedProduct.min_rental_days + '-' + selectedProduct.max_rental_days"></span> jours
+                        {{ __('app.rentals.duration') }}: <span x-text="selectedProduct.min_rental_days + '-' + selectedProduct.max_rental_days"></span> {{ __('app.rentals.days') }}
                     </p>
                 </div>
 
@@ -395,7 +401,7 @@
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                     </div>
                     <div>
-                        <label for="modal-end-date" class="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
+                        <label for="modal-end-date" class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.rentals.end_date') }}</label>
                         <input type="date" 
                                x-model="rentalForm.endDate"
                                :min="rentalForm.startDate"
@@ -406,11 +412,11 @@
 
                 <!-- Calcul automatique -->
                 <div x-show="calculation.show" class="bg-blue-50 p-4 rounded-md">
-                    <h5 class="font-medium text-blue-900 mb-2">💰 Récapitulatif</h5>
+                    <h5 class="font-medium text-blue-900 mb-2">💰 {{ __('app.rentals.total_price') }}</h5>
                     <div class="space-y-1 text-sm">
                         <div class="flex justify-between">
-                            <span>Durée:</span>
-                            <span x-text="calculation.days + ' jour(s)'" class="font-medium"></span>
+                            <span>{{ __('app.rentals.duration') }}:</span>
+                            <span x-text="calculation.days + ' {{ __('app.rentals.days') }}'" class="font-medium"></span>
                         </div>
                         <div class="flex justify-between">
                             <span>Sous-total:</span>
@@ -421,11 +427,11 @@
                             <span x-text="calculation.tax.toFixed(2) + '€'" class="font-medium"></span>
                         </div>
                         <div class="flex justify-between">
-                            <span>Caution:</span>
+                            <span>{{ __('app.rentals.deposit') }}:</span>
                             <span x-text="calculation.deposit.toFixed(2) + '€'" class="font-medium text-amber-600"></span>
                         </div>
                         <div class="flex justify-between border-t pt-1 mt-2">
-                            <span class="font-semibold">Total à payer:</span>
+                            <span class="font-semibold">{{ __('app.rentals.total_price') }}:</span>
                             <span x-text="calculation.total.toFixed(2) + '€'" class="font-bold text-purple-600"></span>
                         </div>
                     </div>
@@ -447,11 +453,11 @@
                 <button x-on:click="confirmRental" 
                         :disabled="!calculation.valid"
                         class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                    🏠 Confirmer la location
+                    🏠 {{ __('app.rentals.confirm_rental') }}
                 </button>
                 <button x-on:click="showRentalModal = false" 
                         class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
-                    Annuler
+                    {{ __('app.rentals.cancel') }}
                 </button>
             </div>
         </div>
@@ -470,7 +476,7 @@
         <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
              x-on:click.away="showCartLocation = false">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">📋 Panier de location</h3>
+                <h3 class="text-lg font-semibold text-gray-900">📋 {{ __('app.rentals.cart_rental') }}</h3>
                 <button x-on:click="showCartLocation = false" class="text-gray-400 hover:text-gray-600">
                     <span class="sr-only">{{ __("app.buttons.close") }}</span>
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

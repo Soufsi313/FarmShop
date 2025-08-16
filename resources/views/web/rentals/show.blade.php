@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $product->name . ' - Location - FarmShop')
+@section('title', trans_product($product) . ' - Location - FarmShop')
 
 @push('styles')
 <style>
@@ -31,10 +31,10 @@
                 @if($product->rentalCategory)
                     <span>›</span>
                     <a href="{{ route('rentals.index', ['rental_category' => $product->rentalCategory->id]) }}" 
-                       class="hover:text-purple-600 transition-colors">{{ $product->rentalCategory->name }}</a>
+                       class="hover:text-purple-600 transition-colors">{{ __('app.rental_categories.' . $product->rentalCategory->slug) }}</a>
                 @endif
                 <span>›</span>
-                <span class="text-gray-900 font-medium">{{ $product->name }}</span>
+                <span class="text-gray-900 font-medium">{{ trans_product($product) }}</span>
             </nav>
         </div>
     </div>
@@ -86,11 +86,11 @@
                 <div class="flex space-x-4">
                     <a href="{{ route('rentals.index') }}" 
                        class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
-                        ← Retour aux locations
+                        {{ __('app.rentals.back_to_rentals') }}
                     </a>
                     <a href="{{ route('products.index') }}" 
                        class="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors">
-                        🛒 Voir les achats
+                        {{ __('app.rentals.view_purchases') }}
                     </a>
                 </div>
             </div>
@@ -103,12 +103,12 @@
                     @if($product->rentalCategory)
                         <div class="mb-2">
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-                                {{ $product->rentalCategory->name }}
+                                {{ __('app.rental_categories.' . $product->rentalCategory->slug) }}
                             </span>
                         </div>
                     @endif
                     
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $product->name }}</h1>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ trans_product($product) }}</h1>
                     <!-- Compteur de likes (visible par tous) -->
                     <div class="flex items-center space-x-2 text-lg text-gray-600 mb-4">
                         <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
@@ -149,18 +149,21 @@
                         </div>
                     @endauth
                     
-                    @if($product->short_description)
-                        <p class="text-lg text-gray-600">{{ $product->short_description }}</p>
+                    @php
+                        $shortDescription = trans_product($product, 'description');
+                    @endphp
+                    @if($shortDescription && strlen(trim($shortDescription)) > 0)
+                        <p class="text-lg text-gray-600">{{ $shortDescription }}</p>
                     @endif
 
                     <!-- État du stock -->
                     <div class="mt-4">
                         <div class="flex items-center space-x-3">
-                            <span class="text-sm font-medium text-gray-700">Disponibilité :</span>
+                            <span class="text-sm font-medium text-gray-700">{{ __('app.rentals.availability') }} :</span>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                        {{ $product->rental_stock > 10 ? 'bg-green-100 text-green-800' : 
                                           ($product->rental_stock > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
-                                {{ $product->rental_stock > 0 ? $product->rental_stock . ' en stock' : __("app.ecommerce.out_of_stock") }}
+                                {{ $product->rental_stock > 0 ? $product->rental_stock . ' ' . __('app.rentals.in_stock') : __("app.ecommerce.out_of_stock") }}
                             </span>
                         </div>
                     </div>
@@ -173,11 +176,11 @@
                         <div class="text-4xl font-bold text-purple-600 mb-1">
                             {{ number_format($product->rental_price_per_day, 2) }}€
                         </div>
-                        <div class="text-lg text-gray-600">par jour</div>
+                        <div class="text-lg text-gray-600">{{ __('app.rentals.per_day') }}</div>
                         
                         @if($product->deposit_amount > 0)
                             <div class="mt-2 text-amber-600">
-                                <span class="text-sm">Caution requise :</span>
+                                <span class="text-sm">{{ __('app.rentals.deposit_required') }} :</span>
                                 <span class="font-semibold">{{ number_format($product->deposit_amount, 2) }}€</span>
                             </div>
                         @endif
@@ -185,19 +188,19 @@
 
                     <!-- Contraintes de location -->
                     <div class="space-y-3">
-                        <h3 class="font-semibold text-gray-900">📋 Conditions de location</h3>
+                        <h3 class="font-semibold text-gray-900">📋 {{ __('app.rentals.rental_conditions') }}</h3>
                         
                         <div class="space-y-2">
                             @if($product->min_rental_days || $product->max_rental_days)
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600">Durée de location :</span>
+                                    <span class="text-sm text-gray-600">{{ __('app.rentals.rental_duration') }} :</span>
                                     <span class="constraint-badge">
                                         @if($product->min_rental_days && $product->max_rental_days)
-                                            {{ $product->min_rental_days }} - {{ $product->max_rental_days }} jours
+                                            {{ $product->min_rental_days }} - {{ $product->max_rental_days }} {{ __('app.rentals.days') }}
                                         @elseif($product->min_rental_days)
-                                            Minimum {{ $product->min_rental_days }} jour(s)
+                                            {{ __('app.rentals.minimum_days') }} {{ $product->min_rental_days }} {{ __('app.rentals.days') }}
                                         @elseif($product->max_rental_days)
-                                            Maximum {{ $product->max_rental_days }} jour(s)
+                                            {{ __('app.rentals.maximum_days') }} {{ $product->max_rental_days }} {{ __('app.rentals.days') }}
                                         @endif
                                     </span>
                                 </div>
@@ -205,8 +208,8 @@
                             
                             @if($product->advance_notice_days)
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600">Préavis requis :</span>
-                                    <span class="constraint-badge">{{ $product->advance_notice_days }} jour(s)</span>
+                                    <span class="text-sm text-gray-600">{{ __('app.rentals.advance_notice') }} :</span>
+                                    <span class="constraint-badge">{{ $product->advance_notice_days }} {{ __('app.rentals.days') }}</span>
                                 </div>
                             @endif
                         </div>
@@ -216,7 +219,7 @@
                         @if($product->rental_stock > 0)
                             <!-- Sélecteur de quantité -->
                             <div class="flex items-center justify-between">
-                                <label class="text-sm font-medium text-gray-700">Quantité :</label>
+                                <label class="text-sm font-medium text-gray-700">{{ __('app.rentals.quantity_label') }} :</label>
                                 <div class="flex items-center space-x-3">
                                     <button type="button" 
                                             x-on:click="decreaseQuantity()" 
@@ -240,30 +243,30 @@
                             <div class="space-y-3">
                                 <button x-on:click="addToCartLocation()" 
                                         class="w-full px-6 py-3 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors font-medium">
-                                    🛒 Ajouter au panier (<span x-text="quantity"></span> unité<span x-show="quantity > 1">s</span>)
+                                    🛒 {{ __('app.rentals.add_to_cart_with_qty') }} (<span x-text="quantity"></span> <span x-text="quantity > 1 ? '{{ __('app.rentals.units') }}' : '{{ __('app.rentals.unit') }}'"></span>)
                                 </button>
-                                <p class="text-xs text-gray-500 text-center">Ajoutez les quantités souhaitées à votre panier</p>
+                                <p class="text-xs text-gray-500 text-center">{{ __('app.rentals.add_to_cart_description') }}</p>
                                 
                                 <button x-on:click="showRentalModal = true" 
                                         class="w-full px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors font-medium">
-                                    ⚡ Louer maintenant (1 unité)
+                                    ⚡ {{ __('app.rentals.rent_now') }} (1 {{ __('app.rentals.unit') }})
                                 </button>
-                                <p class="text-xs text-gray-400 text-center">Ajout rapide d'1 unité et redirection vers le panier</p>
+                                <p class="text-xs text-gray-400 text-center">{{ __('app.rentals.rent_now_description') }}</p>
                             </div>
                         @else
                             <div class="text-center py-4">
-                                <p class="text-red-600 font-medium">❌ Produit indisponible</p>
-                                <p class="text-sm text-gray-500 mt-1">Ce produit n'est actuellement pas en stock</p>
+                                <p class="text-red-600 font-medium">❌ {{ __('app.rentals.product_unavailable') }}</p>
+                                <p class="text-sm text-gray-500 mt-1">{{ __('app.rentals.product_out_of_stock') }}</p>
                             </div>
                         @endif
                     @else
                         <div class="space-y-3">
                             <a href="{{ route('login') }}" 
                                class="block w-full px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium text-center">
-                                Se connecter pour louer
+                                {{ __('app.rentals.login_to_rent') }}
                             </a>
                             <p class="text-sm text-gray-500 text-center">
-                                Vous devez être connecté pour pouvoir louer ce produit
+                                {{ __('app.rentals.login_required_message') }}
                             </p>
                         </div>
                     @endauth
@@ -272,11 +275,11 @@
                 @auth
                 <!-- Calculateur de location -->
                 <div class="rental-calculator text-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold mb-4">💰 Calculateur de location</h3>
+                    <h3 class="text-lg font-semibold mb-4">💰 {{ __('app.rentals.calculator_title') }}</h3>
                     
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label class="block text-sm font-medium text-purple-100 mb-1">Date de début</label>
+                            <label class="block text-sm font-medium text-purple-100 mb-1">{{ __('app.rentals.start_date') }}</label>
                             <input type="date" 
                                    x-model="startDate"
                                    :min="minDate"
@@ -284,7 +287,7 @@
                                    class="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-md text-white placeholder-purple-200 focus:ring-2 focus:ring-white/50 focus:border-transparent">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-purple-100 mb-1">Date de fin</label>
+                            <label class="block text-sm font-medium text-purple-100 mb-1">{{ __('app.rentals.end_date') }}</label>
                             <input type="date" 
                                    x-model="endDate"
                                    :min="startDate"
@@ -297,27 +300,27 @@
                     <div x-show="calculation.loading || calculation.show" class="bg-white/20 rounded-md p-4">
                         <div x-show="calculation.loading" class="flex items-center justify-center py-4">
                             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                            <span class="ml-2 text-sm">Calcul en cours...</span>
+                            <span class="ml-2 text-sm">{{ __('app.rentals.calculating') }}</span>
                         </div>
                         <div x-show="calculation.show && !calculation.loading" class="space-y-2 text-sm">
                             <div class="flex justify-between">
-                                <span>Durée :</span>
-                                <span x-text="calculation.days + ' jour(s)'" class="font-medium"></span>
+                                <span>{{ __('app.rentals.duration') }} :</span>
+                                <span x-text="calculation.days + ' {{ __('app.rentals.days') }}'" class="font-medium"></span>
                             </div>
                             <div class="flex justify-between">
-                                <span>Sous-total :</span>
+                                <span>{{ __('app.rentals.subtotal') }} :</span>
                                 <span x-text="calculation.subtotal.toFixed(2) + '€'" class="font-medium"></span>
                             </div>
                             <div class="flex justify-between">
-                                <span>TVA (21%) :</span>
+                                <span>{{ __('app.rentals.tax_label') }} :</span>
                                 <span x-text="calculation.tax.toFixed(2) + '€'" class="font-medium"></span>
                             </div>
                             <div class="flex justify-between">
-                                <span>Caution :</span>
+                                <span>{{ __('app.rentals.deposit') }} :</span>
                                 <span x-text="calculation.deposit.toFixed(2) + '€'" class="font-medium text-amber-200"></span>
                             </div>
                             <div class="flex justify-between border-t border-white/30 pt-2 mt-2">
-                                <span class="font-semibold">Total à payer :</span>
+                                <span class="font-semibold">{{ __('app.rentals.total_to_pay') }} :</span>
                                 <span x-text="calculation.total.toFixed(2) + '€'" class="font-bold text-xl"></span>
                             </div>
                         </div>
@@ -333,11 +336,14 @@
         </div>
 
         <!-- Description détaillée -->
-        @if($product->description)
+        @php
+            $translatedDescription = trans_product($product, 'description');
+        @endphp
+        @if($translatedDescription && strlen(trim($translatedDescription)) > 0)
             <div class="mt-12 bg-white rounded-lg shadow-md p-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">📝 Description détaillée</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">📝 {{ __('app.rentals.detailed_description') }}</h2>
                 <div class="prose max-w-none text-gray-600">
-                    {!! nl2br(e(trans_product($product, 'description'))) !!}
+                    {!! nl2br(e($translatedDescription)) !!}
                 </div>
             </div>
         @endif
@@ -345,14 +351,14 @@
         <!-- Produits similaires -->
         @if($similarProducts && $similarProducts->count() > 0)
             <div class="mt-12">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">🔄 Produits similaires</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('app.rentals.similar_products') }}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     @foreach($similarProducts as $similar)
                         <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                             <div class="aspect-square bg-gray-200">
                                 @if($similar->main_image)
                                     <img src="{{ asset('storage/' . $similar->main_image) }}" 
-                                         alt="{{ $similar->name }}"
+                                         alt="{{ trans_product($similar) }}"
                                          class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-gray-400">
@@ -361,12 +367,12 @@
                                 @endif
                             </div>
                             <div class="p-4">
-                                <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ $similar->name }}</h3>
+                                <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ trans_product($similar) }}</h3>
                                 <div class="flex items-center justify-between">
                                     <span class="text-purple-600 font-bold">{{ number_format($similar->rental_price_per_day, 2) }}€/j</span>
                                     <a href="{{ route('rentals.show', $similar) }}" 
                                        class="text-purple-600 hover:text-purple-800 text-sm font-medium">
-                                        Voir →
+                                        {{ __('app.rentals.view_product') }} →
                                     </a>
                                 </div>
                             </div>
@@ -403,7 +409,7 @@
 
             <!-- Récapitulatif produit -->
             <div class="bg-gray-50 p-4 rounded-md mb-4">
-                <h4 class="font-medium text-gray-900">{{ $product->name }}</h4>
+                <h4 class="font-medium text-gray-900">{{ trans_product($product) }}</h4>
                 <p class="text-sm text-gray-600">
                     Prix : <span class="font-semibold text-purple-600">{{ number_format($product->rental_price_per_day, 2) }}€/jour</span>
                 </p>
@@ -695,7 +701,7 @@ document.addEventListener('alpine:init', () => {
                 } else if (error.message) {
                     this.calculationError = error.message;
                 } else {
-                    this.calculationError = 'Impossible de calculer le prix. Vérifiez vos dates et la disponibilité du produit.';
+                    this.calculationError = '{{ __('app.rentals.calculation_error') }}';
                 }
             });
         },
@@ -728,7 +734,7 @@ document.addEventListener('alpine:init', () => {
                     }, 1500);
                 } else {
                     // Utiliser le message spécifique de l'API
-                    this.rentalError = data.message || 'Impossible d\'ajouter ce produit au panier';
+                    this.rentalError = data.message || '{{ __('app.rentals.add_to_cart_error') }}';
                 }
             }).catch((error) => {
                 console.error('Confirm rental error:', error);
@@ -743,7 +749,7 @@ document.addEventListener('alpine:init', () => {
                 } else if (error.message) {
                     this.rentalError = error.message;
                 } else {
-                    this.rentalError = 'Impossible d\'ajouter ce produit au panier. Vérifiez vos dates et la disponibilité.';
+                    this.rentalError = '{{ __('app.rentals.add_to_cart_error') }}';
                 }
             });
         },

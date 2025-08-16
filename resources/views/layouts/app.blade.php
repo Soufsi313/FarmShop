@@ -489,17 +489,61 @@
                 <!-- Actions utilisateur -->
                 <div class="hidden md:flex items-center space-x-4">
                     @guest
-                        <!-- Sélecteur de langue pour invités -->
-                        <div class="flex items-center space-x-2 mr-4">
-                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'fr']) }}" title="Français" class="hover:opacity-80 transition-opacity">
-                                <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-5 w-5 rounded border {{ app()->getLocale() === 'fr' ? 'ring-2 ring-green-500' : '' }}" />
-                            </a>
-                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" title="English" class="hover:opacity-80 transition-opacity">
-                                <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-5 w-5 rounded border {{ app()->getLocale() === 'en' ? 'ring-2 ring-green-500' : '' }}" />
-                            </a>
-                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'nl']) }}" title="Nederlands" class="hover:opacity-80 transition-opacity">
-                                <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-5 w-5 rounded border {{ app()->getLocale() === 'nl' ? 'ring-2 ring-green-500' : '' }}" />
-                            </a>
+                        <!-- Dropdown sélecteur de langue pour invités -->
+                        <div class="relative mr-4" x-data="{ langDropdownOpen: false }">
+                            <button @click="langDropdownOpen = !langDropdownOpen" class="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50 transition-colors">
+                                @if(app()->getLocale() === 'fr')
+                                    <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-4 w-4 rounded border shadow-sm" />
+                                    <span>FR</span>
+                                @elseif(app()->getLocale() === 'en')
+                                    <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-4 w-4 rounded border shadow-sm" />
+                                    <span>EN</span>
+                                @else
+                                    <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-4 w-4 rounded border shadow-sm" />
+                                    <span>NL</span>
+                                @endif
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            
+                            <div x-show="langDropdownOpen" 
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                 @click.away="langDropdownOpen = false"
+                                 class="absolute left-0 z-10 mt-2 w-40 origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                                <a href="{{ request()->fullUrlWithQuery(['lang' => 'fr']) }}" title="Français" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() === 'fr' ? 'bg-green-50 text-green-700' : '' }}">
+                                    <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-4 w-4 rounded border shadow-sm mr-3" />
+                                    Français
+                                    @if(app()->getLocale() === 'fr')
+                                        <svg class="w-4 h-4 text-green-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                </a>
+                                <a href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" title="English" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() === 'en' ? 'bg-green-50 text-green-700' : '' }}">
+                                    <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-4 w-4 rounded border shadow-sm mr-3" />
+                                    English
+                                    @if(app()->getLocale() === 'en')
+                                        <svg class="w-4 h-4 text-green-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                </a>
+                                <a href="{{ request()->fullUrlWithQuery(['lang' => 'nl']) }}" title="Nederlands" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() === 'nl' ? 'bg-green-50 text-green-700' : '' }}">
+                                    <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-4 w-4 rounded border shadow-sm mr-3" />
+                                    Nederlands
+                                    @if(app()->getLocale() === 'nl')
+                                        <svg class="w-4 h-4 text-green-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                </a>
+                            </div>
                         </div>
 
                         <a href="{{ route('login') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors">
@@ -509,17 +553,61 @@
                             {{ __('app.nav.register') }}
                         </a>
                     @else
-                        <!-- Sélecteur de langue pour utilisateurs connectés -->
-                        <div class="flex items-center space-x-2 mr-4">
-                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'fr']) }}" title="Français" class="hover:opacity-80 transition-opacity">
-                                <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-5 w-5 rounded border {{ app()->getLocale() === 'fr' ? 'ring-2 ring-green-500' : '' }}" />
-                            </a>
-                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" title="English" class="hover:opacity-80 transition-opacity">
-                                <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-5 w-5 rounded border {{ app()->getLocale() === 'en' ? 'ring-2 ring-green-500' : '' }}" />
-                            </a>
-                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'nl']) }}" title="Nederlands" class="hover:opacity-80 transition-opacity">
-                                <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-5 w-5 rounded border {{ app()->getLocale() === 'nl' ? 'ring-2 ring-green-500' : '' }}" />
-                            </a>
+                        <!-- Dropdown sélecteur de langue pour utilisateurs connectés -->
+                        <div class="relative mr-3" x-data="{ langDropdownOpen: false }">
+                            <button @click="langDropdownOpen = !langDropdownOpen" class="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50 transition-colors">
+                                @if(app()->getLocale() === 'fr')
+                                    <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-4 w-4 rounded border shadow-sm" />
+                                    <span>FR</span>
+                                @elseif(app()->getLocale() === 'en')
+                                    <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-4 w-4 rounded border shadow-sm" />
+                                    <span>EN</span>
+                                @else
+                                    <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-4 w-4 rounded border shadow-sm" />
+                                    <span>NL</span>
+                                @endif
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            
+                            <div x-show="langDropdownOpen" 
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                 @click.away="langDropdownOpen = false"
+                                 class="absolute left-0 z-10 mt-2 w-40 origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                                <a href="{{ request()->fullUrlWithQuery(['lang' => 'fr']) }}" title="Français" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() === 'fr' ? 'bg-green-50 text-green-700' : '' }}">
+                                    <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-4 w-4 rounded border shadow-sm mr-3" />
+                                    Français
+                                    @if(app()->getLocale() === 'fr')
+                                        <svg class="w-4 h-4 text-green-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                </a>
+                                <a href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" title="English" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() === 'en' ? 'bg-green-50 text-green-700' : '' }}">
+                                    <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-4 w-4 rounded border shadow-sm mr-3" />
+                                    English
+                                    @if(app()->getLocale() === 'en')
+                                        <svg class="w-4 h-4 text-green-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                </a>
+                                <a href="{{ request()->fullUrlWithQuery(['lang' => 'nl']) }}" title="Nederlands" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() === 'nl' ? 'bg-green-50 text-green-700' : '' }}">
+                                    <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-4 w-4 rounded border shadow-sm mr-3" />
+                                    Nederlands
+                                    @if(app()->getLocale() === 'nl')
+                                        <svg class="w-4 h-4 text-green-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                </a>
+                            </div>
                         </div>
 
                         <div class="relative" x-data="{ userMenuOpen: false }">
@@ -611,19 +699,43 @@
                     
                     <!-- Sélecteur de langue mobile -->
                     <div class="border-t pt-4 mt-4">
-                        <div class="px-3 py-2 text-sm font-medium text-gray-500 uppercase tracking-wider">Langue / Language</div>
-                        <div class="flex items-center space-x-4 px-3 py-2">
-                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'fr']) }}" title="Français" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-                                <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-6 w-6 rounded border {{ app()->getLocale() === 'fr' ? 'ring-2 ring-green-500' : '' }}" />
-                                <span class="text-sm">Français</span>
+                        <div class="px-3 py-2 text-sm font-medium text-gray-500 uppercase tracking-wider">Langue / Language / Taal</div>
+                        <div class="space-y-2 px-3 py-2">
+                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'fr']) }}" title="Français" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors {{ app()->getLocale() === 'fr' ? 'bg-green-50 ring-2 ring-green-500' : '' }}">
+                                <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-7 w-7 rounded border shadow-sm" />
+                                <div>
+                                    <div class="text-sm font-medium {{ app()->getLocale() === 'fr' ? 'text-green-700' : 'text-gray-900' }}">Français</div>
+                                    <div class="text-xs text-gray-500 uppercase">FR</div>
+                                </div>
+                                @if(app()->getLocale() === 'fr')
+                                    <svg class="w-4 h-4 text-green-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                @endif
                             </a>
-                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" title="English" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-                                <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-6 w-6 rounded border {{ app()->getLocale() === 'en' ? 'ring-2 ring-green-500' : '' }}" />
-                                <span class="text-sm">English</span>
+                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" title="English" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors {{ app()->getLocale() === 'en' ? 'bg-green-50 ring-2 ring-green-500' : '' }}">
+                                <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-7 w-7 rounded border shadow-sm" />
+                                <div>
+                                    <div class="text-sm font-medium {{ app()->getLocale() === 'en' ? 'text-green-700' : 'text-gray-900' }}">English</div>
+                                    <div class="text-xs text-gray-500 uppercase">EN</div>
+                                </div>
+                                @if(app()->getLocale() === 'en')
+                                    <svg class="w-4 h-4 text-green-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                @endif
                             </a>
-                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'nl']) }}" title="Nederlands" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-                                <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-6 w-6 rounded border {{ app()->getLocale() === 'nl' ? 'ring-2 ring-green-500' : '' }}" />
-                                <span class="text-sm">Nederlands</span>
+                            <a href="{{ request()->fullUrlWithQuery(['lang' => 'nl']) }}" title="Nederlands" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors {{ app()->getLocale() === 'nl' ? 'bg-green-50 ring-2 ring-green-500' : '' }}">
+                                <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-7 w-7 rounded border shadow-sm" />
+                                <div>
+                                    <div class="text-sm font-medium {{ app()->getLocale() === 'nl' ? 'text-green-700' : 'text-gray-900' }}">Nederlands</div>
+                                    <div class="text-xs text-gray-500 uppercase">NL</div>
+                                </div>
+                                @if(app()->getLocale() === 'nl')
+                                    <svg class="w-4 h-4 text-green-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                @endif
                             </a>
                         </div>
                     </div>
