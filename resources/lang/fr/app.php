@@ -120,6 +120,22 @@ return array (
     'registration_benefits' => '⚡ Inscription rapide • 🔒 100% sécurisé • 📧 Pas de spam',
     'login' => 'Connexion',
     'register' => 'Inscription',
+    
+    // Page de connexion
+    'login_title' => 'Connectez-vous à votre compte',
+    'login_subtitle' => 'Ou',
+    'create_new_account' => 'créez un nouveau compte',
+    'email_address' => 'Adresse email',
+    'password' => 'Mot de passe',
+    'remember_me' => 'Se souvenir de moi',
+    'forgot_password' => 'Mot de passe oublié ?',
+    'login_button' => 'Se connecter',
+    'login_error' => 'Erreur de connexion',
+    'check_credentials' => 'Vérifiez vos identifiants et réessayez.',
+    'first_visit' => 'Première visite ?',
+    'create_account' => 'Créer un compte',
+    'back_to_home' => '← Retour à l\'accueil',
+    'site_description' => 'Matériel Agricole Belge',
   ),
   'form' => 
   array (

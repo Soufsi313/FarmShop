@@ -237,6 +237,22 @@ return array (
     'registration_benefits' => '⚡ Snelle registratie • 🔒 100% veilig • 📧 Geen spam',
     'login' => 'Inloggen',
     'register' => 'Registreren',
+    
+    // Inlogpagina
+    'login_title' => 'Log in op uw account',
+    'login_subtitle' => 'Of',
+    'create_new_account' => 'maak een nieuw account aan',
+    'email_address' => 'E-mailadres',
+    'password' => 'Wachtwoord',
+    'remember_me' => 'Onthoud mij',
+    'forgot_password' => 'Wachtwoord vergeten?',
+    'login_button' => 'Inloggen',
+    'login_error' => 'Inlogfout',
+    'check_credentials' => 'Controleer uw inloggegevens en probeer opnieuw.',
+    'first_visit' => 'Eerste bezoek?',
+    'create_account' => 'Een account aanmaken',
+    'back_to_home' => '← Terug naar home',
+    'site_description' => 'Belgische Landbouwmachines',
   ),
   'form' => 
   array (

@@ -154,6 +154,22 @@ return array (
     'registration_benefits' => '⚡ Quick registration • 🔒 100% secure • 📧 No spam',
     'login' => 'Login',
     'register' => 'Register',
+    
+    // Login page
+    'login_title' => 'Sign in to your account',
+    'login_subtitle' => 'Or',
+    'create_new_account' => 'create a new account',
+    'email_address' => 'Email address',
+    'password' => 'Password',
+    'remember_me' => 'Remember me',
+    'forgot_password' => 'Forgot your password?',
+    'login_button' => 'Sign in',
+    'login_error' => 'Login error',
+    'check_credentials' => 'Check your credentials and try again.',
+    'first_visit' => 'First time here?',
+    'create_account' => 'Create an account',
+    'back_to_home' => '← Back to home',
+    'site_description' => 'Belgian Agricultural Equipment',
   ),
   'form' => 
   array (

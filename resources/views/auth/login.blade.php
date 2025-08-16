@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', '{{ smart_translate("Connexion") }} - FarmShop')
+@section('title', __('app.auth.login') . ' - FarmShop')
 @section('description', 'Connectez-vous à votre compte FarmShop pour accéder à vos achats, locations et wishlist.')
 
 @section('content')
@@ -8,15 +8,15 @@
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <div class="text-center">
             <h1 class="text-3xl font-bold text-farm-green-800">FarmShop</h1>
-            <p class="mt-2 text-sm text-farm-orange-700">Matériel Agricole Belge</p>
+            <p class="mt-2 text-sm text-farm-orange-700">{{ __('app.auth.site_description') }}</p>
         </div>
         <h2 class="mt-6 text-center text-3xl font-extrabold text-farm-green-800">
-            Connectez-vous à votre compte
+            {{ __('app.auth.login_title') }}
         </h2>
         <p class="mt-2 text-center text-sm text-farm-orange-600">
-            Ou
+            {{ __('app.auth.login_subtitle') }}
             <a href="{{ route('register') }}" class="font-medium text-farm-green-600 hover:text-farm-green-500">
-                créez un nouveau compte
+                {{ __('app.auth.create_new_account') }}
             </a>
         </p>
     </div>
@@ -26,10 +26,10 @@
             <form class="space-y-6" method="POST" action="{{ route('login') }}">
                 @csrf
                 
-                <!-- {{ smart_translate("Email") }} -->
+                <!-- Email -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-farm-green-700">
-                        Adresse email
+                        {{ __('app.auth.email_address') }}
                     </label>
                     <div class="mt-1">
                         <input id="email" 
@@ -45,10 +45,10 @@
                     </div>
                 </div>
 
-                <!-- {{ smart_translate("Mot de passe") }} -->
+                <!-- Mot de passe -->
                 <div>
                     <label for="password" class="block text-sm font-medium text-farm-green-700">
-                        {{ smart_translate("Mot de passe") }}
+                        {{ __('app.auth.password') }}
                     </label>
                     <div class="mt-1">
                         <input id="password" 
@@ -63,7 +63,7 @@
                     </div>
                 </div>
 
-                <!-- {{ smart_translate("Se souvenir de moi") }} & {{ smart_translate("Mot de passe") }} oublié -->
+                <!-- Se souvenir de moi & Mot de passe oublié -->
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <input id="remember" 
@@ -71,13 +71,13 @@
                                type="checkbox" 
                                class="h-4 w-4 text-farm-green-600 focus:ring-farm-green-500 border-farm-green-300 rounded">
                         <label for="remember" class="ml-2 block text-sm text-farm-green-700">
-                            {{ smart_translate("Se souvenir de moi") }}
+                            {{ __('app.auth.remember_me') }}
                         </label>
                     </div>
 
                     <div class="text-sm">
                         <a href="#" class="font-medium text-farm-orange-600 hover:text-farm-orange-500">
-                            {{ smart_translate("Mot de passe") }} oublié ?
+                            {{ __('app.auth.forgot_password') }}
                         </a>
                     </div>
                 </div>
@@ -93,10 +93,10 @@
                             </div>
                             <div class="ml-3">
                                 <h3 class="text-sm font-medium text-red-800">
-                                    Erreur de connexion
+                                    {{ __('app.auth.login_error') }}
                                 </h3>
                                 <div class="mt-2 text-sm text-red-700">
-                                    Vérifiez vos identifiants et réessayez.
+                                    {{ __('app.auth.check_credentials') }}
                                 </div>
                             </div>
                         </div>
@@ -130,7 +130,7 @@
                                 <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
                             </svg>
                         </span>
-                        {{ smart_translate("Se connecter") }}
+                        {{ __('app.auth.login_button') }}
                     </button>
                 </div>
             </form>
@@ -142,14 +142,14 @@
                         <div class="w-full border-t border-farm-orange-300"></div>
                     </div>
                     <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-white/80 text-farm-orange-600">Première visite ?</span>
+                        <span class="px-2 bg-white/80 text-farm-orange-600">{{ __('app.auth.first_visit') }}</span>
                     </div>
                 </div>
 
                 <div class="mt-6">
                     <a href="{{ route('register') }}" 
                        class="w-full flex justify-center py-2 px-4 border border-farm-orange-500 rounded-md shadow-sm text-sm font-medium text-farm-orange-600 bg-white/80 hover:bg-farm-orange-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-farm-orange-500 transition-colors">
-                        {{ smart_translate("Créer un compte") }}
+                        {{ __('app.auth.create_account') }}
                     </a>
                 </div>
             </div>
@@ -158,7 +158,7 @@
         <!-- Lien retour accueil -->
         <div class="mt-8 text-center">
             <a href="{{ url('/') }}" class="text-sm text-farm-green-600 hover:text-farm-orange-600 transition-colors">
-                ← Retour à l'accueil
+                {{ __('app.auth.back_to_home') }}
             </a>
         </div>
     </div>
