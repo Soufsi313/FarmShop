@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Mes locations - FarmShop')
+@section('title', __('app.rental_orders.my_rentals') . ' - FarmShop')
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8">
@@ -8,34 +8,34 @@
         
         <!-- En-tête -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Mes Locations</h1>
-            <p class="text-gray-600">Gérez vos locations et suivez leur statut</p>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ __('app.rental_orders.my_rentals') }}</h1>
+            <p class="text-gray-600">{{ __('app.rental_orders.description') }}</p>
         </div>
 
         <!-- Filtres -->
         <div class="bg-white rounded-lg shadow p-6 mb-6">
             <form method="GET" action="{{ route('rental-orders.index') }}" class="flex flex-wrap gap-4 items-center">
                 <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Filtrer par statut</label>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.rental_orders.filter_by_status') }}</label>
                     <select name="status" id="status" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <option value="">Tous les statuts</option>
-                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>{{ __("app.status.pending") }}<//option>
-                        <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmée</option>
-                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Terminée</option>
-                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Annulée</option>
-                        <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>Clôturée</option>
+                        <option value="">{{ __('app.rental_orders.all_statuses') }}</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>{{ __("app.rental_status.pending") }}</option>
+                        <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>{{ __("app.rental_status.confirmed") }}</option>
+                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>{{ __("app.rental_status.active") }}</option>
+                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>{{ __("app.rental_status.completed") }}</option>
+                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>{{ __("app.rental_status.cancelled") }}</option>
+                        <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>{{ __("app.rental_status.closed") }}</option>
                     </select>
                 </div>
                 
                 <div>
-                    <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Date de début</label>
+                    <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.rental_orders.start_date') }}</label>
                     <input type="date" name="start_date" id="start_date" value="{{ request('start_date') }}" 
                            class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
                 
                 <div>
-                    <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
+                    <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.rental_orders.end_date') }}</label>
                     <input type="date" name="end_date" id="end_date" value="{{ request('end_date') }}" 
                            class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
@@ -45,7 +45,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
-                        Filtrer
+                        {{ __('app.rental_orders.filter') }}
                     </button>
                 </div>
             </form>
@@ -59,10 +59,10 @@
                         <div class="flex items-center justify-between mb-4">
                             <div>
                                 <h3 class="text-lg font-semibold text-gray-900">
-                                    Commande #{{ $order->order_number }}
+                                    {{ __('app.rental_orders.order_number') }} #{{ $order->order_number }}
                                 </h3>
                                 <p class="text-sm text-gray-600">
-                                    Passée le {{ $order->created_at->format('d/m/Y à H:i') }}
+                                    {{ __('app.rental_orders.placed_on') }} {{ $order->created_at->format('d/m/Y à H:i') }}
                                 </p>
                             </div>
                             
@@ -78,12 +78,12 @@
                                         @elseif($order->status === 'closed') bg-gray-100 text-gray-800
                                         @else bg-gray-100 text-gray-800
                                         @endif">
-                                        @if($order->status === 'pending') 🟡 En attente
-                                        @elseif($order->status === 'confirmed') 🔵 Confirmée
-                                        @elseif($order->status === 'active') 🟢 Active
-                                        @elseif($order->status === 'completed') 🟣 Terminée
-                                        @elseif($order->status === 'cancelled') 🔴 Annulée
-                                        @elseif($order->status === 'closed') 🔒 Clôturée
+                                        @if($order->status === 'pending') 🟡 {{ __('app.rental_status.pending') }}
+                                        @elseif($order->status === 'confirmed') 🔵 {{ __('app.rental_status.confirmed') }}
+                                        @elseif($order->status === 'active') 🟢 {{ __('app.rental_status.active') }}
+                                        @elseif($order->status === 'completed') 🟣 {{ __('app.rental_status.completed') }}
+                                        @elseif($order->status === 'cancelled') 🔴 {{ __('app.rental_status.cancelled') }}
+                                        @elseif($order->status === 'closed') 🔒 {{ __('app.rental_status.closed') }}
                                         @else 🔘 {{ $order->status_label }}
                                         @endif
                                     </span>
@@ -96,10 +96,10 @@
                                         @elseif($order->payment_status === 'refunded') bg-blue-100 text-blue-800
                                         @else bg-gray-100 text-gray-800
                                         @endif">
-                                        @if($order->payment_status === 'pending') 💳 En attente
-                                        @elseif($order->payment_status === 'paid') 💚 Payé
-                                        @elseif($order->payment_status === 'failed') 💔 Échec
-                                        @elseif($order->payment_status === 'refunded') 💙 Remboursé
+                                        @if($order->payment_status === 'pending') 💳 {{ __('app.payment_status.pending') }}
+                                        @elseif($order->payment_status === 'paid') 💚 {{ __('app.payment_status.paid') }}
+                                        @elseif($order->payment_status === 'failed') 💔 {{ __('app.payment_status.failed') }}
+                                        @elseif($order->payment_status === 'refunded') 💙 {{ __('app.payment_status.refunded') }}
                                         @else 💳 {{ $order->payment_status_label }}
                                         @endif
                                     </span>
@@ -113,21 +113,21 @@
                         <!-- Informations de location -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-gray-50 rounded-lg p-4">
                             <div>
-                                <p class="text-sm font-medium text-gray-500">Période de location</p>
+                                <p class="text-sm font-medium text-gray-500">{{ __('app.rental_orders.rental_period') }}</p>
                                 <p class="text-sm text-gray-900">
                                     Du {{ \Carbon\Carbon::parse($order->start_date)->format('d/m/Y') }} 
                                     au {{ \Carbon\Carbon::parse($order->end_date)->format('d/m/Y') }}
                                 </p>
-                                <p class="text-xs text-gray-500">⏱️ {{ $order->rental_days }} jour(s)</p>
+                                <p class="text-xs text-gray-500">⏱️ {{ $order->rental_days }} {{ __('app.rental_orders.rental_days') }}</p>
                             </div>
                             
                             <div>
-                                <p class="text-sm font-medium text-gray-500">Articles</p>
+                                <p class="text-sm font-medium text-gray-500">{{ __('app.rental_orders.items') }}</p>
                                 <p class="text-sm text-gray-900">📦 {{ $order->items->count() }} article(s)</p>
                             </div>
                             
                             <div>
-                                <p class="text-sm font-medium text-gray-500">Dernière mise à jour</p>
+                                <p class="text-sm font-medium text-gray-500">{{ __('app.rental_orders.last_update') }}</p>
                                 <p class="text-xs text-gray-500">📅 {{ $order->updated_at->format('d/m/Y à H:i') }}</p>
                             </div>
                         </div>
@@ -146,14 +146,14 @@
                                                  alt="{{ $item->product->name }}" 
                                                  class="w-6 h-6 object-cover rounded">
                                         @endif
-                                        <span class="text-sm">{{ $item->product->name ?? 'Produit supprimé' }}</span>
+                                        <span class="text-sm">{{ $item->product ? trans_product($item->product, 'name') : 'Produit supprimé' }}</span>
                                         <span class="text-xs text-gray-600">×{{ $item->quantity }}</span>
                                     </div>
                                 @endforeach
                                 
                                 @if($order->items->count() > 3)
                                     <div class="flex items-center px-3 py-2 text-sm text-gray-600">
-                                        +{{ $order->items->count() - 3 }} autres articles
+                                        +{{ $order->items->count() - 3 }} {{ __('app.rental_orders.other_items') }}
                                     </div>
                                 @endif
                             </div>
@@ -167,7 +167,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                 </svg>
-                                {{ __("app.content.view_details") }}
+                                {{ __("app.rental_orders.see_details") }}
                             </a>
                             
                             @if($order->canGenerateInvoice())
@@ -176,7 +176,7 @@
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
-                                    Télécharger facture
+                                    {{ __('app.rental_orders.download_invoice') }}
                                 </a>
                             @endif
                             
@@ -187,7 +187,7 @@
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                     </svg>
-                                    Clôturer la location
+                                    {{ __('app.rental_orders.close_rental') }}
                                 </button>
                             @endif
                             
@@ -198,7 +198,7 @@
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
-                                    Annuler
+                                    {{ __('app.rental_orders.cancel_rental') }}
                                 </button>
                             @endif
                         </div>
@@ -217,14 +217,14 @@
                     <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                     </svg>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune commande de location</h3>
-                    <p class="text-gray-600 mb-6">Vous n'avez pas encore passé de commande de location.</p>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('app.rental_orders.no_rentals') }}</h3>
+                    <p class="text-gray-600 mb-6">{{ __('app.rental_orders.no_rentals_description') }}</p>
                     <a href="{{ route('products.index') }}" 
                        class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                         </svg>
-                        Découvrir nos produits
+                        {{ __('app.rental_orders.discover_products') }}
                     </a>
                 </div>
             </div>

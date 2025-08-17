@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Panier de Location - FarmShop')
+@section('title', __('app.cart_location.title') . ' - FarmShop')
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8" x-data="cartLocationApp()">
@@ -14,7 +14,7 @@
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-9 9a1 1 0 101.414 1.414L9 4.414V17a1 1 0 102 0V4.414l7.293 7.293a1 1 0 001.414-1.414l-9-9z"></path>
                             </svg>
-                            Accueil
+                            {{ __('app.cart_location.home') }}
                         </a>
                     </li>
                     <li>
@@ -23,7 +23,7 @@
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                             </svg>
                             <a href="{{ route('rentals.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">
-                                Locations
+                                {{ __('app.cart_location.rentals') }}
                             </a>
                         </div>
                     </li>
@@ -32,15 +32,15 @@
                             <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                             </svg>
-                            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Panier de Location</span>
+                            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">{{ __('app.cart_location.title') }}</span>
                         </div>
                     </li>
                 </ol>
             </nav>
             
             <div class="mt-4">
-                <h1 class="text-3xl font-bold text-gray-900">Panier de Location</h1>
-                <p class="mt-2 text-sm text-gray-600">Gérez vos produits de location avant de procéder au checkout</p>
+                <h1 class="text-3xl font-bold text-gray-900">{{ __('app.cart_location.title') }}</h1>
+                <p class="mt-2 text-sm text-gray-600">{{ __('app.cart_location.description') }}</p>
             </div>
         </div>
 
@@ -55,14 +55,14 @@
                 <svg class="mx-auto h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l1.5 6m0 0H17M9 19h8"></path>
                 </svg>
-                <h3 class="mt-4 text-lg font-medium text-gray-900">Votre panier de location est vide</h3>
-                <p class="mt-2 text-gray-500">Découvrez nos produits de location et ajoutez-les à votre panier.</p>
+                <h3 class="mt-4 text-lg font-medium text-gray-900">{{ __('app.cart_location.empty_title') }}</h3>
+                <p class="mt-2 text-gray-500">{{ __('app.cart_location.empty_description') }}</p>
                 <div class="mt-6">
                     <a href="{{ route('rentals.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                         <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
-                        Découvrir les locations
+                        {{ __('app.cart_location.discover_rentals') }}
                     </a>
                 </div>
             </div>
@@ -76,12 +76,12 @@
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold text-gray-900">
-                            Articles de location (<span x-text="cartItems.length">0</span>)
+                            {{ __('app.cart_location.rental_items') }} (<span x-text="cartItems.length">0</span>)
                         </h2>
                         <button @click="clearCart()" 
                                 x-show="cartItems.length > 0"
                                 class="text-sm text-red-600 hover:text-red-800 font-medium">
-                            Vider le panier
+                            {{ __('app.cart_location.clear_cart') }}
                         </button>
                     </div>
                 </div>
@@ -95,7 +95,7 @@
                                 <div class="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden">
                                     <img x-show="item.product.main_image" 
                                          :src="item.product.main_image ? '/storage/' + item.product.main_image : ''"
-                                         :alt="item.product.name"
+                                         :alt="getTranslatedProductName(item.product)"
                                          class="w-full h-full object-cover">
                                     <div x-show="!item.product.main_image" 
                                          class="w-full h-full flex items-center justify-center text-gray-400">
@@ -110,7 +110,7 @@
                             <div class="flex-1 min-w-0">
                                 <div class="flex flex-col md:flex-row md:items-start md:justify-between">
                                     <div class="flex-1">
-                                        <h3 class="text-lg font-semibold text-gray-900" x-text="item.product.name"></h3>
+                                        <h3 class="text-lg font-semibold text-gray-900" x-text="getTranslatedProductName(item.product)"></h3>
                                         <p class="text-sm text-gray-500 mt-1" x-text="item.rental_category_name"></p>
                                         <p class="text-sm text-gray-600 mt-1" x-text="item.product.sku"></p>
                                         
@@ -120,14 +120,14 @@
                                                 <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
                                                 </svg>
-                                                <span x-text="`Du ${formatDate(item.start_date)} au ${formatDate(item.end_date)} (${item.duration_days} jour${item.duration_days > 1 ? 's' : ''})`"></span>
+                                                <span x-text="`{{ __('app.cart_location.from') }} ${formatDate(item.start_date)} {{ __('app.cart_location.to') }} ${formatDate(item.end_date)} (${item.duration_days} {{ __('app.cart_location.day') }}${item.duration_days > 1 ? 's' : ''})`"></span>
                                             </div>
                                         </div>
 
                                         <!-- Notes if any -->
                                         <div x-show="item.notes" class="mt-2">
                                             <p class="text-sm text-gray-600">
-                                                <strong>Notes:</strong> <span x-text="item.notes"></span>
+                                                <strong>{{ __('app.cart_location.notes_label') }}:</strong> <span x-text="item.notes"></span>
                                             </p>
                                         </div>
                                     </div>
@@ -136,7 +136,7 @@
                                     <div class="mt-4 md:mt-0 md:ml-6 flex-shrink-0">
                                         <!-- Quantity Controls -->
                                         <div class="flex items-center space-x-3 mb-4">
-                                            <label class="text-sm font-medium text-gray-700">Quantité:</label>
+                                            <label class="text-sm font-medium text-gray-700">{{ __('app.cart_location.quantity_label') }}:</label>
                                             <div class="flex items-center border border-gray-300 rounded-md">
                                                 <button @click="updateQuantity(item.id, item.quantity - 1)"
                                                         :disabled="item.quantity <= 1"
@@ -158,13 +158,13 @@
                                         <!-- Pricing -->
                                         <div class="text-right space-y-1">
                                             <div class="text-sm text-gray-600">
-                                                <span x-text="formatCurrency(item.unit_price_per_day)"></span>/jour × <span x-text="item.quantity"></span> × <span x-text="item.duration_days"></span> jours
+                                                <span x-text="formatCurrency(item.unit_price_per_day)"></span>{{ __('app.cart_location.per_day') }} × <span x-text="item.quantity"></span> × <span x-text="item.duration_days"></span> {{ __('app.cart_location.days') }}
                                             </div>
                                             <div class="text-lg font-semibold text-gray-900">
                                                 <span x-text="formatCurrency(item.total_amount)"></span>
                                             </div>
                                             <div class="text-sm text-orange-600">
-                                                Caution: <span x-text="formatCurrency(item.subtotal_deposit)"></span>
+                                                {{ __('app.cart_location.deposit_label') }}: <span x-text="formatCurrency(item.subtotal_deposit)"></span>
                                             </div>
                                         </div>
 
@@ -172,11 +172,11 @@
                                         <div class="mt-4 flex space-x-2">
                                             <button @click="editDates(item)" 
                                                     class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                                                Modifier dates
+                                                {{ __('app.cart_location.edit_dates') }}
                                             </button>
                                             <button @click="removeItem(item.id)" 
                                                     class="text-sm text-red-600 hover:text-red-800 font-medium">
-                                                Supprimer
+                                                {{ __('app.cart_location.remove') }}
                                             </button>
                                         </div>
                                     </div>
@@ -190,24 +190,24 @@
             <!-- Summary Sidebar (Right Column) -->
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-lg shadow-sm p-6 sticky top-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Résumé de la location</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.cart_location.rental_summary') }}</h3>
                     
                     <!-- Summary Details -->
                     <div class="space-y-3 text-sm">
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Sous-total HT:</span>
+                            <span class="text-gray-600">{{ __('app.cart_location.subtotal_ht') }}:</span>
                             <span x-text="formatCurrency(cartSummary.total_amount || 0)"></span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-600">TVA (21%):</span>
+                            <span class="text-gray-600">{{ __('app.cart_location.vat') }} (21%):</span>
                             <span x-text="formatCurrency(cartSummary.total_tva || 0)"></span>
                         </div>
                         <div class="flex justify-between border-t pt-3">
-                            <span class="font-semibold text-gray-900">Total TTC:</span>
+                            <span class="font-semibold text-gray-900">{{ __('app.cart_location.total_ttc') }}:</span>
                             <span class="font-semibold text-lg" x-text="formatCurrency(cartSummary.total_with_tax || 0)"></span>
                         </div>
                         <div class="flex justify-between border-t pt-3">
-                            <span class="font-semibold text-orange-600">Caution totale:</span>
+                            <span class="font-semibold text-orange-600">{{ __('app.cart_location.total_deposit') }}:</span>
                             <span class="font-semibold text-orange-600" x-text="formatCurrency(cartSummary.total_deposit || 0)"></span>
                         </div>
                     </div>
@@ -216,11 +216,11 @@
                     <div class="mt-6 p-4 bg-gray-50 rounded-lg">
                         <div class="text-sm text-gray-600 space-y-1">
                             <div class="flex justify-between">
-                                <span>Articles:</span>
+                                <span>{{ __('app.cart_location.items_count') }}:</span>
                                 <span x-text="cartSummary.total_items || 0"></span>
                             </div>
                             <div class="flex justify-between">
-                                <span>Quantité totale:</span>
+                                <span>{{ __('app.cart_location.total_quantity') }}:</span>
                                 <span x-text="cartSummary.total_quantity || 0"></span>
                             </div>
                         </div>
@@ -231,11 +231,11 @@
                         <button @click="proceedToCheckout()" 
                                 :disabled="cartItems.length === 0"
                                 class="w-full bg-purple-600 text-white py-3 px-4 rounded-md font-semibold hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                            Procéder au checkout
+                            {{ __('app.cart_location.proceed_checkout') }}
                         </button>
                         <a href="{{ route('rentals.index') }}" 
                            class="w-full bg-gray-200 text-gray-700 py-3 px-4 rounded-md font-semibold hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors text-center block">
-                            Continuer les achats
+                            {{ __('app.cart_location.continue_shopping') }}
                         </a>
                     </div>
 
@@ -246,12 +246,12 @@
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                             </svg>
                             <div class="ml-3">
-                                <h4 class="text-sm font-medium text-blue-800">Informations importantes</h4>
+                                <h4 class="text-sm font-medium text-blue-800">{{ __('app.cart_location.important_info') }}</h4>
                                 <div class="mt-2 text-sm text-blue-700">
                                     <ul class="list-disc list-inside space-y-1">
-                                        <li>La caution est bloquée mais non débitée</li>
-                                        <li>Retour obligatoire en bon état</li>
-                                        <li>Inspection à la restitution</li>
+                                        <li>{{ __('app.cart_location.deposit_blocked') }}</li>
+                                        <li>{{ __('app.cart_location.return_mandatory') }}</li>
+                                        <li>{{ __('app.cart_location.inspection_required') }}</li>
                                     </ul>
                                 </div>
                             </div>
@@ -274,11 +274,11 @@
          style="display: none;">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Modifier les dates de location</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('app.cart_location.edit_dates_modal_title') }}</h3>
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Date de début</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('app.cart_location.start_date_label') }}</label>
                         <input type="date" 
                                x-model="editForm.start_date"
                                :min="minDate"
@@ -286,7 +286,7 @@
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Date de fin</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('app.cart_location.end_date_label') }}</label>
                         <input type="date" 
                                x-model="editForm.end_date"
                                :min="editForm.start_date"
@@ -297,11 +297,11 @@
                 <div class="mt-6 flex space-x-3">
                     <button @click="saveDateChanges()" 
                             class="flex-1 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                        Sauvegarder
+                        {{ __('app.cart_location.save') }}
                     </button>
                     <button @click="showDateModal = false" 
                             class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                        Annuler
+                        {{ __('app.cart_location.cancel') }}
                     </button>
                 </div>
             </div>
@@ -314,6 +314,9 @@
 
 @push('scripts')
 <script>
+// Traductions des noms de produits pour JavaScript
+window.productTranslations = @json($productNames ?? []);
+
 document.addEventListener('alpine:init', () => {
     Alpine.data('cartLocationApp', () => ({
         // State
@@ -330,6 +333,7 @@ document.addEventListener('alpine:init', () => {
 
         // Initialize
         async init() {
+            console.log('Product translations loaded:', window.productTranslations);
             await this.loadCart();
         },
 
@@ -540,6 +544,15 @@ document.addEventListener('alpine:init', () => {
             }
 
             return data;
+        },
+
+        // Get translated product name
+        getTranslatedProductName(product) {
+            if (window.productTranslations && window.productTranslations[product.slug]) {
+                return window.productTranslations[product.slug];
+            }
+            // Fallback to database name if translation not found
+            return product.name || product.slug;
         },
 
         showNotification(message, type = 'info') {

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Commande de location #' . $orderLocation->order_number . ' - FarmShop')
+@section('title', __('app.rental_orders.rental_order') . ' #' . $orderLocation->order_number . ' - FarmShop')
 
 @section('content')
 <div class="min-h-screen bg-gray-50">
@@ -15,7 +15,7 @@
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-9 9a1 1 0 101.414 1.414L9 4.414V17a1 1 0 102 0V4.414l7.293 7.293a1 1 0 001.414-1.414l-9-9z"></path>
                             </svg>
-                            Accueil
+                            {{ __('app.rental_orders.home') }}
                         </a>
                     </li>
                     <li>
@@ -24,7 +24,7 @@
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                             </svg>
                             <a href="{{ route('rental-orders.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">
-                                Mes locations
+                                {{ __('app.rental_orders.my_rentals') }}
                             </a>
                         </div>
                     </li>
@@ -33,7 +33,7 @@
                             <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                             </svg>
-                            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Commande #{{ $orderLocation->order_number }}</span>
+                            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">{{ __('app.rental_orders.order_number') }} #{{ $orderLocation->order_number }}</span>
                         </div>
                     </li>
                 </ol>
@@ -42,9 +42,9 @@
             <div class="mt-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900">Commande de location #{{ $orderLocation->order_number }}</h1>
+                        <h1 class="text-3xl font-bold text-gray-900">{{ __('app.rental_orders.rental_order') }} #{{ $orderLocation->order_number }}</h1>
                         <p class="mt-2 text-sm text-gray-600">
-                            Passée le {{ $orderLocation->created_at->format('d/m/Y à H:i') }}
+                            {{ __('app.rental_orders.placed_on') }} {{ $orderLocation->created_at->format('d/m/Y à H:i') }}
                         </p>
                     </div>
                     
@@ -59,11 +59,11 @@
                             ];
                             
                             $statusLabels = [
-                                'pending' => __("app.status.pending"),
-                                'confirmed' => 'Confirmée',
-                                'active' => __("app.status.in_progress"),
-                                'completed' => 'Terminée',
-                                'cancelled' => 'Annulée'
+                                'pending' => __("app.rental_status.pending"),
+                                'confirmed' => __("app.rental_status.confirmed"),
+                                'active' => __("app.rental_status.active"),
+                                'completed' => __("app.rental_status.completed"),
+                                'cancelled' => __("app.rental_status.cancelled")
                             ];
                         @endphp
                         
@@ -96,22 +96,22 @@
                 
                 <!-- Informations de la location -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de location</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.rental_orders.rental_information') }}</h2>
                     
                     <div class="grid grid-cols-2 gap-6">
                         <div>
-                            <h3 class="text-sm font-medium text-gray-700 mb-2">Période de location</h3>
+                            <h3 class="text-sm font-medium text-gray-700 mb-2">{{ __('app.rental_orders.period') }}</h3>
                             <p class="text-sm text-gray-900">
                                 Du {{ $orderLocation->start_date->format('d/m/Y') }} 
                                 au {{ $orderLocation->end_date->format('d/m/Y') }}
                             </p>
                             <p class="text-sm text-purple-600 font-medium">
-                                ({{ $orderLocation->rental_days }} jours)
+                                ({{ $orderLocation->rental_days }} {{ __('app.rental_orders.days') }})
                             </p>
                         </div>
                         
                         <div>
-                            <h3 class="text-sm font-medium text-gray-700 mb-2">Statut</h3>
+                            <h3 class="text-sm font-medium text-gray-700 mb-2">{{ __('app.rental_orders.status') }}</h3>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$orderLocation->status] ?? 'bg-gray-100 text-gray-800' }}">
                                 {{ $statusLabels[$orderLocation->status] ?? $orderLocation->status }}
                             </span>
@@ -121,18 +121,18 @@
 
                 <!-- Adresses -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Adresses</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.rental_orders.addresses') }}</h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <h3 class="text-sm font-medium text-gray-700 mb-2">Adresse de récupération</h3>
+                            <h3 class="text-sm font-medium text-gray-700 mb-2">{{ __('app.rental_orders.pickup_address') }}</h3>
                             <div class="p-3 bg-gray-50 rounded-md">
                                 <p class="text-sm text-gray-900 whitespace-pre-line">{{ $orderLocation->pickup_address }}</p>
                             </div>
                         </div>
                         
                         <div>
-                            <h3 class="text-sm font-medium text-gray-700 mb-2">Adresse de retour</h3>
+                            <h3 class="text-sm font-medium text-gray-700 mb-2">{{ __('app.rental_orders.return_address') }}</h3>
                             <div class="p-3 bg-gray-50 rounded-md">
                                 <p class="text-sm text-gray-900 whitespace-pre-line">{{ $orderLocation->return_address }}</p>
                             </div>
@@ -143,7 +143,7 @@
                 @if($orderLocation->notes)
                 <!-- Notes -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Notes additionnelles</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.rental_orders.additional_notes') }}</h2>
                     <div class="p-3 bg-gray-50 rounded-md">
                         <p class="text-sm text-gray-900 whitespace-pre-line">{{ $orderLocation->notes }}</p>
                     </div>
@@ -152,7 +152,7 @@
 
                 <!-- Produits loués -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Produits loués</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.rental_orders.ordered_items') }}</h2>
                     
                     <div class="space-y-4">
                         @foreach($orderLocation->items as $item)
@@ -170,23 +170,23 @@
                             @endif
                             
                             <div class="flex-1">
-                                <h4 class="font-medium text-gray-900">{{ $item->product_name }}</h4>
+                                <h4 class="font-medium text-gray-900">{{ trans_product($item) }}</h4>
                                 @if($item->product_description)
                                     <p class="text-sm text-gray-600 mt-1">{{ Str::limit($item->product_description, 100) }}</p>
                                 @endif
                                 
                                 <div class="mt-2 flex items-center space-x-4 text-sm text-gray-600">
-                                    <span>Quantité: {{ $item->quantity }}</span>
-                                    <span>{{ number_format($item->daily_rate, 2) }}€/jour</span>
-                                    <span>{{ $item->rental_days }} jours</span>
+                                    <span>{{ __('app.rental_orders.quantity') }}: {{ $item->quantity }}</span>
+                                    <span>{{ number_format($item->daily_rate, 2) }}€{{ __('app.rental_orders.per_day') }}</span>
+                                    <span>{{ $item->rental_days }} {{ __('app.rental_orders.days') }}</span>
                                 </div>
                                 
                                 <div class="mt-2">
                                     <span class="text-sm font-medium text-gray-900">
-                                        Sous-total: {{ number_format($item->subtotal, 2) }}€
+                                        {{ __('app.rental_orders.subtotal_label') }}: {{ number_format($item->subtotal, 2) }}€
                                     </span>
                                     <span class="text-sm text-gray-600 ml-4">
-                                        Caution: {{ number_format($item->total_deposit, 2) }}€
+                                        {{ __('app.rental_orders.deposit_label') }}: {{ number_format($item->total_deposit, 2) }}€
                                     </span>
                                 </div>
                             </div>
@@ -199,24 +199,24 @@
             <!-- Colonne de droite : Récapitulatif -->
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-lg shadow p-6 sticky top-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Récapitulatif</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.rental_orders.summary') }}</h2>
                     
                     <!-- Total -->
                     <div class="space-y-2">
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Sous-total location</span>
+                            <span class="text-gray-600">{{ __('app.rental_orders.rental_subtotal') }}</span>
                             <span>{{ number_format($orderLocation->subtotal, 2) }}€</span>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Caution totale</span>
+                            <span class="text-gray-600">{{ __('app.rental_orders.total_deposit') }}</span>
                             <span>{{ number_format($orderLocation->deposit_amount, 2) }}€</span>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">TVA ({{ $orderLocation->tax_rate }}%)</span>
+                            <span class="text-gray-600">{{ __('app.rental_orders.tax') }} ({{ $orderLocation->tax_rate }}%)</span>
                             <span>{{ number_format($orderLocation->tax_amount, 2) }}€</span>
                         </div>
                         <div class="flex justify-between text-lg font-semibold pt-2 border-t border-gray-200">
-                            <span>Total payé</span>
+                            <span>{{ __('app.rental_orders.total_paid') }}</span>
                             <span>{{ number_format($orderLocation->total_amount, 2) }}€</span>
                         </div>
                     </div>
@@ -227,7 +227,7 @@
                         <button type="button" 
                                 onclick="cancelOrder({{ $orderLocation->id }}, '{{ $orderLocation->status }}')"
                                 class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                            ❌ Annuler la commande
+                            ❌ {{ __('app.rental_orders.cancel_order') }}
                         </button>
                     </div>
                     @endif
@@ -237,7 +237,7 @@
                     <div class="mt-6 pt-6 border-t border-gray-200">
                         <a href="{{ route('rental-orders.invoice', $orderLocation) }}" 
                            class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 block text-center">
-                            📄 Télécharger la facture
+                            📄 {{ __('app.rental_orders.download_invoice') }}
                         </a>
                     </div>
                     @endif
@@ -259,24 +259,24 @@
                         </svg>
                     </div>
                     <h3 class="ml-3 text-lg font-medium text-gray-900">
-                        Annuler la commande de location
+                        {{ __('app.rental_orders.cancel_rental_modal_title') }}
                     </h3>
                 </div>
                 
                 <p class="text-sm text-gray-500 mb-4">
-                    Êtes-vous sûr de vouloir annuler cette commande de location ? Cette action ne peut pas être annulée.
+                    {{ __('app.rental_orders.cancel_confirmation_text') }}
                 </p>
                 
                 <div class="mb-4">
                     <label for="cancellation_reason" class="block text-sm font-medium text-gray-700 mb-2">
-                        Raison de l'annulation *
+                        {{ __('app.rental_orders.cancellation_reason') }} *
                     </label>
                     <textarea 
                         id="cancellation_reason" 
                         name="cancellation_reason" 
                         rows="3" 
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                        placeholder="Veuillez expliquer la raison de l'annulation..."
+                        placeholder="{{ __('app.rental_orders.cancellation_reason_placeholder') }}"
                         required></textarea>
                 </div>
                 
@@ -284,12 +284,12 @@
                     <button type="button" 
                             onclick="closeCancelModal()" 
                             class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Annuler
+                        {{ __('app.rental_orders.cancel') }}
                     </button>
                     <button type="button" 
                             onclick="confirmCancellation()" 
                             class="px-4 py-2 bg-red-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                        ❌ Confirmer l'annulation
+                        ❌ {{ __('app.rental_orders.confirm_cancellation') }}
                     </button>
                 </div>
             </div>
@@ -309,19 +309,19 @@
                         </svg>
                     </div>
                     <h3 class="ml-3 text-lg font-medium text-gray-900">
-                        Annulation impossible
+                        {{ __('app.rental_orders.cancellation_impossible') }}
                     </h3>
                 </div>
                 
                 <p class="text-sm text-gray-500 mb-4">
-                    Il n'est pas possible d'annuler une location en cours. Veuillez contacter notre service client pour toute assistance.
+                    {{ __('app.rental_orders.active_rental_cancellation_text') }}
                 </p>
                 
                 <div class="flex justify-end">
                     <button type="button" 
                             onclick="closeInfoModal()" 
                             class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Compris
+                        {{ __('app.rental_orders.ok') }}
                     </button>
                 </div>
             </div>
