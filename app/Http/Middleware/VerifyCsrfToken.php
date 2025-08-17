@@ -18,6 +18,7 @@ class VerifyCsrfToken extends Middleware
         // Exclure les webhooks et autres endpoints qui ne nécessitent pas de CSRF
         'api/stripe/webhook',
         'api/webhook/stripe',
+    // temporary debug routes removed
         // Exclure les APIs publiques de location
         'api/rentals/*',
     ];

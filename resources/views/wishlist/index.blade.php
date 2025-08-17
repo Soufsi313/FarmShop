@@ -514,7 +514,7 @@ window.addToCartFromWishlist = async function(productId) {
             updateCartCount(data.cart_count);
             
             // Afficher message de succès
-            showNotification('{{ __('app.wishlist.added_to_cart_success') }}', 'success');
+            showNotification('Produit ajouté au panier avec succès', 'success');
         } else {
             showNotification(data.message || '{{ __('app.wishlist.add_to_cart_error') }}', 'error');
         }

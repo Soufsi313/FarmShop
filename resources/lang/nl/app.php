@@ -168,6 +168,13 @@ return array (
   array (
     'total' => 'Totaal',
     'category' => 'Categorie',
+    'subtotal' => 'Subtotaal',
+    'tax' => 'BTW',
+    'payment' => 'Betaling',
+  ),
+  'forms' => 
+  array (
+    'delivery_address' => 'Bezorgadres',
   ),
   'pages' => 
   array (
@@ -973,5 +980,44 @@ return array (
     'update' => 'Bijwerken',
     'add' => 'Toevoegen',
     'remove' => 'Weghalen',
+    'sort_by' => 'Sorteren op',
+  ),
+  'status' => 
+  array (
+    'pending' => 'In afwachting',
+    'confirmed' => 'Bevestigd',
+    'shipped' => 'Verzonden',
+    'delivered' => 'Geleverd',
+    'cancelled' => 'Geannuleerd',
+    'return_requested' => 'Retour aangevraagd',
+    'returned' => 'Geretourneerd',
+  ),
+  'orders' => 
+  array (
+    'my_orders' => 'Mijn Bestellingen',
+    'description' => 'Volg de status van uw bestellingen en beheer uw aankopen',
+    'filter_by_status' => 'Filteren op status',
+    'all_statuses' => 'Alle statussen',
+    'placed_on' => 'Geplaatst op',
+    'other_items' => 'andere artikelen',
+    'download_invoice' => 'Factuur downloaden',
+    'order_number' => 'Bestelling',
+    'back_to_orders' => 'Terug naar mijn bestellingen',
+    'ordered_items' => 'Bestelde artikelen',
+    'billing_address' => 'Factuuradres',
+    'order_summary' => 'Bestellingsoverzicht',
+    'actions' => 'Acties',
+    'payment_method' => 'Methode',
+    'payment_status' => 'Status',
+    'paid_on' => 'Betaald op',
+    'cancel_order' => 'Bestelling annuleren',
+    'reorder' => 'Deze bestelling opnieuw bestellen',
+    'request_return' => 'Retour aanvragen',
+    'sort' => array(
+      'most_recent' => 'Meest recent',
+      'oldest' => 'Oudste',
+      'amount_desc' => 'Bedrag aflopend',
+      'amount_asc' => 'Bedrag oplopend',
+    ),
   ),
 );

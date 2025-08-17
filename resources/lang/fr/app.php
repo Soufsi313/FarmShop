@@ -105,6 +105,13 @@ return array (
   array (
     'total' => 'Total',
     'category' => 'Catégorie',
+    'subtotal' => 'Sous-total',
+    'tax' => 'TVA',
+    'payment' => 'Paiement',
+  ),
+  'forms' => 
+  array (
+    'delivery_address' => 'Adresse de livraison',
   ),
   'pages' => 
   array (
@@ -893,5 +900,52 @@ return array (
     'filet-anti-insectes-3418' => 'Filet anti-insectes maille fine 0,8mm pour protection bio. Polyéthylène traité UV, transparence 90%. Dimensions 4x10m. Laisse passer air et lumière tout en bloquant pucerons, altises et mouches. Installation facile.',
     'serre-tunnel-3x2m-7259' => 'Serre tunnel galvanisée 3x2m hauteur 2m. Structure tube Ø25mm résistant vents 80km/h. Bâche polyéthylène 200 microns anti-UV. 2 portes avec moustiquaires. Parfaite pour cultures précoces et hivernage.',
     'composteur-rotatif-3230' => 'Composteur rotatif 160L double chambre pour compost rapide. Rotation 360° facilitant brassage et aération. Matériau recyclé résistant UV et intempéries. Production compost mature en 6-8 semaines. Socle stable inclus.',
+  ),
+  'status' => 
+  array (
+    'pending' => 'En attente',
+    'confirmed' => 'Confirmée',
+    'shipped' => 'Expédiée',
+    'delivered' => 'Livrée',
+    'cancelled' => 'Annulée',
+    'return_requested' => 'Retour demandé',
+    'returned' => 'Retournée',
+  ),
+  'buttons' => 
+  array (
+    'sort_by' => 'Trier par',
+    'view_details' => 'Voir les détails',
+    'download_invoice' => 'Télécharger la facture',
+    'cancel_order' => 'Annuler la commande',
+    'request_return' => 'Demander un retour',
+    'reorder' => 'Renouveler la commande',
+  ),
+  'orders' => 
+  array (
+    'my_orders' => 'Mes Commandes',
+    'description' => 'Suivez l\'état de vos commandes et gérez vos achats',
+    'filter_by_status' => 'Filtrer par statut',
+    'all_statuses' => 'Tous les statuts',
+    'placed_on' => 'Passée le',
+    'other_items' => 'autres articles',
+    'download_invoice' => 'Télécharger la facture',
+    'order_number' => 'Commande',
+    'back_to_orders' => 'Retour à mes commandes',
+    'ordered_items' => 'Articles commandés',
+    'billing_address' => 'Adresse de facturation',
+    'order_summary' => 'Résumé de la commande',
+    'actions' => 'Actions',
+    'payment_method' => 'Méthode',
+    'payment_status' => 'Statut',
+    'paid_on' => 'Payé le',
+    'cancel_order' => 'Annuler la commande',
+    'reorder' => 'Renouveler cette commande',
+    'request_return' => 'Demander un retour',
+    'sort' => array(
+      'most_recent' => 'Plus récentes',
+      'oldest' => 'Plus anciennes',
+      'amount_desc' => 'Montant décroissant',
+      'amount_asc' => 'Montant croissant',
+    ),
   ),
 );

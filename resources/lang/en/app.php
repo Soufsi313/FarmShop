@@ -104,6 +104,13 @@ return array (
   array (
     'total' => 'Total',
     'category' => 'Category',
+    'subtotal' => 'Subtotal',
+    'tax' => 'Tax',
+    'payment' => 'Payment',
+  ),
+  'forms' => 
+  array (
+    'delivery_address' => 'Delivery address',
   ),
   'pages' => 
   array (
@@ -926,5 +933,43 @@ return array (
     'filet-anti-insectes-3418' => 'Fine-mesh 0.8mm insect protection net for organic protection. UV-treated polyethylene, 90% transparency. 4x10m dimensions. Allows air and light passage while blocking aphids, flea beetles, and flies. Easy installation.',
     'serre-tunnel-3x2m-7259' => 'Galvanized tunnel greenhouse 3x2m height 2m. Ø25mm tube structure resistant to 80km/h winds. 200-micron UV-resistant polyethylene cover. 2 doors with mosquito nets. Perfect for early crops and overwintering.',
     'composteur-rotatif-3230' => 'Rotating composter 160L dual chamber for rapid composting. 360° rotation facilitating mixing and aeration. UV and weather-resistant recycled material. Mature compost production in 6-8 weeks. Stable base included.',
+  ),
+  'status' => 
+  array (
+    'pending' => 'Pending',
+    'confirmed' => 'Confirmed',
+    'shipped' => 'Shipped',
+    'delivered' => 'Delivered',
+    'cancelled' => 'Cancelled',
+    'return_requested' => 'Return requested',
+    'returned' => 'Returned',
+  ),
+  'orders' => 
+  array (
+    'my_orders' => 'My Orders',
+    'description' => 'Track your orders status and manage your purchases',
+    'filter_by_status' => 'Filter by status',
+    'all_statuses' => 'All statuses',
+    'placed_on' => 'Placed on',
+    'other_items' => 'other items',
+    'download_invoice' => 'Download invoice',
+    'order_number' => 'Order',
+    'back_to_orders' => 'Back to my orders',
+    'ordered_items' => 'Ordered items',
+    'billing_address' => 'Billing address',
+    'order_summary' => 'Order summary',
+    'actions' => 'Actions',
+    'payment_method' => 'Method',
+    'payment_status' => 'Status',
+    'paid_on' => 'Paid on',
+    'cancel_order' => 'Cancel order',
+    'reorder' => 'Reorder this order',
+    'request_return' => 'Request return',
+    'sort' => array(
+      'most_recent' => 'Most recent',
+      'oldest' => 'Oldest',
+      'amount_desc' => 'Amount descending',
+      'amount_asc' => 'Amount ascending',
+    ),
   ),
 );

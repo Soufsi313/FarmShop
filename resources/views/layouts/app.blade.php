@@ -474,6 +474,7 @@
                                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                 </svg>
                                 <span>Wishlist</span>
+                                <span id="wishlist-count" class="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-1 hidden">0</span>
                             </a>
                         @endauth
                         
@@ -642,6 +643,7 @@
                                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                         </svg>
                                         Ma Wishlist
+                                        <span id="wishlist-count-dropdown" class="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-1 hidden">0</span>
                                     </div>
                                 </a>
                                 <form method="POST" action="{{ route('logout') }}">
@@ -689,6 +691,7 @@
                                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                             </svg>
                             Wishlist
+                            <span id="wishlist-count-mobile" class="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-1 hidden">0</span>
                         </a>
                         <a href="{{ route('orders.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Mes achats</a>
                         <a href="{{ route('rental-orders.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Mes locations</a>
@@ -1216,6 +1219,7 @@
             @auth
             loadCartCount();
             loadCartLocationCount();
+            loadWishlistCount();
             @endauth
         }
 
@@ -1241,6 +1245,27 @@
                     cartLocationCountElement.classList.remove('hidden');
                 }
             }
+        };
+
+        // Fonction globale pour mettre à jour le compteur de wishlist
+        window.updateWishlistCount = function(count) {
+            const wishlistCountElements = [
+                document.getElementById('wishlist-count'),
+                document.getElementById('wishlist-count-mobile'),
+                document.getElementById('wishlist-count-dropdown')
+            ];
+            
+            wishlistCountElements.forEach(element => {
+                if (element) {
+                    element.textContent = count;
+                    element.style.display = count > 0 ? 'inline' : 'none';
+                    if (count > 0) {
+                        element.classList.remove('hidden');
+                    } else {
+                        element.classList.add('hidden');
+                    }
+                }
+            });
         };
 
         // Charger le compteur du panier d'achat
@@ -1280,6 +1305,33 @@
                 }
             } catch (error) {
                 console.error('Erreur lors du chargement du compteur panier location:', error);
+            }
+        }
+
+        // Charger le compteur de wishlist
+        async function loadWishlistCount() {
+            try {
+                const response = await fetch('/web/wishlist/count', {
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data && typeof data.data.count === 'number') {
+                        updateWishlistCount(data.data.count);
+                    }
+                } else if (response.status === 401) {
+                    // Utilisateur non connecté, ce n'est pas une erreur
+                    console.log('Utilisateur non connecté - pas de wishlist');
+                } else {
+                    console.error('Erreur HTTP:', response.status);
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement du compteur wishlist:', error);
             }
         }
     </script>

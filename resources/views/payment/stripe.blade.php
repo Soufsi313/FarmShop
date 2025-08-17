@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', {{ __("app.ecommerce.payment") }})
+@section('title', __("app.ecommerce.payment"))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">

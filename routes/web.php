@@ -13,6 +13,20 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+
+// Temporary debug/test routes removed. Use the authenticated
+// route POST /web/likes/products/{product}/toggle handled by
+// ProductLikeController for production behaviour.
+
+// Routes web pour likes et wishlists (retournent du JSON mais utilisent l'auth web)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/web/likes/products/{product}/toggle', [\App\Http\Controllers\ProductLikeController::class, 'toggle'])->name('web.likes.toggle');
+    Route::get('/web/wishlist/count', [\App\Http\Controllers\WishlistController::class, 'count'])->name('web.wishlist.count');
+    Route::post('/web/wishlist/products/{product}/toggle', [\App\Http\Controllers\WishlistController::class, 'toggle'])->name('web.wishlist.toggle');
+    Route::delete('/web/wishlist/products/{product}', [\App\Http\Controllers\WishlistController::class, 'destroy'])->name('web.wishlist.destroy');
+    Route::delete('/web/wishlist/clear', [\App\Http\Controllers\WishlistController::class, 'clear'])->name('web.wishlist.clear');
+});
+
 use App\Http\Controllers\Admin\OrderLocationController as AdminOrderLocationController;
 use App\Http\Controllers\Admin\SpecialOfferController as AdminSpecialOfferController;
 use App\Http\Controllers\Admin\MessageController as AdminMessageController;
@@ -688,6 +702,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 // Routes web pour likes et wishlists (retournent du JSON mais utilisent l'auth web)
 Route::middleware(['auth'])->group(function () {
     Route::post('/web/likes/products/{product}/toggle', [\App\Http\Controllers\ProductLikeController::class, 'toggle'])->name('web.likes.toggle');
+    Route::get('/web/wishlist/count', [\App\Http\Controllers\WishlistController::class, 'count'])->name('web.wishlist.count');
     Route::post('/web/wishlist/products/{product}/toggle', [\App\Http\Controllers\WishlistController::class, 'toggle'])->name('web.wishlist.toggle');
     Route::delete('/web/wishlist/products/{product}', [\App\Http\Controllers\WishlistController::class, 'destroy'])->name('web.wishlist.destroy');
     Route::delete('/web/wishlist/clear', [\App\Http\Controllers\WishlistController::class, 'clear'])->name('web.wishlist.clear');
