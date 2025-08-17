@@ -743,6 +743,56 @@ return array (
     'cancel' => 'Annuler',
   ),
   
+  // Traductions pour la page checkout-rental
+  'checkout_rental' => [
+    // En-tête et navigation
+    'title' => 'Finaliser ma location',
+    'meta_title' => 'Finaliser ma location - FarmShop',
+    'description' => 'Vérifiez vos informations avant de confirmer votre commande de location',
+    'breadcrumb_home' => 'Accueil',
+    'breadcrumb_cart' => 'Panier de Location',
+    'breadcrumb_checkout' => 'Finaliser ma location',
+    
+    // Messages d'erreur et succès
+    'validation_errors' => 'Erreurs de validation :',
+    
+    // Période de location
+    'rental_period_title' => 'Période de location',
+    'start_date_label' => 'Date de début',
+    'end_date_label' => 'Date de fin',
+    'rental_duration' => 'Durée de location :',
+    'days' => 'jour(s)',
+    
+    // Adresses
+    'addresses_title' => 'Adresses de récupération et retour',
+    'pickup_address_title' => 'Adresse de récupération',
+    'pickup_address_placeholder' => 'Indiquez l\'adresse où vous souhaitez récupérer le matériel',
+    'return_address_title' => 'Adresse de retour',
+    'return_address_placeholder' => 'Indiquez l\'adresse où vous souhaitez retourner le matériel',
+    'same_address_checkbox' => 'Même adresse que la récupération',
+    
+    // Notes
+    'notes_title' => 'Notes additionnelles',
+    'notes_placeholder' => 'Informations supplémentaires sur votre location (instructions spéciales, créneaux de disponibilité, etc.)',
+    
+    // Récapitulatif
+    'summary_title' => 'Récapitulatif de location',
+    'quantity_label' => 'Quantité:',
+    'per_day' => '€/jour',
+    'period_label' => 'Période:',
+    'subtotal_rental' => 'Sous-total location',
+    'total_deposit' => 'Caution totale',
+    'vat' => 'TVA (21%)',
+    'total_to_pay' => 'Total à payer',
+    'deposit_note' => '* La caution sera bloquée sur votre carte et libérée au retour du matériel en bon état',
+    
+    // Actions
+    'confirm_rental' => 'Confirmer ma location',
+    
+    // JavaScript - Dates et calculs
+    'js_days' => 'jour(s)'
+  ],
+  
   'wishlist' => 
   array (
     'title' => 'Ma Liste de Souhaits',

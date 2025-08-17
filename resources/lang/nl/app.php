@@ -1097,6 +1097,56 @@ return array (
     'cancel' => 'Annuleren',
   ),
   
+  // Vertalingen voor checkout-rental pagina
+  'checkout_rental' => [
+    // Header en navigatie
+    'title' => 'Mijn verhuur afronden',
+    'meta_title' => 'Mijn verhuur afronden - FarmShop',
+    'description' => 'Controleer uw gegevens voordat u uw verhuurbestelling bevestigt',
+    'breadcrumb_home' => 'Home',
+    'breadcrumb_cart' => 'Verhuurwagen',
+    'breadcrumb_checkout' => 'Mijn verhuur afronden',
+    
+    // Fout- en succesboodschappen
+    'validation_errors' => 'Validatiefouten:',
+    
+    // Verhuurperiode
+    'rental_period_title' => 'Verhuurperiode',
+    'start_date_label' => 'Startdatum',
+    'end_date_label' => 'Einddatum',
+    'rental_duration' => 'Verhuurduur:',
+    'days' => 'dag(en)',
+    
+    // Adressen
+    'addresses_title' => 'Ophaal- en retouradressen',
+    'pickup_address_title' => 'Ophaaladres',
+    'pickup_address_placeholder' => 'Geef het adres op waar u de apparatuur wilt ophalen',
+    'return_address_title' => 'Retouradres',
+    'return_address_placeholder' => 'Geef het adres op waar u de apparatuur wilt terugbrengen',
+    'same_address_checkbox' => 'Hetzelfde adres als ophalen',
+    
+    // Notities
+    'notes_title' => 'Aanvullende notities',
+    'notes_placeholder' => 'Aanvullende informatie over uw verhuur (speciale instructies, beschikbaarheidsslots, enz.)',
+    
+    // Samenvatting
+    'summary_title' => 'Verhuursamenvatting',
+    'quantity_label' => 'Hoeveelheid:',
+    'per_day' => '€/dag',
+    'period_label' => 'Periode:',
+    'subtotal_rental' => 'Verhuursubtotaal',
+    'total_deposit' => 'Totale borg',
+    'vat' => 'BTW (21%)',
+    'total_to_pay' => 'Totaal te betalen',
+    'deposit_note' => '* De borg wordt geblokkeerd op uw kaart en vrijgegeven wanneer de apparatuur in goede staat wordt teruggebracht',
+    
+    // Acties
+    'confirm_rental' => 'Mijn verhuur bevestigen',
+    
+    // JavaScript - Datums en berekeningen
+    'js_days' => 'dag(en)'
+  ],
+  
   'wishlist' => 
   array (
     'title' => 'Mijn Verlanglijst',

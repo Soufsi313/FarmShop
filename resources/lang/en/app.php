@@ -777,6 +777,56 @@ return array (
     'cancel' => 'Cancel',
   ),
   
+  // Translations for checkout-rental page
+  'checkout_rental' => [
+    // Header and navigation
+    'title' => 'Complete my rental',
+    'meta_title' => 'Complete my rental - FarmShop',
+    'description' => 'Check your information before confirming your rental order',
+    'breadcrumb_home' => 'Home',
+    'breadcrumb_cart' => 'Rental Cart',
+    'breadcrumb_checkout' => 'Complete my rental',
+    
+    // Error and success messages
+    'validation_errors' => 'Validation errors:',
+    
+    // Rental period
+    'rental_period_title' => 'Rental period',
+    'start_date_label' => 'Start date',
+    'end_date_label' => 'End date',
+    'rental_duration' => 'Rental duration:',
+    'days' => 'day(s)',
+    
+    // Addresses
+    'addresses_title' => 'Pickup and return addresses',
+    'pickup_address_title' => 'Pickup address',
+    'pickup_address_placeholder' => 'Please specify the address where you want to pick up the equipment',
+    'return_address_title' => 'Return address',
+    'return_address_placeholder' => 'Please specify the address where you want to return the equipment',
+    'same_address_checkbox' => 'Same address as pickup',
+    
+    // Notes
+    'notes_title' => 'Additional notes',
+    'notes_placeholder' => 'Additional information about your rental (special instructions, availability slots, etc.)',
+    
+    // Summary
+    'summary_title' => 'Rental summary',
+    'quantity_label' => 'Quantity:',
+    'per_day' => '€/day',
+    'period_label' => 'Period:',
+    'subtotal_rental' => 'Rental subtotal',
+    'total_deposit' => 'Total deposit',
+    'vat' => 'VAT (21%)',
+    'total_to_pay' => 'Total to pay',
+    'deposit_note' => '* The deposit will be blocked on your card and released when the equipment is returned in good condition',
+    
+    // Actions
+    'confirm_rental' => 'Confirm my rental',
+    
+    // JavaScript - Dates and calculations
+    'js_days' => 'day(s)'
+  ],
+  
   'wishlist' => 
   array (
     'title' => 'My Wishlist',
