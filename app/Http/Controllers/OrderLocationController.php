@@ -118,15 +118,11 @@ class OrderLocationController extends Controller
         // Calculer le résumé du panier
         $summary = $cartLocation->getSummary();
         
-        // Récupérer les traductions des noms de produits pour la langue courante
-        $locale = app()->getLocale();
-        $productNames = __('app.product_names', [], $locale);
-        
         \Log::info('DEBUG Checkout - Résumé calculé', [
             'summary' => $summary
         ]);
         
-        return view('checkout-rental.index', compact('cartLocation', 'summary', 'productNames'));
+        return view('checkout-rental.index', compact('cartLocation', 'summary'));
     }
 
     /**

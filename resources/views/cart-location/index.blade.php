@@ -329,6 +329,7 @@ document.addEventListener('alpine:init', () => {
             start_date: '',
             end_date: ''
         },
+        // MODIFICATION TEMPORAIRE POUR TESTS : Autoriser les locations le jour même
         minDate: new Date().toISOString().split('T')[0],
 
         // Initialize

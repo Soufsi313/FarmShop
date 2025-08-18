@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FarmShop - Schéma de Base de Données</title>
+    <style>
+        body { margin: 0; padding: 20px; background: #f5f5f5; font-family: Arial, sans-serif; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c5aa0; text-align: center; margin-bottom: 30px; }
+        .schema { text-align: center; }
+        .legend { margin-top: 30px; display: flex; justify-content: center; gap: 30px; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-color { width: 15px; height: 15px; border-radius: 3px; }
+        .pk { background: #d4af37; }
+        .fk { background: #4a90e2; }
+        .relation { background: #666; height: 2px; width: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌾 FarmShop - Schéma de Base de Données</h1>
+        <div class="schema">
+            <?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="7350" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <style>
+    .table-header { fill: #2c5aa0; color: white; font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; }
+    .table-name { fill: white; font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; }
+    .column-text { fill: #333; font-family: Arial, sans-serif; font-size: 10px; }
+    .pk-column { fill: #d4af37; font-weight: bold; }
+    .fk-column { fill: #4a90e2; }
+    .table-border { fill: none; stroke: #ccc; stroke-width: 1; }
+    .relation-line { stroke: #666; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
+  </style>
+  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+  </marker>
+</defs>
+
+<text x="400" y="25" text-anchor="middle" style="fill: #2c5aa0; font-family: Arial, sans-serif; font-size: 18px; font-weight: bold;">FarmShop - Schéma de Base de Données</text>
+
+<rect x="50" y="50" width="200" height="410" class="table-border" fill="white"/>
+<rect x="50" y="50" width="200" height="30" class="table-header"/>
+<text x="150" y="68" text-anchor="middle" class="table-name">blog_categories</text>
+<text x="55" y="95" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="55" y="115" class="column-text">name: varchar(255)</text>
+<text x="55" y="135" class="column-text">slug: varchar(255)</text>
+<text x="55" y="155" class="column-text">description: text (null)</text>
+<text x="55" y="175" class="column-text">color: varchar(255)</text>
+<text x="55" y="195" class="column-text">icon: varchar(255) (null)</text>
+<text x="55" y="215" class="column-text">featured_image: varchar(255) (null)</text>
+<text x="55" y="235" class="column-text">metadata: longtext (null)</text>
+<text x="55" y="255" class="fk-column">🔗 is_active: tinyint(1)</text>
+<text x="55" y="275" class="column-text">sort_order: int(11)</text>
+<text x="55" y="295" class="column-text">meta_title: varchar(255) (null)</text>
+<text x="55" y="315" class="column-text">meta_description: text (null)</text>
+<text x="55" y="335" class="column-text">meta_keywords: text (null)</text>
+<text x="55" y="355" class="column-text">posts_count: int(11)</text>
+<text x="55" y="375" class="column-text">views_count: int(11)</text>
+<text x="55" y="395" class="fk-column">🔗 created_by: bigint(20) unsigned</text>
+<text x="55" y="415" class="column-text">created_at: timestamp (null)</text>
+<text x="55" y="435" class="column-text">updated_at: timestamp (null)</text>
+<text x="55" y="455" class="column-text">deleted_at: timestamp (null)</text>
+<rect x="300" y="50" width="200" height="370" class="table-border" fill="white"/>
+<rect x="300" y="50" width="200" height="30" class="table-header"/>
+<text x="400" y="68" text-anchor="middle" class="table-name">blog_comment_reports</text>
+<text x="305" y="95" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="305" y="115" class="fk-column">🔗 blog_comment_id: bigint(20) unsigned</text>
+<text x="305" y="135" class="fk-column">🔗 reported_by: bigint(20) unsigned</text>
+<text x="305" y="155" class="column-text">reason: enum('spam','inappropriate_content','harassment','hate_speech','false_information','copyright_violation','other')</text>
+<text x="305" y="175" class="column-text">description: text (null)</text>
+<text x="305" y="195" class="column-text">additional_info: longtext (null)</text>
+<text x="305" y="215" class="fk-column">🔗 status: enum('pending','reviewed','resolved','dismissed')</text>
+<text x="305" y="235" class="column-text">admin_notes: text (null)</text>
+<text x="305" y="255" class="fk-column">🔗 reviewed_by: bigint(20) unsigned (null)</text>
+<text x="305" y="275" class="fk-column">🔗 reviewed_at: timestamp (null)</text>
+<text x="305" y="295" class="column-text">action_taken: enum('none','warning_sent','comment_hidden','comment_deleted','user_warned','user_suspended','user_banned') (null)</text>
+<text x="305" y="315" class="column-text">priority: enum('low','medium','high','urgent')</text>
+<text x="305" y="335" class="column-text">reporter_ip: varchar(45) (null)</text>
+<text x="305" y="355" class="column-text">reporter_user_agent: varchar(255) (null)</text>
+<text x="305" y="375" class="column-text">evidence: longtext (null)</text>
+<text x="305" y="395" class="column-text">created_at: timestamp (null)</text>
+<text x="305" y="415" class="column-text">updated_at: timestamp (null)</text>
+<rect x="550" y="50" width="200" height="550" class="table-border" fill="white"/>
+<rect x="550" y="50" width="200" height="30" class="table-header"/>
+<text x="650" y="68" text-anchor="middle" class="table-name">blog_comments</text>
+<text x="555" y="95" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="555" y="115" class="fk-column">🔗 blog_post_id: bigint(20) unsigned</text>
+<text x="555" y="135" class="fk-column">🔗 user_id: bigint(20) unsigned</text>
+<text x="555" y="155" class="fk-column">🔗 parent_id: bigint(20) unsigned (null)</text>
+<text x="555" y="175" class="column-text">content: text</text>
+<text x="555" y="195" class="column-text">original_content: text (null)</text>
+<text x="555" y="215" class="fk-column">🔗 status: enum('pending','approved','rejected','spam')</text>
+<text x="555" y="235" class="column-text">rejection_reason: text (null)</text>
+<text x="555" y="255" class="fk-column">🔗 moderated_by: bigint(20) unsigned (null)</text>
+<text x="555" y="275" class="column-text">moderated_at: timestamp (null)</text>
+<text x="555" y="295" class="column-text">guest_name: varchar(255) (null)</text>
+<text x="555" y="315" class="column-text">guest_email: varchar(255) (null)</text>
+<text x="555" y="335" class="column-text">guest_website: varchar(255) (null)</text>
+<text x="555" y="355" class="column-text">ip_address: varchar(45) (null)</text>
+<text x="555" y="375" class="column-text">user_agent: varchar(255) (null)</text>
+<text x="555" y="395" class="column-text">likes_count: int(11)</text>
+<text x="555" y="415" class="column-text">replies_count: int(11)</text>
+<text x="555" y="435" class="column-text">is_pinned: tinyint(1)</text>
+<text x="555" y="455" class="column-text">reports_count: int(11)</text>
+<text x="555" y="475" class="fk-column">🔗 is_reported: tinyint(1)</text>
+<text x="555" y="495" class="column-text">metadata: longtext (null)</text>
+<text x="555" y="515" class="column-text">is_edited: tinyint(1)</text>
+<text x="555" y="535" class="column-text">edited_at: timestamp (null)</text>
+<text x="555" y="555" class="column-text">created_at: timestamp (null)</text>
+<text x="555" y="575" class="column-text">updated_at: timestamp (null)</text>
+<text x="555" y="595" class="column-text">deleted_at: timestamp (null)</text>
+<rect x="50" y="650" width="200" height="190" class="table-border" fill="white"/>
+<rect x="50" y="650" width="200" height="30" class="table-header"/>
+<text x="150" y="668" text-anchor="middle" class="table-name">blog_post_translations</text>
+<text x="55" y="695" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="55" y="715" class="fk-column">🔗 blog_post_id: bigint(20) unsigned</text>
+<text x="55" y="735" class="column-text">locale: varchar(2)</text>
+<text x="55" y="755" class="column-text">title: varchar(255)</text>
+<text x="55" y="775" class="column-text">excerpt: text (null)</text>
+<text x="55" y="795" class="column-text">content: longtext (null)</text>
+<text x="55" y="815" class="column-text">created_at: timestamp (null)</text>
+<text x="55" y="835" class="column-text">updated_at: timestamp (null)</text>
+<rect x="300" y="650" width="200" height="910" class="table-border" fill="white"/>
+<rect x="300" y="650" width="200" height="30" class="table-header"/>
+<text x="400" y="668" text-anchor="middle" class="table-name">blog_posts</text>
+<text x="305" y="695" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="305" y="715" class="fk-column">🔗 blog_category_id: bigint(20) unsigned</text>
+<text x="305" y="735" class="column-text">title: varchar(255)</text>
+<text x="305" y="755" class="column-text">title_en: varchar(255) (null)</text>
+<text x="305" y="775" class="column-text">title_nl: varchar(255) (null)</text>
+<text x="305" y="795" class="column-text">slug: varchar(255)</text>
+<text x="305" y="815" class="column-text">slug_en: varchar(255) (null)</text>
+<text x="305" y="835" class="column-text">slug_nl: varchar(255) (null)</text>
+<text x="305" y="855" class="column-text">excerpt: text (null)</text>
+<text x="305" y="875" class="column-text">excerpt_en: text (null)</text>
+<text x="305" y="895" class="column-text">excerpt_nl: text (null)</text>
+<text x="305" y="915" class="column-text">content: longtext</text>
+<text x="305" y="935" class="column-text">content_en: longtext (null)</text>
+<text x="305" y="955" class="column-text">content_nl: longtext (null)</text>
+<text x="305" y="975" class="column-text">featured_image: varchar(255) (null)</text>
+<text x="305" y="995" class="column-text">gallery: longtext (null)</text>
+<text x="305" y="1015" class="fk-column">🔗 status: enum('draft','published','scheduled','archived')</text>
+<text x="305" y="1035" class="fk-column">🔗 published_at: timestamp (null)</text>
+<text x="305" y="1055" class="column-text">scheduled_for: timestamp (null)</text>
+<text x="305" y="1075" class="column-text">meta_title: varchar(255) (null)</text>
+<text x="305" y="1095" class="column-text">meta_title_en: varchar(255) (null)</text>
+<text x="305" y="1115" class="column-text">meta_title_nl: varchar(255) (null)</text>
+<text x="305" y="1135" class="column-text">meta_description: text (null)</text>
+<text x="305" y="1155" class="column-text">meta_description_en: text (null)</text>
+<text x="305" y="1175" class="column-text">meta_description_nl: text (null)</text>
+<text x="305" y="1195" class="column-text">meta_keywords: text (null)</text>
+<text x="305" y="1215" class="column-text">meta_keywords_en: text (null)</text>
+<text x="305" y="1235" class="column-text">meta_keywords_nl: text (null)</text>
+<text x="305" y="1255" class="column-text">metadata: longtext (null)</text>
+<text x="305" y="1275" class="column-text">tags: longtext (null)</text>
+<text x="305" y="1295" class="column-text">views_count: int(11)</text>
+<text x="305" y="1315" class="column-text">likes_count: int(11)</text>
+<text x="305" y="1335" class="column-text">shares_count: int(11)</text>
+<text x="305" y="1355" class="column-text">comments_count: int(11)</text>
+<text x="305" y="1375" class="column-text">reading_time: decimal(8,2) (null)</text>
+<text x="305" y="1395" class="column-text">allow_comments: tinyint(1)</text>
+<text x="305" y="1415" class="fk-column">🔗 is_featured: tinyint(1)</text>
+<text x="305" y="1435" class="column-text">is_sticky: tinyint(1)</text>
+<text x="305" y="1455" class="fk-column">🔗 author_id: bigint(20) unsigned</text>
+<text x="305" y="1475" class="fk-column">🔗 last_edited_by: bigint(20) unsigned (null)</text>
+<text x="305" y="1495" class="column-text">last_edited_at: timestamp (null)</text>
+<text x="305" y="1515" class="column-text">created_at: timestamp (null)</text>
+<text x="305" y="1535" class="column-text">updated_at: timestamp (null)</text>
+<text x="305" y="1555" class="column-text">deleted_at: timestamp (null)</text>
+<rect x="550" y="650" width="200" height="470" class="table-border" fill="white"/>
+<rect x="550" y="650" width="200" height="30" class="table-header"/>
+<text x="650" y="668" text-anchor="middle" class="table-name">cart_item_locations</text>
+<text x="555" y="695" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="555" y="715" class="fk-column">🔗 cart_location_id: bigint(20) unsigned</text>
+<text x="555" y="735" class="fk-column">🔗 product_id: bigint(20) unsigned</text>
+<text x="555" y="755" class="fk-column">🔗 start_date: date</text>
+<text x="555" y="775" class="column-text">end_date: date</text>
+<text x="555" y="795" class="column-text">duration_days: int(11)</text>
+<text x="555" y="815" class="column-text">quantity: int(11)</text>
+<text x="555" y="835" class="column-text">unit_price_per_day: decimal(8,2)</text>
+<text x="555" y="855" class="column-text">unit_deposit: decimal(8,2)</text>
+<text x="555" y="875" class="column-text">subtotal_amount: decimal(10,2)</text>
+<text x="555" y="895" class="column-text">subtotal_deposit: decimal(10,2)</text>
+<text x="555" y="915" class="column-text">tva_amount: decimal(10,2)</text>
+<text x="555" y="935" class="column-text">total_amount: decimal(10,2)</text>
+<text x="555" y="955" class="column-text">product_name: varchar(255)</text>
+<text x="555" y="975" class="column-text">product_sku: varchar(255) (null)</text>
+<text x="555" y="995" class="column-text">rental_category_name: varchar(255) (null)</text>
+<text x="555" y="1015" class="column-text">notes: text (null)</text>
+<text x="555" y="1035" class="column-text">is_available: tinyint(1)</text>
+<text x="555" y="1055" class="column-text">availability_checked_at: timestamp (null)</text>
+<text x="555" y="1075" class="column-text">metadata: longtext (null)</text>
+<text x="555" y="1095" class="fk-column">🔗 created_at: timestamp (null)</text>
+<text x="555" y="1115" class="column-text">updated_at: timestamp (null)</text>
+<rect x="50" y="1610" width="200" height="430" class="table-border" fill="white"/>
+<rect x="50" y="1610" width="200" height="30" class="table-header"/>
+<text x="150" y="1628" text-anchor="middle" class="table-name">cart_items</text>
+<text x="55" y="1655" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="55" y="1675" class="fk-column">🔗 cart_id: bigint(20) unsigned</text>
+<text x="55" y="1695" class="fk-column">🔗 product_id: bigint(20) unsigned</text>
+<text x="55" y="1715" class="column-text">product_name: varchar(255)</text>
+<text x="55" y="1735" class="column-text">product_category: varchar(255)</text>
+<text x="55" y="1755" class="column-text">unit_price: decimal(10,2)</text>
+<text x="55" y="1775" class="column-text">quantity: int(11)</text>
+<text x="55" y="1795" class="column-text">subtotal: decimal(10,2)</text>
+<text x="55" y="1815" class="column-text">tax_rate: decimal(5,2)</text>
+<text x="55" y="1835" class="column-text">is_available: tinyint(1)</text>
+<text x="55" y="1855" class="column-text">availability_checked_at: timestamp (null)</text>
+<text x="55" y="1875" class="column-text">tax_amount: decimal(10,2)</text>
+<text x="55" y="1895" class="column-text">total: decimal(10,2)</text>
+<text x="55" y="1915" class="column-text">product_metadata: longtext (null)</text>
+<text x="55" y="1935" class="fk-column">🔗 special_offer_id: bigint(20) unsigned (null)</text>
+<text x="55" y="1955" class="column-text">original_unit_price: decimal(8,2) (null)</text>
+<text x="55" y="1975" class="column-text">discount_percentage: decimal(5,2)</text>
+<text x="55" y="1995" class="column-text">discount_amount: decimal(8,2)</text>
+<text x="55" y="2015" class="column-text">created_at: timestamp (null)</text>
+<text x="55" y="2035" class="column-text">updated_at: timestamp (null)</text>
+<rect x="300" y="1610" width="200" height="330" class="table-border" fill="white"/>
+<rect x="300" y="1610" width="200" height="30" class="table-header"/>
+<text x="400" y="1628" text-anchor="middle" class="table-name">cart_locations</text>
+<text x="305" y="1655" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="305" y="1675" class="fk-column">🔗 user_id: bigint(20) unsigned</text>
+<text x="305" y="1695" class="column-text">total_amount: decimal(10,2)</text>
+<text x="305" y="1715" class="column-text">total_deposit: decimal(10,2)</text>
+<text x="305" y="1735" class="column-text">total_tva: decimal(10,2)</text>
+<text x="305" y="1755" class="column-text">total_with_tax: decimal(10,2)</text>
+<text x="305" y="1775" class="column-text">total_items: int(11)</text>
+<text x="305" y="1795" class="column-text">total_quantity: int(11)</text>
+<text x="305" y="1815" class="column-text">default_start_date: date (null)</text>
+<text x="305" y="1835" class="column-text">default_end_date: date (null)</text>
+<text x="305" y="1855" class="column-text">default_duration_days: int(11) (null)</text>
+<text x="305" y="1875" class="column-text">notes: text (null)</text>
+<text x="305" y="1895" class="column-text">metadata: longtext (null)</text>
+<text x="305" y="1915" class="fk-column">🔗 created_at: timestamp (null)</text>
+<text x="305" y="1935" class="column-text">updated_at: timestamp (null)</text>
+<rect x="550" y="1610" width="200" height="310" class="table-border" fill="white"/>
+<rect x="550" y="1610" width="200" height="30" class="table-header"/>
+<text x="650" y="1628" text-anchor="middle" class="table-name">carts</text>
+<text x="555" y="1655" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="555" y="1675" class="fk-column">🔗 user_id: bigint(20) unsigned</text>
+<text x="555" y="1695" class="column-text">subtotal: decimal(10,2)</text>
+<text x="555" y="1715" class="column-text">tax_amount: decimal(10,2)</text>
+<text x="555" y="1735" class="column-text">shipping_cost: decimal(8,2)</text>
+<text x="555" y="1755" class="column-text">free_shipping_eligible: tinyint(1)</text>
+<text x="555" y="1775" class="column-text">total: decimal(10,2)</text>
+<text x="555" y="1795" class="column-text">tax_rate: decimal(5,2)</text>
+<text x="555" y="1815" class="column-text">total_items: int(11)</text>
+<text x="555" y="1835" class="column-text">metadata: longtext (null)</text>
+<text x="555" y="1855" class="column-text">status: enum('active','abandoned','converted')</text>
+<text x="555" y="1875" class="column-text">expires_at: timestamp (null)</text>
+<text x="555" y="1895" class="column-text">created_at: timestamp (null)</text>
+<text x="555" y="1915" class="column-text">updated_at: timestamp (null)</text>
+<rect x="50" y="2090" width="200" height="310" class="table-border" fill="white"/>
+<rect x="50" y="2090" width="200" height="30" class="table-header"/>
+<text x="150" y="2108" text-anchor="middle" class="table-name">categories</text>
+<text x="55" y="2135" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="55" y="2155" class="column-text">name: varchar(255)</text>
+<text x="55" y="2175" class="column-text">description: text (null)</text>
+<text x="55" y="2195" class="column-text">meta_title: varchar(255) (null)</text>
+<text x="55" y="2215" class="column-text">meta_description: text (null)</text>
+<text x="55" y="2235" class="column-text">icon: varchar(10) (null)</text>
+<text x="55" y="2255" class="column-text">display_order: int(11)</text>
+<text x="55" y="2275" class="column-text">food_type: enum('alimentaire','non_alimentaire')</text>
+<text x="55" y="2295" class="column-text">is_returnable: tinyint(1)</text>
+<text x="55" y="2315" class="column-text">slug: varchar(255)</text>
+<text x="55" y="2335" class="column-text">is_active: tinyint(1)</text>
+<text x="55" y="2355" class="column-text">deleted_at: timestamp (null)</text>
+<text x="55" y="2375" class="column-text">created_at: timestamp (null)</text>
+<text x="55" y="2395" class="column-text">updated_at: timestamp (null)</text>
+<rect x="300" y="2090" width="200" height="150" class="table-border" fill="white"/>
+<rect x="300" y="2090" width="200" height="30" class="table-header"/>
+<text x="400" y="2108" text-anchor="middle" class="table-name">comment_translations</text>
+<text x="305" y="2135" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="305" y="2155" class="column-text">comment_id: bigint(20) unsigned</text>
+<text x="305" y="2175" class="column-text">locale: varchar(2)</text>
+<text x="305" y="2195" class="column-text">content: text</text>
+<text x="305" y="2215" class="column-text">created_at: timestamp (null)</text>
+<text x="305" y="2235" class="column-text">updated_at: timestamp (null)</text>
+<rect x="550" y="2090" width="200" height="470" class="table-border" fill="white"/>
+<rect x="550" y="2090" width="200" height="30" class="table-header"/>
+<text x="650" y="2108" text-anchor="middle" class="table-name">cookies</text>
+<text x="555" y="2135" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="555" y="2155" class="fk-column">🔗 user_id: bigint(20) unsigned (null)</text>
+<text x="555" y="2175" class="fk-column">🔗 session_id: varchar(255) (null)</text>
+<text x="555" y="2195" class="column-text">ip_address: varchar(45)</text>
+<text x="555" y="2215" class="column-text">user_agent: text</text>
+<text x="555" y="2235" class="column-text">necessary: tinyint(1)</text>
+<text x="555" y="2255" class="column-text">analytics: tinyint(1)</text>
+<text x="555" y="2275" class="column-text">marketing: tinyint(1)</text>
+<text x="555" y="2295" class="column-text">preferences: tinyint(1)</text>
+<text x="555" y="2315" class="column-text">social_media: tinyint(1)</text>
+<text x="555" y="2335" class="fk-column">🔗 accepted_at: timestamp (null)</text>
+<text x="555" y="2355" class="column-text">rejected_at: timestamp (null)</text>
+<text x="555" y="2375" class="column-text">last_updated_at: timestamp (null)</text>
+<text x="555" y="2395" class="column-text">migrated_at: timestamp (null)</text>
+<text x="555" y="2415" class="column-text">preferences_details: longtext (null)</text>
+<text x="555" y="2435" class="column-text">consent_version: varchar(255)</text>
+<text x="555" y="2455" class="fk-column">🔗 status: enum('pending','accepted','rejected','partial')</text>
+<text x="555" y="2475" class="column-text">page_url: varchar(255) (null)</text>
+<text x="555" y="2495" class="column-text">referer: varchar(255) (null)</text>
+<text x="555" y="2515" class="column-text">browser_info: longtext (null)</text>
+<text x="555" y="2535" class="column-text">created_at: timestamp (null)</text>
+<text x="555" y="2555" class="column-text">updated_at: timestamp (null)</text>
+<rect x="50" y="2610" width="200" height="190" class="table-border" fill="white"/>
+<rect x="50" y="2610" width="200" height="30" class="table-header"/>
+<text x="150" y="2628" text-anchor="middle" class="table-name">email_logs</text>
+<text x="55" y="2655" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="55" y="2675" class="fk-column">🔗 email_type: varchar(255)</text>
+<text x="55" y="2695" class="fk-column">🔗 order_location_id: bigint(20) unsigned</text>
+<text x="55" y="2715" class="column-text">recipient_email: varchar(255)</text>
+<text x="55" y="2735" class="column-text">status: enum('sent','failed')</text>
+<text x="55" y="2755" class="column-text">details: text (null)</text>
+<text x="55" y="2775" class="column-text">created_at: timestamp (null)</text>
+<text x="55" y="2795" class="column-text">updated_at: timestamp (null)</text>
+<rect x="300" y="2610" width="200" height="370" class="table-border" fill="white"/>
+<rect x="300" y="2610" width="200" height="30" class="table-header"/>
+<text x="400" y="2628" text-anchor="middle" class="table-name">messages</text>
+<text x="305" y="2655" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="305" y="2675" class="fk-column">🔗 user_id: bigint(20) unsigned</text>
+<text x="305" y="2695" class="fk-column">🔗 sender_id: bigint(20) unsigned (null)</text>
+<text x="305" y="2715" class="column-text">type: varchar(255)</text>
+<text x="305" y="2735" class="column-text">subject: varchar(255)</text>
+<text x="305" y="2755" class="column-text">content: text</text>
+<text x="305" y="2775" class="column-text">metadata: longtext (null)</text>
+<text x="305" y="2795" class="column-text">status: enum('unread','read','archived')</text>
+<text x="305" y="2815" class="column-text">priority: enum('low','normal','high','urgent')</text>
+<text x="305" y="2835" class="column-text">read_at: timestamp (null)</text>
+<text x="305" y="2855" class="column-text">archived_at: timestamp (null)</text>
+<text x="305" y="2875" class="column-text">is_important: tinyint(1)</text>
+<text x="305" y="2895" class="column-text">action_url: varchar(255) (null)</text>
+<text x="305" y="2915" class="column-text">action_label: varchar(255) (null)</text>
+<text x="305" y="2935" class="fk-column">🔗 created_at: timestamp (null)</text>
+<text x="305" y="2955" class="column-text">updated_at: timestamp (null)</text>
+<text x="305" y="2975" class="column-text">deleted_at: timestamp (null)</text>
+<rect x="550" y="2610" width="200" height="530" class="table-border" fill="white"/>
+<rect x="550" y="2610" width="200" height="30" class="table-header"/>
+<text x="650" y="2628" text-anchor="middle" class="table-name">newsletter_sends</text>
+<text x="555" y="2655" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="555" y="2675" class="fk-column">🔗 newsletter_id: bigint(20) unsigned</text>
+<text x="555" y="2695" class="fk-column">🔗 user_id: bigint(20) unsigned</text>
+<text x="555" y="2715" class="column-text">email: varchar(255) (null)</text>
+<text x="555" y="2735" class="column-text">status: enum('pending','sent','failed','bounced')</text>
+<text x="555" y="2755" class="column-text">sent_at: timestamp (null)</text>
+<text x="555" y="2775" class="column-text">failure_reason: varchar(255) (null)</text>
+<text x="555" y="2795" class="column-text">error_message: text (null)</text>
+<text x="555" y="2815" class="fk-column">🔗 is_opened: tinyint(1)</text>
+<text x="555" y="2835" class="column-text">opened_at: timestamp (null)</text>
+<text x="555" y="2855" class="column-text">open_count: int(11)</text>
+<text x="555" y="2875" class="column-text">last_opened_at: timestamp (null)</text>
+<text x="555" y="2895" class="fk-column">🔗 is_clicked: tinyint(1)</text>
+<text x="555" y="2915" class="column-text">clicked_at: timestamp (null)</text>
+<text x="555" y="2935" class="column-text">click_count: int(11)</text>
+<text x="555" y="2955" class="column-text">last_clicked_at: timestamp (null)</text>
+<text x="555" y="2975" class="column-text">is_unsubscribed: tinyint(1)</text>
+<text x="555" y="2995" class="column-text">unsubscribed_at: timestamp (null)</text>
+<text x="555" y="3015" class="column-text">tracking_token: varchar(255)</text>
+<text x="555" y="3035" class="column-text">unsubscribe_token: varchar(255)</text>
+<text x="555" y="3055" class="column-text">tracking_url: varchar(255) (null)</text>
+<text x="555" y="3075" class="column-text">unsubscribe_url: varchar(255) (null)</text>
+<text x="555" y="3095" class="column-text">metadata: longtext (null)</text>
+<text x="555" y="3115" class="column-text">created_at: timestamp (null)</text>
+<text x="555" y="3135" class="column-text">updated_at: timestamp (null)</text>
+<rect x="50" y="3190" width="200" height="270" class="table-border" fill="white"/>
+<rect x="50" y="3190" width="200" height="30" class="table-header"/>
+<text x="150" y="3208" text-anchor="middle" class="table-name">newsletter_subscriptions</text>
+<text x="55" y="3235" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="55" y="3255" class="column-text">user_id: bigint(20) unsigned</text>
+<text x="55" y="3275" class="fk-column">🔗 is_subscribed: tinyint(1)</text>
+<text x="55" y="3295" class="column-text">subscribed_at: timestamp (null)</text>
+<text x="55" y="3315" class="column-text">unsubscribed_at: timestamp (null)</text>
+<text x="55" y="3335" class="column-text">unsubscribe_reason: varchar(255) (null)</text>
+<text x="55" y="3355" class="column-text">unsubscribe_token: varchar(255)</text>
+<text x="55" y="3375" class="column-text">preferences: longtext (null)</text>
+<text x="55" y="3395" class="column-text">source: varchar(255) (null)</text>
+<text x="55" y="3415" class="column-text">metadata: longtext (null)</text>
+<text x="55" y="3435" class="column-text">created_at: timestamp (null)</text>
+<text x="55" y="3455" class="column-text">updated_at: timestamp (null)</text>
+<rect x="300" y="3190" width="200" height="510" class="table-border" fill="white"/>
+<rect x="300" y="3190" width="200" height="30" class="table-header"/>
+<text x="400" y="3208" text-anchor="middle" class="table-name">newsletters</text>
+<text x="305" y="3235" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="305" y="3255" class="column-text">title: varchar(255)</text>
+<text x="305" y="3275" class="column-text">subject: varchar(255)</text>
+<text x="305" y="3295" class="column-text">content: text</text>
+<text x="305" y="3315" class="column-text">excerpt: text (null)</text>
+<text x="305" y="3335" class="column-text">featured_image: varchar(255) (null)</text>
+<text x="305" y="3355" class="fk-column">🔗 status: enum('draft','scheduled','sent','cancelled')</text>
+<text x="305" y="3375" class="fk-column">🔗 scheduled_at: timestamp (null)</text>
+<text x="305" y="3395" class="fk-column">🔗 sent_at: timestamp (null)</text>
+<text x="305" y="3415" class="column-text">recipients_count: int(11)</text>
+<text x="305" y="3435" class="column-text">sent_count: int(11)</text>
+<text x="305" y="3455" class="column-text">failed_count: int(11)</text>
+<text x="305" y="3475" class="column-text">opened_count: int(11)</text>
+<text x="305" y="3495" class="column-text">clicked_count: int(11)</text>
+<text x="305" y="3515" class="column-text">unsubscribed_count: int(11)</text>
+<text x="305" y="3535" class="column-text">tags: longtext (null)</text>
+<text x="305" y="3555" class="column-text">metadata: longtext (null)</text>
+<text x="305" y="3575" class="fk-column">🔗 is_template: tinyint(1)</text>
+<text x="305" y="3595" class="column-text">template_name: varchar(255) (null)</text>
+<text x="305" y="3615" class="fk-column">🔗 created_by: bigint(20) unsigned</text>
+<text x="305" y="3635" class="fk-column">🔗 updated_by: bigint(20) unsigned (null)</text>
+<text x="305" y="3655" class="column-text">created_at: timestamp (null)</text>
+<text x="305" y="3675" class="column-text">updated_at: timestamp (null)</text>
+<text x="305" y="3695" class="column-text">deleted_at: timestamp (null)</text>
+<rect x="550" y="3190" width="200" height="530" class="table-border" fill="white"/>
+<rect x="550" y="3190" width="200" height="30" class="table-header"/>
+<text x="650" y="3208" text-anchor="middle" class="table-name">order_item_locations</text>
+<text x="555" y="3235" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="555" y="3255" class="fk-column">🔗 order_location_id: bigint(20) unsigned</text>
+<text x="555" y="3275" class="fk-column">🔗 product_id: bigint(20) unsigned</text>
+<text x="555" y="3295" class="column-text">product_name: varchar(255)</text>
+<text x="555" y="3315" class="column-text">product_sku: varchar(255) (null)</text>
+<text x="555" y="3335" class="column-text">product_description: text (null)</text>
+<text x="555" y="3355" class="column-text">quantity: int(11)</text>
+<text x="555" y="3375" class="column-text">daily_rate: decimal(8,2)</text>
+<text x="555" y="3395" class="column-text">rental_days: int(11)</text>
+<text x="555" y="3415" class="column-text">deposit_per_item: decimal(8,2)</text>
+<text x="555" y="3435" class="column-text">subtotal: decimal(10,2)</text>
+<text x="555" y="3455" class="column-text">total_deposit: decimal(10,2)</text>
+<text x="555" y="3475" class="column-text">tax_amount: decimal(8,2)</text>
+<text x="555" y="3495" class="column-text">total_amount: decimal(10,2)</text>
+<text x="555" y="3515" class="column-text">condition_at_pickup: enum('excellent','good','fair','poor')</text>
+<text x="555" y="3535" class="column-text">condition_at_return: enum('excellent','good','fair','poor') (null)</text>
+<text x="555" y="3555" class="column-text">item_damage_cost: decimal(8,2)</text>
+<text x="555" y="3575" class="column-text">item_inspection_notes: text (null)</text>
+<text x="555" y="3595" class="column-text">damage_details: longtext (null)</text>
+<text x="555" y="3615" class="column-text">item_late_days: int(11)</text>
+<text x="555" y="3635" class="column-text">item_late_fees: decimal(8,2)</text>
+<text x="555" y="3655" class="column-text">item_deposit_refund: decimal(8,2)</text>
+<text x="555" y="3675" class="column-text">created_at: timestamp (null)</text>
+<text x="555" y="3695" class="column-text">updated_at: timestamp (null)</text>
+<text x="555" y="3715" class="column-text">penalty_amount: decimal(10,2)</text>
+<rect x="50" y="3770" width="200" height="710" class="table-border" fill="white"/>
+<rect x="50" y="3770" width="200" height="30" class="table-header"/>
+<text x="150" y="3788" text-anchor="middle" class="table-name">order_items</text>
+<text x="55" y="3815" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="55" y="3835" class="fk-column">🔗 order_id: bigint(20) unsigned</text>
+<text x="55" y="3855" class="fk-column">🔗 product_id: bigint(20) unsigned</text>
+<text x="55" y="3875" class="column-text">product_name: varchar(255)</text>
+<text x="55" y="3895" class="column-text">product_sku: varchar(255) (null)</text>
+<text x="55" y="3915" class="column-text">product_description: text (null)</text>
+<text x="55" y="3935" class="column-text">product_image: varchar(255) (null)</text>
+<text x="55" y="3955" class="column-text">product_category: longtext (null)</text>
+<text x="55" y="3975" class="fk-column">🔗 special_offer_id: bigint(20) unsigned (null)</text>
+<text x="55" y="3995" class="column-text">original_unit_price: decimal(8,2) (null)</text>
+<text x="55" y="4015" class="column-text">discount_percentage: decimal(5,2)</text>
+<text x="55" y="4035" class="column-text">discount_amount: decimal(8,2)</text>
+<text x="55" y="4055" class="column-text">quantity: int(11)</text>
+<text x="55" y="4075" class="column-text">unit_price: decimal(10,2)</text>
+<text x="55" y="4095" class="column-text">total_price: decimal(10,2)</text>
+<text x="55" y="4115" class="column-text">tax_rate: decimal(5,2)</text>
+<text x="55" y="4135" class="column-text">subtotal: decimal(10,2)</text>
+<text x="55" y="4155" class="column-text">tax_amount: decimal(10,2)</text>
+<text x="55" y="4175" class="column-text">status: enum('pending','confirmed','preparing','shipped','delivered','cancelled','returned','return_requested') (null)</text>
+<text x="55" y="4195" class="column-text">status_updated_at: timestamp (null)</text>
+<text x="55" y="4215" class="fk-column">🔗 is_returnable: tinyint(1)</text>
+<text x="55" y="4235" class="fk-column">🔗 is_returned: tinyint(1)</text>
+<text x="55" y="4255" class="column-text">returned_quantity: int(11)</text>
+<text x="55" y="4275" class="column-text">return_deadline: timestamp (null)</text>
+<text x="55" y="4295" class="column-text">tracking_number: varchar(255) (null)</text>
+<text x="55" y="4315" class="fk-column">🔗 shipped_at: timestamp (null)</text>
+<text x="55" y="4335" class="fk-column">🔗 delivered_at: timestamp (null)</text>
+<text x="55" y="4355" class="column-text">can_be_cancelled: tinyint(1)</text>
+<text x="55" y="4375" class="column-text">cancelled_at: timestamp (null)</text>
+<text x="55" y="4395" class="column-text">cancellation_reason: text (null)</text>
+<text x="55" y="4415" class="column-text">metadata: longtext (null)</text>
+<text x="55" y="4435" class="column-text">created_at: timestamp (null)</text>
+<text x="55" y="4455" class="column-text">updated_at: timestamp (null)</text>
+<text x="55" y="4475" class="column-text">deleted_at: timestamp (null)</text>
+<rect x="300" y="3770" width="200" height="1210" class="table-border" fill="white"/>
+<rect x="300" y="3770" width="200" height="30" class="table-header"/>
+<text x="400" y="3788" text-anchor="middle" class="table-name">order_locations</text>
+<text x="305" y="3815" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="305" y="3835" class="column-text">order_number: varchar(255)</text>
+<text x="305" y="3855" class="column-text">invoice_number: varchar(255) (null)</text>
+<text x="305" y="3875" class="column-text">invoice_generated_at: timestamp (null)</text>
+<text x="305" y="3895" class="fk-column">🔗 user_id: bigint(20) unsigned</text>
+<text x="305" y="3915" class="fk-column">🔗 start_date: date</text>
+<text x="305" y="3935" class="column-text">end_date: date</text>
+<text x="305" y="3955" class="column-text">rental_days: int(11)</text>
+<text x="305" y="3975" class="column-text">daily_rate: decimal(10,2)</text>
+<text x="305" y="3995" class="column-text">total_rental_cost: decimal(10,2)</text>
+<text x="305" y="4015" class="column-text">deposit_amount: decimal(10,2)</text>
+<text x="305" y="4035" class="column-text">penalty_amount: decimal(10,2)</text>
+<text x="305" y="4055" class="column-text">late_fee_per_day: decimal(8,2)</text>
+<text x="305" y="4075" class="column-text">tax_rate: decimal(5,2)</text>
+<text x="305" y="4095" class="column-text">subtotal: decimal(10,2)</text>
+<text x="305" y="4115" class="column-text">tax_amount: decimal(10,2)</text>
+<text x="305" y="4135" class="column-text">total_amount: decimal(10,2)</text>
+<text x="305" y="4155" class="fk-column">🔗 status: enum('pending','confirmed','active','completed','closed','inspecting','finished','cancelled')</text>
+<text x="305" y="4175" class="column-text">payment_status: enum('pending','deposit_paid','paid','failed','refunded','partial_refund')</text>
+<text x="305" y="4195" class="column-text">payment_details: longtext (null)</text>
+<text x="305" y="4215" class="column-text">paid_at: timestamp (null)</text>
+<text x="305" y="4235" class="column-text">deposit_status: enum('none','authorized','captured','released')</text>
+<text x="305" y="4255" class="column-text">deposit_captured_amount: decimal(10,2) (null)</text>
+<text x="305" y="4275" class="column-text">deposit_captured_at: timestamp (null)</text>
+<text x="305" y="4295" class="column-text">deposit_cancelled_at: timestamp (null)</text>
+<text x="305" y="4315" class="column-text">payment_method: varchar(255) (null)</text>
+<text x="305" y="4335" class="column-text">stripe_payment_intent_id: varchar(255) (null)</text>
+<text x="305" y="4355" class="column-text">payment_reference: varchar(255) (null)</text>
+<text x="305" y="4375" class="column-text">billing_address: longtext</text>
+<text x="305" y="4395" class="column-text">delivery_address: longtext</text>
+<text x="305" y="4415" class="column-text">late_days: int(11)</text>
+<text x="305" y="4435" class="column-text">late_fees: decimal(10,2)</text>
+<text x="305" y="4455" class="column-text">actual_return_date: timestamp (null)</text>
+<text x="305" y="4475" class="column-text">inspection_status: enum('pending','in_progress','completed') (null)</text>
+<text x="305" y="4495" class="column-text">product_condition: enum('excellent','good','poor') (null)</text>
+<text x="305" y="4515" class="column-text">damage_cost: decimal(8,2)</text>
+<text x="305" y="4535" class="column-text">total_penalties: decimal(8,2)</text>
+<text x="305" y="4555" class="column-text">deposit_refund: decimal(8,2)</text>
+<text x="305" y="4575" class="column-text">inspection_notes: text (null)</text>
+<text x="305" y="4595" class="column-text">inspection_completed_at: timestamp (null)</text>
+<text x="305" y="4615" class="fk-column">🔗 inspected_by: bigint(20) unsigned (null)</text>
+<text x="305" y="4635" class="column-text">notes: text (null)</text>
+<text x="305" y="4655" class="column-text">cancellation_reason: text (null)</text>
+<text x="305" y="4675" class="column-text">confirmed_at: timestamp (null)</text>
+<text x="305" y="4695" class="column-text">frontend_confirmed: tinyint(1)</text>
+<text x="305" y="4715" class="column-text">frontend_confirmed_at: timestamp (null)</text>
+<text x="305" y="4735" class="column-text">started_at: timestamp (null)</text>
+<text x="305" y="4755" class="column-text">reminder_sent_at: timestamp (null)</text>
+<text x="305" y="4775" class="column-text">ended_at: timestamp (null)</text>
+<text x="305" y="4795" class="column-text">overdue_notification_sent_at: timestamp (null)</text>
+<text x="305" y="4815" class="column-text">completed_at: timestamp (null)</text>
+<text x="305" y="4835" class="column-text">last_completed_email_sent_at: timestamp (null)</text>
+<text x="305" y="4855" class="column-text">closed_at: timestamp (null)</text>
+<text x="305" y="4875" class="column-text">cancelled_at: timestamp (null)</text>
+<text x="305" y="4895" class="column-text">returned_at: timestamp (null)</text>
+<text x="305" y="4915" class="column-text">created_at: timestamp (null)</text>
+<text x="305" y="4935" class="column-text">updated_at: timestamp (null)</text>
+<text x="305" y="4955" class="column-text">deleted_at: timestamp (null)</text>
+<text x="305" y="4975" class="column-text">stripe_deposit_authorization_id: varchar(255) (null)</text>
+<rect x="550" y="3770" width="200" height="770" class="table-border" fill="white"/>
+<rect x="550" y="3770" width="200" height="30" class="table-header"/>
+<text x="650" y="3788" text-anchor="middle" class="table-name">order_returns</text>
+<text x="555" y="3815" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="555" y="3835" class="fk-column">🔗 order_id: bigint(20) unsigned</text>
+<text x="555" y="3855" class="fk-column">🔗 order_item_id: bigint(20) unsigned</text>
+<text x="555" y="3875" class="fk-column">🔗 user_id: bigint(20) unsigned</text>
+<text x="555" y="3895" class="column-text">return_number: varchar(255)</text>
+<text x="555" y="3915" class="column-text">quantity_returned: int(11)</text>
+<text x="555" y="3935" class="column-text">reason: enum('defective','wrong_item','not_as_described','changed_mind','damaged_shipping','other')</text>
+<text x="555" y="3955" class="column-text">description: text (null)</text>
+<text x="555" y="3975" class="column-text">images: longtext (null)</text>
+<text x="555" y="3995" class="fk-column">🔗 status: enum('requested','approved','rejected','item_received','inspected','refunded','cancelled')</text>
+<text x="555" y="4015" class="column-text">status_history: text (null)</text>
+<text x="555" y="4035" class="column-text">status_updated_at: timestamp (null)</text>
+<text x="555" y="4055" class="column-text">requested_at: timestamp</text>
+<text x="555" y="4075" class="column-text">approved_at: timestamp (null)</text>
+<text x="555" y="4095" class="column-text">item_received_at: timestamp (null)</text>
+<text x="555" y="4115" class="column-text">inspected_at: timestamp (null)</text>
+<text x="555" y="4135" class="column-text">refunded_at: timestamp (null)</text>
+<text x="555" y="4155" class="column-text">refund_amount: decimal(10,2)</text>
+<text x="555" y="4175" class="column-text">refund_method: varchar(255) (null)</text>
+<text x="555" y="4195" class="column-text">refund_transaction_id: varchar(255) (null)</text>
+<text x="555" y="4215" class="fk-column">🔗 refund_processed: tinyint(1)</text>
+<text x="555" y="4235" class="column-text">return_shipping_address: longtext (null)</text>
+<text x="555" y="4255" class="column-text">return_tracking_number: varchar(255) (null)</text>
+<text x="555" y="4275" class="column-text">return_shipping_cost: decimal(10,2)</text>
+<text x="555" y="4295" class="column-text">inspection_result: enum('approved','rejected','partial') (null)</text>
+<text x="555" y="4315" class="column-text">inspection_notes: text (null)</text>
+<text x="555" y="4335" class="column-text">inspection_images: longtext (null)</text>
+<text x="555" y="4355" class="fk-column">🔗 inspected_by: bigint(20) unsigned (null)</text>
+<text x="555" y="4375" class="fk-column">🔗 approved_by: bigint(20) unsigned (null)</text>
+<text x="555" y="4395" class="column-text">admin_notes: text (null)</text>
+<text x="555" y="4415" class="column-text">rejection_reason: text (null)</text>
+<text x="555" y="4435" class="column-text">email_notifications_sent: longtext (null)</text>
+<text x="555" y="4455" class="column-text">last_notification_sent_at: timestamp (null)</text>
+<text x="555" y="4475" class="column-text">metadata: longtext (null)</text>
+<text x="555" y="4495" class="column-text">created_at: timestamp (null)</text>
+<text x="555" y="4515" class="column-text">updated_at: timestamp (null)</text>
+<text x="555" y="4535" class="column-text">deleted_at: timestamp (null)</text>
+<rect x="50" y="5030" width="200" height="210" class="table-border" fill="white"/>
+<rect x="50" y="5030" width="200" height="30" class="table-header"/>
+<text x="150" y="5048" text-anchor="middle" class="table-name">order_status_transitions</text>
+<text x="55" y="5075" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="55" y="5095" class="fk-column">🔗 order_id: bigint(20) unsigned</text>
+<text x="55" y="5115" class="column-text">from_status: varchar(255)</text>
+<text x="55" y="5135" class="column-text">to_status: varchar(255)</text>
+<text x="55" y="5155" class="fk-column">🔗 scheduled_at: timestamp</text>
+<text x="55" y="5175" class="column-text">executed: tinyint(1)</text>
+<text x="55" y="5195" class="column-text">executed_at: timestamp (null)</text>
+<text x="55" y="5215" class="column-text">created_at: timestamp (null)</text>
+<text x="55" y="5235" class="column-text">updated_at: timestamp (null)</text>
+<rect x="300" y="5030" width="200" height="970" class="table-border" fill="white"/>
+<rect x="300" y="5030" width="200" height="30" class="table-header"/>
+<text x="400" y="5048" text-anchor="middle" class="table-name">orders</text>
+<text x="305" y="5075" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="305" y="5095" class="column-text">order_number: varchar(255)</text>
+<text x="305" y="5115" class="fk-column">🔗 user_id: bigint(20) unsigned</text>
+<text x="305" y="5135" class="fk-column">🔗 status: enum('pending','confirmed','preparing','shipped','delivered','cancelled','returned','return_requested') (null)</text>
+<text x="305" y="5155" class="column-text">status_history: text (null)</text>
+<text x="305" y="5175" class="column-text">status_updated_at: timestamp (null)</text>
+<text x="305" y="5195" class="column-text">billing_address: longtext</text>
+<text x="305" y="5215" class="column-text">shipping_address: longtext</text>
+<text x="305" y="5235" class="column-text">subtotal: decimal(10,2)</text>
+<text x="305" y="5255" class="column-text">tax_amount: decimal(10,2)</text>
+<text x="305" y="5275" class="column-text">shipping_cost: decimal(10,2)</text>
+<text x="305" y="5295" class="column-text">discount_amount: decimal(10,2)</text>
+<text x="305" y="5315" class="column-text">total_amount: decimal(10,2)</text>
+<text x="305" y="5335" class="column-text">payment_method: varchar(255) (null)</text>
+<text x="305" y="5355" class="column-text">stripe_payment_intent_id: varchar(255) (null)</text>
+<text x="305" y="5375" class="fk-column">🔗 payment_status: enum('pending','paid','failed','refunded') (null)</text>
+<text x="305" y="5395" class="column-text">payment_details: longtext (null)</text>
+<text x="305" y="5415" class="column-text">payment_transaction_id: varchar(255) (null)</text>
+<text x="305" y="5435" class="column-text">paid_at: timestamp (null)</text>
+<text x="305" y="5455" class="column-text">shipping_method: varchar(255) (null)</text>
+<text x="305" y="5475" class="column-text">tracking_number: varchar(255) (null)</text>
+<text x="305" y="5495" class="fk-column">🔗 shipped_at: timestamp (null)</text>
+<text x="305" y="5515" class="fk-column">🔗 delivered_at: timestamp (null)</text>
+<text x="305" y="5535" class="column-text">estimated_delivery: timestamp (null)</text>
+<text x="305" y="5555" class="column-text">can_be_cancelled: tinyint(1)</text>
+<text x="305" y="5575" class="column-text">can_be_returned: tinyint(1)</text>
+<text x="305" y="5595" class="column-text">cancelled_at: timestamp (null)</text>
+<text x="305" y="5615" class="column-text">return_reason: text (null)</text>
+<text x="305" y="5635" class="column-text">return_requested_at: timestamp (null)</text>
+<text x="305" y="5655" class="column-text">return_processed_at: timestamp (null)</text>
+<text x="305" y="5675" class="column-text">return_processed_by: varchar(255) (null)</text>
+<text x="305" y="5695" class="column-text">refund_processed: tinyint(1)</text>
+<text x="305" y="5715" class="column-text">refund_processed_at: timestamp (null)</text>
+<text x="305" y="5735" class="column-text">refund_stripe_id: varchar(255) (null)</text>
+<text x="305" y="5755" class="column-text">cancellation_reason: text (null)</text>
+<text x="305" y="5775" class="column-text">has_returnable_items: tinyint(1)</text>
+<text x="305" y="5795" class="column-text">has_non_returnable_items: tinyint(1)</text>
+<text x="305" y="5815" class="column-text">return_deadline: timestamp (null)</text>
+<text x="305" y="5835" class="column-text">invoice_number: varchar(255) (null)</text>
+<text x="305" y="5855" class="column-text">invoice_generated_at: timestamp (null)</text>
+<text x="305" y="5875" class="column-text">email_notifications_sent: longtext (null)</text>
+<text x="305" y="5895" class="column-text">last_notification_sent_at: timestamp (null)</text>
+<text x="305" y="5915" class="column-text">metadata: longtext (null)</text>
+<text x="305" y="5935" class="column-text">notes: text (null)</text>
+<text x="305" y="5955" class="column-text">created_at: timestamp (null)</text>
+<text x="305" y="5975" class="column-text">updated_at: timestamp (null)</text>
+<text x="305" y="5995" class="column-text">deleted_at: timestamp (null)</text>
+<rect x="550" y="5030" width="200" height="130" class="table-border" fill="white"/>
+<rect x="550" y="5030" width="200" height="30" class="table-header"/>
+<text x="650" y="5048" text-anchor="middle" class="table-name">product_likes</text>
+<text x="555" y="5075" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="555" y="5095" class="fk-column">🔗 user_id: bigint(20) unsigned</text>
+<text x="555" y="5115" class="fk-column">🔗 product_id: bigint(20) unsigned</text>
+<text x="555" y="5135" class="column-text">created_at: timestamp (null)</text>
+<text x="555" y="5155" class="column-text">updated_at: timestamp (null)</text>
+<rect x="50" y="6050" width="200" height="790" class="table-border" fill="white"/>
+<rect x="50" y="6050" width="200" height="30" class="table-header"/>
+<text x="150" y="6068" text-anchor="middle" class="table-name">products</text>
+<text x="55" y="6095" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="55" y="6115" class="fk-column">🔗 name: varchar(255)</text>
+<text x="55" y="6135" class="column-text">description: text</text>
+<text x="55" y="6155" class="column-text">short_description: varchar(500) (null)</text>
+<text x="55" y="6175" class="column-text">slug: varchar(255)</text>
+<text x="55" y="6195" class="column-text">sku: varchar(255) (null)</text>
+<text x="55" y="6215" class="fk-column">🔗 price: decimal(10,2)</text>
+<text x="55" y="6235" class="column-text">rental_price_per_day: decimal(8,2) (null)</text>
+<text x="55" y="6255" class="column-text">deposit_amount: decimal(8,2) (null)</text>
+<text x="55" y="6275" class="column-text">min_rental_days: int(11)</text>
+<text x="55" y="6295" class="column-text">max_rental_days: int(11)</text>
+<text x="55" y="6315" class="column-text">available_days: longtext (null)</text>
+<text x="55" y="6335" class="column-text">type: enum('sale','rental','both')</text>
+<text x="55" y="6355" class="column-text">is_rental_available: tinyint(1)</text>
+<text x="55" y="6375" class="column-text">weight: decimal(8,3) (null)</text>
+<text x="55" y="6395" class="column-text">dimensions: varchar(255) (null)</text>
+<text x="55" y="6415" class="fk-column">🔗 quantity: int(11)</text>
+<text x="55" y="6435" class="column-text">rental_stock: int(11)</text>
+<text x="55" y="6455" class="column-text">critical_threshold: int(11)</text>
+<text x="55" y="6475" class="column-text">low_stock_threshold: int(11) (null)</text>
+<text x="55" y="6495" class="column-text">out_of_stock_threshold: int(11) (null)</text>
+<text x="55" y="6515" class="column-text">unit_symbol: enum('kg','pièce','litre','gramme','tonne')</text>
+<text x="55" y="6535" class="column-text">main_image: varchar(255) (null)</text>
+<text x="55" y="6555" class="column-text">image_alt: text (null)</text>
+<text x="55" y="6575" class="column-text">gallery_images: longtext (null)</text>
+<text x="55" y="6595" class="column-text">images: longtext (null)</text>
+<text x="55" y="6615" class="column-text">is_active: tinyint(1)</text>
+<text x="55" y="6635" class="column-text">is_featured: tinyint(1)</text>
+<text x="55" y="6655" class="column-text">likes_count: int(11)</text>
+<text x="55" y="6675" class="column-text">views_count: int(11)</text>
+<text x="55" y="6695" class="fk-column">🔗 category_id: bigint(20) unsigned</text>
+<text x="55" y="6715" class="fk-column">🔗 rental_category_id: bigint(20) unsigned (null)</text>
+<text x="55" y="6735" class="column-text">meta_title: varchar(255) (null)</text>
+<text x="55" y="6755" class="column-text">meta_description: text (null)</text>
+<text x="55" y="6775" class="column-text">meta_keywords: varchar(255) (null)</text>
+<text x="55" y="6795" class="column-text">deleted_at: timestamp (null)</text>
+<text x="55" y="6815" class="column-text">created_at: timestamp (null)</text>
+<text x="55" y="6835" class="column-text">updated_at: timestamp (null)</text>
+<rect x="300" y="6050" width="200" height="270" class="table-border" fill="white"/>
+<rect x="300" y="6050" width="200" height="30" class="table-header"/>
+<text x="400" y="6068" text-anchor="middle" class="table-name">rental_categories</text>
+<text x="305" y="6095" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="305" y="6115" class="column-text">name: varchar(255)</text>
+<text x="305" y="6135" class="column-text">description: text (null)</text>
+<text x="305" y="6155" class="column-text">meta_title: varchar(255) (null)</text>
+<text x="305" y="6175" class="column-text">meta_description: text (null)</text>
+<text x="305" y="6195" class="column-text">icon: varchar(255) (null)</text>
+<text x="305" y="6215" class="column-text">display_order: int(11)</text>
+<text x="305" y="6235" class="column-text">slug: varchar(255)</text>
+<text x="305" y="6255" class="column-text">is_active: tinyint(1)</text>
+<text x="305" y="6275" class="column-text">deleted_at: timestamp (null)</text>
+<text x="305" y="6295" class="column-text">created_at: timestamp (null)</text>
+<text x="305" y="6315" class="column-text">updated_at: timestamp (null)</text>
+<rect x="550" y="6050" width="200" height="310" class="table-border" fill="white"/>
+<rect x="550" y="6050" width="200" height="30" class="table-header"/>
+<text x="650" y="6068" text-anchor="middle" class="table-name">special_offers</text>
+<text x="555" y="6095" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="555" y="6115" class="column-text">name: varchar(255)</text>
+<text x="555" y="6135" class="column-text">description: text (null)</text>
+<text x="555" y="6155" class="fk-column">🔗 product_id: bigint(20) unsigned</text>
+<text x="555" y="6175" class="column-text">minimum_quantity: int(11)</text>
+<text x="555" y="6195" class="column-text">discount_percentage: decimal(5,2)</text>
+<text x="555" y="6215" class="fk-column">🔗 start_date: datetime</text>
+<text x="555" y="6235" class="column-text">end_date: datetime</text>
+<text x="555" y="6255" class="column-text">is_active: tinyint(1)</text>
+<text x="555" y="6275" class="column-text">usage_count: int(11)</text>
+<text x="555" y="6295" class="column-text">usage_limit: int(11) (null)</text>
+<text x="555" y="6315" class="column-text">created_at: timestamp (null)</text>
+<text x="555" y="6335" class="column-text">updated_at: timestamp (null)</text>
+<text x="555" y="6355" class="column-text">deleted_at: timestamp (null)</text>
+<rect x="50" y="6890" width="200" height="410" class="table-border" fill="white"/>
+<rect x="50" y="6890" width="200" height="30" class="table-header"/>
+<text x="150" y="6908" text-anchor="middle" class="table-name">users</text>
+<text x="55" y="6935" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="55" y="6955" class="column-text">username: varchar(255)</text>
+<text x="55" y="6975" class="column-text">name: varchar(255) (null)</text>
+<text x="55" y="6995" class="column-text">email: varchar(255)</text>
+<text x="55" y="7015" class="column-text">phone: varchar(255) (null)</text>
+<text x="55" y="7035" class="column-text">address: varchar(255) (null)</text>
+<text x="55" y="7055" class="column-text">address_line_2: varchar(255) (null)</text>
+<text x="55" y="7075" class="column-text">city: varchar(255) (null)</text>
+<text x="55" y="7095" class="column-text">postal_code: varchar(255) (null)</text>
+<text x="55" y="7115" class="column-text">country: varchar(255)</text>
+<text x="55" y="7135" class="column-text">email_verified_at: timestamp (null)</text>
+<text x="55" y="7155" class="column-text">password: varchar(255)</text>
+<text x="55" y="7175" class="column-text">role: enum('Admin','User')</text>
+<text x="55" y="7195" class="column-text">newsletter_subscribed: tinyint(1)</text>
+<text x="55" y="7215" class="column-text">newsletter_subscribed_at: timestamp (null)</text>
+<text x="55" y="7235" class="column-text">remember_token: varchar(100) (null)</text>
+<text x="55" y="7255" class="column-text">created_at: timestamp (null)</text>
+<text x="55" y="7275" class="column-text">updated_at: timestamp (null)</text>
+<text x="55" y="7295" class="column-text">deleted_at: timestamp (null)</text>
+<rect x="300" y="6890" width="200" height="130" class="table-border" fill="white"/>
+<rect x="300" y="6890" width="200" height="30" class="table-header"/>
+<text x="400" y="6908" text-anchor="middle" class="table-name">wishlists</text>
+<text x="305" y="6935" class="pk-column">🔑 id: bigint(20) unsigned</text>
+<text x="305" y="6955" class="fk-column">🔗 user_id: bigint(20) unsigned</text>
+<text x="305" y="6975" class="fk-column">🔗 product_id: bigint(20) unsigned</text>
+<text x="305" y="6995" class="column-text">created_at: timestamp (null)</text>
+<text x="305" y="7015" class="column-text">updated_at: timestamp (null)</text>
+<line x1="50" y1="255" x2="250" y2="7095" class="relation-line"/>
+<line x1="500" y1="235" x2="550" y2="325" class="relation-line"/>
+<line x1="300" y1="235" x2="250" y2="7095" class="relation-line"/>
+<line x1="300" y1="235" x2="250" y2="7095" class="relation-line"/>
+<line x1="550" y1="325" x2="500" y2="1105" class="relation-line"/>
+<line x1="550" y1="325" x2="250" y2="7095" class="relation-line"/>
+<line x1="550" y1="325" x2="750" y2="325" class="relation-line"/>
+<line x1="550" y1="325" x2="250" y2="7095" class="relation-line"/>
+<line x1="250" y1="745" x2="300" y2="1105" class="relation-line"/>
+<line x1="300" y1="1105" x2="250" y2="7095" class="relation-line"/>
+<line x1="300" y1="1105" x2="250" y2="255" class="relation-line"/>
+<line x1="300" y1="1105" x2="250" y2="7095" class="relation-line"/>
+<line x1="550" y1="885" x2="500" y2="1775" class="relation-line"/>
+<line x1="550" y1="885" x2="250" y2="6445" class="relation-line"/>
+<line x1="250" y1="1825" x2="550" y2="1765" class="relation-line"/>
+<line x1="50" y1="1825" x2="250" y2="6445" class="relation-line"/>
+<line x1="250" y1="1825" x2="550" y2="6205" class="relation-line"/>
+<line x1="300" y1="1775" x2="250" y2="7095" class="relation-line"/>
+<line x1="550" y1="1765" x2="250" y2="7095" class="relation-line"/>
+<line x1="550" y1="2325" x2="250" y2="7095" class="relation-line"/>
+<line x1="300" y1="2795" x2="250" y2="7095" class="relation-line"/>
+<line x1="300" y1="2795" x2="250" y2="7095" class="relation-line"/>
+<line x1="550" y1="2875" x2="500" y2="3445" class="relation-line"/>
+<line x1="550" y1="2875" x2="250" y2="7095" class="relation-line"/>
+<line x1="50" y1="3325" x2="250" y2="7095" class="relation-line"/>
+<line x1="300" y1="3445" x2="250" y2="7095" class="relation-line"/>
+<line x1="300" y1="3445" x2="250" y2="7095" class="relation-line"/>
+<line x1="550" y1="3455" x2="500" y2="4375" class="relation-line"/>
+<line x1="550" y1="3455" x2="250" y2="6445" class="relation-line"/>
+<line x1="250" y1="4125" x2="300" y2="5515" class="relation-line"/>
+<line x1="50" y1="4125" x2="250" y2="6445" class="relation-line"/>
+<line x1="250" y1="4125" x2="550" y2="6205" class="relation-line"/>
+<line x1="300" y1="4375" x2="250" y2="7095" class="relation-line"/>
+<line x1="300" y1="4375" x2="250" y2="7095" class="relation-line"/>
+<line x1="550" y1="4155" x2="250" y2="7095" class="relation-line"/>
+<line x1="550" y1="4155" x2="250" y2="7095" class="relation-line"/>
+<line x1="550" y1="4155" x2="500" y2="5515" class="relation-line"/>
+<line x1="550" y1="4155" x2="250" y2="4125" class="relation-line"/>
+<line x1="550" y1="4155" x2="250" y2="7095" class="relation-line"/>
+<line x1="250" y1="5135" x2="300" y2="5515" class="relation-line"/>
+<line x1="300" y1="5515" x2="250" y2="7095" class="relation-line"/>
+<line x1="550" y1="5095" x2="250" y2="6445" class="relation-line"/>
+<line x1="550" y1="5095" x2="250" y2="7095" class="relation-line"/>
+<line x1="50" y1="6445" x2="250" y2="2245" class="relation-line"/>
+<line x1="250" y1="6445" x2="300" y2="6185" class="relation-line"/>
+<line x1="550" y1="6205" x2="250" y2="6445" class="relation-line"/>
+<line x1="300" y1="6955" x2="250" y2="6445" class="relation-line"/>
+<line x1="300" y1="6955" x2="250" y2="7095" class="relation-line"/>
+</svg>
+        </div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color pk"></div>
+                <span>🔑 Clé primaire</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color fk"></div>
+                <span>🔗 Clé étrangère</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color relation"></div>
+                <span>→ Relation</span>
+            </div>
+        </div>
+        <div style="margin-top: 30px; text-align: center; color: #666; font-size: 12px;">
+            Généré automatiquement le 17/08/2025 à 20:32
+        </div>
+    </div>
+</body>
+</html>

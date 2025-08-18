@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>FarmShop Favicon Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'farm-green': '#22c55e',
+                        'farm-orange': '#ea580c',
+                        'farm-yellow': '#eab308'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8">FarmShop Favicon - Différentes tailles</h1>
+        
+        <div class="grid grid-cols-4 gap-8 text-center">
+            <!-- 16x16 -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm font-semibold mb-4">16x16px</h3>
+                <div id="favicon-16" class="mx-auto relative" style="width: 16px; height: 16px;">
+                    <div class="w-4 h-4 border border-farm-green rounded-full bg-green-200 relative overflow-hidden">
+                        <div class="absolute bottom-0 left-0 w-full h-1.5 bg-farm-green rounded-b-full"></div>
+                        <div class="absolute top-0.5 right-0.5 w-1 h-1 bg-farm-yellow rounded-full"></div>
+                    </div>
+                    <div class="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-farm-orange rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- 32x32 -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm font-semibold mb-4">32x32px</h3>
+                <div id="favicon-32" class="mx-auto relative" style="width: 32px; height: 32px;">
+                    <div class="w-8 h-8 border-2 border-farm-green rounded-full bg-gradient-to-br from-green-100 to-green-200 relative overflow-hidden">
+                        <div class="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-farm-yellow rounded-full"></div>
+                        <div class="absolute bottom-0 left-0 w-full h-3 bg-farm-green rounded-b-full opacity-60"></div>
+                        <div class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-yellow-800"></div>
+                    </div>
+                    <div class="absolute -top-0.5 -right-0.5 w-3 h-3 bg-farm-orange rounded-full border border-white"></div>
+                </div>
+            </div>
+
+            <!-- 64x64 -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm font-semibold mb-4">64x64px</h3>
+                <div id="favicon-64" class="mx-auto relative" style="width: 64px; height: 64px;">
+                    <div class="w-16 h-16 border-4 border-farm-green rounded-full bg-gradient-to-br from-green-100 to-green-200 relative overflow-hidden">
+                        <div class="absolute top-1 right-1 w-3 h-3 bg-farm-yellow rounded-full"></div>
+                        <div class="absolute bottom-0 left-0 w-full h-6 bg-farm-green rounded-b-full opacity-60"></div>
+                        <div class="absolute bottom-0 right-0 w-10 h-4 bg-green-600 rounded-bl-full opacity-80"></div>
+                        <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                            <div class="w-0.5 h-4 bg-yellow-800"></div>
+                            <div class="absolute -top-1 -left-1 w-3 h-2 bg-farm-yellow rounded-full transform rotate-12"></div>
+                        </div>
+                    </div>
+                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-farm-orange rounded-full border-2 border-white flex items-center justify-center">
+                        <div class="w-2 h-2 bg-white rounded-sm"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 128x128 -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm font-semibold mb-4">128x128px</h3>
+                <div id="favicon-128" class="mx-auto relative" style="width: 128px; height: 128px;">
+                    <div class="w-32 h-32 border-8 border-farm-green rounded-full bg-gradient-to-br from-green-100 via-green-200 to-green-300 relative overflow-hidden shadow-lg">
+                        <div class="absolute top-3 right-3 w-6 h-6 bg-farm-yellow rounded-full shadow-md">
+                            <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-farm-yellow"></div>
+                            <div class="absolute -right-1 top-1/2 transform -translate-y-1/2 w-2 h-0.5 bg-farm-yellow"></div>
+                            <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-farm-yellow"></div>
+                            <div class="absolute -left-1 top-1/2 transform -translate-y-1/2 w-2 h-0.5 bg-farm-yellow"></div>
+                        </div>
+                        <div class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-farm-green to-green-400 rounded-b-full opacity-70"></div>
+                        <div class="absolute bottom-0 right-0 w-20 h-8 bg-gradient-to-t from-green-600 to-green-500 rounded-bl-full opacity-90"></div>
+                        <div class="absolute bottom-0 left-4 w-16 h-6 bg-gradient-to-t from-green-700 to-green-600 rounded-bl-full opacity-60"></div>
+                        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                            <div class="w-1 h-8 bg-yellow-800 shadow-sm"></div>
+                            <div class="absolute -top-2 -left-2 w-5 h-3 bg-farm-yellow rounded-full transform rotate-12 shadow-sm"></div>
+                        </div>
+                        <div class="absolute bottom-3 left-8">
+                            <div class="w-0.5 h-6 bg-yellow-800"></div>
+                            <div class="absolute -top-1 -left-1 w-3 h-2 bg-farm-yellow rounded-full transform rotate-45"></div>
+                        </div>
+                        <div class="absolute bottom-3 right-8">
+                            <div class="w-0.5 h-5 bg-yellow-800"></div>
+                            <div class="absolute -top-1 -left-1 w-3 h-2 bg-farm-yellow rounded-full transform -rotate-12"></div>
+                        </div>
+                    </div>
+                    <div class="absolute -top-2 -right-2 w-12 h-12 bg-farm-orange rounded-full border-4 border-white flex items-center justify-center shadow-lg">
+                        <div class="w-4 h-4 bg-white rounded-sm"></div>
+                        <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">Instructions pour générer les favicons</h2>
+            <div class="text-sm text-gray-600 space-y-2">
+                <p>1. Utilise un outil comme <strong>favicon.io</strong> ou <strong>realfavicongenerator.net</strong></p>
+                <p>2. Prends une capture d'écran de la version 128x128 ci-dessus</p>
+                <p>3. Upload l'image et génère tous les formats nécessaires</p>
+                <p>4. Place les fichiers dans <code>public/</code> de ton projet Laravel</p>
+                <p>5. Met à jour le <code>&lt;head&gt;</code> avec les liens vers les favicons</p>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-gray-800 text-green-400 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-4 text-white">Code à ajouter dans le &lt;head&gt;</h3>
+            <pre class="text-sm overflow-x-auto"><code>&lt;!-- Favicons --&gt;
+&lt;link rel="icon" type="image/x-icon" href="/favicon.ico"&gt;
+&lt;link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"&gt;
+&lt;link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"&gt;
+&lt;link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"&gt;
+&lt;link rel="manifest" href="/site.webmanifest"&gt;</code></pre>
+        </div>
+    </div>
+
+    <script>
+        // Script pour faciliter la capture d'écran du favicon 128x128
+        document.addEventListener('DOMContentLoaded', function() {
+            const favicon128 = document.getElementById('favicon-128');
+            favicon128.style.backgroundColor = 'white';
+            favicon128.style.padding = '10px';
+            favicon128.style.borderRadius = '10px';
+        });
+    </script>
+</body>
+</html>

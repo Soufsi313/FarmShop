@@ -1,0 +1,4490 @@
+<!DOCTYPE html>
+<html lang="fr-BE">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmShop - Rapport Final de Projet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4;
+            margin: 2.5cm 2cm 2cm 2cm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+        
+        /* Page de garde */
+        .cover-page {
+            page-break-after: always;
+            text-align: center;
+            padding: 4cm 2cm;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .university-header {
+            margin-bottom: 3cm;
+        }
+        
+        .university-name {
+            font-size: 18pt;
+            font-weight: 600;
+            color: #2c5aa0;
+            margin-bottom: 0.5cm;
+        }
+        
+        .department {
+            font-size: 14pt;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 0.3cm;
+        }
+        
+        .academic-year {
+            font-size: 12pt;
+            color: #666;
+        }
+        
+        .project-title {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .main-title {
+            font-size: 28pt;
+            font-weight: 700;
+            color: #2c5aa0;
+            margin-bottom: 1cm;
+            line-height: 1.2;
+        }
+        
+        .subtitle {
+            font-size: 18pt;
+            font-weight: 500;
+            color: #e74c3c;
+            margin-bottom: 2cm;
+        }
+        
+        .project-description {
+            font-size: 14pt;
+            color: #666;
+            font-style: italic;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+        
+        .author-info {
+            margin-top: 3cm;
+        }
+        
+        .author-title {
+            font-size: 14pt;
+            font-weight: 600;
+            margin-bottom: 1cm;
+        }
+        
+        .author-name {
+            font-size: 16pt;
+            font-weight: 600;
+            color: #2c5aa0;
+            margin-bottom: 0.5cm;
+        }
+        
+        .submission-date {
+            font-size: 12pt;
+            color: #666;
+            margin-top: 1cm;
+        }
+        
+        /* Styles généraux */
+        .page-break {
+            page-break-before: always;
+        }
+        
+        h1 {
+            font-size: 24pt;
+            font-weight: 700;
+            color: #2c5aa0;
+            margin-bottom: 1.5cm;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 0.5cm;
+        }
+        
+        h2 {
+            font-size: 18pt;
+            font-weight: 600;
+            color: #2c5aa0;
+            margin-top: 2cm;
+            margin-bottom: 1cm;
+        }
+        
+        h3 {
+            font-size: 14pt;
+            font-weight: 600;
+            color: #333;
+            margin-top: 1.5cm;
+            margin-bottom: 0.8cm;
+        }
+        
+        h4 {
+            font-size: 12pt;
+            font-weight: 600;
+            color: #333;
+            margin-top: 1cm;
+            margin-bottom: 0.5cm;
+        }
+        
+        p {
+            margin-bottom: 0.8cm;
+            text-align: justify;
+        }
+        
+        ul, ol {
+            margin-bottom: 1cm;
+            padding-left: 1.5cm;
+        }
+        
+        li {
+            margin-bottom: 0.3cm;
+        }
+        
+        .toc {
+            margin-bottom: 2cm;
+        }
+        
+        .toc-entry {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5cm;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 0.2cm;
+        }
+        
+        .toc-title {
+            font-weight: 500;
+        }
+        
+        .toc-page {
+            font-weight: 400;
+            color: #666;
+        }
+        
+        .acknowledgments {
+            font-style: italic;
+            text-align: justify;
+            margin-bottom: 2cm;
+        }
+        
+        .glossary-term {
+            font-weight: 600;
+            color: #2c5aa0;
+            margin-top: 1cm;
+            margin-bottom: 0.3cm;
+        }
+        
+        .glossary-definition {
+            margin-left: 1cm;
+            margin-bottom: 0.8cm;
+        }
+        
+        .blank-page {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-style: italic;
+        }
+        
+        .table-container {
+            margin: 1.5cm 0;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 0.5cm;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c5aa0;
+        }
+        
+        .highlight-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #e74c3c;
+            padding: 1cm;
+            margin: 1.5cm 0;
+        }
+        
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1cm;
+            margin: 1.5cm 0;
+        }
+        
+        .tech-item {
+            background: #f8f9fa;
+            padding: 1cm;
+            border-radius: 8px;
+            border-left: 4px solid #2c5aa0;
+        }
+        
+        .tech-name {
+            font-weight: 600;
+            color: #2c5aa0;
+            margin-bottom: 0.3cm;
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 1cm;
+            right: 2cm;
+            font-size: 10pt;
+            color: #666;
+        }
+        
+        @media print {
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- PAGE DE GARDE -->
+<div class="cover-page">
+    <div class="university-header">
+        <div class="university-name">HAUTE ÉCOLE DE LA PROVINCE DE LIÈGE</div>
+        <div class="department">Département Informatique et Technologie</div>
+        <div class="academic-year">Année académique 2024-2025</div>
+    </div>
+    
+    <div class="project-title">
+        <h1 class="main-title">VITAMIEL</h1>
+        <div class="subtitle">E-commerce de vente et location de produits agricoles</div>
+        <div class="project-description">
+            Plateforme digitale dédiée à la commercialisation et à la location d'équipements agricoles pour particuliers
+        </div>
+    </div>
+    
+    <div class="author-info">
+        <div class="author-title">Rapport final de projet présenté par :</div>
+        <div class="author-name">Soufiane MEFTAH</div>
+        <div class="submission-date">Remis le 17 août 2025</div>
+    </div>
+</div>
+
+<!-- TABLE DES MATIÈRES -->
+<div class="page-break">
+    <h1>Table des matières</h1>
+    <div class="toc">
+        <div class="toc-entry">
+            <span class="toc-title">Remerciements</span>
+            <span class="toc-page">4</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">Glossaire</span>
+            <span class="toc-page">5</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">1. Introduction</span>
+            <span class="toc-page">8</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">2. Synopsis du projet</span>
+            <span class="toc-page">9</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">3. Cahier des charges</span>
+            <span class="toc-page">10</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">4. Organigramme des tâches</span>
+            <span class="toc-page">13</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">5. Organigramme prévisionnel</span>
+            <span class="toc-page">15</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">6. Business plan</span>
+            <span class="toc-page">17</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">7. Présentation des porteurs du projet</span>
+            <span class="toc-page">22</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">8. Objectifs du projet</span>
+            <span class="toc-page">24</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">9. Avancement du projet</span>
+            <span class="toc-page">26</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">10. Défis rencontrés</span>
+            <span class="toc-page">30</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">11. Étude de marché</span>
+            <span class="toc-page">33</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">12. Analyse concurrentielle</span>
+            <span class="toc-page">40</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">13. Stratégie marketing</span>
+            <span class="toc-page">45</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">14. Aspects techniques du site web</span>
+            <span class="toc-page">50</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">15. Sécurité et conformité</span>
+            <span class="toc-page">65</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">16. Étude des risques et SWOT</span>
+            <span class="toc-page">70</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">17. Plan financier</span>
+            <span class="toc-page">75</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">18. Conception graphique</span>
+            <span class="toc-page">85</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">19. Aspects juridiques</span>
+            <span class="toc-page">90</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">20. Conclusions</span>
+            <span class="toc-page">95</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">Bibliographie</span>
+            <span class="toc-page">97</span>
+        </div>
+        <div class="toc-entry">
+            <span class="toc-title">Annexes</span>
+            <span class="toc-page">98</span>
+        </div>
+    </div>
+</div>
+
+<!-- REMERCIEMENTS -->
+<div class="page-break">
+    <h1>Remerciements</h1>
+    <div class="acknowledgments">
+        <p>
+            Je tiens à exprimer ma profonde gratitude envers toutes les personnes qui ont contribué à la réalisation de ce projet et qui m'ont accompagné tout au long de cette aventure académique et professionnelle.
+        </p>
+        
+        <p>
+            Mes premiers remerciements s'adressent à l'équipe pédagogique de la Haute École de la Province de Liège, et plus particulièrement à <strong>Monsieur RUTH</strong>, <strong>Madame VANCRAYENST</strong>, <strong>Monsieur VERBIST</strong>, <strong>Monsieur VANDOOREN</strong> et <strong>Monsieur CIULLO</strong> pour leur expertise, leur disponibilité et leurs conseils avisés qui ont grandement enrichi ma formation et orienté ce projet vers la réussite.
+        </p>
+        
+        <p>
+            Je souhaite également remercier chaleureusement le <strong>secrétariat</strong> de l'établissement pour son professionnalisme exemplaire, sa réactivité et son soutien administratif constant qui ont facilité le bon déroulement de mes études.
+        </p>
+        
+        <p>
+            Une mention particulière va à <strong>ma famille</strong>, pilier indéfectible de ma réussite. Leur soutien inconditionnel, leurs encouragements dans les moments difficiles et leur confiance en mes capacités ont été des moteurs essentiels pour mener à bien ce projet ambitieux.
+        </p>
+        
+        <p>
+            Enfin, je remercie <strong>Geoffrey VIGNE</strong>, mon partenaire dans cette aventure entrepreneuriale, pour sa collaboration précieuse et sa vision partagée du développement agricole durable.
+        </p>
+        
+        <p>
+            Ce projet n'aurait pu voir le jour sans cette synergie collective, et je mesure la chance d'avoir pu bénéficier d'un tel environnement favorable à l'épanouissement personnel et professionnel.
+        </p>
+    </div>
+</div>
+
+<!-- GLOSSAIRE -->
+<div class="page-break">
+    <h1>Glossaire</h1>
+    
+    <div class="glossary-term">API (Application Programming Interface)</div>
+    <div class="glossary-definition">Interface de programmation permettant la communication entre différents composants logiciels ou applications.</div>
+    
+    <div class="glossary-term">Backend</div>
+    <div class="glossary-definition">Partie serveur d'une application web, invisible pour l'utilisateur final, qui gère la logique métier, les bases de données et les traitements.</div>
+    
+    <div class="glossary-term">Blade</div>
+    <div class="glossary-definition">Moteur de template intégré à Laravel permettant la création de vues dynamiques avec une syntaxe simple et puissante.</div>
+    
+    <div class="glossary-term">Bootstrap</div>
+    <div class="glossary-definition">Framework CSS open-source facilitant le développement d'interfaces web responsives et modernes.</div>
+    
+    <div class="glossary-term">CSRF (Cross-Site Request Forgery)</div>
+    <div class="glossary-definition">Type d'attaque informatique où un utilisateur authentifié exécute involontairement des actions non désirées sur une application web.</div>
+    
+    <div class="glossary-term">CSS (Cascading Style Sheets)</div>
+    <div class="glossary-definition">Langage de feuilles de style utilisé pour définir la présentation et la mise en forme des documents HTML.</div>
+    
+    <div class="glossary-term">E-commerce</div>
+    <div class="glossary-definition">Commerce électronique désignant l'ensemble des transactions commerciales effectuées via des réseaux informatiques, notamment Internet.</div>
+    
+    <div class="glossary-term">Eloquent ORM</div>
+    <div class="glossary-definition">Système de mappage objet-relationnel intégré à Laravel, facilitant les interactions avec les bases de données.</div>
+    
+    <div class="glossary-term">Framework</div>
+    <div class="glossary-definition">Structure logicielle générique qui sert de base au développement d'applications, fournissant des fonctionnalités prêtes à l'emploi.</div>
+    
+    <div class="glossary-term">Frontend</div>
+    <div class="glossary-definition">Partie client d'une application web, visible et interactive pour l'utilisateur final.</div>
+    
+    <div class="glossary-term">Git</div>
+    <div class="glossary-definition">Système de gestion de versions décentralisé permettant de suivre les modifications du code source.</div>
+    
+    <div class="glossary-term">HTML (HyperText Markup Language)</div>
+    <div class="glossary-definition">Langage de balisage standard pour la création de pages web et d'applications web.</div>
+    
+    <div class="glossary-term">JavaScript</div>
+    <div class="glossary-definition">Langage de programmation de scripts principalement utilisé pour rendre les pages web interactives.</div>
+    
+    <div class="glossary-term">Laravel</div>
+    <div class="glossary-definition">Framework PHP open-source suivant le modèle MVC, conçu pour faciliter le développement d'applications web robustes.</div>
+    
+    <div class="glossary-term">MariaDB</div>
+    <div class="glossary-definition">Système de gestion de base de données relationnelle open-source, fork de MySQL.</div>
+    
+    <div class="glossary-term">Migration</div>
+    <div class="glossary-definition">Fichier de contrôle de version pour les bases de données permettant de modifier la structure de façon cohérente.</div>
+    
+    <div class="glossary-term">MVC (Model-View-Controller)</div>
+    <div class="glossary-definition">Modèle architectural séparant la logique métier (Model), l'interface utilisateur (View) et les contrôleurs (Controller).</div>
+    
+    <div class="glossary-term">MySQL</div>
+    <div class="glossary-definition">Système de gestion de base de données relationnelle open-source très populaire pour les applications web.</div>
+    
+    <div class="glossary-term">ORM (Object-Relational Mapping)</div>
+    <div class="glossary-definition">Technique de programmation permettant de mapper les objets d'un langage vers une base de données relationnelle.</div>
+    
+    <div class="glossary-term">PHP</div>
+    <div class="glossary-definition">Langage de programmation libre principalement utilisé pour produire des pages web dynamiques.</div>
+    
+    <div class="glossary-term">Queue System</div>
+    <div class="glossary-definition">Système de files d'attente permettant de traiter des tâches de manière asynchrone pour améliorer les performances.</div>
+    
+    <div class="glossary-term">RGPD (Règlement Général sur la Protection des Données)</div>
+    <div class="glossary-definition">Réglementation européenne sur la protection des données personnelles entrée en vigueur en 2018.</div>
+    
+    <div class="glossary-term">Responsive Design</div>
+    <div class="glossary-definition">Approche de conception web permettant aux sites de s'adapter automatiquement à différentes tailles d'écran.</div>
+    
+    <div class="glossary-term">SEO (Search Engine Optimization)</div>
+    <div class="glossary-definition">Ensemble de techniques visant à optimiser la visibilité d'un site web dans les résultats des moteurs de recherche.</div>
+    
+    <div class="glossary-term">SQL (Structured Query Language)</div>
+    <div class="glossary-definition">Langage informatique standardisé servant à exploiter des bases de données relationnelles.</div>
+    
+    <div class="glossary-term">Stripe</div>
+    <div class="glossary-definition">Plateforme de paiement en ligne offrant des solutions complètes pour traiter les transactions électroniques.</div>
+    
+    <div class="glossary-term">UML (Unified Modeling Language)</div>
+    <div class="glossary-definition">Langage de modélisation graphique utilisé en génie logiciel pour visualiser la conception d'un système.</div>
+    
+    <div class="glossary-term">UX (User Experience)</div>
+    <div class="glossary-definition">Qualité de l'expérience vécue par l'utilisateur lors de l'utilisation d'une interface.</div>
+    
+    <div class="glossary-term">Webhook</div>
+    <div class="glossary-definition">Méthode permettant à une application d'envoyer automatiquement des données à une autre application lors d'événements spécifiques.</div>
+</div>
+
+<!-- INTRODUCTION -->
+<div class="page-break">
+    <h1>1. Introduction</h1>
+    
+    <p>
+        Dans un contexte de transformation digitale accélérée et de sensibilisation croissante aux enjeux environnementaux, le secteur agricole connaît une mutation profonde. Les particuliers, qu'ils soient jardiniers amateurs ou producteurs urbains, expriment un besoin grandissant d'accès facilité aux équipements agricoles de qualité, sans nécessairement en supporter le coût d'acquisition complet.
+    </p>
+    
+    <p>
+        C'est dans cette dynamique que s'inscrit le projet <strong>Vitamiel</strong>, une plateforme e-commerce innovante dédiée à la vente et à la location d'équipements agricoles destinés aux particuliers. Cette initiative répond à une double problématique : démocratiser l'accès aux outils professionnels pour l'agriculture de proximité et proposer une alternative économique et écologique à l'achat systématique d'équipements.
+    </p>
+    
+    <p>
+        Le présent rapport détaille l'ensemble du processus de conception, de développement et d'implémentation de cette solution technologique. Il présente une analyse complète du marché, des choix techniques opérés, des défis rencontrés et des perspectives d'évolution du projet.
+    </p>
+    
+    <p>
+        Développé entre juin et août 2025, Vitamiel constitue l'aboutissement d'une réflexion approfondie sur les besoins du marché agricole belge et européen, matérialisée par une solution technique robuste et évolutive, construite selon les meilleures pratiques du développement web moderne.
+    </p>
+    
+    <p>
+        Au-delà de l'aspect purement technologique, ce projet s'inscrit dans une démarche entrepreneuriale concrète, portée par une vision partagée du développement durable et de l'innovation au service de l'agriculture de demain.
+    </p>
+</div>
+
+<!-- SYNOPSIS -->
+<div class="page-break">
+    <h1>2. Synopsis du projet</h1>
+    
+    <div class="highlight-box">
+        <h3>Vision du projet</h3>
+        <p>
+            <strong>Vitamiel</strong> est une plateforme e-commerce spécialisée dans la vente et la location d'équipements agricoles destinés aux particuliers. Le projet vise à démocratiser l'accès aux outils professionnels pour l'agriculture de proximité, le jardinage avancé et la petite production locale.
+        </p>
+    </div>
+    
+    <h2>2.1 Concept général</h2>
+    
+    <p>
+        Vitamiel se positionne comme un pont entre les fabricants d'équipements agricoles et les particuliers désireux de développer leurs projets agricoles ou horticoles. La plateforme propose une double approche commerciale :
+    </p>
+    
+    <ul>
+        <li><strong>Vente directe</strong> : acquisition définitive d'équipements neufs ou reconditionnés</li>
+        <li><strong>Location temporaire</strong> : accès ponctuel à des équipements spécialisés avec gestion flexible des durées</li>
+    </ul>
+    
+    <h2>2.2 Public cible</h2>
+    
+    <p>La plateforme s'adresse principalement à :</p>
+    
+    <ul>
+        <li><strong>Jardiniers passionnés</strong> recherchant des outils professionnels pour leurs projets</li>
+        <li><strong>Producteurs urbains</strong> développant l'agriculture en milieu urbain</li>
+        <li><strong>Petits exploitants</strong> nécessitant un accès ponctuel à des équipements coûteux</li>
+        <li><strong>Particuliers saisonniers</strong> ayant des besoins temporaires spécifiques</li>
+        <li><strong>Entrepreneurs agricoles</strong> en phase de test avant investissement</li>
+    </ul>
+    
+    <h2>2.3 Proposition de valeur</h2>
+    
+    <div class="tech-stack">
+        <div class="tech-item">
+            <div class="tech-name">Accessibilité économique</div>
+            <p>Réduction des barrières financières par la location</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">Flexibilité d'usage</div>
+            <p>Adaptation aux besoins saisonniers et ponctuels</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">Qualité garantie</div>
+            <p>Équipements professionnels maintenus et vérifiés</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">Impact environnemental</div>
+            <p>Optimisation de l'usage des ressources par le partage</p>
+        </div>
+    </div>
+    
+    <h2>2.4 Modèle économique</h2>
+    
+    <p>
+        Le modèle économique de Vitamiel repose sur plusieurs sources de revenus complémentaires :
+    </p>
+    
+    <ul>
+        <li><strong>Marges sur les ventes</strong> d'équipements neufs et reconditionnés</li>
+        <li><strong>Revenus de location</strong> avec tarification différenciée selon la durée</li>
+        <li><strong>Services annexes</strong> : maintenance, formation, conseil technique</li>
+        <li><strong>Partenariats commerciaux</strong> avec les fabricants et distributeurs</li>
+    </ul>
+    
+    <h2>2.5 Innovation technologique</h2>
+    
+    <p>
+        La plateforme se distingue par son approche technologique moderne, intégrant des fonctionnalités avancées de gestion des stocks, de planification des locations et de suivi client. L'accent est mis sur l'expérience utilisateur et l'automatisation des processus opérationnels.
+    </p>
+</div>
+
+<!-- CAHIER DES CHARGES (Pages blanches) -->
+<div class="page-break">
+    <h1>3. Cahier des charges</h1>
+    <div class="blank-page">
+        [Page réservée au cahier des charges - À compléter]
+    </div>
+</div>
+
+<div class="page-break">
+    <div class="blank-page">
+        [Page réservée au cahier des charges - À compléter]
+    </div>
+</div>
+
+<div class="page-break">
+    <div class="blank-page">
+        [Page réservée au cahier des charges - À compléter]
+    </div>
+</div>
+
+<!-- ORGANIGRAMME DES TÂCHES -->
+<div class="page-break">
+    <h1>4. Organigramme des tâches</h1>
+    
+    <p>
+        La planification du projet Vitamiel a été structurée selon une approche méthodologique rigoureuse, décomposant l'ensemble des activités en phases distinctes et tâches spécifiques. L'organigramme des tâches (WBS - Work Breakdown Structure) présente la hiérarchisation logique des travaux réalisés.
+    </p>
+    
+    <h2>4.1 Structure hiérarchique des tâches</h2>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Code WBS</th>
+                    <th>Tâche</th>
+                    <th>Durée estimée</th>
+                    <th>Ressources</th>
+                    <th>Dépendances</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1</strong></td>
+                    <td><strong>ANALYSE ET CONCEPTION</strong></td>
+                    <td><strong>3 semaines</strong></td>
+                    <td><strong>Équipe projet</strong></td>
+                    <td><strong>-</strong></td>
+                </tr>
+                <tr>
+                    <td>1.1</td>
+                    <td>Étude de marché</td>
+                    <td>1 semaine</td>
+                    <td>Analyste marché</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>1.2</td>
+                    <td>Analyse des besoins</td>
+                    <td>4 jours</td>
+                    <td>Chef de projet</td>
+                    <td>1.1</td>
+                </tr>
+                <tr>
+                    <td>1.3</td>
+                    <td>Spécifications fonctionnelles</td>
+                    <td>5 jours</td>
+                    <td>Analyste fonctionnel</td>
+                    <td>1.2</td>
+                </tr>
+                <tr>
+                    <td>1.4</td>
+                    <td>Architecture technique</td>
+                    <td>3 jours</td>
+                    <td>Architecte logiciel</td>
+                    <td>1.3</td>
+                </tr>
+                <tr>
+                    <td><strong>2</strong></td>
+                    <td><strong>DÉVELOPPEMENT BACKEND</strong></td>
+                    <td><strong>4 semaines</strong></td>
+                    <td><strong>Développeur PHP</strong></td>
+                    <td><strong>1</strong></td>
+                </tr>
+                <tr>
+                    <td>2.1</td>
+                    <td>Configuration Laravel</td>
+                    <td>2 jours</td>
+                    <td>Développeur senior</td>
+                    <td>1.4</td>
+                </tr>
+                <tr>
+                    <td>2.2</td>
+                    <td>Modélisation base de données</td>
+                    <td>3 jours</td>
+                    <td>DBA + Développeur</td>
+                    <td>2.1</td>
+                </tr>
+                <tr>
+                    <td>2.3</td>
+                    <td>API utilisateurs et authentification</td>
+                    <td>4 jours</td>
+                    <td>Développeur PHP</td>
+                    <td>2.2</td>
+                </tr>
+                <tr>
+                    <td>2.4</td>
+                    <td>Gestion produits et catalogue</td>
+                    <td>5 jours</td>
+                    <td>Développeur PHP</td>
+                    <td>2.3</td>
+                </tr>
+                <tr>
+                    <td>2.5</td>
+                    <td>Système de commandes</td>
+                    <td>6 jours</td>
+                    <td>Développeur PHP</td>
+                    <td>2.4</td>
+                </tr>
+                <tr>
+                    <td>2.6</td>
+                    <td>Module de location</td>
+                    <td>7 jours</td>
+                    <td>Développeur PHP</td>
+                    <td>2.5</td>
+                </tr>
+                <tr>
+                    <td>2.7</td>
+                    <td>Intégration Stripe</td>
+                    <td>3 jours</td>
+                    <td>Développeur PHP</td>
+                    <td>2.6</td>
+                </tr>
+                <tr>
+                    <td><strong>3</strong></td>
+                    <td><strong>DÉVELOPPEMENT FRONTEND</strong></td>
+                    <td><strong>3 semaines</strong></td>
+                    <td><strong>Développeur Frontend</strong></td>
+                    <td><strong>2.3</strong></td>
+                </tr>
+                <tr>
+                    <td>3.1</td>
+                    <td>Design system et composants</td>
+                    <td>4 jours</td>
+                    <td>UI/UX Designer</td>
+                    <td>1.4</td>
+                </tr>
+                <tr>
+                    <td>3.2</td>
+                    <td>Pages publiques</td>
+                    <td>5 jours</td>
+                    <td>Développeur Frontend</td>
+                    <td>3.1</td>
+                </tr>
+                <tr>
+                    <td>3.3</td>
+                    <td>Interface utilisateur</td>
+                    <td>6 jours</td>
+                    <td>Développeur Frontend</td>
+                    <td>3.2</td>
+                </tr>
+                <tr>
+                    <td>3.4</td>
+                    <td>Dashboard administrateur</td>
+                    <td>6 jours</td>
+                    <td>Développeur Frontend</td>
+                    <td>3.3</td>
+                </tr>
+                <tr>
+                    <td><strong>4</strong></td>
+                    <td><strong>TESTS ET DÉPLOIEMENT</strong></td>
+                    <td><strong>2 semaines</strong></td>
+                    <td><strong>Équipe QA</strong></td>
+                    <td><strong>2, 3</strong></td>
+                </tr>
+                <tr>
+                    <td>4.1</td>
+                    <td>Tests unitaires</td>
+                    <td>3 jours</td>
+                    <td>Développeur</td>
+                    <td>2, 3</td>
+                </tr>
+                <tr>
+                    <td>4.2</td>
+                    <td>Tests d'intégration</td>
+                    <td>4 jours</td>
+                    <td>Testeur QA</td>
+                    <td>4.1</td>
+                </tr>
+                <tr>
+                    <td>4.3</td>
+                    <td>Tests utilisateur</td>
+                    <td>3 jours</td>
+                    <td>Testeur UX</td>
+                    <td>4.2</td>
+                </tr>
+                <tr>
+                    <td>4.4</td>
+                    <td>Configuration serveur production</td>
+                    <td>2 jours</td>
+                    <td>DevOps</td>
+                    <td>4.3</td>
+                </tr>
+                <tr>
+                    <td>4.5</td>
+                    <td>Déploiement et mise en ligne</td>
+                    <td>2 jours</td>
+                    <td>DevOps + Développeur</td>
+                    <td>4.4</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="highlight-box">
+        <h3>Tableau Excel à insérer</h3>
+        <p><em>Un tableau Excel détaillé avec diagramme de Gantt sera inséré ici, présentant la planification temporelle complète du projet avec les interdépendances et l'allocation des ressources.</em></p>
+    </div>
+</div>
+
+<!-- ORGANIGRAMME PRÉVISIONNEL -->
+<div class="page-break">
+    <h1>5. Organigramme prévisionnel</h1>
+    
+    <p>
+        L'organigramme prévisionnel de Vitamiel définit la structure organisationnelle envisagée pour le développement et l'exploitation de la plateforme. Cette organisation évolue selon les phases du projet, de l'équipe de développement initiale vers une structure commerciale opérationnelle.
+    </p>
+    
+    <h2>5.1 Structure organisationnelle initiale (Phase de développement)</h2>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Poste</th>
+                    <th>Responsabilités</th>
+                    <th>Profil requis</th>
+                    <th>Charge (ETP)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Chef de projet / Product Owner</strong></td>
+                    <td>
+                        - Vision produit et stratégie<br>
+                        - Coordination équipe<br>
+                        - Relation clients/partenaires
+                    </td>
+                    <td>
+                        Soufiane MEFTAH<br>
+                        Formation IT + Agriculture
+                    </td>
+                    <td>1.0</td>
+                </tr>
+                <tr>
+                    <td><strong>Développeur Full-Stack Senior</strong></td>
+                    <td>
+                        - Architecture technique<br>
+                        - Développement backend/frontend<br>
+                        - Intégrations API
+                    </td>
+                    <td>
+                        5+ ans PHP/Laravel<br>
+                        Expérience e-commerce
+                    </td>
+                    <td>1.0</td>
+                </tr>
+                <tr>
+                    <td><strong>Spécialiste Agriculture</strong></td>
+                    <td>
+                        - Expertise métier<br>
+                        - Sélection produits<br>
+                        - Formation utilisateurs
+                    </td>
+                    <td>
+                        Geoffrey VIGNE<br>
+                        Agriculteur spécialisé
+                    </td>
+                    <td>0.5</td>
+                </tr>
+                <tr>
+                    <td><strong>UI/UX Designer</strong></td>
+                    <td>
+                        - Design interface<br>
+                        - Expérience utilisateur<br>
+                        - Tests d'utilisabilité
+                    </td>
+                    <td>
+                        Portfolio e-commerce<br>
+                        Outils design modernes
+                    </td>
+                    <td>0.3</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>5.2 Structure organisationnelle cible (Phase d'exploitation)</h2>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Département</th>
+                    <th>Poste</th>
+                    <th>Missions principales</th>
+                    <th>Échéance recrutement</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="2"><strong>Direction</strong></td>
+                    <td>Directeur Général</td>
+                    <td>Stratégie, vision, développement commercial</td>
+                    <td>T0 (Soufiane MEFTAH)</td>
+                </tr>
+                <tr>
+                    <td>Directeur Technique</td>
+                    <td>Supervision technique, innovation, R&D</td>
+                    <td>T+6 mois</td>
+                </tr>
+                <tr>
+                    <td rowspan="3"><strong>Technique</strong></td>
+                    <td>Lead Développeur</td>
+                    <td>Architecture, équipe dev, qualité code</td>
+                    <td>T+3 mois</td>
+                </tr>
+                <tr>
+                    <td>Développeur Backend</td>
+                    <td>APIs, base de données, intégrations</td>
+                    <td>T+6 mois</td>
+                </tr>
+                <tr>
+                    <td>DevOps Engineer</td>
+                    <td>Infrastructure, déploiement, monitoring</td>
+                    <td>T+9 mois</td>
+                </tr>
+                <tr>
+                    <td rowspan="3"><strong>Commercial</strong></td>
+                    <td>Responsable Commercial</td>
+                    <td>Stratégie vente, partenariats, KAM</td>
+                    <td>T+6 mois</td>
+                </tr>
+                <tr>
+                    <td>Chargé Marketing Digital</td>
+                    <td>SEO, SEM, réseaux sociaux, content</td>
+                    <td>T+9 mois</td>
+                </tr>
+                <tr>
+                    <td>Customer Success Manager</td>
+                    <td>Support client, formation, fidélisation</td>
+                    <td>T+12 mois</td>
+                </tr>
+                <tr>
+                    <td rowspan="2"><strong>Opérations</strong></td>
+                    <td>Responsable Logistique</td>
+                    <td>Gestion stocks, expéditions, retours</td>
+                    <td>T+6 mois</td>
+                </tr>
+                <tr>
+                    <td>Technicien Maintenance</td>
+                    <td>Réparations, contrôle qualité équipements</td>
+                    <td>T+9 mois</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="highlight-box">
+        <h3>Organigramme Excel à insérer</h3>
+        <p><em>Un organigramme détaillé au format Excel sera inséré ici, présentant la structure hiérarchique, les liens fonctionnels et l'évolution prévisionnelle des effectifs sur 24 mois.</em></p>
+    </div>
+    
+    <h2>5.3 Évolution des effectifs</h2>
+    
+    <p>
+        La montée en charge de l'équipe suit la croissance prévue de l'activité :
+    </p>
+    
+    <ul>
+        <li><strong>T0 à T+3 mois</strong> : Équipe core (4 personnes) - Développement et lancement</li>
+        <li><strong>T+3 à T+6 mois</strong> : Renforcement technique (6 personnes) - Stabilisation produit</li>
+        <li><strong>T+6 à T+12 mois</strong> : Développement commercial (9 personnes) - Croissance marché</li>
+        <li><strong>T+12 à T+24 mois</strong> : Maturité opérationnelle (12 personnes) - Expansion géographique</li>
+    </ul>
+</div>
+
+<!-- BUSINESS PLAN -->
+<div class="page-break">
+    <h1>6. Business plan</h1>
+    
+    <h2>6.1 Résumé exécutif</h2>
+    
+    <p>
+        Vitamiel est une startup innovante positionnée sur le marché en croissance de l'agriculture de proximité et du jardinage professionnel. La plateforme propose une solution complète de vente et location d'équipements agricoles, répondant aux besoins d'accessibilité économique et de flexibilité d'usage exprimés par les particuliers.
+    </p>
+    
+    <div class="highlight-box">
+        <h3>Données clés du projet</h3>
+        <ul>
+            <li><strong>Investissement initial</strong> : 75 000 €</li>
+            <li><strong>Chiffre d'affaires prévisionnel Y1</strong> : 180 000 €</li>
+            <li><strong>Seuil de rentabilité</strong> : Mois 14</li>
+            <li><strong>Marché adressable</strong> : 2,4 M€ (Belgique)</li>
+            <li><strong>Équipe</strong> : 4 personnes à T0, 12 à T+24</li>
+        </ul>
+    </div>
+    
+    <h2>6.2 Modèle économique</h2>
+    
+    <h3>6.2.1 Sources de revenus</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Source de revenus</th>
+                    <th>Modèle</th>
+                    <th>Part Y1</th>
+                    <th>Part Y3</th>
+                    <th>Marge brute</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Vente d'équipements</strong></td>
+                    <td>Marge distributeur</td>
+                    <td>60%</td>
+                    <td>45%</td>
+                    <td>25-35%</td>
+                </tr>
+                <tr>
+                    <td><strong>Location d'équipements</strong></td>
+                    <td>Revenus récurrents</td>
+                    <td>30%</td>
+                    <td>40%</td>
+                    <td>60-70%</td>
+                </tr>
+                <tr>
+                    <td><strong>Services maintenance</strong></td>
+                    <td>Prestation horaire</td>
+                    <td>5%</td>
+                    <td>8%</td>
+                    <td>45-55%</td>
+                </tr>
+                <tr>
+                    <td><strong>Formation et conseil</strong></td>
+                    <td>Forfait/session</td>
+                    <td>3%</td>
+                    <td>5%</td>
+                    <td>70-80%</td>
+                </tr>
+                <tr>
+                    <td><strong>Partenariats commerciaux</strong></td>
+                    <td>Commission</td>
+                    <td>2%</td>
+                    <td>2%</td>
+                    <td>90-95%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h3>6.2.2 Structure de coûts</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Catégorie de coûts</th>
+                    <th>Type</th>
+                    <th>% CA Y1</th>
+                    <th>% CA Y3</th>
+                    <th>Optimisation prévue</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Coût des marchandises vendues</strong></td>
+                    <td>Variable</td>
+                    <td>45%</td>
+                    <td>40%</td>
+                    <td>Négociation volumes</td>
+                </tr>
+                <tr>
+                    <td><strong>Salaires et charges sociales</strong></td>
+                    <td>Fixe</td>
+                    <td>35%</td>
+                    <td>28%</td>
+                    <td>Effet d'échelle</td>
+                </tr>
+                <tr>
+                    <td><strong>Marketing et acquisition</strong></td>
+                    <td>Variable</td>
+                    <td>8%</td>
+                    <td>6%</td>
+                    <td>Référencement naturel</td>
+                </tr>
+                <tr>
+                    <td><strong>Infrastructure et hébergement</strong></td>
+                    <td>Fixe</td>
+                    <td>3%</td>
+                    <td>2%</td>
+                    <td>Optimisation technique</td>
+                </tr>
+                <tr>
+                    <td><strong>Logistique et stockage</strong></td>
+                    <td>Variable</td>
+                    <td>5%</td>
+                    <td>4%</td>
+                    <td>Automatisation</td>
+                </tr>
+                <tr>
+                    <td><strong>Autres charges</strong></td>
+                    <td>Fixe</td>
+                    <td>4%</td>
+                    <td>3%</td>
+                    <td>Rationalisation</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>6.3 Stratégie de développement</h2>
+    
+    <h3>6.3.1 Phase 1 : Lancement et validation (Mois 1-6)</h3>
+    
+    <ul>
+        <li>Lancement de la plateforme avec catalogue initial de 200 références</li>
+        <li>Focus sur le marché belge francophone</li>
+        <li>Acquisition de 100 premiers clients</li>
+        <li>Validation du product-market fit</li>
+        <li>Partenariats avec 3-5 fournisseurs clés</li>
+    </ul>
+    
+    <h3>6.3.2 Phase 2 : Croissance (Mois 7-18)</h3>
+    
+    <ul>
+        <li>Extension du catalogue à 500 références</li>
+        <li>Couverture complète de la Belgique</li>
+        <li>Développement du service de location</li>
+        <li>Objectif : 1000 clients actifs</li>
+        <li>Levée de fonds série A (250 000 €)</li>
+    </ul>
+    
+    <h3>6.3.3 Phase 3 : Expansion (Mois 19-36)</h3>
+    
+    <ul>
+        <li>Expansion BENELUX (Pays-Bas, Luxembourg)</li>
+        <li>Services premium et maintenance</li>
+        <li>Application mobile native</li>
+        <li>Objectif : 5000 clients actifs</li>
+        <li>Préparation expansion européenne</li>
+    </ul>
+    
+    <h2>6.4 Analyse financière prévisionnelle</h2>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Indicateur financier</th>
+                    <th>Année 1</th>
+                    <th>Année 2</th>
+                    <th>Année 3</th>
+                    <th>Commentaires</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Chiffre d'affaires</strong></td>
+                    <td>180 000 €</td>
+                    <td>420 000 €</td>
+                    <td>850 000 €</td>
+                    <td>Croissance 133% puis 102%</td>
+                </tr>
+                <tr>
+                    <td><strong>Marge brute</strong></td>
+                    <td>72 000 €</td>
+                    <td>189 000 €</td>
+                    <td>425 000 €</td>
+                    <td>Amélioration progressive</td>
+                </tr>
+                <tr>
+                    <td><strong>Charges d'exploitation</strong></td>
+                    <td>95 000 €</td>
+                    <td>165 000 €</td>
+                    <td>285 000 €</td>
+                    <td>Maîtrise des coûts fixes</td>
+                </tr>
+                <tr>
+                    <td><strong>EBITDA</strong></td>
+                    <td>-23 000 €</td>
+                    <td>24 000 €</td>
+                    <td>140 000 €</td>
+                    <td>Rentabilité dès Y2</td>
+                </tr>
+                <tr>
+                    <td><strong>Résultat net</strong></td>
+                    <td>-28 000 €</td>
+                    <td>18 000 €</td>
+                    <td>125 000 €</td>
+                    <td>ROI positif Y2</td>
+                </tr>
+                <tr>
+                    <td><strong>Trésorerie fin période</strong></td>
+                    <td>35 000 €</td>
+                    <td>78 000 €</td>
+                    <td>225 000 €</td>
+                    <td>Autofinancement Y3</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>6.5 Besoins de financement</h2>
+    
+    <div class="highlight-box">
+        <h3>Plan de financement initial : 75 000 €</h3>
+        <ul>
+            <li><strong>Développement technique</strong> : 25 000 € (33%)</li>
+            <li><strong>Stock initial</strong> : 20 000 € (27%)</li>
+            <li><strong>Marketing et communication</strong> : 15 000 € (20%)</li>
+            <li><strong>Infrastructure et équipement</strong> : 8 000 € (11%)</li>
+            <li><strong>Fonds de roulement</strong> : 7 000 € (9%)</li>
+        </ul>
+    </div>
+    
+    <p>
+        Ce financement initial sera complété par une levée de fonds série A de 250 000 € en fin d'année 2 pour accélérer la croissance et l'expansion géographique.
+    </p>
+</div>
+
+<!-- PRÉSENTATION DES PORTEURS -->
+<div class="page-break">
+    <h1>7. Présentation des porteurs du projet</h1>
+    
+    <p>
+        Le projet Vitamiel est porté par une équipe fondatrice complémentaire, alliant expertise technique et connaissance approfondie du secteur agricole. Cette synergie garantit une approche équilibrée entre innovation technologique et réponse aux besoins réels du marché.
+    </p>
+    
+    <h2>7.1 Soufiane MEFTAH - Co-fondateur et Directeur Général</h2>
+    
+    <div class="highlight-box">
+        <h3>Profil professionnel</h3>
+        <ul>
+            <li><strong>Formation</strong> : Informatique et Technologies - Haute École de la Province de Liège</li>
+            <li><strong>Spécialisations</strong> : Développement web, E-commerce, Gestion de projet</li>
+            <li><strong>Expérience</strong> : Projets de développement web full-stack, Maîtrise des technologies modernes</li>
+        </ul>
+    </div>
+    
+    <h3>7.1.1 Expertise technique</h3>
+    
+    <p>
+        Soufiane apporte une solide expertise en développement web moderne, acquise à travers sa formation spécialisée et ses projets pratiques. Sa maîtrise des technologies Laravel, PHP, et des architectures e-commerce constitue l'atout technique majeur du projet.
+    </p>
+    
+    <div class="tech-stack">
+        <div class="tech-item">
+            <div class="tech-name">Backend Development</div>
+            <p>PHP, Laravel, MySQL, API REST</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">Frontend Development</div>
+            <p>HTML5, CSS3, JavaScript, Bootstrap</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">DevOps & Tools</div>
+            <p>Git, Composer, Deployment, Testing</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">E-commerce</div>
+            <p>Payment systems, Inventory, UX/UI</p>
+        </div>
+    </div>
+    
+    <h3>7.1.2 Responsabilités dans le projet</h3>
+    
+    <ul>
+        <li><strong>Vision stratégique</strong> : Définition de la roadmap produit et des orientations technologiques</li>
+        <li><strong>Développement technique</strong> : Architecture, développement et maintenance de la plateforme</li>
+        <li><strong>Gestion d'équipe</strong> : Coordination des développeurs et prestataires techniques</li>
+        <li><strong>Relations partenaires</strong> : Négociation avec les fournisseurs de solutions techniques</li>
+        <li><strong>Innovation</strong> : Veille technologique et intégration des nouvelles fonctionnalités</li>
+    </ul>
+    
+    <h2>7.2 Geoffrey VIGNE - Co-fondateur et Directeur Agricole</h2>
+    
+    <div class="highlight-box">
+        <h3>Profil professionnel</h3>
+        <ul>
+            <li><strong>Formation</strong> : Ingénieur agronome, Spécialisation génétique végétale</li>
+            <li><strong>Spécialisations</strong> : Croisement fruits et légumes, Agriculture de précision</li>
+            <li><strong>Expérience</strong> : 8 ans d'exploitation agricole, Innovation variétale</li>
+        </ul>
+    </div>
+    
+    <h3>7.2.1 Expertise agricole</h3>
+    
+    <p>
+        Geoffrey apporte une connaissance pratique et approfondie du secteur agricole, acquise à travers son expérience d'exploitant spécialisé dans le croisement et l'amélioration variétale. Cette expertise garantit la pertinence des produits proposés et la crédibilité technique de Vitamiel.
+    </p>
+    
+    <div class="tech-stack">
+        <div class="tech-item">
+            <div class="tech-name">Sélection Équipements</div>
+            <p>Analyse besoins, Tests terrain, Qualité</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">Expertise Métier</div>
+            <p>Techniques culturales, Saisonnalité</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">Réseau Professionnel</div>
+            <p>Fournisseurs, Distributeurs, Utilisateurs</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">Formation Clients</div>
+            <p>Usage optimal, Maintenance, Sécurité</p>
+        </div>
+    </div>
+    
+    <h3>7.2.2 Responsabilités dans le projet</h3>
+    
+    <ul>
+        <li><strong>Curation produits</strong> : Sélection et évaluation des équipements proposés</li>
+        <li><strong>Relations fournisseurs</strong> : Négociation commerciale avec les fabricants</li>
+        <li><strong>Support technique</strong> : Conseil et formation des utilisateurs</li>
+        <li><strong>Contrôle qualité</strong> : Validation des équipements en location</li>
+        <li><strong>Développement commercial</strong> : Prospection des partenaires agricoles</li>
+    </ul>
+    
+    <h2>7.3 Complémentarité de l'équipe fondatrice</h2>
+    
+    <p>
+        La synergie entre les compétences techniques de Soufiane et l'expertise agricole de Geoffrey constitue un avantage concurrentiel majeur pour Vitamiel. Cette complémentarité permet :
+    </p>
+    
+    <ul>
+        <li><strong>Crédibilité technique</strong> : Maîtrise des enjeux métier et des besoins utilisateurs</li>
+        <li><strong>Innovation pertinente</strong> : Développement de fonctionnalités adaptées aux usages réels</li>
+        <li><strong>Réseau étendu</strong> : Accès facilité aux fournisseurs et aux premiers clients</li>
+        <li><strong>Vision long terme</strong> : Anticipation des évolutions du marché agricole</li>
+    </ul>
+    
+    <h2>7.4 Gouvernance et prise de décision</h2>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Domaine de décision</th>
+                    <th>Responsable principal</th>
+                    <th>Validation requise</th>
+                    <th>Processus</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Stratégie technique</td>
+                    <td>Soufiane MEFTAH</td>
+                    <td>Geoffrey (impact métier)</td>
+                    <td>Discussion puis décision</td>
+                </tr>
+                <tr>
+                    <td>Sélection produits</td>
+                    <td>Geoffrey VIGNE</td>
+                    <td>Soufiane (faisabilité tech)</td>
+                    <td>Analyse puis validation</td>
+                </tr>
+                <tr>
+                    <td>Orientations commerciales</td>
+                    <td>Décision collégiale</td>
+                    <td>Consensus requis</td>
+                    <td>Réunion hebdomadaire</td>
+                </tr>
+                <tr>
+                    <td>Investissements majeurs</td>
+                    <td>Décision collégiale</td>
+                    <td>Unanimité requise</td>
+                    <td>Analyse financière commune</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- OBJECTIFS DU PROJET -->
+<div class="page-break">
+    <h1>8. Objectifs du projet</h1>
+    
+    <p>
+        Les objectifs de Vitamiel s'articulent autour d'une vision claire : démocratiser l'accès aux équipements agricoles professionnels pour les particuliers, tout en créant une entreprise durable et rentable. Ces objectifs se déclinent en plusieurs dimensions complémentaires.
+    </p>
+    
+    <h2>8.1 Objectifs stratégiques</h2>
+    
+    <h3>8.1.1 Objectif principal</h3>
+    
+    <div class="highlight-box">
+        <h3>Mission de Vitamiel</h3>
+        <p>
+            <strong>Faciliter l'accès aux équipements agricoles professionnels pour les particuliers</strong> en proposant une solution flexible combinant vente et location, soutenue par une plateforme technologique moderne et un service client expert.
+        </p>
+    </div>
+    
+    <h3>8.1.2 Objectifs spécifiques</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Dimension</th>
+                    <th>Objectif</th>
+                    <th>Indicateur</th>
+                    <th>Cible Y1</th>
+                    <th>Cible Y3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td>Conquête marché belgique</td>
+                    <td>Part de marché</td>
+                    <td>0,5%</td>
+                    <td>3%</td>
+                </tr>
+                <tr>
+                    <td><strong>Client</strong></td>
+                    <td>Satisfaction utilisateurs</td>
+                    <td>NPS (Net Promoter Score)</td>
+                    <td>+40</td>
+                    <td>+60</td>
+                </tr>
+                <tr>
+                    <td><strong>Produit</strong></td>
+                    <td>Couverture besoins</td>
+                    <td>Références catalogue</td>
+                    <td>200</td>
+                    <td>800</td>
+                </tr>
+                <tr>
+                    <td><strong>Technologique</strong></td>
+                    <td>Performance plateforme</td>
+                    <td>Disponibilité</td>
+                    <td>99%</td>
+                    <td>99,9%</td>
+                </tr>
+                <tr>
+                    <td><strong>Financier</strong></td>
+                    <td>Rentabilité</td>
+                    <td>EBITDA</td>
+                    <td>-5%</td>
+                    <td>+15%</td>
+                </tr>
+                <tr>
+                    <td><strong>Équipe</strong></td>
+                    <td>Développement RH</td>
+                    <td>Effectif</td>
+                    <td>6</td>
+                    <td>12</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>8.2 Objectifs opérationnels détaillés</h2>
+    
+    <h3>8.2.1 Développement de la plateforme</h3>
+    
+    <ul>
+        <li><strong>Architecture technique robuste</strong> : Plateforme Laravel scalable supportant 10 000 utilisateurs simultanés</li>
+        <li><strong>Expérience utilisateur optimisée</strong> : Interface intuitive avec taux de conversion > 3%</li>
+        <li><strong>Fonctionnalités avancées</strong> : Système de location intelligent, gestion automatisée des stocks</li>
+        <li><strong>Intégrations partenaires</strong> : API connectées avec 5+ fournisseurs majeurs</li>
+        <li><strong>Mobile first</strong> : Responsive design avec 60% du trafic mobile</li>
+    </ul>
+    
+    <h3>8.2.2 Croissance commerciale</h3>
+    
+    <ul>
+        <li><strong>Acquisition clients</strong> : 1000 clients actifs en 18 mois</li>
+        <li><strong>Panier moyen</strong> : 150€ en vente, 45€ en location</li>
+        <li><strong>Récurrence</strong> : 40% de clients récurrents sur 12 mois</li>
+        <li><strong>Géographie</strong> : Couverture complète Belgique, expansion BENELUX</li>
+        <li><strong>Partenariats</strong> : 20 fournisseurs référencés, 5 partenaires stratégiques</li>
+    </ul>
+    
+    <h3>8.2.3 Excellence opérationnelle</h3>
+    
+    <ul>
+        <li><strong>Qualité service</strong> : Délai livraison < 48h, taux retour < 2%</li>
+        <li><strong>Gestion stocks</strong> : Rotation 8x/an, disponibilité 95%</li>
+        <li><strong>Support client</strong> : Temps réponse < 4h, résolution 1er niveau 80%</li>
+        <li><strong>Maintenance équipements</strong> : Contrôle systématique, traçabilité complète</li>
+    </ul>
+    
+    <h2>8.3 Objectifs d'impact sociétal</h2>
+    
+    <h3>8.3.1 Démocratisation de l'agriculture</h3>
+    
+    <p>
+        Vitamiel ambitionne de contribuer à la démocratisation de l'agriculture de proximité en :
+    </p>
+    
+    <ul>
+        <li><strong>Réduisant les barrières d'entrée</strong> : Accès aux équipements sans investissement initial majeur</li>
+        <li><strong>Favorisant l'expérimentation</strong> : Possibilité de tester avant d'acheter</li>
+        <li><strong>Accompagnant les utilisateurs</strong> : Formation et conseil personnalisés</li>
+        <li><strong>Développant les savoir-faire</strong> : Transfert de compétences techniques</li>
+    </ul>
+    
+    <h3>8.3.2 Impact environnemental positif</h3>
+    
+    <ul>
+        <li><strong>Économie circulaire</strong> : Optimisation de l'usage des équipements par la location</li>
+        <li><strong>Réduction du gaspillage</strong> : Éviter l'achat d'équipements sous-utilisés</li>
+        <li><strong>Maintenance préventive</strong> : Allongement de la durée de vie des matériels</li>
+        <li><strong>Circuits courts</strong> : Favoriser la production locale et de proximité</li>
+    </ul>
+    
+    <h2>8.4 Indicateurs de suivi et mesure du succès</h2>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>KPI</th>
+                    <th>Méthode de mesure</th>
+                    <th>Fréquence</th>
+                    <th>Responsable</th>
+                    <th>Seuil d'alerte</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Chiffre d'affaires</td>
+                    <td>Reporting financier</td>
+                    <td>Mensuel</td>
+                    <td>Direction</td>
+                    <td>-10% vs prévision</td>
+                </tr>
+                <tr>
+                    <td>Nombre clients actifs</td>
+                    <td>Analytics plateforme</td>
+                    <td>Hebdomadaire</td>
+                    <td>Commercial</td>
+                    <td>-15% vs objectif</td>
+                </tr>
+                <tr>
+                    <td>Taux de conversion</td>
+                    <td>Google Analytics</td>
+                    <td>Quotidien</td>
+                    <td>Marketing</td>
+                    <td>< 2%</td>
+                </tr>
+                <tr>
+                    <td>Satisfaction client</td>
+                    <td>Enquêtes NPS</td>
+                    <td>Trimestriel</td>
+                    <td>Customer Success</td>
+                    <td>NPS < +30</td>
+                </tr>
+                <tr>
+                    <td>Performance technique</td>
+                    <td>Monitoring serveurs</td>
+                    <td>Temps réel</td>
+                    <td>Technique</td>
+                    <td>Disponibilité < 98%</td>
+                </tr>
+                <tr>
+                    <td>Rentabilité</td>
+                    <td>Comptabilité analytique</td>
+                    <td>Mensuel</td>
+                    <td>Direction</td>
+                    <td>Marge brute < 35%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>8.5 Roadmap de réalisation</h2>
+    
+    <p>
+        La réalisation de ces objectifs suit une roadmap structurée en jalons clés :
+    </p>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Période</th>
+                    <th>Objectifs prioritaires</th>
+                    <th>Livrables clés</th>
+                    <th>Critères de succès</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>T0-T3</strong></td>
+                    <td>Lancement plateforme</td>
+                    <td>MVP fonctionnel, 50 produits</td>
+                    <td>100 premiers clients</td>
+                </tr>
+                <tr>
+                    <td><strong>T3-T6</strong></td>
+                    <td>Validation market-fit</td>
+                    <td>Module location, 200 produits</td>
+                    <td>300 clients, rentabilité unitaire</td>
+                </tr>
+                <tr>
+                    <td><strong>T6-T12</strong></td>
+                    <td>Croissance accélérée</td>
+                    <td>App mobile, 400 produits</td>
+                    <td>1000 clients, seuil rentabilité</td>
+                </tr>
+                <tr>
+                    <td><strong>T12-T18</strong></td>
+                    <td>Consolidation marché</td>
+                    <td>Services premium, B2B</td>
+                    <td>2000 clients, profitabilité</td>
+                </tr>
+                <tr>
+                    <td><strong>T18-T24</strong></td>
+                    <td>Expansion géographique</td>
+                    <td>BENELUX, 800 produits</td>
+                    <td>5000 clients, leader marché</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- AVANCEMENT DU PROJET -->
+<div class="page-break">
+    <h1>9. Avancement du projet</h1>
+    
+    <p>
+        Le développement de Vitamiel s'est déroulé sur une période de 10 semaines intensives, de juin à août 2025. Cette section présente le détail de l'avancement réel du projet, les technologies implementées et les résultats obtenus.
+    </p>
+    
+    <h2>9.1 Chronologie du développement</h2>
+    
+    <div class="highlight-box">
+        <h3>Calendrier de réalisation</h3>
+        <ul>
+            <li><strong>Début du projet</strong> : 1er juin 2025</li>
+            <li><strong>Fin du développement</strong> : 17 août 2025</li>
+            <li><strong>Durée totale</strong> : 77 jours (11 semaines)</li>
+            <li><strong>Effort de développement</strong> : 520 heures</li>
+        </ul>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Phase</th>
+                    <th>Période</th>
+                    <th>Durée</th>
+                    <th>Livrables</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Analyse et conception</strong></td>
+                    <td>01/06 - 14/06</td>
+                    <td>2 semaines</td>
+                    <td>Cahier des charges, Maquettes, Architecture</td>
+                    <td>✅ Terminé</td>
+                </tr>
+                <tr>
+                    <td><strong>Développement Backend</strong></td>
+                    <td>15/06 - 15/07</td>
+                    <td>4 semaines</td>
+                    <td>API, Base de données, Logique métier</td>
+                    <td>✅ Terminé</td>
+                </tr>
+                <tr>
+                    <td><strong>Développement Frontend</strong></td>
+                    <td>01/07 - 05/08</td>
+                    <td>5 semaines</td>
+                    <td>Interface utilisateur, Dashboard admin</td>
+                    <td>✅ Terminé</td>
+                </tr>
+                <tr>
+                    <td><strong>Intégrations</strong></td>
+                    <td>25/07 - 10/08</td>
+                    <td>2 semaines</td>
+                    <td>Stripe, Emails, Queue system</td>
+                    <td>✅ Terminé</td>
+                </tr>
+                <tr>
+                    <td><strong>Tests et débogage</strong></td>
+                    <td>06/08 - 17/08</td>
+                    <td>2 semaines</td>
+                    <td>Tests fonctionnels, Optimisations</td>
+                    <td>✅ Terminé</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>9.2 Stack technique développée</h2>
+    
+    <h3>9.2.1 Backend - Architecture serveur</h3>
+    
+    <div class="tech-stack">
+        <div class="tech-item">
+            <div class="tech-name">Laravel 11.45.1</div>
+            <p>Framework PHP principal avec architecture MVC, Eloquent ORM, système de routing avancé</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">PHP 8.4.10</div>
+            <p>Langage serveur moderne avec support des dernières fonctionnalités et optimisations</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">MariaDB 11.5.2</div>
+            <p>Base de données relationnelle avec 31 tables interconnectées et index optimisés</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">Composer</div>
+            <p>Gestionnaire de dépendances pour l'écosystème PHP et les packages Laravel</p>
+        </div>
+    </div>
+    
+    <h3>9.2.2 Frontend - Interface utilisateur</h3>
+    
+    <div class="tech-stack">
+        <div class="tech-item">
+            <div class="tech-name">Blade Templates</div>
+            <p>Moteur de templates Laravel pour la génération dynamique des vues HTML</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">Tailwind CSS 4.1.11</div>
+            <p>Framework CSS utility-first avec design system moderne et responsive</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">Alpine.js 3.14.9</div>
+            <p>Framework JavaScript léger pour l'interactivité côté client</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">Vite 5.0 + PostCSS</div>
+            <p>Build tool moderne avec hot reload et optimisation des assets</p>
+        </div>
+    </div>
+    
+    <h3>9.2.3 Services et intégrations</h3>
+    
+    <div class="tech-stack">
+        <div class="tech-item">
+            <div class="tech-name">Stripe Payment</div>
+            <p>Plateforme de paiement sécurisée avec gestion des cautions et remboursements</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">Queue System</div>
+            <p>Système de files d'attente Laravel pour traitement asynchrone des emails</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">Mail System</div>
+            <p>Service d'envoi d'emails transactionnels avec templates personnalisés</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">File Storage</div>
+            <p>Gestion des uploads et stockage des images produits avec optimisation</p>
+        </div>
+    </div>
+    
+    <h2>9.3 Fonctionnalités développées</h2>
+    
+    <h3>9.3.1 Module e-commerce</h3>
+    
+    <ul>
+        <li><strong>Catalogue produits</strong> : Gestion complète avec catégories, images, descriptions détaillées</li>
+        <li><strong>Panier d'achat</strong> : Ajout/suppression, calculs automatiques, persistance session</li>
+        <li><strong>Système de commandes</strong> : Workflow complet de la commande à la livraison</li>
+        <li><strong>Gestion des stocks</strong> : Suivi en temps réel, alertes de stock faible</li>
+        <li><strong>Système de retours</strong> : Demandes de retour, suivi du processus, remboursements</li>
+    </ul>
+    
+    <h3>9.3.2 Module de location</h3>
+    
+    <ul>
+        <li><strong>Panier de location</strong> : Sélection de dates, calcul de tarifs par jour</li>
+        <li><strong>Gestion des disponibilités</strong> : Calendrier de réservation, conflits automatiques</li>
+        <li><strong>Locations same-day</strong> : Possibilité de location le jour même</li>
+        <li><strong>Workflow de location</strong> : États confirmé → actif → terminé avec transitions automatiques</li>
+        <li><strong>Système d'inspection</strong> : Contrôle état des équipements, calcul pénalités</li>
+    </ul>
+    
+    <h3>9.3.3 Gestion utilisateurs</h3>
+    
+    <ul>
+        <li><strong>Authentification sécurisée</strong> : Inscription, connexion, récupération mot de passe</li>
+        <li><strong>Profils utilisateurs</strong> : Gestion informations personnelles, préférences</li>
+        <li><strong>Système de rôles</strong> : Différenciation User/Admin avec permissions</li>
+        <li><strong>Historique d'activité</strong> : Suivi commandes, locations, favoris</li>
+        <li><strong>Système de messages</strong> : Notifications internes, communication admin-user</li>
+    </ul>
+    
+    <h3>9.3.4 Administration</h3>
+    
+    <ul>
+        <li><strong>Dashboard complet</strong> : Statistiques temps réel, KPIs, graphiques</li>
+        <li><strong>Gestion produits</strong> : CRUD complet, gestion stocks, catégories</li>
+        <li><strong>Gestion commandes</strong> : Suivi, modification statuts, gestion retours</li>
+        <li><strong>Gestion locations</strong> : Approbation, inspections, calcul pénalités</li>
+        <li><strong>Gestion utilisateurs</strong> : Administration comptes, rôles, messages</li>
+    </ul>
+    
+    <h3>9.3.5 Système de blog</h3>
+    
+    <ul>
+        <li><strong>Articles de blog</strong> : Création, édition, publication avec éditeur riche</li>
+        <li><strong>Catégories et tags</strong> : Organisation du contenu, navigation facile</li>
+        <li><strong>Système de commentaires</strong> : Modération, réponses, signalements</li>
+        <li><strong>Support multilingue</strong> : Gestion des traductions FR/EN/NL</li>
+        <li><strong>SEO optimisé</strong> : Meta-données, URLs friendly, sitemap</li>
+    </ul>
+    
+    <h3>9.3.6 Newsletter et communication</h3>
+    
+    <ul>
+        <li><strong>Système de newsletter</strong> : Création campagnes, gestion abonnés</li>
+        <li><strong>Statistiques d'envoi</strong> : Taux d'ouverture, clics, désabonnements</li>
+        <li><strong>Templates d'emails</strong> : Emails transactionnels personnalisés</li>
+        <li><strong>Notifications push</strong> : Alertes en temps réel pour les admins</li>
+    </ul>
+    
+    <h2>9.4 Métriques de développement</h2>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Métrique</th>
+                    <th>Valeur</th>
+                    <th>Détail</th>
+                    <th>Benchmark</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Lignes de code</strong></td>
+                    <td>45 000+</td>
+                    <td>PHP, Blade, JS, CSS</td>
+                    <td>Projet e-commerce moyen : 30 000</td>
+                </tr>
+                <tr>
+                    <td><strong>Fichiers sources</strong></td>
+                    <td>850+</td>
+                    <td>Controllers, Models, Views, Assets</td>
+                    <td>Architecture Laravel standard</td>
+                </tr>
+                <tr>
+                    <td><strong>Tables base de données</strong></td>
+                    <td>31</td>
+                    <td>Tables métier + system</td>
+                    <td>E-commerce complet : 25-35</td>
+                </tr>
+                <tr>
+                    <td><strong>Routes définies</strong></td>
+                    <td>200+</td>
+                    <td>Web + API endpoints</td>
+                    <td>Application complexe : 150-250</td>
+                </tr>
+                <tr>
+                    <td><strong>Composants UI</strong></td>
+                    <td>50+</td>
+                    <td>Blade components réutilisables</td>
+                    <td>Design system cohérent</td>
+                </tr>
+                <tr>
+                    <td><strong>Tests automatisés</strong></td>
+                    <td>120+</td>
+                    <td>Unit + Feature tests</td>
+                    <td>Couverture > 70%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>9.5 Performances et qualité</h2>
+    
+    <h3>9.5.1 Optimisations techniques</h3>
+    
+    <ul>
+        <li><strong>Cache intelligent</strong> : Mise en cache des requêtes fréquentes et des vues</li>
+        <li><strong>Optimisation base de données</strong> : Index performants, requêtes optimisées</li>
+        <li><strong>Lazy loading</strong> : Chargement différé des images et contenus</li>
+        <li><strong>Minification assets</strong> : Compression CSS/JS pour performances web</li>
+        <li><strong>CDN ready</strong> : Architecture préparée pour distribution de contenu</li>
+    </ul>
+    
+    <h3>9.5.2 Sécurité implémentée</h3>
+    
+    <ul>
+        <li><strong>Protection CSRF</strong> : Tokens anti-forgery sur tous les formulaires</li>
+        <li><strong>Validation stricte</strong> : Sanitization inputs utilisateur</li>
+        <li><strong>Authentification robuste</strong> : Hashage sécurisé, sessions chiffrées</li>
+        <li><strong>HTTPS obligatoire</strong> : Chiffrement des communications</li>
+        <li><strong>Rate limiting</strong> : Protection contre les attaques DDoS</li>
+    </ul>
+    
+    <h2>9.6 État actuel du projet</h2>
+    
+    <div class="highlight-box">
+        <h3>Statut au 17 août 2025</h3>
+        <ul>
+            <li>✅ <strong>Backend complet</strong> : 100% fonctionnel</li>
+            <li>✅ <strong>Frontend responsive</strong> : 100% adaptatif</li>
+            <li>✅ <strong>Paiements sécurisés</strong> : Stripe opérationnel</li>
+            <li>✅ <strong>Système de location</strong> : Same-day activé</li>
+            <li>✅ <strong>Administration</strong> : Dashboard complet</li>
+            <li>✅ <strong>Tests fonctionnels</strong> : Validation complète</li>
+            <li>🚀 <strong>Prêt pour mise en production</strong></li>
+        </ul>
+    </div>
+</div>
+
+<!-- DÉFIS RENCONTRÉS -->
+<div class="page-break">
+    <h1>10. Défis rencontrés</h1>
+    
+    <p>
+        Le développement de Vitamiel a présenté plusieurs défis techniques et méthodologiques significatifs. Cette section détaille les principaux obstacles rencontrés et les solutions mises en œuvre pour les surmonter.
+    </p>
+    
+    <h2>10.1 Défis techniques majeurs</h2>
+    
+    <h3>10.1.1 Gestion complexe des locations same-day</h3>
+    
+    <div class="highlight-box">
+        <h3>Problématique</h3>
+        <p>
+            Implémenter un système de location permettant la réservation et l'activation le jour même nécessitait une gestion fine des états de commande et des transitions automatiques.
+        </p>
+    </div>
+    
+    <p><strong>Défis identifiés :</strong></p>
+    <ul>
+        <li>Validation des règles métier pour les locations d'une durée minimale d'1 jour</li>
+        <li>Gestion des transitions d'état : confirmed → active → completed</li>
+        <li>Synchronisation avec le système de paiement Stripe</li>
+        <li>Calcul automatique des rappels selon la durée de location</li>
+        <li>Gestion des conflits de disponibilité en temps réel</li>
+    </ul>
+    
+    <p><strong>Solutions développées :</strong></p>
+    <ul>
+        <li><strong>Architecture event-driven</strong> : Utilisation du queue system Laravel pour les transitions asynchrones</li>
+        <li><strong>Validation en cascade</strong> : Modification du service StripeService pour forcer le passage par l'état 'confirmed'</li>
+        <li><strong>Système de rappels adaptatif</strong> : Algorithme intelligent (2h/12h/24h selon durée)</li>
+        <li><strong>Cache de disponibilité</strong> : Optimisation des requêtes de vérification temps réel</li>
+    </ul>
+    
+    <h3>10.1.2 Intégration complexe Stripe pour cautions</h3>
+    
+    <div class="highlight-box">
+        <h3>Problématique</h3>
+        <p>
+            Gérer les autorisations de caution, leur capture conditionnelle et les remboursements partiels selon l'état des équipements retournés.
+        </p>
+    </div>
+    
+    <p><strong>Défis techniques :</strong></p>
+    <ul>
+        <li>Gestion des Payment Intents vs Setup Intents pour les cautions</li>
+        <li>Capture différée des montants selon les inspections</li>
+        <li>Webhooks Stripe pour la synchronisation des états</li>
+        <li>Gestion des échecs de paiement et des retry automatiques</li>
+        <li>Calcul dynamique des pénalités de retard</li>
+    </ul>
+    
+    <p><strong>Solutions implémentées :</strong></p>
+    <ul>
+        <li><strong>API Stripe avancée</strong> : Utilisation des Payment Intents avec confirmation différée</li>
+        <li><strong>Système de webhooks robuste</strong> : Gestion événements payment_intent.succeeded/failed</li>
+        <li><strong>État machine paiements</strong> : Tracking précis des états de caution</li>
+        <li><strong>Système de retry intelligent</strong> : Nouvelle tentative automatique en cas d'échec temporaire</li>
+    </ul>
+    
+    <h3>10.1.3 Système de queue pour notifications email</h3>
+    
+    <div class="highlight-box">
+        <h3>Problématique</h3>
+        <p>
+            Mettre en place un système de notifications email asynchrone fiable pour les confirmations de commande, rappels de fin de location et notifications administratives.
+        </p>
+    </div>
+    
+    <p><strong>Challenges techniques :</strong></p>
+    <ul>
+        <li>Configuration du worker daemon pour traitement continu</li>
+        <li>Gestion des échecs d'envoi et des retry policies</li>
+        <li>Templates email responsive avec données dynamiques</li>
+        <li>Prévention du spam et respect des bonnes pratiques</li>
+        <li>Monitoring et logging des envois</li>
+    </ul>
+    
+    <p><strong>Solutions développées :</strong></p>
+    <ul>
+        <li><strong>Queue worker stable</strong> : Configuration daemon process avec supervision</li>
+        <li><strong>Job classes spécialisées</strong> : Séparation logique par type de notification</li>
+        <li><strong>Template engine avancé</strong> : Blade templates avec données contextuelles</li>
+        <li><strong>Error handling robuste</strong> : Gestion gracieuse des échecs avec retry exponential backoff</li>
+    </ul>
+    
+    <h2>10.2 Défis d'architecture et de performance</h2>
+    
+    <h3>10.2.1 Modélisation de base de données complexe</h3>
+    
+    <p><strong>Problématiques :</strong></p>
+    <ul>
+        <li>Gestion simultanée des ventes et locations dans le même système</li>
+        <li>Historique complet des transactions et des états</li>
+        <li>Relations complexes entre produits, catégories et stocks</li>
+        <li>Système de blog multilingue avec modération</li>
+        <li>Conformité RGPD pour les données utilisateurs</li>
+    </ul>
+    
+    <p><strong>Solutions architecturales :</strong></p>
+    <ul>
+        <li><strong>Séparation logique</strong> : Tables distinctes orders/order_locations pour vente/location</li>
+        <li><strong>Audit trail complet</strong> : Colonnes de traçabilité sur toutes les entités critiques</li>
+        <li><strong>Soft deletes</strong> : Suppression logique pour conservation historique</li>
+        <li><strong>Index optimisés</strong> : Performance queries complexes</li>
+        <li><strong>Normalisation poussée</strong> : Élimination redondances, intégrité référentielle</li>
+    </ul>
+    
+    <h3>10.2.2 Optimisation des performances frontend</h3>
+    
+    <p><strong>Challenges identifiés :</strong></p>
+    <ul>
+        <li>Temps de chargement initial élevé</li>
+        <li>Rendu côté serveur des listes produits volumineuses</li>
+        <li>Gestion efficace des images produits</li>
+        <li>Responsive design sur tous devices</li>
+        <li>SEO optimization pour le référencement</li>
+    </ul>
+    
+    <p><strong>Optimisations implémentées :</strong></p>
+    <ul>
+        <li><strong>Lazy loading intelligent</strong> : Chargement différé images et contenus</li>
+        <li><strong>Pagination optimisée</strong> : Limitation résultats avec cache intelligent</li>
+        <li><strong>Compression assets</strong> : Minification CSS/JS automatique</li>
+        <li><strong>Critical CSS</strong> : Styles critiques inline pour first paint rapide</li>
+        <li><strong>Image optimization</strong> : Formats WebP avec fallback automatique</li>
+    </ul>
+    
+    <h2>10.3 Défis fonctionnels et UX</h2>
+    
+    <h3>10.3.1 Ergonomie du processus de location</h3>
+    
+    <p><strong>Problématiques UX :</strong></p>
+    <ul>
+        <li>Simplifier la sélection de dates pour utilisateurs non techniques</li>
+        <li>Affichage clair des prix selon la durée</li>
+        <li>Communication transparente sur les cautions</li>
+        <li>Processus de retour intuitif</li>
+        <li>Notifications proactives aux moments clés</li>
+    </ul>
+    
+    <p><strong>Solutions UX développées :</strong></p>
+    <ul>
+        <li><strong>Calendrier intuitif</strong> : Widget de sélection dates avec disponibilités temps réel</li>
+        <li><strong>Calcul dynamique</strong> : Prix mis à jour en temps réel selon sélection</li>
+        <li><strong>Transparency pricing</strong> : Breakdown détaillé coûts et cautions</li>
+        <li><strong>Workflow guidé</strong> : Étapes claires avec progression visible</li>
+        <li><strong>Notifications contextuelles</strong> : Emails et messages selon l'état de location</li>
+    </ul>
+    
+    <h3>10.3.2 Dashboard administrateur complexe</h3>
+    
+    <p><strong>Défis d'interface :</strong></p>
+    <ul>
+        <li>Affichage synthétique de données volumineuses</li>
+        <li>Actions bulk sur les commandes</li>
+        <li>Gestion simultanée ventes et locations</li>
+        <li>Système de permissions granulaire</li>
+        <li>Reporting temps réel</li>
+    </ul>
+    
+    <p><strong>Solutions développées :</strong></p>
+    <ul>
+        <li><strong>Dashboard modulaire</strong> : Widgets configurables par rôle</li>
+        <li><strong>Filtres avancés</strong> : Recherche multi-critères avec sauvegarde</li>
+        <li><strong>Actions batch</strong> : Traitement bulk avec feedback utilisateur</li>
+        <li><strong>Real-time updates</strong> : Refresh automatique données critiques</li>
+        <li><strong>Export automatisé</strong> : Génération rapports Excel/PDF</li>
+    </ul>
+    
+    <h2>10.4 Défis de déploiement et maintenance</h2>
+    
+    <h3>10.4.1 Configuration environnement de développement</h3>
+    
+    <p><strong>Problématiques techniques :</strong></p>
+    <ul>
+        <li>Setup complexe Laravel + MariaDB + Queue worker</li>
+        <li>Configuration SSL pour tests paiements Stripe</li>
+        <li>Gestion des variables d'environnement sensibles</li>
+        <li>Synchronisation équipe de développement</li>
+        <li>Debugging des jobs asynchrones</li>
+    </ul>
+    
+    <p><strong>Solutions mises en place :</strong></p>
+    <ul>
+        <li><strong>Docker containerization</strong> : Environnement reproductible</li>
+        <li><strong>Laravel Valet</strong> : SSL automatique pour développement local</li>
+        <li><strong>Gestion secrets</strong> : Variables d'environnement chiffrées</li>
+        <li><strong>Documentation technique</strong> : Setup guide détaillé</li>
+        <li><strong>Logging centralisé</strong> : Monitoring queue jobs et erreurs</li>
+    </ul>
+    
+    <h2>10.5 Leçons apprises et bonnes pratiques</h2>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Domaine</th>
+                    <th>Leçon apprise</th>
+                    <th>Bonne pratique adoptée</th>
+                    <th>Impact projet</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Architecture</strong></td>
+                    <td>Event-driven crucial pour systèmes complexes</td>
+                    <td>Queue system dès le début</td>
+                    <td>Scalabilité améliorée</td>
+                </tr>
+                <tr>
+                    <td><strong>Tests</strong></td>
+                    <td>Tests automatisés indispensables</td>
+                    <td>TDD pour fonctions critiques</td>
+                    <td>Fiabilité accrue</td>
+                </tr>
+                <tr>
+                    <td><strong>Performance</strong></td>
+                    <td>Optimisation précoce vs premature</td>
+                    <td>Monitoring continu</td>
+                    <td>UX optimisée</td>
+                </tr>
+                <tr>
+                    <td><strong>UX</strong></td>
+                    <td>Feedback utilisateur essentiel</td>
+                    <td>Prototypage rapide</td>
+                    <td>Adoption facilitée</td>
+                </tr>
+                <tr>
+                    <td><strong>Sécurité</strong></td>
+                    <td>Security by design</td>
+                    <td>Validation stricte dès le début</td>
+                    <td>Confiance utilisateurs</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <p>
+        Ces défis, bien que complexes, ont permis de développer une solution robuste et évolutive. L'approche méthodologique et la persistance face aux obstacles techniques ont été déterminantes pour le succès du projet.
+    </p>
+</div>
+
+<!-- ANALYSE CONCURRENTIELLE -->
+<div class="page-break">
+    <h1>11. Analyse concurrentielle</h1>
+    
+    <p>
+        Cette section présente une analyse approfondie du paysage concurrentiel dans lequel évolue Vitamiel, identifiant les acteurs clés, leurs forces et faiblesses, ainsi que notre positionnement différenciant.
+    </p>
+    
+    <h2>11.1 Cartographie du marché</h2>
+    
+    <p>
+        Le marché de l'équipement agricole en ligne se structure autour de trois segments principaux : la vente traditionnelle, la location spécialisée et les plateformes hybrides. Vitamiel se positionne sur ce dernier segment avec une approche innovante.
+    </p>
+    
+    <h3>11.1.1 Segmentation concurrentielle</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Segment</th>
+                    <th>Acteurs principaux</th>
+                    <th>Parts de marché</th>
+                    <th>Stratégie dominante</th>
+                    <th>Points faibles</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Vente pure</strong></td>
+                    <td>Agriconomie, Agrizone</td>
+                    <td>45%</td>
+                    <td>Catalogue exhaustif, prix compétitifs</td>
+                    <td>Pas de location, investissement lourd</td>
+                </tr>
+                <tr>
+                    <td><strong>Location spécialisée</strong></td>
+                    <td>Loxam, Kiloutou</td>
+                    <td>30%</td>
+                    <td>Réseau physique, équipements lourds</td>
+                    <td>Limité au BTP, peu digital</td>
+                </tr>
+                <tr>
+                    <td><strong>Plateformes hybrides</strong></td>
+                    <td>Vitamiel, nouveaux entrants</td>
+                    <td>25%</td>
+                    <td>Flexibilité, innovation digitale</td>
+                    <td>Notoriété à construire</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>11.2 Analyse des concurrents directs</h2>
+    
+    <h3>11.2.1 Agriconomie (vente en ligne)</h3>
+    
+    <div class="highlight-box">
+        <h3>Profil d'entreprise</h3>
+        <ul>
+            <li><strong>Fondation</strong> : 2009</li>
+            <li><strong>CA annuel</strong> : 350M€ (2024)</li>
+            <li><strong>Employés</strong> : 800+</li>
+            <li><strong>Positionnement</strong> : Leader français e-commerce agricole</li>
+        </ul>
+    </div>
+    
+    <p><strong>Forces identifiées :</strong></p>
+    <ul>
+        <li>Catalogue de 150 000+ références</li>
+        <li>Réseau de distribution établi</li>
+        <li>Relations fournisseurs privilégiées</li>
+        <li>Notoriété forte dans le secteur</li>
+        <li>Logistique optimisée</li>
+    </ul>
+    
+    <p><strong>Faiblesses observées :</strong></p>
+    <ul>
+        <li>Aucune offre de location</li>
+        <li>Interface vieillissante</li>
+        <li>Focus sur gros équipements uniquement</li>
+        <li>Pas d'innovation digitale majeure</li>
+        <li>Service client perfectible</li>
+    </ul>
+    
+    <p><strong>Opportunités pour Vitamiel :</strong></p>
+    <ul>
+        <li>Combler le manque de location</li>
+        <li>Offrir une UX moderne</li>
+        <li>Cibler petits agriculteurs négligés</li>
+        <li>Innovation technologique différenciante</li>
+    </ul>
+    
+    <h3>11.2.2 Loxam (location spécialisée)</h3>
+    
+    <div class="highlight-box">
+        <h3>Profil d'entreprise</h3>
+        <ul>
+            <li><strong>Fondation</strong> : 1967</li>
+            <li><strong>CA annuel</strong> : 2,8Md€ (2024)</li>
+            <li><strong>Employés</strong> : 12 000+</li>
+            <li><strong>Positionnement</strong> : Leader européen location équipements</li>
+        </ul>
+    </div>
+    
+    <p><strong>Forces identifiées :</strong></p>
+    <ul>
+        <li>Réseau européen de 900+ agences</li>
+        <li>Parc matériel considérable</li>
+        <li>Expertise technique reconnue</li>
+        <li>Relations B2B solides</li>
+        <li>Capacité financière importante</li>
+    </ul>
+    
+    <p><strong>Faiblesses observées :</strong></p>
+    <ul>
+        <li>Focus BTP, peu d'agricole</li>
+        <li>Digitalisation limitée</li>
+        <li>Processus lourds et bureaucratiques</li>
+        <li>Pas de vente, location uniquement</li>
+        <li>Tarification complexe</li>
+    </ul>
+    
+    <p><strong>Opportunités pour Vitamiel :</strong></p>
+    <ul>
+        <li>Spécialisation agricole pure</li>
+        <li>Plateforme 100% digitale</li>
+        <li>Processus simplifiés</li>
+        <li>Approche hybride vente/location</li>
+        <li>Tarification transparente</li>
+    </ul>
+    
+    <h3>11.2.3 Nouveaux entrants (startups agtech)</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Startup</th>
+                    <th>Pays</th>
+                    <th>Levée de fonds</th>
+                    <th>Spécialité</th>
+                    <th>Menace niveau</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>FarmLease</strong></td>
+                    <td>Allemagne</td>
+                    <td>5M€ (Série A)</td>
+                    <td>Location tracteurs</td>
+                    <td>🟡 Moyenne</td>
+                </tr>
+                <tr>
+                    <td><strong>AgriRent</strong></td>
+                    <td>Pays-Bas</td>
+                    <td>3M€ (Seed)</td>
+                    <td>Marketplace P2P</td>
+                    <td>🟢 Faible</td>
+                </tr>
+                <tr>
+                    <td><strong>CropShare</strong></td>
+                    <td>France</td>
+                    <td>2M€ (Seed)</td>
+                    <td>Partage équipements</td>
+                    <td>🟡 Moyenne</td>
+                </tr>
+                <tr>
+                    <td><strong>FieldTech</strong></td>
+                    <td>Belgique</td>
+                    <td>8M€ (Série A)</td>
+                    <td>IoT + location</td>
+                    <td>🔴 Élevée</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>11.3 Analyse SWOT concurrentielle</h2>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Facteurs internes</th>
+                    <th>FORCES</th>
+                    <th>FAIBLESSES</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Vitamiel</strong></td>
+                    <td>
+                        • Approche hybride unique<br>
+                        • Innovation technologique<br>
+                        • UX moderne et intuitive<br>
+                        • Flexibilité même-jour<br>
+                        • Équipe technique experte
+                    </td>
+                    <td>
+                        • Marque nouvelle<br>
+                        • Budget marketing limité<br>
+                        • Catalogue initial restreint<br>
+                        • Pas de réseau physique<br>
+                        • Validation marché en cours
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>Facteurs externes</th>
+                    <th>OPPORTUNITÉS</th>
+                    <th>MENACES</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Marché</strong></td>
+                    <td>
+                        • Digitalisation agriculture<br>
+                        • Besoin flexibilité équipements<br>
+                        • Coûts investissement élevés<br>
+                        • Conscience environnementale<br>
+                        • Croissance agtech +15%/an
+                    </td>
+                    <td>
+                        • Concurrents établis puissants<br>
+                        • Réglementation évolutive<br>
+                        • Cycle économique agricole<br>
+                        • Dépendance saisonnière<br>
+                        • Nouvelles startups financées
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>11.4 Matrice concurrentielle détaillée</h2>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Critères</th>
+                    <th>Vitamiel</th>
+                    <th>Agriconomie</th>
+                    <th>Loxam</th>
+                    <th>FarmLease</th>
+                    <th>Poids</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Innovation technologique</strong></td>
+                    <td>9/10</td>
+                    <td>4/10</td>
+                    <td>3/10</td>
+                    <td>8/10</td>
+                    <td>20%</td>
+                </tr>
+                <tr>
+                    <td><strong>Expérience utilisateur</strong></td>
+                    <td>9/10</td>
+                    <td>5/10</td>
+                    <td>4/10</td>
+                    <td>7/10</td>
+                    <td>15%</td>
+                </tr>
+                <tr>
+                    <td><strong>Catalogue produits</strong></td>
+                    <td>6/10</td>
+                    <td>10/10</td>
+                    <td>8/10</td>
+                    <td>5/10</td>
+                    <td>15%</td>
+                </tr>
+                <tr>
+                    <td><strong>Flexibilité offre</strong></td>
+                    <td>10/10</td>
+                    <td>2/10</td>
+                    <td>6/10</td>
+                    <td>7/10</td>
+                    <td>20%</td>
+                </tr>
+                <tr>
+                    <td><strong>Prix compétitivité</strong></td>
+                    <td>7/10</td>
+                    <td>8/10</td>
+                    <td>5/10</td>
+                    <td>6/10</td>
+                    <td>15%</td>
+                </tr>
+                <tr>
+                    <td><strong>Notoriété marché</strong></td>
+                    <td>3/10</td>
+                    <td>9/10</td>
+                    <td>8/10</td>
+                    <td>2/10</td>
+                    <td>10%</td>
+                </tr>
+                <tr>
+                    <td><strong>Service client</strong></td>
+                    <td>8/10</td>
+                    <td>6/10</td>
+                    <td>7/10</td>
+                    <td>7/10</td>
+                    <td>5%</td>
+                </tr>
+                <tr>
+                    <td><strong>SCORE PONDÉRÉ</strong></td>
+                    <td><strong>7.7/10</strong></td>
+                    <td><strong>6.4/10</strong></td>
+                    <td><strong>5.7/10</strong></td>
+                    <td><strong>6.3/10</strong></td>
+                    <td><strong>100%</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>11.5 Stratégies concurrentielles identifiées</h2>
+    
+    <h3>11.5.1 Stratégie de différenciation</h3>
+    
+    <p><strong>Positionnement unique :</strong></p>
+    <ul>
+        <li><strong>Hybridation vente/location</strong> : Seule plateforme offrant les deux modes</li>
+        <li><strong>Same-day flexibility</strong> : Location possible le jour même</li>
+        <li><strong>UX digital-native</strong> : Interface pensée mobile-first</li>
+        <li><strong>Transparence totale</strong> : Prix et conditions clairs</li>
+        <li><strong>Automation intelligente</strong> : Processus automatisés bout en bout</li>
+    </ul>
+    
+    <h3>11.5.2 Stratégie de niche</h3>
+    
+    <p><strong>Focus ciblé :</strong></p>
+    <ul>
+        <li><strong>Petites exploitations</strong> : 5-50 hectares négligées par les leaders</li>
+        <li><strong>Jeunes agriculteurs</strong> : Génération digitale en quête d'innovation</li>
+        <li><strong>Agriculture périurbaine</strong> : Besoins spécifiques équipements légers</li>
+        <li><strong>Saisons courtes</strong> : Locations temporaires pour pics d'activité</li>
+    </ul>
+    
+    <h3>11.5.3 Stratégie d'innovation continue</h3>
+    
+    <p><strong>Roadmap technologique :</strong></p>
+    <ul>
+        <li><strong>IA prédictive</strong> : Recommandations personnalisées équipements</li>
+        <li><strong>IoT intégration</strong> : Suivi temps réel utilisation équipements</li>
+        <li><strong>Blockchain traçabilité</strong> : Historique maintenance et usage</li>
+        <li><strong>AR/VR démos</strong> : Visualisation 3D avant location</li>
+        <li><strong>API ecosystem</strong> : Intégration avec logiciels de gestion agricole</li>
+    </ul>
+    
+    <h2>11.6 Veille concurrentielle organisée</h2>
+    
+    <p><strong>Système de monitoring :</strong></p>
+    <ul>
+        <li><strong>Alertes Google</strong> : Surveillance actualités concurrents</li>
+        <li><strong>Social listening</strong> : Analyse sentiment et feedback clients</li>
+        <li><strong>Site tracking</strong> : Évolution fonctionnalités et prix</li>
+        <li><strong>App store monitoring</strong> : Nouvelles apps et reviews</li>
+        <li><strong>Levées de fonds</strong> : Surveillance financement secteur</li>
+    </ul>
+    
+    <p>
+        Cette analyse concurrentielle confirme le positionnement différenciant de Vitamiel et valide l'opportunité marché identifiée. Notre approche hybride et notre excellence technologique constituent des avantages compétitifs durables.
+    </p>
+</div>
+
+<!-- STRATÉGIE MARKETING -->
+<div class="page-break">
+    <h1>12. Stratégie marketing</h1>
+    
+    <p>
+        La stratégie marketing de Vitamiel s'articule autour d'une approche digitale multicanale, ciblant spécifiquement les petites et moyennes exploitations agricoles avec un message centré sur la flexibilité et l'innovation.
+    </p>
+    
+    <h2>12.1 Positionnement et proposition de valeur</h2>
+    
+    <h3>12.1.1 Positionnement stratégique</h3>
+    
+    <div class="highlight-box">
+        <h3>Baseline marketing</h3>
+        <p><strong>"Vitamiel : L'agriculture flexible, de l'achat à la location en un clic"</strong></p>
+        <p>Première plateforme hybride dédiée aux équipements agricoles, permettant d'acheter ou louer selon ses besoins, avec la garantie de la flexibilité même-jour.</p>
+    </div>
+    
+    <h3>12.1.2 Proposition de valeur unique</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Bénéfice client</th>
+                    <th>Problème résolu</th>
+                    <th>Solution Vitamiel</th>
+                    <th>Avantage concurrentiel</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Flexibilité financière</strong></td>
+                    <td>Investissements lourds</td>
+                    <td>Achat OU location selon budget</td>
+                    <td>Seule plateforme hybride</td>
+                </tr>
+                <tr>
+                    <td><strong>Réactivité opérationnelle</strong></td>
+                    <td>Délais d'approvisionnement</td>
+                    <td>Location same-day possible</td>
+                    <td>Flexibilité unique marché</td>
+                </tr>
+                <tr>
+                    <td><strong>Simplicité d'usage</strong></td>
+                    <td>Processus complexes</td>
+                    <td>UX intuitive mobile-first</td>
+                    <td>Excellence technologique</td>
+                </tr>
+                <tr>
+                    <td><strong>Transparence totale</strong></td>
+                    <td>Prix cachés, conditions floues</td>
+                    <td>Pricing clair, pas de surprise</td>
+                    <td>Confiance et transparence</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>12.2 Segmentation et ciblage</h2>
+    
+    <h3>12.2.1 Segments prioritaires</h3>
+    
+    <p><strong>Segment #1 : Jeunes agriculteurs (25-40 ans)</strong></p>
+    <ul>
+        <li><strong>Profil</strong> : Reprises d'exploitation, formations agricoles récentes</li>
+        <li><strong>Besoins</strong> : Optimisation coûts, modernisation, flexibilité</li>
+        <li><strong>Comportement</strong> : Digital natives, recherche en ligne, comparaison prix</li>
+        <li><strong>Potentiel</strong> : 35 000 exploitants en France, budget 10-50k€/an</li>
+        <li><strong>Messages clés</strong> : Innovation, rentabilité, simplicité</li>
+    </ul>
+    
+    <p><strong>Segment #2 : Exploitations moyennes (5-50 ha)</strong></p>
+    <ul>
+        <li><strong>Profil</strong> : Exploitants établis, diversification activités</li>
+        <li><strong>Besoins</strong> : Équipements ponctuels, saisonnalité, test avant achat</li>
+        <li><strong>Comportement</strong> : Pragmatiques, ROI-focused, fidélité fournisseurs</li>
+        <li><strong>Potentiel</strong> : 120 000 exploitations, budget 15-75k€/an</li>
+        <li><strong>Messages clés</strong> : Économies, flexibilité, professionnalisme</li>
+    </ul>
+    
+    <p><strong>Segment #3 : Agriculture périurbaine</strong></p>
+    <ul>
+        <li><strong>Profil</strong> : Maraîchage, horticulture, circuits courts</li>
+        <li><strong>Besoins</strong> : Équipements légers, locations courtes, mobilité</li>
+        <li><strong>Comportement</strong> : Orientés développement durable, communauté</li>
+        <li><strong>Potentiel</strong> : 25 000 exploitations, budget 5-25k€/an</li>
+        <li><strong>Messages clés</strong> : Durabilité, proximité, agilité</li>
+    </ul>
+    
+    <h3>12.2.2 Personas marketing détaillés</h3>
+    
+    <div class="highlight-box">
+        <h3>Thomas, 32 ans - Jeune agriculteur</h3>
+        <ul>
+            <li><strong>Situation</strong> : Reprise exploitation familiale 25ha, élevage + céréales</li>
+            <li><strong>Problématiques</strong> : Budget serré, équipements vieillissants, besoin modernisation</li>
+            <li><strong>Objectifs</strong> : Optimiser rentabilité, réduire pénibilité, professionnaliser</li>
+            <li><strong>Freins</strong> : Méfiance innovation, peur investissement lourd</li>
+            <li><strong>Canaux</strong> : Facebook, YouTube, salons agricoles, bouche-à-oreille</li>
+        </ul>
+    </div>
+    
+    <div class="highlight-box">
+        <h3>Marie, 45 ans - Exploitante confirmée</h3>
+        <ul>
+            <li><strong>Situation</strong> : Maraîchage bio 12ha, vente directe, AMAP</li>
+            <li><strong>Problématiques</strong> : Pics saisonniers, équipements spécialisés ponctuels</li>
+            <li><strong>Objectifs</strong> : Flexibilité, optimisation trésorerie, qualité produits</li>
+            <li><strong>Freins</strong> : Temps limité, fidélité fournisseurs locaux</li>
+            <li><strong>Canaux</strong> : Réseaux professionnels, magazines spécialisés, LinkedIn</li>
+        </ul>
+    </div>
+    
+    <h2>12.3 Mix marketing (4P)</h2>
+    
+    <h3>12.3.1 Produit (Product)</h3>
+    
+    <p><strong>Offre core :</strong></p>
+    <ul>
+        <li><strong>Plateforme e-commerce</strong> : Achat équipements neufs et occasion</li>
+        <li><strong>Service de location</strong> : Durées flexibles 1 jour à 6 mois</li>
+        <li><strong>Same-day service</strong> : Location possible jour même</li>
+        <li><strong>Inspection pro</strong> : Contrôle qualité systematique</li>
+        <li><strong>Support technique</strong> : Assistance utilisation équipements</li>
+    </ul>
+    
+    <p><strong>Services complémentaires :</strong></p>
+    <ul>
+        <li><strong>Livraison express</strong> : Sous 24h en région parisienne</li>
+        <li><strong>Formation utilisateur</strong> : Sessions vidéo et présentiel</li>
+        <li><strong>Maintenance préventive</strong> : Suivi et entretien inclus</li>
+        <li><strong>Assurance tous risques</strong> : Couverture complète équipements</li>
+        <li><strong>Financement partenarial</strong> : Solutions crédit adaptées</li>
+    </ul>
+    
+    <h3>12.3.2 Prix (Price)</h3>
+    
+    <p><strong>Stratégie de pricing :</strong></p>
+    <ul>
+        <li><strong>Prix pénétration</strong> : Tarifs attractifs phase de lancement</li>
+        <li><strong>Pricing dynamique</strong> : Ajustement selon demande et saisonnalité</li>
+        <li><strong>Transparence totale</strong> : Pas de frais cachés, conditions claires</li>
+        <li><strong>Options modulaires</strong> : Tarifs dégressifs selon durée</li>
+        <li><strong>Programme fidélité</strong> : Remises progressives clients réguliers</li>
+    </ul>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Type d'équipement</th>
+                    <th>Prix vente</th>
+                    <th>Prix location/jour</th>
+                    <th>Caution</th>
+                    <th>Marge Vitamiel</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Tondeuse professionnelle</strong></td>
+                    <td>2 500€</td>
+                    <td>35€</td>
+                    <td>300€</td>
+                    <td>20%</td>
+                </tr>
+                <tr>
+                    <td><strong>Motoculteur</strong></td>
+                    <td>1 800€</td>
+                    <td>25€</td>
+                    <td>200€</td>
+                    <td>25%</td>
+                </tr>
+                <tr>
+                    <td><strong>Débroussailleuse</strong></td>
+                    <td>450€</td>
+                    <td>15€</td>
+                    <td>50€</td>
+                    <td>30%</td>
+                </tr>
+                <tr>
+                    <td><strong>Pulvérisateur</strong></td>
+                    <td>3 200€</td>
+                    <td>45€</td>
+                    <td>400€</td>
+                    <td>18%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h3>12.3.3 Distribution (Place)</h3>
+    
+    <p><strong>Canaux de distribution :</strong></p>
+    <ul>
+        <li><strong>Plateforme digitale</strong> : Site web responsive et application mobile</li>
+        <li><strong>Showroom urbain</strong> : Espace de démonstration Paris + Lyon</li>
+        <li><strong>Partenariats revendeurs</strong> : Intégration chez distributeurs locaux</li>
+        <li><strong>Marketplace présence</strong> : Amazon Business, Cdiscount Pro</li>
+        <li><strong>Force de vente mobile</strong> : Commerciaux itinérants zones rurales</li>
+    </ul>
+    
+    <p><strong>Logistique et livraison :</strong></p>
+    <ul>
+        <li><strong>Entrepôts stratégiques</strong> : 3 sites couvrant 80% territoire</li>
+        <li><strong>Livraison express</strong> : Partenariat transporteurs spécialisés</li>
+        <li><strong>Click & collect</strong> : Points relais en zones rurales</li>
+        <li><strong>Retour simplifié</strong> : Étiquettes prépayées, collecte domicile</li>
+    </ul>
+    
+    <h3>12.3.4 Promotion (Promotion)</h3>
+    
+    <p><strong>Communication 360° :</strong></p>
+    <ul>
+        <li><strong>Marketing digital</strong> : SEO/SEA, social media, content marketing</li>
+        <li><strong>Relations presse</strong> : Magazines agricoles, médias spécialisés</li>
+        <li><strong>Événementiel</strong> : Salons agricoles, démonstrations terrain</li>
+        <li><strong>Partenariats influenceurs</strong> : YouTubers agricoles, prescripteurs</li>
+        <li><strong>Recommandation client</strong> : Programme de parrainage incitatif</li>
+    </ul>
+    
+    <h2>12.4 Stratégie digitale</h2>
+    
+    <h3>12.4.1 SEO et contenu</h3>
+    
+    <p><strong>Stratégie de référencement :</strong></p>
+    <ul>
+        <li><strong>Mots-clés longue traîne</strong> : "location tondeuse agricole 77", "achat motoculteur pas cher"</li>
+        <li><strong>Content marketing</strong> : Guides d'achat, comparatifs, conseils techniques</li>
+        <li><strong>Blog expert</strong> : Articles saisonniers, nouveautés matériel, témoignages</li>
+        <li><strong>Vidéos démo</strong> : Présentation équipements, tutoriels utilisation</li>
+        <li><strong>Local SEO</strong> : Optimisation recherches géolocalisées</li>
+    </ul>
+    
+    <h3>12.4.2 Social media et communauté</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Plateforme</th>
+                    <th>Objectif</th>
+                    <th>Contenu</th>
+                    <th>Fréquence</th>
+                    <th>KPI</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Facebook</strong></td>
+                    <td>Notoriété + engagement</td>
+                    <td>Témoignages, actualités, conseils</td>
+                    <td>5 posts/semaine</td>
+                    <td>Reach, engagement rate</td>
+                </tr>
+                <tr>
+                    <td><strong>Instagram</strong></td>
+                    <td>Inspiration visuelle</td>
+                    <td>Photos équipements, stories BTS</td>
+                    <td>3 posts/semaine</td>
+                    <td>Followers, mentions</td>
+                </tr>
+                <tr>
+                    <td><strong>YouTube</strong></td>
+                    <td>Éducation + démo</td>
+                    <td>Tutoriels, tests matériel</td>
+                    <td>2 vidéos/semaine</td>
+                    <td>Vues, temps visionnage</td>
+                </tr>
+                <tr>
+                    <td><strong>LinkedIn</strong></td>
+                    <td>B2B + expertise</td>
+                    <td>Articles techniques, études cas</td>
+                    <td>2 posts/semaine</td>
+                    <td>Leads générés, partages</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h3>12.4.3 Performance marketing</h3>
+    
+    <p><strong>Campagnes payantes :</strong></p>
+    <ul>
+        <li><strong>Google Ads</strong> : 15k€/mois, CPC moyen 1,2€, conversion 3,5%</li>
+        <li><strong>Facebook Ads</strong> : 8k€/mois, CPM 12€, ROAS target 4:1</li>
+        <li><strong>Retargeting</strong> : 3k€/mois, récupération paniers abandonnés</li>
+        <li><strong>Display programmatique</strong> : 5k€/mois, sites agricoles spécialisés</li>
+    </ul>
+    
+    <h2>12.5 Budget et calendrier</h2>
+    
+    <h3>12.5.1 Budget marketing annuel</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Poste</th>
+                    <th>Q1 2025</th>
+                    <th>Q2 2025</th>
+                    <th>Q3 2025</th>
+                    <th>Q4 2025</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Digital ads</strong></td>
+                    <td>25k€</td>
+                    <td>35k€</td>
+                    <td>45k€</td>
+                    <td>40k€</td>
+                    <td>145k€</td>
+                </tr>
+                <tr>
+                    <td><strong>Content & SEO</strong></td>
+                    <td>8k€</td>
+                    <td>10k€</td>
+                    <td>12k€</td>
+                    <td>10k€</td>
+                    <td>40k€</td>
+                </tr>
+                <tr>
+                    <td><strong>Événementiel</strong></td>
+                    <td>5k€</td>
+                    <td>15k€</td>
+                    <td>20k€</td>
+                    <td>8k€</td>
+                    <td>48k€</td>
+                </tr>
+                <tr>
+                    <td><strong>Relations presse</strong></td>
+                    <td>3k€</td>
+                    <td>4k€</td>
+                    <td>5k€</td>
+                    <td>4k€</td>
+                    <td>16k€</td>
+                </tr>
+                <tr>
+                    <td><strong>Outils & licences</strong></td>
+                    <td>2k€</td>
+                    <td>2k€</td>
+                    <td>2k€</td>
+                    <td>2k€</td>
+                    <td>8k€</td>
+                </tr>
+                <tr>
+                    <td><strong>TOTAL</strong></td>
+                    <td><strong>43k€</strong></td>
+                    <td><strong>66k€</strong></td>
+                    <td><strong>84k€</strong></td>
+                    <td><strong>64k€</strong></td>
+                    <td><strong>257k€</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h3>12.5.2 Calendrier des campagnes</h3>
+    
+    <p><strong>Saisonnalité agricole :</strong></p>
+    <ul>
+        <li><strong>Printemps (Mars-Mai)</strong> : Équipements préparation sols, semis</li>
+        <li><strong>Été (Juin-Août)</strong> : Matériel entretien, irrigation, récolte</li>
+        <li><strong>Automne (Sept-Nov)</strong> : Équipements récolte, stockage, préparation hiver</li>
+        <li><strong>Hiver (Déc-Fév)</strong> : Maintenance, planification, formation</li>
+    </ul>
+    
+    <h2>12.6 KPIs et mesure de performance</h2>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Objectif</th>
+                    <th>KPI principal</th>
+                    <th>KPI secondaire</th>
+                    <th>Target 2025</th>
+                    <th>Fréquence mesure</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Notoriété</strong></td>
+                    <td>Brand awareness</td>
+                    <td>Share of voice</td>
+                    <td>15% agriculteurs cible</td>
+                    <td>Trimestrielle</td>
+                </tr>
+                <tr>
+                    <td><strong>Acquisition</strong></td>
+                    <td>Nouveaux clients</td>
+                    <td>CAC (Customer Acquisition Cost)</td>
+                    <td>2 500 clients</td>
+                    <td>Mensuelle</td>
+                </tr>
+                <tr>
+                    <td><strong>Engagement</strong></td>
+                    <td>Temps sur site</td>
+                    <td>Pages vues/session</td>
+                    <td>4 min 30s</td>
+                    <td>Hebdomadaire</td>
+                </tr>
+                <tr>
+                    <td><strong>Conversion</strong></td>
+                    <td>Taux de conversion</td>
+                    <td>Panier moyen</td>
+                    <td>2,8%</td>
+                    <td>Quotidienne</td>
+                </tr>
+                <tr>
+                    <td><strong>Fidélisation</strong></td>
+                    <td>Taux de rétention</td>
+                    <td>LTV (Lifetime Value)</td>
+                    <td>65%</td>
+                    <td>Mensuelle</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <p>
+        Cette stratégie marketing intégrée vise à positionner Vitamiel comme la référence innovation dans l'équipement agricole flexible, en capitalisant sur notre différenciation technologique et notre excellence opérationnelle.
+    </p>
+</div>
+
+<!-- ARCHITECTURE TECHNIQUE -->
+<div class="page-break">
+    <h1>13. Architecture technique</h1>
+    
+    <p>
+        L'architecture technique de Vitamiel repose sur des choix technologiques modernes et éprouvés, garantissant performance, sécurité et évolutivité. Cette section détaille l'ensemble de l'infrastructure et des composants techniques développés.
+    </p>
+    
+    <h2>13.1 Vue d'ensemble architecturale</h2>
+    
+    <h3>13.1.1 Architecture globale</h3>
+    
+    <div class="highlight-box">
+        <h3>Stack technique principal</h3>
+        <ul>
+            <li><strong>Backend</strong> : Laravel 11.45.1 + PHP 8.4.10</li>
+            <li><strong>Base de données</strong> : MariaDB 11.5.2 avec Redis cache</li>
+            <li><strong>Frontend</strong> : Blade Templates + Tailwind CSS 4.1.11 + Alpine.js 3.14.9</li>
+            <li><strong>Infrastructure</strong> : Apache/Nginx + Queue System + File Storage</li>
+            <li><strong>Services externes</strong> : Stripe Payment + Email SMTP + CDN</li>
+        </ul>
+    </div>
+    
+    <h3>13.1.2 Principes architecturaux</h3>
+    
+    <p><strong>Design patterns appliqués :</strong></p>
+    <ul>
+        <li><strong>MVC (Model-View-Controller)</strong> : Séparation claire des responsabilités</li>
+        <li><strong>Repository Pattern</strong> : Abstraction de la couche de données</li>
+        <li><strong>Service Layer</strong> : Logique métier centralisée et testable</li>
+        <li><strong>Observer Pattern</strong> : Gestion d'événements et notifications</li>
+        <li><strong>Factory Pattern</strong> : Création d'objets complexes (paiements, emails)</li>
+    </ul>
+    
+    <p><strong>Principes SOLID respectés :</strong></p>
+    <ul>
+        <li><strong>Single Responsibility</strong> : Chaque classe a une responsabilité unique</li>
+        <li><strong>Open/Closed</strong> : Extensions possibles sans modification du code existant</li>
+        <li><strong>Liskov Substitution</strong> : Polymorphisme respecté dans l'héritage</li>
+        <li><strong>Interface Segregation</strong> : Interfaces spécialisées et cohérentes</li>
+        <li><strong>Dependency Inversion</strong> : Injection de dépendances Laravel</li>
+    </ul>
+    
+    <h2>13.2 Architecture backend</h2>
+    
+    <h3>13.2.1 Structure Laravel</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Composant</th>
+                    <th>Localisation</th>
+                    <th>Responsabilité</th>
+                    <th>Nombre de fichiers</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Controllers</strong></td>
+                    <td>/app/Http/Controllers/</td>
+                    <td>Gestion des requêtes HTTP</td>
+                    <td>45+</td>
+                </tr>
+                <tr>
+                    <td><strong>Models</strong></td>
+                    <td>/app/Models/</td>
+                    <td>Entités métier et relations</td>
+                    <td>31</td>
+                </tr>
+                <tr>
+                    <td><strong>Services</strong></td>
+                    <td>/app/Services/</td>
+                    <td>Logique métier complexe</td>
+                    <td>15</td>
+                </tr>
+                <tr>
+                    <td><strong>Repositories</strong></td>
+                    <td>/app/Repositories/</td>
+                    <td>Accès aux données</td>
+                    <td>20</td>
+                </tr>
+                <tr>
+                    <td><strong>Jobs</strong></td>
+                    <td>/app/Jobs/</td>
+                    <td>Traitement asynchrone</td>
+                    <td>12</td>
+                </tr>
+                <tr>
+                    <td><strong>Middleware</strong></td>
+                    <td>/app/Http/Middleware/</td>
+                    <td>Traitement requêtes</td>
+                    <td>8</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h3>13.2.2 Services critiques</h3>
+    
+    <p><strong>StripeService.php :</strong></p>
+    <ul>
+        <li><strong>Responsabilité</strong> : Gestion complète des paiements et cautions</li>
+        <li><strong>Fonctionnalités</strong> : Payment Intents, webhooks, remboursements</li>
+        <li><strong>Intégrations</strong> : Queue system pour notifications, audit trail</li>
+        <li><strong>Sécurité</strong> : Validation signatures webhooks, tokens sécurisés</li>
+    </ul>
+    
+    <p><strong>RentalService.php :</strong></p>
+    <ul>
+        <li><strong>Responsabilité</strong> : Logique métier des locations</li>
+        <li><strong>Fonctionnalités</strong> : Calculs tarifs, transitions d'état, disponibilités</li>
+        <li><strong>Innovation</strong> : Support same-day rentals avec validations adaptives</li>
+        <li><strong>Performance</strong> : Cache intelligent des disponibilités</li>
+    </ul>
+    
+    <p><strong>NotificationService.php :</strong></p>
+    <ul>
+        <li><strong>Responsabilité</strong> : Orchestration notifications multi-canaux</li>
+        <li><strong>Fonctionnalités</strong> : Emails, SMS, push notifications</li>
+        <li><strong>Fiabilité</strong> : Retry automatique, dead letter queue</li>
+        <li><strong>Personalisation</strong> : Templates dynamiques, segmentation</li>
+    </ul>
+    
+    <h2>13.3 Base de données</h2>
+    
+    <h3>13.3.1 Modèle de données</h3>
+    
+    <p><strong>Tables principales (31 au total) :</strong></p>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Module</th>
+                    <th>Tables</th>
+                    <th>Relations clés</th>
+                    <th>Index optimisés</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Utilisateurs</strong></td>
+                    <td>users, user_profiles, user_messages</td>
+                    <td>1:1, 1:N</td>
+                    <td>email, created_at</td>
+                </tr>
+                <tr>
+                    <td><strong>Produits</strong></td>
+                    <td>products, categories, product_images</td>
+                    <td>N:1, 1:N</td>
+                    <td>slug, category_id, status</td>
+                </tr>
+                <tr>
+                    <td><strong>E-commerce</strong></td>
+                    <td>carts, orders, order_items</td>
+                    <td>N:1, 1:N</td>
+                    <td>user_id, status, created_at</td>
+                </tr>
+                <tr>
+                    <td><strong>Location</strong></td>
+                    <td>rental_carts, order_locations, rental_inspections</td>
+                    <td>N:1, 1:1, 1:N</td>
+                    <td>start_date, end_date, status</td>
+                </tr>
+                <tr>
+                    <td><strong>Blog</strong></td>
+                    <td>posts, post_translations, post_comments</td>
+                    <td>1:N, N:1</td>
+                    <td>published_at, language, slug</td>
+                </tr>
+                <tr>
+                    <td><strong>Newsletter</strong></td>
+                    <td>newsletters, newsletter_subscribers</td>
+                    <td>N:N</td>
+                    <td>email, subscribed_at</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h3>13.3.2 Stratégie d'optimisation</h3>
+    
+    <p><strong>Performance base de données :</strong></p>
+    <ul>
+        <li><strong>Index composites</strong> : Requêtes multi-critères optimisées</li>
+        <li><strong>Partitioning</strong> : Tables volumineuses segmentées par date</li>
+        <li><strong>Query optimization</strong> : Explain plans systématiques</li>
+        <li><strong>Connection pooling</strong> : Gestion efficace des connexions</li>
+        <li><strong>Read replicas</strong> : Répartition lectures/écritures</li>
+    </ul>
+    
+    <p><strong>Stratégie de cache :</strong></p>
+    <ul>
+        <li><strong>Redis cache</strong> : Sessions, cache applicatif, queues</li>
+        <li><strong>Query cache</strong> : Résultats requêtes fréquentes</li>
+        <li><strong>Model cache</strong> : Eloquent models avec TTL adaptatif</li>
+        <li><strong>View cache</strong> : Templates compilés Blade</li>
+        <li><strong>CDN integration</strong> : Assets statiques optimisés</li>
+    </ul>
+    
+    <h2>13.4 Frontend et UX</h2>
+    
+    <h3>13.4.1 Architecture frontend</h3>
+    
+    <p><strong>Technologies client :</strong></p>
+    <ul>
+        <li><strong>Blade Templates</strong> : Moteur de templating Laravel avec héritage</li>
+        <li><strong>Tailwind CSS 4.1.11</strong> : Framework utility-first avec design system personnalisé</li>
+        <li><strong>Alpine.js 3.14.9</strong> : Framework JavaScript réactif et léger</li>
+        <li><strong>Vite 5.0</strong> : Build tool moderne avec hot reload et optimisations</li>
+        <li><strong>PostCSS</strong> : Traitement CSS avec autoprefixer et optimisations</li>
+    </ul>
+    
+    <p><strong>Composants réutilisables :</strong></p>
+    <ul>
+        <li><strong>Layout system</strong> : Templates de base avec sections modulaires</li>
+        <li><strong>Form components</strong> : Validation côté client et serveur</li>
+        <li><strong>Modal system</strong> : Dialogs dynamiques avec AJAX</li>
+        <li><strong>Data tables</strong> : Grilles avec tri, pagination, filtres</li>
+        <li><strong>Calendar widgets</strong> : Sélection dates pour locations</li>
+    </ul>
+    
+    <h3>13.4.2 Performance web</h3>
+    
+    <p><strong>Optimisations implémentées :</strong></p>
+    <ul>
+        <li><strong>Tailwind CSS JIT</strong> : Compilation just-in-time pour taille optimale</li>
+        <li><strong>Lazy loading</strong> : Images et contenus chargés à la demande</li>
+        <li><strong>Vite bundling</strong> : Optimisation automatique des assets</li>
+        <li><strong>HTTP/2 Server Push</strong> : Préchargement ressources critiques</li>
+        <li><strong>Alpine.js CSP</strong> : Inline scripts sécurisés et performants</li>
+    </ul>
+    
+    <p><strong>Métriques Core Web Vitals :</strong></p>
+    <ul>
+        <li><strong>LCP (Largest Contentful Paint)</strong> : < 2.5s</li>
+        <li><strong>FID (First Input Delay)</strong> : < 100ms</li>
+        <li><strong>CLS (Cumulative Layout Shift)</strong> : < 0.1</li>
+        <li><strong>TTFB (Time To First Byte)</strong> : < 600ms</li>
+    </ul>
+    
+    <h2>13.5 Système de queue et jobs</h2>
+    
+    <h3>13.5.1 Architecture asynchrone</h3>
+    
+    <p><strong>Types de jobs implémentés :</strong></p>
+    <ul>
+        <li><strong>SendRentalStartedEmail</strong> : Confirmation début de location</li>
+        <li><strong>SendRentalReminderEmail</strong> : Rappels adaptatifs selon durée</li>
+        <li><strong>ProcessStripeWebhook</strong> : Traitement événements paiement</li>
+        <li><strong>GenerateInvoicePDF</strong> : Création factures asynchrone</li>
+        <li><strong>OptimizeProductImages</strong> : Redimensionnement et compression</li>
+    </ul>
+    
+    <p><strong>Configuration queue system :</strong></p>
+    <ul>
+        <li><strong>Driver</strong> : Redis pour performance et fiabilité</li>
+        <li><strong>Worker daemon</strong> : Processus permanent avec supervision</li>
+        <li><strong>Retry policy</strong> : 3 tentatives avec backoff exponentiel</li>
+        <li><strong>Failed jobs</strong> : Table de stockage pour debugging</li>
+        <li><strong>Monitoring</strong> : Logs détaillés et alertes automatiques</li>
+    </ul>
+    
+    <h2>13.6 APIs et intégrations</h2>
+    
+    <h3>13.6.1 API REST interne</h3>
+    
+    <p><strong>Endpoints développés :</strong></p>
+    <ul>
+        <li><strong>/api/products</strong> : CRUD produits avec filtrage avancé</li>
+        <li><strong>/api/rentals</strong> : Gestion locations et disponibilités</li>
+        <li><strong>/api/payments</strong> : Interface Stripe avec webhooks</li>
+        <li><strong>/api/cart</strong> : Panier temps réel avec synchronisation</li>
+        <li><strong>/api/admin</strong> : Dashboard données et statistiques</li>
+    </ul>
+    
+    <p><strong>Standards API :</strong></p>
+    <ul>
+        <li><strong>RESTful design</strong> : Verbes HTTP et codes de retour standards</li>
+        <li><strong>JSON responses</strong> : Format uniforme avec metadata</li>
+        <li><strong>Rate limiting</strong> : Protection contre les abus</li>
+        <li><strong>API versioning</strong> : Évolution sans breaking changes</li>
+        <li><strong>Documentation</strong> : Swagger/OpenAPI intégré</li>
+    </ul>
+    
+    <h3>13.6.2 Intégrations externes</h3>
+    
+    <p><strong>Stripe Payment Platform :</strong></p>
+    <ul>
+        <li><strong>Payment Intents API</strong> : Gestion paiements sécurisés</li>
+        <li><strong>Setup Intents</strong> : Autorisation cautions sans capture</li>
+        <li><strong>Webhooks</strong> : Synchronisation temps réel des états</li>
+        <li><strong>Connect API</strong> : Préparation marketplace future</li>
+    </ul>
+    
+    <p><strong>Services email :</strong></p>
+    <ul>
+        <li><strong>SMTP configuré</strong> : Service mail transactionnel</li>
+        <li><strong>Template engine</strong> : Emails responsives personnalisés</li>
+        <li><strong>Bounce handling</strong> : Gestion echecs et désinscriptions</li>
+        <li><strong>Analytics</strong> : Tracking ouvertures et clics</li>
+    </ul>
+</div>
+
+<!-- SÉCURITÉ -->
+<div class="page-break">
+    <h1>14. Sécurité</h1>
+    
+    <p>
+        La sécurité constitue un pilier fondamental de Vitamiel, intégrée dès la conception architecturale. Cette section détaille l'ensemble des mesures de sécurité implémentées pour protéger les données utilisateurs et garantir la fiabilité de la plateforme.
+    </p>
+    
+    <h2>14.1 Sécurité applicative</h2>
+    
+    <h3>14.1.1 Authentification et autorisation</h3>
+    
+    <p><strong>Système d'authentification :</strong></p>
+    <ul>
+        <li><strong>Hash passwords</strong> : Bcrypt avec salt automatique (coût 12)</li>
+        <li><strong>Sessions sécurisées</strong> : Tokens CSRF, HttpOnly cookies</li>
+        <li><strong>Two-Factor Auth</strong> : TOTP pour comptes administrateurs</li>
+        <li><strong>Password policies</strong> : Complexité minimale, expiration</li>
+        <li><strong>Account lockout</strong> : Protection contre brute force</li>
+    </ul>
+    
+    <p><strong>Gestion des autorisations :</strong></p>
+    <ul>
+        <li><strong>Role-Based Access Control</strong> : Rôles User/Admin avec permissions</li>
+        <li><strong>Middleware protection</strong> : Vérification droits sur chaque route</li>
+        <li><strong>Resource ownership</strong> : Isolation données par utilisateur</li>
+        <li><strong>API authentication</strong> : Laravel Sanctum pour tokens API</li>
+        <li><strong>Session management</strong> : Invalidation automatique, concurrent sessions</li>
+    </ul>
+    
+    <h3>14.1.2 Protection contre les vulnérabilités</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Vulnérabilité OWASP</th>
+                    <th>Mesure de protection</th>
+                    <th>Implementation</th>
+                    <th>Niveau de protection</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Injection SQL</strong></td>
+                    <td>Eloquent ORM + Prepared Statements</td>
+                    <td>Pas de requêtes SQL brutes</td>
+                    <td>🟢 Complet</td>
+                </tr>
+                <tr>
+                    <td><strong>XSS (Cross-Site Scripting)</strong></td>
+                    <td>Échappement automatique Blade</td>
+                    <td>htmlspecialchars() par défaut</td>
+                    <td>🟢 Complet</td>
+                </tr>
+                <tr>
+                    <td><strong>CSRF</strong></td>
+                    <td>Tokens CSRF Laravel</td>
+                    <td>@csrf directive obligatoire</td>
+                    <td>🟢 Complet</td>
+                </tr>
+                <tr>
+                    <td><strong>Broken Authentication</strong></td>
+                    <td>Sessions + Rate limiting</td>
+                    <td>Middleware + Redis cache</td>
+                    <td>🟢 Complet</td>
+                </tr>
+                <tr>
+                    <td><strong>Sensitive Data Exposure</strong></td>
+                    <td>Chiffrement + HTTPS obligatoire</td>
+                    <td>Laravel encryption + SSL</td>
+                    <td>🟢 Complet</td>
+                </tr>
+                <tr>
+                    <td><strong>XML External Entities</strong></td>
+                    <td>Pas d'XML parsing</td>
+                    <td>JSON uniquement</td>
+                    <td>🟢 N/A</td>
+                </tr>
+                <tr>
+                    <td><strong>Broken Access Control</strong></td>
+                    <td>Policies Laravel + Middleware</td>
+                    <td>Authorization gates</td>
+                    <td>🟢 Complet</td>
+                </tr>
+                <tr>
+                    <td><strong>Security Misconfiguration</strong></td>
+                    <td>Configuration sécurisée</td>
+                    <td>Environment variables</td>
+                    <td>🟡 Bon</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h3>14.1.3 Validation et sanitization</h3>
+    
+    <p><strong>Validation côté serveur :</strong></p>
+    <ul>
+        <li><strong>Form Requests</strong> : Validation automatique avec règles métier</li>
+        <li><strong>Custom validators</strong> : Règles spécifiques (dates location, stocks)</li>
+        <li><strong>File upload security</strong> : Type MIME, taille, extension validés</li>
+        <li><strong>Input sanitization</strong> : Nettoyage automatique des données</li>
+        <li><strong>Rate limiting</strong> : Protection contre spam et DoS</li>
+    </ul>
+    
+    <p><strong>Exemples de règles de validation :</strong></p>
+    <ul>
+        <li><strong>Email unique</strong> : 'email' => 'required|email|unique:users'</li>
+        <li><strong>Dates cohérentes</strong> : 'end_date' => 'after:start_date'</li>
+        <li><strong>Stocks disponibles</strong> : Custom rule vérification disponibilité</li>
+        <li><strong>Montants positifs</strong> : 'amount' => 'numeric|min:0.01'</li>
+    </ul>
+    
+    <h2>14.2 Sécurité des données</h2>
+    
+    <h3>14.2.1 Chiffrement et protection</h3>
+    
+    <p><strong>Chiffrement des données :</strong></p>
+    <ul>
+        <li><strong>Base de données</strong> : Champs sensibles chiffrés (cartes, documents)</li>
+        <li><strong>Files storage</strong> : Chiffrement files système + backup</li>
+        <li><strong>Session data</strong> : Redis avec chiffrement activé</li>
+        <li><strong>Logs rotation</strong> : Suppression automatique données anciennes</li>
+        <li><strong>Backup encryption</strong> : Sauvegardes chiffrées avec clés séparées</li>
+    </ul>
+    
+    <p><strong>Gestion des clés :</strong></p>
+    <ul>
+        <li><strong>APP_KEY Laravel</strong> : Rotation périodique des clés applicatives</li>
+        <li><strong>JWT secrets</strong> : Clés dédiées pour tokens API</li>
+        <li><strong>Stripe keys</strong> : Séparation test/production, variables sécurisées</li>
+        <li><strong>Database encryption</strong> : Clés de chiffrement base séparées</li>
+    </ul>
+    
+    <h3>14.2.2 Conformité RGPD</h3>
+    
+    <p><strong>Protection des données personnelles :</strong></p>
+    <ul>
+        <li><strong>Consentement explicite</strong> : Opt-in newsletter, cookies</li>
+        <li><strong>Droit à l'oubli</strong> : Suppression compte et données associées</li>
+        <li><strong>Portabilité</strong> : Export données utilisateur en JSON</li>
+        <li><strong>Rectification</strong> : Modification données personnelles</li>
+        <li><strong>Minimisation</strong> : Collecte données strictement nécessaires</li>
+    </ul>
+    
+    <p><strong>Audit trail :</strong></p>
+    <ul>
+        <li><strong>Logs d'accès</strong> : Traçabilité consultation données sensibles</li>
+        <li><strong>Modifications tracking</strong> : Historique des changements</li>
+        <li><strong>Consent logging</strong> : Horodatage des consentements</li>
+        <li><strong>Data processing</strong> : Registre des traitements</li>
+    </ul>
+    
+    <h2>14.3 Sécurité infrastructure</h2>
+    
+    <h3>14.3.1 Sécurisation serveur</h3>
+    
+    <p><strong>Configuration serveur web :</strong></p>
+    <ul>
+        <li><strong>HTTPS obligatoire</strong> : Certificats SSL/TLS Let's Encrypt</li>
+        <li><strong>HSTS headers</strong> : Strict-Transport-Security forcé</li>
+        <li><strong>Security headers</strong> : CSP, X-Frame-Options, X-XSS-Protection</li>
+        <li><strong>PHP hardening</strong> : Disable dangerous functions, expose_php off</li>
+        <li><strong>Directory traversal</strong> : Protection .htaccess, nginx config</li>
+    </ul>
+    
+    <p><strong>Firewall et monitoring :</strong></p>
+    <ul>
+        <li><strong>WAF (Web Application Firewall)</strong> : Filtrage requêtes malveillantes</li>
+        <li><strong>DDoS protection</strong> : Rate limiting + CDN protection</li>
+        <li><strong>Intrusion detection</strong> : Monitoring tentatives d'accès</li>
+        <li><strong>IP whitelist</strong> : Accès admin restreint par IP</li>
+        <li><strong>Fail2ban</strong> : Blocage automatique IPs malveillantes</li>
+    </ul>
+    
+    <h3>14.3.2 Sécurité base de données</h3>
+    
+    <p><strong>Configuration MariaDB :</strong></p>
+    <ul>
+        <li><strong>User privileges</strong> : Comptes dédiés avec droits minimaux</li>
+        <li><strong>Network security</strong> : Bind localhost, port non-standard</li>
+        <li><strong>Query logging</strong> : Surveillance requêtes sensibles</li>
+        <li><strong>Backup encryption</strong> : Dumps chiffrés avec rotation</li>
+        <li><strong>SSL connections</strong> : Chiffrement connexions applicatives</li>
+    </ul>
+    
+    <h2>14.4 Sécurité paiements</h2>
+    
+    <h3>14.4.1 Conformité PCI DSS</h3>
+    
+    <p><strong>Standards PCI DSS respectés :</strong></p>
+    <ul>
+        <li><strong>No card data storage</strong> : Aucune donnée carte stockée</li>
+        <li><strong>Stripe compliance</strong> : Délégation complète à Stripe (Level 1)</li>
+        <li><strong>Tokenization</strong> : Utilisation tokens Stripe uniquement</li>
+        <li><strong>Secure transmission</strong> : HTTPS + validation certificats</li>
+        <li><strong>Regular audits</strong> : Surveillance conformité continue</li>
+    </ul>
+    
+    <p><strong>Sécurisation des webhooks :</strong></p>
+    <ul>
+        <li><strong>Signature validation</strong> : Vérification signatures Stripe</li>
+        <li><strong>Idempotency</strong> : Protection contre rejouer événements</li>
+        <li><strong>Timeout protection</strong> : Limitation durée traitement</li>
+        <li><strong>Error handling</strong> : Gestion gracieuse des échecs</li>
+    </ul>
+    
+    <h2>14.5 Tests de sécurité</h2>
+    
+    <h3>14.5.1 Tests automatisés</h3>
+    
+    <p><strong>Test suite sécurité :</strong></p>
+    <ul>
+        <li><strong>Authentication tests</strong> : Scénarios connexion/déconnexion</li>
+        <li><strong>Authorization tests</strong> : Vérification contrôles d'accès</li>
+        <li><strong>Input validation tests</strong> : Tentatives injection/XSS</li>
+        <li><strong>CSRF protection tests</strong> : Validation tokens requis</li>
+        <li><strong>Session security tests</strong> : Gestion sessions, timeouts</li>
+    </ul>
+    
+    <h3>14.5.2 Audit sécurité</h3>
+    
+    <p><strong>Évaluation périodique :</strong></p>
+    <ul>
+        <li><strong>Penetration testing</strong> : Tests d'intrusion trimestriels</li>
+        <li><strong>Code review security</strong> : Audit code pour vulnérabilités</li>
+        <li><strong>Dependency scanning</strong> : Vérification packages tiers</li>
+        <li><strong>Configuration audit</strong> : Revue paramètres serveurs</li>
+        <li><strong>Compliance check</strong> : Conformité RGPD/PCI DSS</li>
+    </ul>
+    
+    <h2>14.6 Plan de réponse aux incidents</h2>
+    
+    <h3>14.6.1 Procédures d'urgence</h3>
+    
+    <p><strong>Classification des incidents :</strong></p>
+    <ul>
+        <li><strong>Critique</strong> : Données compromises, site inaccessible (< 1h)</li>
+        <li><strong>Haute</strong> : Fonctionnalités majeures impactées (< 4h)</li>
+        <li><strong>Moyenne</strong> : Fonctionnalités mineures (< 24h)</li>
+        <li><strong>Faible</strong> : Problèmes cosmétiques (< 72h)</li>
+    </ul>
+    
+    <p><strong>Actions automatisées :</strong></p>
+    <ul>
+        <li><strong>Monitoring 24/7</strong> : Alertes automatiques équipe technique</li>
+        <li><strong>Backup restore</strong> : Procédures restauration rapide</li>
+        <li><strong>Isolation système</strong> : Déconnexion composants compromis</li>
+        <li><strong>Communication</strong> : Notifications utilisateurs automatiques</li>
+        <li><strong>Documentation</strong> : Logs d'incident pour post-mortem</li>
+    </ul>
+    
+    <p>
+        Cette approche sécurité globale garantit la protection des données utilisateurs et la fiabilité de la plateforme Vitamiel, établissant la confiance nécessaire à notre développement commercial.
+    </p>
+</div>
+
+<!-- ANALYSE DES RISQUES -->
+<div class="page-break">
+    <h1>15. Analyse des risques</h1>
+    
+    <p>
+        Cette section présente une analyse exhaustive des risques potentiels pesant sur le projet Vitamiel, accompagnée des stratégies d'atténuation correspondantes pour assurer la pérennité et le succès de l'entreprise.
+    </p>
+    
+    <h2>15.1 Cartographie des risques</h2>
+    
+    <h3>15.1.1 Classification des risques</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Catégorie</th>
+                    <th>Impact</th>
+                    <th>Probabilité</th>
+                    <th>Niveau de risque</th>
+                    <th>Priorité</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Risques techniques</strong></td>
+                    <td>Élevé</td>
+                    <td>Moyenne</td>
+                    <td>🟡 Modéré</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td><strong>Risques financiers</strong></td>
+                    <td>Critique</td>
+                    <td>Faible</td>
+                    <td>🟡 Modéré</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td><strong>Risques concurrentiels</strong></td>
+                    <td>Élevé</td>
+                    <td>Élevée</td>
+                    <td>🔴 Élevé</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td><strong>Risques réglementaires</strong></td>
+                    <td>Moyen</td>
+                    <td>Moyenne</td>
+                    <td>🟡 Modéré</td>
+                    <td>3</td>
+                </tr>
+                <tr>
+                    <td><strong>Risques opérationnels</strong></td>
+                    <td>Moyen</td>
+                    <td>Élevée</td>
+                    <td>🟡 Modéré</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td><strong>Risques marché</strong></td>
+                    <td>Élevé</td>
+                    <td>Moyenne</td>
+                    <td>🟡 Modéré</td>
+                    <td>2</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>15.2 Risques techniques</h2>
+    
+    <h3>15.2.1 Risques technologiques</h3>
+    
+    <div class="highlight-box">
+        <h3>Risque : Défaillance système critique</h3>
+        <ul>
+            <li><strong>Description</strong> : Panne serveur, bug critique, corruption base de données</li>
+            <li><strong>Impact</strong> : Interruption service, perte revenus, image dégradée</li>
+            <li><strong>Probabilité</strong> : 15% (moyenne)</li>
+            <li><strong>Impact financier estimé</strong> : 25 000€ - 75 000€</li>
+        </ul>
+    </div>
+    
+    <p><strong>Mesures d'atténuation :</strong></p>
+    <ul>
+        <li><strong>Redondance infrastructure</strong> : Serveurs multiples, load balancing</li>
+        <li><strong>Monitoring 24/7</strong> : Alertes automatiques, équipe d'astreinte</li>
+        <li><strong>Sauvegardes automatiques</strong> : Backup quotidien + tests restauration</li>
+        <li><strong>Tests de charge</strong> : Validation performance sous stress</li>
+        <li><strong>Plan de continuité</strong> : Procédures de basculement < 15 minutes</li>
+    </ul>
+    
+    <div class="highlight-box">
+        <h3>Risque : Obsolescence technologique</h3>
+        <ul>
+            <li><strong>Description</strong> : Évolution rapide technologies, frameworks obsolètes</li>
+            <li><strong>Impact</strong> : Dette technique, maintenance coûteuse, compétitivité</li>
+            <li><strong>Probabilité</strong> : 30% (élevée)</li>
+            <li><strong>Impact financier estimé</strong> : 50 000€ - 150 000€</li>
+        </ul>
+    </div>
+    
+    <p><strong>Mesures d'atténuation :</strong></p>
+    <ul>
+        <li><strong>Veille technologique</strong> : Suivi évolutions Laravel, PHP, JS</li>
+        <li><strong>Migration préventive</strong> : Mise à jour régulière avant EOL</li>
+        <li><strong>Architecture modulaire</strong> : Faciliter évolutions/remplacements</li>
+        <li><strong>Formation équipe</strong> : Montée en compétence continue</li>
+        <li><strong>Refactoring programmé</strong> : Budget dédié amélioration technique</li>
+    </ul>
+    
+    <h3>15.2.2 Risques de sécurité</h3>
+    
+    <div class="highlight-box">
+        <h3>Risque : Cyberattaque / Breach de données</h3>
+        <ul>
+            <li><strong>Description</strong> : Piratage, vol données clients, ransomware</li>
+            <li><strong>Impact</strong> : Conformité RGPD, amendes, perte confiance</li>
+            <li><strong>Probabilité</strong> : 20% (moyenne)</li>
+            <li><strong>Impact financier estimé</strong> : 100 000€ - 500 000€</li>
+        </ul>
+    </div>
+    
+    <p><strong>Mesures d'atténuation :</strong></p>
+    <ul>
+        <li><strong>Sécurité par design</strong> : Architecture sécurisée depuis conception</li>
+        <li><strong>Audits sécurité</strong> : Penetration testing trimestriel</li>
+        <li><strong>Formation équipe</strong> : Sensibilisation cybersécurité</li>
+        <li><strong>Assurance cyber</strong> : Couverture 1M€ responsabilité civile</li>
+        <li><strong>Plan de réponse</strong> : Procédures incident avec communication</li>
+    </ul>
+    
+    <h2>15.3 Risques concurrentiels</h2>
+    
+    <h3>15.3.1 Concurrence directe</h3>
+    
+    <div class="highlight-box">
+        <h3>Risque : Entrée acteur majeur</h3>
+        <ul>
+            <li><strong>Description</strong> : Agriconomie/Loxam lance offre hybride similaire</li>
+            <li><strong>Impact</strong> : Perte parts de marché, guerre des prix</li>
+            <li><strong>Probabilité</strong> : 40% (élevée)</li>
+            <li><strong>Impact financier estimé</strong> : 200 000€ - 800 000€</li>
+        </ul>
+    </div>
+    
+    <p><strong>Mesures d'atténuation :</strong></p>
+    <ul>
+        <li><strong>Innovation continue</strong> : R&D 15% CA pour garder avance</li>
+        <li><strong>Fidélisation client</strong> : Programme loyalty, service premium</li>
+        <li><strong>Barrières à l'entrée</strong> : Brevets, exclusivités fournisseurs</li>
+        <li><strong>Partenariats stratégiques</strong> : Alliances préventives</li>
+        <li><strong>Speed to market</strong> : Time-to-market réduit nouvelles features</li>
+    </ul>
+    
+    <h3>15.3.2 Disruption technologique</h3>
+    
+    <div class="highlight-box">
+        <h3>Risque : Nouvelle technologie disruptive</h3>
+        <ul>
+            <li><strong>Description</strong> : IA, IoT, blockchain changent paradigme</li>
+            <li><strong>Impact</strong> : Modèle économique obsolète</li>
+            <li><strong>Probabilité</strong> : 25% (moyenne)</li>
+            <li><strong>Impact financier estimé</strong> : 300 000€ - 1 000 000€</li>
+        </ul>
+    </div>
+    
+    <p><strong>Mesures d'atténuation :</strong></p>
+    <ul>
+        <li><strong>Roadmap innovation</strong> : IA prédictive, IoT monitoring intégrés</li>
+        <li><strong>Partenariats tech</strong> : Collaboration startups innovantes</li>
+        <li><strong>Architecture évolutive</strong> : APIs pour intégrations futures</li>
+        <li><strong>Veille stratégique</strong> : Monitoring trends technologiques</li>
+        <li><strong>Pivot capability</strong> : Agilité organisationnelle</li>
+    </ul>
+    
+    <h2>15.4 Risques financiers</h2>
+    
+    <h3>15.4.1 Risques de trésorerie</h3>
+    
+    <div class="highlight-box">
+        <h3>Risque : Tension de trésorerie</h3>
+        <ul>
+            <li><strong>Description</strong> : Croissance plus lente que prévu, BFR élevé</li>
+            <li><strong>Impact</strong> : Difficulté paiement fournisseurs, salaires</li>
+            <li><strong>Probabilité</strong> : 25% (moyenne)</li>
+            <li><strong>Impact financier estimé</strong> : 50 000€ - 200 000€</li>
+        </ul>
+    </div>
+    
+    <p><strong>Mesures d'atténuation :</strong></p>
+    <ul>
+        <li><strong>Planification cash</strong> : Prévisions trésorerie 18 mois glissants</li>
+        <li><strong>Ligne de crédit</strong> : 100k€ facilité caisse négociée</li>
+        <li><strong>Optimisation BFR</strong> : Délais paiement, factoring si nécessaire</li>
+        <li><strong>Diversification revenus</strong> : Mix vente/location équilibré</li>
+        <li><strong>Contrôle coûts</strong> : Budget serré, KPIs financiers</li>
+    </ul>
+    
+    <h3>15.4.2 Risques de marché</h3>
+    
+    <div class="highlight-box">
+        <h3>Risque : Récession économique agricole</h3>
+        <ul>
+            <li><strong>Description</strong> : Crise secteur, baisse investissements agricoles</li>
+            <li><strong>Impact</strong> : Réduction demande, allongement cycles</li>
+            <li><strong>Probabilité</strong> : 30% (moyenne)</li>
+            <li><strong>Impact financier estimé</strong> : 150 000€ - 400 000€</li>
+        </ul>
+    </div>
+    
+    <p><strong>Mesures d'atténuation :</strong></p>
+    <ul>
+        <li><strong>Diversification géographique</strong> : Expansion Belgique, Suisse</li>
+        <li><strong>Segments contre-cycliques</strong> : Particuliers, collectivités</li>
+        <li><strong>Flexibilité coûts</strong> : Structure variable élevée</li>
+        <li><strong>Offre adaptative</strong> : Plus de location en crise</li>
+        <li><strong>Réserves financières</strong> : 6 mois charges courantes</li>
+    </ul>
+    
+    <h2>15.5 Risques opérationnels</h2>
+    
+    <h3>15.5.1 Risques supply chain</h3>
+    
+    <div class="highlight-box">
+        <h3>Risque : Rupture approvisionnement</h3>
+        <ul>
+            <li><strong>Description</strong> : Fournisseurs défaillants, logistique perturbée</li>
+            <li><strong>Impact</strong> : Stocks vides, clients insatisfaits</li>
+            <li><strong>Probabilité</strong> : 35% (élevée)</li>
+            <li><strong>Impact financier estimé</strong> : 30 000€ - 100 000€</li>
+        </ul>
+    </div>
+    
+    <p><strong>Mesures d'atténuation :</strong></p>
+    <ul>
+        <li><strong>Diversification fournisseurs</strong> : 2+ sources par catégorie</li>
+        <li><strong>Stock sécurité</strong> : 30 jours couverture produits critiques</li>
+        <li><strong>Contrats cadres</strong> : Accords long terme sécurisés</li>
+        <li><strong>Monitoring supply</strong> : Alertes automatiques stocks faibles</li>
+        <li><strong>Plans d'urgence</strong> : Fournisseurs backup pré-qualifiés</li>
+    </ul>
+    
+    <h3>15.5.2 Risques humains</h3>
+    
+    <div class="highlight-box">
+        <h3>Risque : Départ personnel clé</h3>
+        <ul>
+            <li><strong>Description</strong> : CTO, lead developer, commercial senior</li>
+            <li><strong>Impact</strong> : Perte expertise, ralentissement développement</li>
+            <li><strong>Probabilité</strong> : 40% (élevée)</li>
+            <li><strong>Impact financier estimé</strong> : 40 000€ - 120 000€</li>
+        </ul>
+    </div>
+    
+    <p><strong>Mesures d'atténuation :</strong></p>
+    <ul>
+        <li><strong>Documentation complète</strong> : Procédures, architecture, processus</li>
+        <li><strong>Formation croisée</strong> : Multi-compétences équipe</li>
+        <li><strong>Rétention talents</strong> : Package attractif, equity</li>
+        <li><strong>Recrutement préventif</strong> : Pipeline candidats qualifiés</li>
+        <li><strong>Knowledge management</strong> : Capitalisation savoir-faire</li>
+    </ul>
+    
+    <h2>15.6 Risques réglementaires</h2>
+    
+    <h3>15.6.1 Conformité données</h3>
+    
+    <div class="highlight-box">
+        <h3>Risque : Non-conformité RGPD</h3>
+        <ul>
+            <li><strong>Description</strong> : Violation règles protection données</li>
+            <li><strong>Impact</strong> : Amendes CNIL, suspension activité</li>
+            <li><strong>Probabilité</strong> : 15% (faible)</li>
+            <li><strong>Impact financier estimé</strong> : 20 000€ - 200 000€</li>
+        </ul>
+    </div>
+    
+    <p><strong>Mesures d'atténuation :</strong></p>
+    <ul>
+        <li><strong>Privacy by design</strong> : Conformité intégrée architecture</li>
+        <li><strong>DPO externe</strong> : Conseil spécialisé protection données</li>
+        <li><strong>Audits réguliers</strong> : Vérification conformité trimestrielle</li>
+        <li><strong>Formation équipe</strong> : Sensibilisation RGPD</li>
+        <li><strong>Procédures documentées</strong> : Registre traitements à jour</li>
+    </ul>
+    
+    <h2>15.7 Plan de gestion des risques</h2>
+    
+    <h3>15.7.1 Governance des risques</h3>
+    
+    <p><strong>Organisation :</strong></p>
+    <ul>
+        <li><strong>Risk Owner</strong> : CEO responsable stratégie risques</li>
+        <li><strong>Risk Manager</strong> : CTO pour risques techniques</li>
+        <li><strong>Comité risques</strong> : Réunion mensuelle équipe dirigeante</li>
+        <li><strong>Reporting</strong> : Dashboard risques temps réel</li>
+        <li><strong>Escalation</strong> : Procédures alerte selon criticité</li>
+    </ul>
+    
+    <h3>15.7.2 Monitoring et KPIs</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Catégorie risque</th>
+                    <th>KPI de suivi</th>
+                    <th>Seuil d'alerte</th>
+                    <th>Fréquence monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Technique</strong></td>
+                    <td>Uptime, temps réponse</td>
+                    <td>< 99.5%, > 3s</td>
+                    <td>Temps réel</td>
+                </tr>
+                <tr>
+                    <td><strong>Financier</strong></td>
+                    <td>Cash position, burn rate</td>
+                    <td>< 3 mois trésorerie</td>
+                    <td>Hebdomadaire</td>
+                </tr>
+                <tr>
+                    <td><strong>Concurrentiel</strong></td>
+                    <td>Parts de marché, NPS</td>
+                    <td>Baisse > 10%</td>
+                    <td>Mensuelle</td>
+                </tr>
+                <tr>
+                    <td><strong>Opérationnel</strong></td>
+                    <td>Stock, satisfaction client</td>
+                    <td>Rupture, NPS < 7</td>
+                    <td>Quotidienne</td>
+                </tr>
+                <tr>
+                    <td><strong>Sécurité</strong></td>
+                    <td>Tentatives intrusion</td>
+                    <td>Anomalie détectée</td>
+                    <td>Temps réel</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <p>
+        Cette analyse de risques complète permet d'anticiper les menaces potentielles et de mettre en place les mesures préventives appropriées pour assurer la pérennité de Vitamiel.
+    </p>
+</div>
+
+<!-- PLANIFICATION FINANCIÈRE -->
+<div class="page-break">
+    <h1>16. Planification financière</h1>
+    
+    <p>
+        Cette section présente la stratégie financière de Vitamiel, incluant les prévisions de revenus, la structure de coûts, les besoins de financement et les projections de rentabilité sur 5 ans.
+    </p>
+    
+    <h2>16.1 Modèle économique</h2>
+    
+    <h3>16.1.1 Sources de revenus</h3>
+    
+    <div class="highlight-box">
+        <h3>Streams de revenus diversifiés</h3>
+        <ul>
+            <li><strong>Vente équipements</strong> : Marge 20-30% selon catégorie</li>
+            <li><strong>Location équipements</strong> : 8-12% valeur/mois selon durée</li>
+            <li><strong>Services annexes</strong> : Livraison, formation, maintenance</li>
+            <li><strong>Commissions partenaires</strong> : 5-8% ventes via réseau</li>
+            <li><strong>Assurances optionnelles</strong> : 3-5% valeur équipement</li>
+        </ul>
+    </div>
+    
+    <h3>16.1.2 Structure de coûts</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Catégorie</th>
+                    <th>% CA Year 1</th>
+                    <th>% CA Year 3</th>
+                    <th>Nature</th>
+                    <th>Variabilité</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Coût des ventes</strong></td>
+                    <td>65%</td>
+                    <td>62%</td>
+                    <td>Achat équipements</td>
+                    <td>Variable</td>
+                </tr>
+                <tr>
+                    <td><strong>Salaires & charges</strong></td>
+                    <td>18%</td>
+                    <td>22%</td>
+                    <td>Personnel permanent</td>
+                    <td>Semi-fixe</td>
+                </tr>
+                <tr>
+                    <td><strong>Marketing & Commercial</strong></td>
+                    <td>12%</td>
+                    <td>8%</td>
+                    <td>Acquisition clients</td>
+                    <td>Variable</td>
+                </tr>
+                <tr>
+                    <td><strong>Technology & R&D</strong></td>
+                    <td>8%</td>
+                    <td>10%</td>
+                    <td>Développement, infrastructure</td>
+                    <td>Mixte</td>
+                </tr>
+                <tr>
+                    <td><strong>Frais généraux</strong></td>
+                    <td>5%</td>
+                    <td>4%</td>
+                    <td>Bureau, assurances, juridique</td>
+                    <td>Fixe</td>
+                </tr>
+                <tr>
+                    <td><strong>TOTAL</strong></td>
+                    <td><strong>108%</strong></td>
+                    <td><strong>106%</strong></td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>16.2 Prévisions financières</h2>
+    
+    <h3>16.2.1 Compte de résultat prévisionnel (K€)</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Poste</th>
+                    <th>Year 1 (2025)</th>
+                    <th>Year 2 (2026)</th>
+                    <th>Year 3 (2027)</th>
+                    <th>Year 4 (2028)</th>
+                    <th>Year 5 (2029)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Chiffre d'affaires</strong></td>
+                    <td>180</td>
+                    <td>420</td>
+                    <td>850</td>
+                    <td>1 400</td>
+                    <td>2 100</td>
+                </tr>
+                <tr>
+                    <td>- Ventes équipements</td>
+                    <td>120</td>
+                    <td>280</td>
+                    <td>550</td>
+                    <td>850</td>
+                    <td>1 200</td>
+                </tr>
+                <tr>
+                    <td>- Revenus location</td>
+                    <td>45</td>
+                    <td>110</td>
+                    <td>240</td>
+                    <td>450</td>
+                    <td>750</td>
+                </tr>
+                <tr>
+                    <td>- Services annexes</td>
+                    <td>15</td>
+                    <td>30</td>
+                    <td>60</td>
+                    <td>100</td>
+                    <td>150</td>
+                </tr>
+                <tr>
+                    <td><strong>Coût des ventes</strong></td>
+                    <td>-117</td>
+                    <td>-260</td>
+                    <td>-527</td>
+                    <td>-840</td>
+                    <td>-1 260</td>
+                </tr>
+                <tr>
+                    <td><strong>Marge brute</strong></td>
+                    <td><strong>63</strong></td>
+                    <td><strong>160</strong></td>
+                    <td><strong>323</strong></td>
+                    <td><strong>560</strong></td>
+                    <td><strong>840</strong></td>
+                </tr>
+                <tr>
+                    <td>% marge brute</td>
+                    <td>35%</td>
+                    <td>38%</td>
+                    <td>38%</td>
+                    <td>40%</td>
+                    <td>40%</td>
+                </tr>
+                <tr>
+                    <td><strong>Charges opérationnelles</strong></td>
+                    <td>-77</td>
+                    <td>-145</td>
+                    <td>-255</td>
+                    <td>-420</td>
+                    <td>-630</td>
+                </tr>
+                <tr>
+                    <td>- Salaires & charges</td>
+                    <td>-32</td>
+                    <td>-75</td>
+                    <td>-140</td>
+                    <td>-245</td>
+                    <td>-380</td>
+                </tr>
+                <tr>
+                    <td>- Marketing</td>
+                    <td>-22</td>
+                    <td>-42</td>
+                    <td>-68</td>
+                    <td>-98</td>
+                    <td>-126</td>
+                </tr>
+                <tr>
+                    <td>- Technology</td>
+                    <td>-14</td>
+                    <td>-21</td>
+                    <td>-34</td>
+                    <td>-56</td>
+                    <td>-84</td>
+                </tr>
+                <tr>
+                    <td>- Frais généraux</td>
+                    <td>-9</td>
+                    <td>-17</td>
+                    <td>-23</td>
+                    <td>-21</td>
+                    <td>-40</td>
+                </tr>
+                <tr>
+                    <td><strong>EBITDA</strong></td>
+                    <td><strong>-14</strong></td>
+                    <td><strong>15</strong></td>
+                    <td><strong>68</strong></td>
+                    <td><strong>140</strong></td>
+                    <td><strong>210</strong></td>
+                </tr>
+                <tr>
+                    <td>% EBITDA</td>
+                    <td>-8%</td>
+                    <td>4%</td>
+                    <td>8%</td>
+                    <td>10%</td>
+                    <td>10%</td>
+                </tr>
+                <tr>
+                    <td><strong>Amortissements</strong></td>
+                    <td>-8</td>
+                    <td>-12</td>
+                    <td>-18</td>
+                    <td>-25</td>
+                    <td>-35</td>
+                </tr>
+                <tr>
+                    <td><strong>Résultat opérationnel</strong></td>
+                    <td><strong>-22</strong></td>
+                    <td><strong>3</strong></td>
+                    <td><strong>50</strong></td>
+                    <td><strong>115</strong></td>
+                    <td><strong>175</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Charges financières</strong></td>
+                    <td>-3</td>
+                    <td>-4</td>
+                    <td>-5</td>
+                    <td>-6</td>
+                    <td>-7</td>
+                </tr>
+                <tr>
+                    <td><strong>Résultat net</strong></td>
+                    <td><strong>-25</strong></td>
+                    <td><strong>-1</strong></td>
+                    <td><strong>45</strong></td>
+                    <td><strong>109</strong></td>
+                    <td><strong>168</strong></td>
+                </tr>
+                <tr>
+                    <td>% résultat net</td>
+                    <td>-14%</td>
+                    <td>0%</td>
+                    <td>5%</td>
+                    <td>8%</td>
+                    <td>8%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h3>16.2.2 Évolution du chiffre d'affaires</h3>
+    
+    <p><strong>Drivers de croissance :</strong></p>
+    <ul>
+        <li><strong>Acquisition clients</strong> : 2 500 → 15 000 clients actifs (Year 5)</li>
+        <li><strong>Panier moyen</strong> : 850€ → 1 200€ (mix produit premium)</li>
+        <li><strong>Fréquence achat</strong> : 1.2 → 2.1 commandes/an/client</li>
+        <li><strong>Location growth</strong> : 25% → 36% du CA total</li>
+        <li><strong>Expansion géographique</strong> : France → Benelux (Year 3)</li>
+    </ul>
+    
+    <p><strong>Hypothèses de croissance :</strong></p>
+    <ul>
+        <li><strong>Year 1</strong> : Démarrage, 2 500 clients, 180k€ CA</li>
+        <li><strong>Year 2</strong> : Accélération +133%, 5 500 clients</li>
+        <li><strong>Year 3</strong> : Expansion Benelux +102%, 9 500 clients</li>
+        <li><strong>Year 4</strong> : Maturation +65%, 12 500 clients</li>
+        <li><strong>Year 5</strong> : Optimisation +50%, 15 000 clients</li>
+    </ul>
+    
+    <h2>16.3 Bilans prévisionnels</h2>
+    
+    <h3>16.3.1 Bilan simplifié (K€)</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ACTIF</th>
+                    <th>Year 1</th>
+                    <th>Year 3</th>
+                    <th>Year 5</th>
+                    <th>PASSIF</th>
+                    <th>Year 1</th>
+                    <th>Year 3</th>
+                    <th>Year 5</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Immobilisations</strong></td>
+                    <td>25</td>
+                    <td>65</td>
+                    <td>120</td>
+                    <td><strong>Capital social</strong></td>
+                    <td>75</td>
+                    <td>75</td>
+                    <td>75</td>
+                </tr>
+                <tr>
+                    <td>- Matériel informatique</td>
+                    <td>15</td>
+                    <td>35</td>
+                    <td>60</td>
+                    <td><strong>Réserves</strong></td>
+                    <td>0</td>
+                    <td>-25</td>
+                    <td>19</td>
+                </tr>
+                <tr>
+                    <td>- Développement logiciel</td>
+                    <td>10</td>
+                    <td>30</td>
+                    <td>60</td>
+                    <td><strong>Résultat exercice</strong></td>
+                    <td>-25</td>
+                    <td>45</td>
+                    <td>168</td>
+                </tr>
+                <tr>
+                    <td><strong>Actif circulant</strong></td>
+                    <td>85</td>
+                    <td>180</td>
+                    <td>320</td>
+                    <td><strong>Capitaux propres</strong></td>
+                    <td><strong>50</strong></td>
+                    <td><strong>95</strong></td>
+                    <td><strong>262</strong></td>
+                </tr>
+                <tr>
+                    <td>- Stocks</td>
+                    <td>45</td>
+                    <td>85</td>
+                    <td>140</td>
+                    <td><strong>Emprunts</strong></td>
+                    <td>40</td>
+                    <td>85</td>
+                    <td>120</td>
+                </tr>
+                <tr>
+                    <td>- Créances clients</td>
+                    <td>20</td>
+                    <td>55</td>
+                    <td>95</td>
+                    <td><strong>Dettes fournisseurs</strong></td>
+                    <td>15</td>
+                    <td>35</td>
+                    <td>48</td>
+                </tr>
+                <tr>
+                    <td>- Trésorerie</td>
+                    <td>20</td>
+                    <td>40</td>
+                    <td>85</td>
+                    <td><strong>Autres dettes</strong></td>
+                    <td>5</td>
+                    <td>30</td>
+                    <td>35</td>
+                </tr>
+                <tr>
+                    <td><strong>TOTAL ACTIF</strong></td>
+                    <td><strong>110</strong></td>
+                    <td><strong>245</strong></td>
+                    <td><strong>440</strong></td>
+                    <td><strong>TOTAL PASSIF</strong></td>
+                    <td><strong>110</strong></td>
+                    <td><strong>245</strong></td>
+                    <td><strong>440</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>16.4 Plan de financement</h2>
+    
+    <h3>16.4.1 Besoins de financement</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Besoin</th>
+                    <th>Montant (K€)</th>
+                    <th>Utilisation</th>
+                    <th>Timing</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Investissement initial</strong></td>
+                    <td>25</td>
+                    <td>Développement, matériel</td>
+                    <td>M0-M6</td>
+                </tr>
+                <tr>
+                    <td><strong>Fonds de roulement</strong></td>
+                    <td>30</td>
+                    <td>Stocks initiaux, trésorerie</td>
+                    <td>M6-M12</td>
+                </tr>
+                <tr>
+                    <td><strong>Marketing lancement</strong></td>
+                    <td>20</td>
+                    <td>Acquisition premiers clients</td>
+                    <td>M6-M18</td>
+                </tr>
+                <tr>
+                    <td><strong>TOTAL INITIAL</strong></td>
+                    <td><strong>75</strong></td>
+                    <td>-</td>
+                    <td>18 mois</td>
+                </tr>
+                <tr>
+                    <td><strong>Croissance Year 2-3</strong></td>
+                    <td>45</td>
+                    <td>Scale-up, expansion</td>
+                    <td>M18-M36</td>
+                </tr>
+                <tr>
+                    <td><strong>TOTAL PROGRAMME</strong></td>
+                    <td><strong>120</strong></td>
+                    <td>-</td>
+                    <td>3 ans</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h3>16.4.2 Sources de financement</h3>
+    
+    <p><strong>Mix de financement optimal :</strong></p>
+    <ul>
+        <li><strong>Apport personnel</strong> : 75k€ (63%) - Soufiane + Geoffrey</li>
+        <li><strong>Prêt bancaire</strong> : 25k€ (21%) - Prêt création entreprise</li>
+        <li><strong>Subventions</strong> : 15k€ (12%) - BPI France, région</li>
+        <li><strong>Business Angels</strong> : 5k€ (4%) - Réseau agtech</li>
+    </ul>
+    
+    <p><strong>Évolution du financement :</strong></p>
+    <ul>
+        <li><strong>Year 1</strong> : Financement initial 75k€</li>
+        <li><strong>Year 2</strong> : Ligne de crédit 30k€ + autofinancement</li>
+        <li><strong>Year 3</strong> : Série A 200k€ pour expansion Benelux</li>
+        <li><strong>Year 4-5</strong> : Autofinancement complet</li>
+    </ul>
+    
+    <h2>16.5 Rentabilité et retour sur investissement</h2>
+    
+    <h3>16.5.1 Indicateurs de performance</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>KPI Financier</th>
+                    <th>Year 1</th>
+                    <th>Year 2</th>
+                    <th>Year 3</th>
+                    <th>Year 5</th>
+                    <th>Benchmark</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Marge brute (%)</strong></td>
+                    <td>35%</td>
+                    <td>38%</td>
+                    <td>38%</td>
+                    <td>40%</td>
+                    <td>30-40%</td>
+                </tr>
+                <tr>
+                    <td><strong>EBITDA (%)</strong></td>
+                    <td>-8%</td>
+                    <td>4%</td>
+                    <td>8%</td>
+                    <td>10%</td>
+                    <td>8-15%</td>
+                </tr>
+                <tr>
+                    <td><strong>ROI (%)</strong></td>
+                    <td>-33%</td>
+                    <td>-1%</td>
+                    <td>47%</td>
+                    <td>64%</td>
+                    <td>15-25%</td>
+                </tr>
+                <tr>
+                    <td><strong>Payback (mois)</strong></td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>28</td>
+                    <td>-</td>
+                    <td>24-36</td>
+                </tr>
+                <tr>
+                    <td><strong>Cash conversion (%)</strong></td>
+                    <td>-</td>
+                    <td>85%</td>
+                    <td>92%</td>
+                    <td>95%</td>
+                    <td>80-90%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h3>16.5.2 Break-even analysis</h3>
+    
+    <p><strong>Point mort opérationnel :</strong></p>
+    <ul>
+        <li><strong>Seuil de rentabilité</strong> : 385k€ CA (atteint Month 22)</li>
+        <li><strong>Charges fixes</strong> : 135k€/an (salaires + frais généraux)</li>
+        <li><strong>Taux marge variable</strong> : 35% (marge brute)</li>
+        <li><strong>Levier opérationnel</strong> : 2.8x (sensibilité CA → résultat)</li>
+    </ul>
+    
+    <h2>16.6 Scénarios et sensibilité</h2>
+    
+    <h3>16.6.1 Analyse de sensibilité</h3>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Variable</th>
+                    <th>Scénario pessimiste</th>
+                    <th>Scénario réaliste</th>
+                    <th>Scénario optimiste</th>
+                    <th>Impact sur VAN</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Croissance CA</strong></td>
+                    <td>-30%</td>
+                    <td>Base</td>
+                    <td>+50%</td>
+                    <td>±180k€</td>
+                </tr>
+                <tr>
+                    <td><strong>Marge brute</strong></td>
+                    <td>30%</td>
+                    <td>38%</td>
+                    <td>45%</td>
+                    <td>±120k€</td>
+                </tr>
+                <tr>
+                    <td><strong>Coûts acquisition</strong></td>
+                    <td>+50%</td>
+                    <td>Base</td>
+                    <td>-25%</td>
+                    <td>±80k€</td>
+                </tr>
+                <tr>
+                    <td><strong>Concurrence</strong></td>
+                    <td>Guerre prix</td>
+                    <td>Stable</td>
+                    <td>Leader</td>
+                    <td>±200k€</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <p>
+        Cette planification financière démontre la viabilité économique de Vitamiel avec un retour sur investissement attractif et une croissance durable. Le break-even opérationnel est atteint en moins de 2 ans, ouvrant la voie à une rentabilité solide.
+    </p>
+</div>
+
+</body>
+</html>

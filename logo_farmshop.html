@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo FarmShop - Tailwind CSS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'farm-green': '#22c55e',
+                        'farm-brown': '#92400e',
+                        'farm-orange': '#ea580c',
+                        'farm-yellow': '#eab308'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Logos FarmShop - Concepts Tailwind CSS</h1>
+        
+        <!-- Logo Concept 1: Ferme avec panier -->
+        <div class="bg-white p-8 rounded-lg shadow-lg mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Concept 1: Ferme avec Panier d'Achat</h2>
+            <div class="flex items-center justify-center">
+                <div class="relative">
+                    <!-- Maison de ferme -->
+                    <div class="relative w-24 h-20 bg-farm-brown rounded-t-lg">
+                        <!-- Toit -->
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-16 border-r-16 border-b-16 border-l-transparent border-r-transparent border-b-red-600"></div>
+                        <!-- Porte -->
+                        <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-10 bg-farm-brown border-2 border-yellow-800 rounded-t-lg"></div>
+                        <!-- Fenêtres -->
+                        <div class="absolute top-2 left-2 w-4 h-4 bg-blue-200 border border-yellow-800"></div>
+                        <div class="absolute top-2 right-2 w-4 h-4 bg-blue-200 border border-yellow-800"></div>
+                    </div>
+                    
+                    <!-- Panier shopping intégré -->
+                    <div class="absolute -right-6 top-4 w-12 h-10">
+                        <!-- Corps du panier -->
+                        <div class="w-10 h-8 border-2 border-farm-green rounded-b-lg bg-green-50 relative">
+                            <!-- Anse du panier -->
+                            <div class="absolute -top-1 left-1 w-8 h-4 border-2 border-farm-green border-b-0 rounded-t-full bg-transparent"></div>
+                            <!-- Légumes dans le panier -->
+                            <div class="absolute top-1 left-1 w-2 h-2 bg-red-500 rounded-full"></div>
+                            <div class="absolute top-1 right-1 w-2 h-2 bg-farm-orange rounded-full"></div>
+                            <div class="absolute bottom-1 left-2 w-2 h-2 bg-farm-yellow rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Texte FarmShop -->
+                <div class="ml-6">
+                    <span class="text-4xl font-bold">
+                        <span class="text-farm-green">Farm</span><span class="text-farm-brown">Shop</span>
+                    </span>
+                    <div class="text-sm text-gray-600 italic">Votre marché agricole en ligne</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logo Concept 2: Tracteur stylisé -->
+        <div class="bg-white p-8 rounded-lg shadow-lg mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Concept 2: Tracteur E-commerce</h2>
+            <div class="flex items-center justify-center">
+                <div class="relative">
+                    <!-- Corps du tracteur -->
+                    <div class="w-20 h-12 bg-farm-green rounded-lg relative">
+                        <!-- Cabine -->
+                        <div class="absolute top-0 right-2 w-8 h-8 bg-green-600 rounded-t-lg border-2 border-green-700">
+                            <div class="absolute top-1 left-1 w-2 h-2 bg-blue-200 rounded"></div>
+                        </div>
+                        <!-- Roues -->
+                        <div class="absolute -bottom-2 left-1 w-6 h-6 bg-gray-800 rounded-full border-2 border-gray-600"></div>
+                        <div class="absolute -bottom-3 right-1 w-8 h-8 bg-gray-800 rounded-full border-2 border-gray-600"></div>
+                    </div>
+                    
+                    <!-- Chariot/remorque avec produits -->
+                    <div class="absolute -right-12 top-2 w-16 h-8 bg-farm-brown rounded border-2 border-yellow-800">
+                        <!-- Produits dans la remorque -->
+                        <div class="flex justify-around items-center h-full px-1">
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-farm-orange rounded"></div>
+                            <div class="w-3 h-3 bg-farm-yellow rounded-full"></div>
+                            <div class="w-3 h-3 bg-green-500 rounded"></div>
+                        </div>
+                        <!-- Roue de remorque -->
+                        <div class="absolute -bottom-2 right-2 w-4 h-4 bg-gray-800 rounded-full border border-gray-600"></div>
+                    </div>
+                </div>
+                
+                <!-- Texte FarmShop -->
+                <div class="ml-8">
+                    <span class="text-4xl font-bold">
+                        <span class="text-farm-green">Farm</span><span class="text-farm-orange">Shop</span>
+                    </span>
+                    <div class="text-sm text-gray-600 italic">Du champ à votre porte</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logo Concept 3: Grange moderne -->
+        <div class="bg-white p-8 rounded-lg shadow-lg mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Concept 3: Grange Digitale</h2>
+            <div class="flex items-center justify-center">
+                <div class="relative">
+                    <!-- Structure de la grange -->
+                    <div class="w-24 h-16 bg-red-600 rounded-t-3xl relative overflow-hidden">
+                        <!-- Porte coulissante -->
+                        <div class="absolute bottom-0 left-2 w-20 h-12 bg-farm-brown border-l-4 border-r-4 border-yellow-800">
+                            <!-- Barres horizontales -->
+                            <div class="absolute top-2 left-0 w-full h-1 bg-yellow-800"></div>
+                            <div class="absolute top-5 left-0 w-full h-1 bg-yellow-800"></div>
+                            <div class="absolute top-8 left-0 w-full h-1 bg-yellow-800"></div>
+                        </div>
+                        
+                        <!-- Symbole digital/wifi au sommet -->
+                        <div class="absolute top-1 left-1/2 transform -translate-x-1/2">
+                            <div class="w-1 h-1 bg-white rounded-full"></div>
+                            <div class="w-3 h-1 bg-white rounded-full mt-0.5 opacity-75"></div>
+                            <div class="w-5 h-1 bg-white rounded-full mt-0.5 opacity-50"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Icône panier shopping moderne -->
+                    <div class="absolute -right-4 -top-2 w-8 h-8 border-2 border-farm-green rounded-lg bg-white shadow-lg flex items-center justify-center">
+                        <div class="w-4 h-3 border border-farm-green rounded-b bg-green-50 relative">
+                            <div class="absolute -top-0.5 left-0.5 w-3 h-1 border border-farm-green border-b-0 rounded-t bg-transparent"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Texte FarmShop -->
+                <div class="ml-6">
+                    <span class="text-4xl font-bold">
+                        <span class="text-red-600">Farm</span><span class="text-farm-green">Shop</span>
+                    </span>
+                    <div class="text-sm text-gray-600 italic">Agriculture connectée</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logo Concept 4: Version minimaliste -->
+        <div class="bg-white p-8 rounded-lg shadow-lg mb-8">
+            <h2 class="text-xl font-semibond mb-4 text-gray-700">Concept 4: Minimaliste & Moderne</h2>
+            <div class="flex items-center justify-center">
+                <div class="relative">
+                    <!-- Cercle avec motif agricole -->
+                    <div class="w-16 h-16 border-4 border-farm-green rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center relative overflow-hidden">
+                        <!-- Soleil -->
+                        <div class="absolute top-1 right-1 w-3 h-3 bg-farm-yellow rounded-full"></div>
+                        
+                        <!-- Collines -->
+                        <div class="absolute bottom-0 left-0 w-full h-6 bg-farm-green rounded-b-full opacity-60"></div>
+                        <div class="absolute bottom-0 right-0 w-10 h-4 bg-green-600 rounded-bl-full opacity-80"></div>
+                        
+                        <!-- Plante/épi -->
+                        <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                            <div class="w-0.5 h-4 bg-farm-brown"></div>
+                            <div class="absolute -top-1 -left-1 w-3 h-2 bg-farm-yellow rounded-full transform rotate-12"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Indicateur shopping -->
+                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-farm-orange rounded-full border-2 border-white flex items-center justify-center">
+                        <div class="w-2 h-2 bg-white rounded-sm"></div>
+                    </div>
+                </div>
+                
+                <!-- Texte FarmShop stylisé -->
+                <div class="ml-4">
+                    <div class="text-3xl font-bold tracking-tight">
+                        <span class="text-farm-green">Farm</span><span class="text-farm-orange">Shop</span>
+                    </div>
+                    <div class="text-xs text-gray-500 tracking-wide uppercase">Marché Bio</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logo Concept 5: Badge style -->
+        <div class="bg-white p-8 rounded-lg shadow-lg">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Concept 5: Badge Authentique</h2>
+            <div class="flex items-center justify-center">
+                <div class="relative">
+                    <!-- Badge principal -->
+                    <div class="w-20 h-20 bg-farm-brown rounded-full border-4 border-farm-yellow relative flex items-center justify-center">
+                        <!-- Texte central -->
+                        <div class="text-center">
+                            <div class="text-xs font-bold text-white leading-tight">FARM</div>
+                            <div class="text-xs font-bold text-farm-yellow leading-tight">SHOP</div>
+                        </div>
+                        
+                        <!-- Éléments décoratifs autour -->
+                        <div class="absolute top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-farm-yellow rounded-full"></div>
+                        <div class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-farm-yellow rounded-full"></div>
+                        <div class="absolute left-1 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-farm-yellow rounded-full"></div>
+                        <div class="absolute right-1 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-farm-yellow rounded-full"></div>
+                    </div>
+                    
+                    <!-- Ruban "FRESH" -->
+                    <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-farm-green text-white text-xs font-bold px-2 py-1 rounded">
+                        FRESH
+                    </div>
+                </div>
+                
+                <!-- Texte d'accompagnement -->
+                <div class="ml-6">
+                    <div class="text-2xl font-bold text-farm-brown">FarmShop</div>
+                    <div class="text-sm text-farm-green font-medium">Produits frais certifiés</div>
+                    <div class="text-xs text-gray-500">Depuis 2024</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions d'utilisation -->
+        <div class="bg-blue-50 p-6 rounded-lg mt-8">
+            <h3 class="text-lg font-semibold text-blue-800 mb-3">Comment utiliser ces logos :</h3>
+            <ul class="text-blue-700 space-y-2">
+                <li>• Copie le code HTML/CSS du concept qui te plaît</li>
+                <li>• Intègre-le dans tes vues Laravel (header, footer, etc.)</li>
+                <li>• Adapte les couleurs selon ta charte graphique</li>
+                <li>• Tu peux redimensionner en modifiant les classes w-* et h-*</li>
+                <li>• Pour la version SVG, on peut exporter le concept choisi</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

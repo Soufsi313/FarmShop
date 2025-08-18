@@ -8,25 +8,25 @@
         
         <!-- En-tête -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ __('app.orders.my_orders') }}</h1>
-            <p class="text-gray-600">{{ __('app.orders.description') }}</p>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Mes Commandes</h1>
+            <p class="text-gray-600">Suivez l'état de vos commandes et gérez vos achats</p>
         </div>
 
         <!-- Filtres -->
         <div class="bg-white rounded-lg shadow p-6 mb-6">
             <div class="flex flex-wrap gap-4 items-center">
                 <div>
-                    <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.orders.filter_by_status') }}</label>
+                    <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">Filtrer par statut</label>
                     <select id="status-filter" onchange="filterByStatus(this.value)" 
                             class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <option value="">{{ __('app.orders.all_statuses') }}</option>
-                        <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>{{ __("app.status.pending") }}</option>
-                        <option value="confirmed" {{ $currentStatus == 'confirmed' ? 'selected' : '' }}>{{ __("app.status.confirmed") }}</option>
-                        <option value="shipped" {{ $currentStatus == 'shipped' ? 'selected' : '' }}>{{ __("app.status.shipped") }}</option>
-                        <option value="delivered" {{ $currentStatus == 'delivered' ? 'selected' : '' }}>{{ __("app.status.delivered") }}</option>
-                        <option value="cancelled" {{ $currentStatus == 'cancelled' ? 'selected' : '' }}>{{ __("app.status.cancelled") }}</option>
-                        <option value="return_requested" {{ $currentStatus == 'return_requested' ? 'selected' : '' }}>{{ __("app.status.return_requested") }}</option>
-                        <option value="returned" {{ $currentStatus == 'returned' ? 'selected' : '' }}>{{ __("app.status.returned") }}</option>
+                        <option value="">Tous les statuts</option>
+                        <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>{{ __("app.status.pending") }}<//option>
+                        <option value="confirmed" {{ $currentStatus == 'confirmed' ? 'selected' : '' }}>Confirmées</option>
+                        <option value="shipped" {{ $currentStatus == 'shipped' ? 'selected' : '' }}>Expédiées</option>
+                        <option value="delivered" {{ $currentStatus == 'delivered' ? 'selected' : '' }}>Livrées</option>
+                        <option value="cancelled" {{ $currentStatus == 'cancelled' ? 'selected' : '' }}>Annulées</option>
+                        <option value="return_requested" {{ $currentStatus == 'return_requested' ? 'selected' : '' }}>Retour demandé</option>
+                        <option value="returned" {{ $currentStatus == 'returned' ? 'selected' : '' }}>Retournées</option>
                     </select>
                 </div>
                 
@@ -34,10 +34,10 @@
                     <label for="sort-filter" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.buttons.sort_by") }}<//label>
                     <select id="sort-filter" onchange="sortBy(this.value)"
                             class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <option value="recent" {{ $currentSort == 'recent' ? 'selected' : '' }}>{{ __('app.orders.sort.most_recent') }}</option>
-                        <option value="oldest" {{ $currentSort == 'oldest' ? 'selected' : '' }}>{{ __('app.orders.sort.oldest') }}</option>
-                        <option value="total_desc" {{ $currentSort == 'total_desc' ? 'selected' : '' }}>{{ __('app.orders.sort.amount_desc') }}</option>
-                        <option value="total_asc" {{ $currentSort == 'total_asc' ? 'selected' : '' }}>{{ __('app.orders.sort.amount_asc') }}</option>
+                        <option value="recent" {{ $currentSort == 'recent' ? 'selected' : '' }}>Plus récentes</option>
+                        <option value="oldest" {{ $currentSort == 'oldest' ? 'selected' : '' }}>Plus anciennes</option>
+                        <option value="total_desc" {{ $currentSort == 'total_desc' ? 'selected' : '' }}>Montant décroissant</option>
+                        <option value="total_asc" {{ $currentSort == 'total_asc' ? 'selected' : '' }}>Montant croissant</option>
                     </select>
                 </div>
             </div>
@@ -82,10 +82,10 @@
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <h3 class="text-lg font-semibold text-gray-900">
-                                {{ __('app.orders.order_number') }} #{{ $order->order_number }}
+                                Commande #{{ $order->order_number }}
                             </h3>
                             <p class="text-sm text-gray-600">
-                                {{ __('app.orders.placed_on') }} {{ $order->created_at->format('d/m/Y à H:i') }}
+                                Passée le {{ $order->created_at->format('d/m/Y à H:i') }}
                             </p>
                         </div>
                         
@@ -123,14 +123,14 @@
                         <div class="flex flex-wrap gap-2">
                             @foreach($order->items->take(3) as $item)
                             <div class="flex items-center space-x-2 bg-gray-50 rounded-lg px-3 py-2">
-                                <span class="text-sm">{{ $item->product ? trans_product($item->product, 'name') : ($item->product_name ?? 'Produit supprimé') }}</span>
+                                <span class="text-sm">{{ $item->product_name }}</span>
                                 <span class="text-xs text-gray-600">×{{ $item->quantity }}</span>
                             </div>
                             @endforeach
                             
                             @if($order->items->count() > 3)
                             <div class="flex items-center px-3 py-2 text-sm text-gray-600">
-                                +{{ $order->items->count() - 3 }} {{ __('app.orders.other_items') }}
+                                +{{ $order->items->count() - 3 }} autres articles
                             </div>
                             @endif
                         </div>
@@ -149,7 +149,7 @@
                             <a x-show="order.payment_status === 'paid' && order.invoice_number" 
                                href="{{ route('orders.invoice', $order) }}" 
                                class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                📄 {{ __('app.orders.download_invoice') }}
+                                📄 Télécharger la facture
                             </a>
 
                             <!-- Annuler la commande (si pas encore expédiée) -->

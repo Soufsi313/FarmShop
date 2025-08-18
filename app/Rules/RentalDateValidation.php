@@ -46,9 +46,10 @@ class RentalDateValidation implements ValidationRule
 
     private function validateStartDate(Carbon $date, Closure $fail): void
     {
-        // Vérifier que la date n'est pas aujourd'hui ou dans le passé
-        if ($date->lte(now()->startOfDay())) {
-            $fail("La location ne peut pas commencer aujourd'hui. Date minimum : " . now()->addDay()->format('d/m/Y'));
+        // MODIFICATION TEMPORAIRE POUR TESTS : Autoriser les locations le jour même
+        // Vérifier que la date n'est pas dans le passé (permettre aujourd'hui)
+        if ($date->lt(now()->startOfDay())) {
+            $fail("La location ne peut pas commencer dans le passé. Date minimum : " . now()->format('d/m/Y'));
             return;
         }
 
@@ -67,9 +68,10 @@ class RentalDateValidation implements ValidationRule
             return; // Cannot validate end date without start date
         }
 
-        // Vérifier que la date de fin est après la date de début
-        if ($date->lte($this->startDate)) {
-            $fail("La date de fin doit être après la date de début");
+        // MODIFICATION TEMPORAIRE POUR TESTS : Permettre les locations d'un jour  
+        // Vérifier que la date de fin est après ou égale à la date de début
+        if ($date->lt($this->startDate)) {
+            $fail("La date de fin doit être après ou égale à la date de début");
             return;
         }
 

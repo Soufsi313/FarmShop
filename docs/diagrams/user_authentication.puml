@@ -1,0 +1,80 @@
+@startuml User_Authentication
+
+!theme plain
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+
+' Configuration des couleurs
+skinparam class {
+    BackgroundColor<<User>> #E3F2FD
+    BorderColor<<User>> #1976D2
+    BackgroundColor<<Other>> #F5F5F5
+    BorderColor<<Other>> #757575
+}
+
+skinparam arrow {
+    Color #2196F3
+    FontColor #1976D2
+}
+
+title User & Authentication System
+
+' ============================
+' UTILISATEURS & AUTHENTIFICATION
+' ============================
+
+class User <<User>> {
+  + id : Integer
+  + username : String
+  + name : String  
+  + email : String
+  + password : String
+  + role : Enum(Admin, User)
+  + newsletter_subscribed : Boolean
+  + phone : String
+  + address : String
+  + address_line_2 : String
+  + city : String
+  + postal_code : String
+  + country : String
+  + email_verified_at : DateTime
+  + remember_token : String
+  + created_at : DateTime
+  + updated_at : DateTime
+  + deleted_at : DateTime
+}
+
+class Cookie <<Other>> {
+  + id : Integer
+  + name : String
+  + value : Text
+  + expires_at : DateTime
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class Message <<Other>> {
+  + id : Integer
+  + name : String
+  + email : String
+  + subject : String
+  + message : Text
+  + is_read : Boolean
+  + admin_reply : Text
+  + replied_at : DateTime
+  + replied_by : Integer [FK]
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+' ============================
+' RELATIONS
+' ============================
+
+User ||--o{ Message : "0..* répond_à"
+
+note right of User : "Utilisateur principal du système\navec authentification complète"
+note right of Cookie : "Gestion des sessions\net préférences utilisateur"
+note right of Message : "Système de contact\net communication"
+
+@enduml

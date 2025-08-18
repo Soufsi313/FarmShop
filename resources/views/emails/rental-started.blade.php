@@ -18,7 +18,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 Votre location a démarré !</h1>
+            <h1>� Votre location a démarré !</h1>
             <p>Commande {{ $orderLocation->order_number }}</p>
         </div>
         
@@ -27,20 +27,11 @@
             
             <div class="alert">
                 <strong>🎉 Excellente nouvelle !</strong><br>
-                Votre location a officiellement démarré aujourd'hui et est maintenant <strong>ACTIVE</strong>.
+                Votre location a officiellement commencé aujourd'hui.
             </div>
             
-            <h3>📋 Détails de votre location :</h3>
-            <ul>
-                <li><strong>Numéro de commande :</strong> {{ $orderLocation->order_number }}</li>
-                <li><strong>Date de début :</strong> {{ $orderLocation->start_date->format('d/m/Y') }}</li>
-                <li><strong>Date de fin :</strong> {{ $orderLocation->end_date->format('d/m/Y') }}</li>
-                <li><strong>Durée :</strong> {{ $orderLocation->start_date->diffInDays($orderLocation->end_date) + 1 }} jour(s)</li>
-                <li><strong>Statut :</strong> <span style="color: #28a745; font-weight: bold;">ACTIVE</span></li>
-            </ul>
-            
-            <h3>📦 Articles en location :</h3>
-            @foreach($items as $item)
+            <h3>� Vos articles en location :</h3>
+            @foreach($orderLocation->orderItemLocations as $item)
             <div class="item">
                 <strong>{{ $item->product->name }}</strong><br>
                 Quantité : {{ $item->quantity }}<br>

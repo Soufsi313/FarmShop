@@ -1,0 +1,69 @@
+Phase,Tâche,Dépendance,Importance,Validation
+Initialisation,Analyse et choix du sujet,,5,Remise du livrable sur Chamilo
+Initialisation,Etude de marché,Analyse et choix du sujet,3,Conseil d'un spécialiste agricole
+Initialisation,Réalisation du support de présentation orale,Analyse et choix du sujet,5,Remise du livrable sur Chamilo
+Initialisation,Etude de faisabilité et Business Plan,Etude de marché,4,Remise du livrable sur Chamilo
+Définition,Cahier des charges fonctionnels,Etude de faisabilité,5,Remise du livrable sur Chamilo
+Planification,Organigramme des tâches,Cahier des charges fonctionnels,3,Remise du livrable sur Chamilo
+Planification,Planning prévisionnel,Organigramme des tâches,5,Remise du livrable sur Chamilo
+Conception,Analyse UML V1,Cahier des charges fonctionnels,5,Remise du livrable sur Chamilo
+Conception,Analyse UML V2,Analyse UML V1,5,Remise du livrable sur Chamilo
+Conception,Schéma de base de données,Analyse UML V2,5,Remise du livrable sur Chamilo
+Conception,Dictionnaire de données,Schéma de base de données,4,Remise du livrable sur Chamilo
+Conception,Rapport écrit V1,Dictionnaire de données,5,Remise du livrable sur Chamilo
+Conception,Analyse UML V3,Rapport écrit V1,5,Remise du livrable sur Chamilo
+Conception,Maquettes fonctionnelles,Cahier des charges fonctionnels,4,Recherche ergonomie
+Conception,Maquettes graphiques,Maquettes fonctionnelles,4,Police et couleurs adaptées
+Conception,Vectorisation du logo,,5,Logo adaptable
+Conception,Rapport conception graphique,Maquettes graphiques,5,Remise du livrable sur Chamilo
+Conception,Prototype navigable,Rapport conception graphique,5,Validation navigation
+Conception,Stratégie de sécurité,Etude de faisabilité,5,Remise du livrable sur Chamilo
+Conception,Stratégie de référencement,Etude de faisabilité,4,Remise du livrable sur Chamilo
+Conception,Aspect juridique,Etude de faisabilité,4,Remise du livrable sur Chamilo
+Conception,Synthèse progiciels et solutions,,5,Remise du livrable sur Chamilo
+Infrastructure,Installer le framework,Synthèse progiciels et solutions,5,
+Infrastructure,Configurer et tester le framework,Installer le framework,5,
+Développement,Implémentation base de données,Configurer le framework,5,PhpMyAdmin
+Développement,Encodage jeu de données,Configurer le framework,4,PhpMyAdmin
+Développement,Tests principales requêtes,Encodage jeu de données,5,CRUD
+Développement,Export base de données,Tests principales requêtes,3,Remise du livrable sur Chamilo
+Développement,Implémenter API/back-office,Implémentation base de données,5,Versionning Github
+Développement,Documenter l'API,Implémenter API/back-office,5,Remise du livrable sur Chamilo
+Développement,Templates responsive,Rapport conception graphique,3,
+Développement,Adapter templates principaux,Templates responsive,5,Données fictives
+Développement,Mapping objet relationnel,Synthèse progiciels et solutions,5,Versionning Github
+Développement,CRUD modèle simple,Synthèse progiciels et solutions,5,Versionning Github
+Développement,Intégrer librairies JS,Recherche progiciels et solutions,3,Versionning Github
+Développement,Mapping relationnel complet,Implémentation base de données,5,Versionning Github
+Développement,Versionning code,Implémenter API,5,Remise du livrable sur Chamilo
+Développement,Intégration design,Rapport conception graphique,5,Données similaires
+Développement,Pages principales,Rapport conception graphique,5,
+Développement,Archiver le site,,5,Versionning Github
+Développement,Gestion utilisateurs,Développement back-office,5,Versionning Github
+Développement,Catalogue produit,Développement back-office,5,Versionning Github
+Développement,Articles de blog,Implémentation API/back-office,5,Versionning Github
+Développement,Facturation,Pages principales,3,Versionning Github
+Développement,Newsletter,Implémentation API/back-office,5,Versionning Github
+Développement,Contact admin,Gestion utilisateurs,4,Versionning Github
+Développement,Changer langue,Implémentation API/back-office,3,Versionning Github
+Développement,Wishlist,Implémentation API/back-office,5,Versionning Github
+Développement,Passer/annuler commande,Implémentation API/back-office,5,Versionning Github
+Développement,CRUD produit,Implémentation API/back-office,5,Versionning Github
+Développement,CRUD blog,Implémentation API/back-office,5,Versionning Github
+Développement,CRUD utilisateurs,Implémentation API/back-office,5,Versionning Github
+Développement,Support client,Implémentation API/back-office,5,Versionning Github
+Développement,Navigation fluide,Implémentation API/back-office,4,Versionning Github
+Développement,Gestion cookies,Pages principales,4,Versionning Github
+Développement,Déconnexion auto,Pages principales,2,Versionning Github
+Développement,Sécuriser données,Pages principales,5,Versionning Github
+Développement,Pénalités retards,Pages principales,3,Versionning Github
+Développement,Pénalités dégâts,Pages principales,3,Versionning Github
+Développement,CRUD cookies,Pages principales,3,Versionning Github
+Tests,Tests unitaires backend,,5,
+Tests,Tests unitaires frontend,,5,
+Tests,Tests d'intégration,,5,
+Bilan,Support présentation orale,Finaliser rapport écrit,5,Remise du livrable sur Chamilo
+Bilan,Archiver le site,Release du site,5,Remise du livrable sur Chamilo
+Bilan,Déployer et tester le site,Archiver le site,5,
+Bilan,Rédiger documentation,Déployer et tester le site,4,Remise du livrable sur Chamilo
+Bilan,Finaliser rapport écrit,Rédiger documentation,5,Remise du livrable sur Chamilo

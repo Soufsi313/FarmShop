@@ -46,7 +46,9 @@
                             700: '#977669',
                             800: '#846358',
                             900: '#43302b',
-                        }
+                        },
+                        'farm-orange': '#ea580c',
+                        'farm-yellow': '#eab308'
                     },
                     fontFamily: {
                         'sans': ['Inter', 'ui-sans-serif', 'system-ui'],
@@ -376,23 +378,27 @@
     @stack('styles')
 </head>
 <body class="h-full bg-gray-50" x-data="{ mobileMenuOpen: false }">
-    <!-- Header -->
+    <!-- Bannière Logo FarmShop -->
+    <div class="hidden md:block bg-gradient-to-r from-farm-green-50 via-white to-farm-green-50 border-b border-farm-green-100">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex justify-center">
+                <x-logo size="xl" linkTo="/" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
     <header class="bg-white shadow-sm sticky top-0 z-40">
         <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex-shrink-0">
-                    <a href="/" class="flex items-center">
-                        <svg class="h-8 w-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-                        </svg>
-                        <span class="ml-2 text-xl font-bold text-gray-900">FarmShop</span>
-                    </a>
+                <!-- Logo pour mobile seulement -->
+                <div class="flex-shrink-0 flex items-center md:hidden">
+                    <x-logo size="md" linkTo="/" />
                 </div>
 
                 <!-- Navigation principale (desktop) -->
                 <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
+                    <div class="ml-10 flex items-center space-x-4">
                         <a href="/" class="text-gray-900 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>

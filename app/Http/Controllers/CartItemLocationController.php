@@ -146,12 +146,17 @@ class CartItemLocationController extends Controller
             'end_date' => [
                 'required', 
                 'date',
-                'after:start_date',
+                // MODIFICATION TEMPORAIRE POUR TESTS : Permettre les locations d'un jour
+                'after_or_equal:start_date',
                 new RentalDateValidation($cartItemLocation->product, 
                     $request->start_date ? Carbon::parse($request->start_date) : null, 
                     null, 
                     'end')
             ]
+        ], [
+            'end_date.after_or_equal' => 'La date de fin doit être postérieure ou égale à la date de début',
+            'start_date.required' => 'La date de début est obligatoire',
+            'end_date.required' => 'La date de fin est obligatoire',
         ]);
 
         try {

@@ -50,7 +50,12 @@ class RentalConstraintController extends Controller
 
         $validated = $request->validate([
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date'
+            // MODIFICATION TEMPORAIRE POUR TESTS : Permettre les locations d'un jour
+            'end_date' => 'required|date|after_or_equal:start_date'
+        ], [
+            'end_date.after_or_equal' => 'La date de fin doit être postérieure ou égale à la date de début',
+            'start_date.required' => 'La date de début est obligatoire',
+            'end_date.required' => 'La date de fin est obligatoire',
         ]);
 
         $startDate = Carbon::parse($validated['start_date']);

@@ -1,0 +1,4758 @@
+{
+    "tables": [
+        {
+            "name": "blog_categories",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "name",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "slug",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "color",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "#28a745"
+                },
+                {
+                    "name": "icon",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "featured_image",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "is_active",
+                    "type": "tinyint(1)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "sort_order",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "meta_title",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_keywords",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "posts_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "views_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "created_by",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "blog_comment_reports",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "blog_comment_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "reported_by",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "reason",
+                    "type": "enum('spam','inappropriate_content','harassment','hate_speech','false_information','copyright_violation','other')",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "additional_info",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "status",
+                    "type": "enum('pending','reviewed','resolved','dismissed')",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "pending"
+                },
+                {
+                    "name": "admin_notes",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "reviewed_by",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "reviewed_at",
+                    "type": "timestamp",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "action_taken",
+                    "type": "enum('none','warning_sent','comment_hidden','comment_deleted','user_warned','user_suspended','user_banned')",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "priority",
+                    "type": "enum('low','medium','high','urgent')",
+                    "key": "",
+                    "nullable": false,
+                    "default": "medium"
+                },
+                {
+                    "name": "reporter_ip",
+                    "type": "varchar(45)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "reporter_user_agent",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "evidence",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "blog_comments",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "blog_post_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "user_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "parent_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "content",
+                    "type": "text",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "original_content",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "status",
+                    "type": "enum('pending','approved','rejected','spam')",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "pending"
+                },
+                {
+                    "name": "rejection_reason",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "moderated_by",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "moderated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "guest_name",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "guest_email",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "guest_website",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "ip_address",
+                    "type": "varchar(45)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "user_agent",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "likes_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "replies_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "is_pinned",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "reports_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "is_reported",
+                    "type": "tinyint(1)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "is_edited",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "edited_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "blog_post_translations",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "blog_post_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "locale",
+                    "type": "varchar(2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "title",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "excerpt",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "content",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "blog_posts",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "blog_category_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "title",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "title_en",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "title_nl",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "slug",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "slug_en",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "slug_nl",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "excerpt",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "excerpt_en",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "excerpt_nl",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "content",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "content_en",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "content_nl",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "featured_image",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "gallery",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "status",
+                    "type": "enum('draft','published','scheduled','archived')",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "draft"
+                },
+                {
+                    "name": "published_at",
+                    "type": "timestamp",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "scheduled_for",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_title",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_title_en",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_title_nl",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_description_en",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_description_nl",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_keywords",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_keywords_en",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_keywords_nl",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "tags",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "views_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "likes_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "shares_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "comments_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "reading_time",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "allow_comments",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "is_featured",
+                    "type": "tinyint(1)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "is_sticky",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "author_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "last_edited_by",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "last_edited_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "cart_item_locations",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "cart_location_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "start_date",
+                    "type": "date",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "end_date",
+                    "type": "date",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "duration_days",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "quantity",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "unit_price_per_day",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "unit_deposit",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "subtotal_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "subtotal_deposit",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "tva_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "total_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_name",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_sku",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "rental_category_name",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "notes",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "is_available",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "availability_checked_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "cart_items",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "cart_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_name",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_category",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "unit_price",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "quantity",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "subtotal",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "tax_rate",
+                    "type": "decimal(5,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "20.00"
+                },
+                {
+                    "name": "is_available",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "availability_checked_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "tax_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "total",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "special_offer_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "original_unit_price",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "discount_percentage",
+                    "type": "decimal(5,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "discount_amount",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "cart_locations",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "user_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "total_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "total_deposit",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "total_tva",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "total_with_tax",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "total_items",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "total_quantity",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "default_start_date",
+                    "type": "date",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "default_end_date",
+                    "type": "date",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "default_duration_days",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "notes",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "carts",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "user_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "subtotal",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "tax_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "shipping_cost",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "free_shipping_eligible",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "total",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "tax_rate",
+                    "type": "decimal(5,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "20.00"
+                },
+                {
+                    "name": "total_items",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "status",
+                    "type": "enum('active','abandoned','converted')",
+                    "key": "",
+                    "nullable": false,
+                    "default": "active"
+                },
+                {
+                    "name": "expires_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "categories",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "name",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_title",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "icon",
+                    "type": "varchar(10)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "display_order",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "food_type",
+                    "type": "enum('alimentaire','non_alimentaire')",
+                    "key": "",
+                    "nullable": false,
+                    "default": "alimentaire"
+                },
+                {
+                    "name": "is_returnable",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "slug",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "is_active",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "comment_translations",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "comment_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "locale",
+                    "type": "varchar(2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "content",
+                    "type": "text",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "cookies",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "user_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "session_id",
+                    "type": "varchar(255)",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "ip_address",
+                    "type": "varchar(45)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "user_agent",
+                    "type": "text",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "necessary",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "analytics",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "marketing",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "preferences",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "social_media",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "accepted_at",
+                    "type": "timestamp",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "rejected_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "last_updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "migrated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "preferences_details",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "consent_version",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "1.0"
+                },
+                {
+                    "name": "status",
+                    "type": "enum('pending','accepted','rejected','partial')",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "pending"
+                },
+                {
+                    "name": "page_url",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "referer",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "browser_info",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "email_logs",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "email_type",
+                    "type": "varchar(255)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "order_location_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "recipient_email",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "status",
+                    "type": "enum('sent','failed')",
+                    "key": "",
+                    "nullable": false,
+                    "default": "sent"
+                },
+                {
+                    "name": "details",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "messages",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "user_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "sender_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "type",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "system"
+                },
+                {
+                    "name": "subject",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "content",
+                    "type": "text",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "status",
+                    "type": "enum('unread','read','archived')",
+                    "key": "",
+                    "nullable": false,
+                    "default": "unread"
+                },
+                {
+                    "name": "priority",
+                    "type": "enum('low','normal','high','urgent')",
+                    "key": "",
+                    "nullable": false,
+                    "default": "normal"
+                },
+                {
+                    "name": "read_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "archived_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "is_important",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "action_url",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "action_label",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "newsletter_sends",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "newsletter_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "user_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "email",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "status",
+                    "type": "enum('pending','sent','failed','bounced')",
+                    "key": "",
+                    "nullable": false,
+                    "default": "pending"
+                },
+                {
+                    "name": "sent_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "failure_reason",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "error_message",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "is_opened",
+                    "type": "tinyint(1)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "opened_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "open_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "last_opened_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "is_clicked",
+                    "type": "tinyint(1)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "clicked_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "click_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "last_clicked_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "is_unsubscribed",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "unsubscribed_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "tracking_token",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "unsubscribe_token",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "tracking_url",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "unsubscribe_url",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "newsletter_subscriptions",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "user_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "is_subscribed",
+                    "type": "tinyint(1)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "subscribed_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "unsubscribed_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "unsubscribe_reason",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "unsubscribe_token",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "preferences",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "source",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "newsletters",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "title",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "subject",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "content",
+                    "type": "text",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "excerpt",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "featured_image",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "status",
+                    "type": "enum('draft','scheduled','sent','cancelled')",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "draft"
+                },
+                {
+                    "name": "scheduled_at",
+                    "type": "timestamp",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "sent_at",
+                    "type": "timestamp",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "recipients_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "sent_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "failed_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "opened_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "clicked_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "unsubscribed_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "tags",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "is_template",
+                    "type": "tinyint(1)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "template_name",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_by",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "updated_by",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "order_item_locations",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "order_location_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_name",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_sku",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "product_description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "quantity",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "daily_rate",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "rental_days",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "deposit_per_item",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "subtotal",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "total_deposit",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "tax_amount",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "total_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "condition_at_pickup",
+                    "type": "enum('excellent','good','fair','poor')",
+                    "key": "",
+                    "nullable": false,
+                    "default": "excellent"
+                },
+                {
+                    "name": "condition_at_return",
+                    "type": "enum('excellent','good','fair','poor')",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "item_damage_cost",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "item_inspection_notes",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "damage_details",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "item_late_days",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "item_late_fees",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "item_deposit_refund",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "penalty_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                }
+            ]
+        },
+        {
+            "name": "order_items",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "order_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_name",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_sku",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "product_description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "product_image",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "product_category",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "special_offer_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "original_unit_price",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "discount_percentage",
+                    "type": "decimal(5,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "discount_amount",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "quantity",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "unit_price",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "total_price",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "tax_rate",
+                    "type": "decimal(5,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "21.00"
+                },
+                {
+                    "name": "subtotal",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "tax_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "status",
+                    "type": "enum('pending','confirmed','preparing','shipped','delivered','cancelled','returned','return_requested')",
+                    "key": "",
+                    "nullable": true,
+                    "default": "pending"
+                },
+                {
+                    "name": "status_updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "is_returnable",
+                    "type": "tinyint(1)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "is_returned",
+                    "type": "tinyint(1)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "returned_quantity",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "return_deadline",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "tracking_number",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "shipped_at",
+                    "type": "timestamp",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "delivered_at",
+                    "type": "timestamp",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "can_be_cancelled",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "cancelled_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "cancellation_reason",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "order_locations",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "order_number",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "invoice_number",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "invoice_generated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "user_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "start_date",
+                    "type": "date",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "end_date",
+                    "type": "date",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "rental_days",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "daily_rate",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "total_rental_cost",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "deposit_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "penalty_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "late_fee_per_day",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "10.00"
+                },
+                {
+                    "name": "tax_rate",
+                    "type": "decimal(5,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "21.00"
+                },
+                {
+                    "name": "subtotal",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "tax_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "total_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "status",
+                    "type": "enum('pending','confirmed','active','completed','closed','inspecting','finished','cancelled')",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "pending"
+                },
+                {
+                    "name": "payment_status",
+                    "type": "enum('pending','deposit_paid','paid','failed','refunded','partial_refund')",
+                    "key": "",
+                    "nullable": false,
+                    "default": "pending"
+                },
+                {
+                    "name": "payment_details",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "paid_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deposit_status",
+                    "type": "enum('none','authorized','captured','released')",
+                    "key": "",
+                    "nullable": false,
+                    "default": "none"
+                },
+                {
+                    "name": "deposit_captured_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deposit_captured_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deposit_cancelled_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "payment_method",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "stripe_payment_intent_id",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "payment_reference",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "billing_address",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "delivery_address",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "late_days",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "late_fees",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "actual_return_date",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "inspection_status",
+                    "type": "enum('pending','in_progress','completed')",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "product_condition",
+                    "type": "enum('excellent','good','poor')",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "damage_cost",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "total_penalties",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "deposit_refund",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "inspection_notes",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "inspection_completed_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "inspected_by",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "notes",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "cancellation_reason",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "confirmed_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "frontend_confirmed",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "frontend_confirmed_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "started_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "reminder_sent_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "ended_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "overdue_notification_sent_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "completed_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "last_completed_email_sent_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "closed_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "cancelled_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "returned_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "stripe_deposit_authorization_id",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "order_returns",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "order_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "order_item_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "user_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "return_number",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "quantity_returned",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "reason",
+                    "type": "enum('defective','wrong_item','not_as_described','changed_mind','damaged_shipping','other')",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "images",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "status",
+                    "type": "enum('requested','approved','rejected','item_received','inspected','refunded','cancelled')",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "requested"
+                },
+                {
+                    "name": "status_history",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "status_updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "requested_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "approved_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "item_received_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "inspected_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "refunded_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "refund_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "refund_method",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "refund_transaction_id",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "refund_processed",
+                    "type": "tinyint(1)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "return_shipping_address",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "return_tracking_number",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "return_shipping_cost",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "inspection_result",
+                    "type": "enum('approved','rejected','partial')",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "inspection_notes",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "inspection_images",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "inspected_by",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "approved_by",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "admin_notes",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "rejection_reason",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "email_notifications_sent",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "last_notification_sent_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "order_status_transitions",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "order_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "from_status",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "to_status",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "scheduled_at",
+                    "type": "timestamp",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "executed",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "executed_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "orders",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "order_number",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "user_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "status",
+                    "type": "enum('pending','confirmed','preparing','shipped','delivered','cancelled','returned','return_requested')",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": "pending"
+                },
+                {
+                    "name": "status_history",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "status_updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "billing_address",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "shipping_address",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "subtotal",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "tax_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "shipping_cost",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "discount_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0.00"
+                },
+                {
+                    "name": "total_amount",
+                    "type": "decimal(10,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "payment_method",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "stripe_payment_intent_id",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "payment_status",
+                    "type": "enum('pending','paid','failed','refunded')",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": "pending"
+                },
+                {
+                    "name": "payment_details",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "payment_transaction_id",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "paid_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "shipping_method",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "tracking_number",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "shipped_at",
+                    "type": "timestamp",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "delivered_at",
+                    "type": "timestamp",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "estimated_delivery",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "can_be_cancelled",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "can_be_returned",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "cancelled_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "return_reason",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "return_requested_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "return_processed_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "return_processed_by",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "refund_processed",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "refund_processed_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "refund_stripe_id",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "cancellation_reason",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "has_returnable_items",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "has_non_returnable_items",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "return_deadline",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "invoice_number",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "invoice_generated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "email_notifications_sent",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "last_notification_sent_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "metadata",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "notes",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "product_likes",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "user_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "products",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "name",
+                    "type": "varchar(255)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "short_description",
+                    "type": "varchar(500)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "slug",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "sku",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "price",
+                    "type": "decimal(10,2)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "rental_price_per_day",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deposit_amount",
+                    "type": "decimal(8,2)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "min_rental_days",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "max_rental_days",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "7"
+                },
+                {
+                    "name": "available_days",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "type",
+                    "type": "enum('sale','rental','both')",
+                    "key": "",
+                    "nullable": false,
+                    "default": "sale"
+                },
+                {
+                    "name": "is_rental_available",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "weight",
+                    "type": "decimal(8,3)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "dimensions",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "quantity",
+                    "type": "int(11)",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "rental_stock",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "critical_threshold",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "5"
+                },
+                {
+                    "name": "low_stock_threshold",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "out_of_stock_threshold",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "unit_symbol",
+                    "type": "enum('kg','pi\u00e8ce','litre','gramme','tonne')",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "main_image",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "image_alt",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "gallery_images",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "images",
+                    "type": "longtext",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "is_active",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "is_featured",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "likes_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "views_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "category_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "rental_category_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_title",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_keywords",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "rental_categories",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "name",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_title",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "meta_description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "icon",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "display_order",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "slug",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "is_active",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "special_offers",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "name",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "description",
+                    "type": "text",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "product_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "minimum_quantity",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "discount_percentage",
+                    "type": "decimal(5,2)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "start_date",
+                    "type": "datetime",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "end_date",
+                    "type": "datetime",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "is_active",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "1"
+                },
+                {
+                    "name": "usage_count",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "usage_limit",
+                    "type": "int(11)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "users",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "username",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "name",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "email",
+                    "type": "varchar(255)",
+                    "key": "UNI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "phone",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "address",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "address_line_2",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "city",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "postal_code",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "country",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "France"
+                },
+                {
+                    "name": "email_verified_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "password",
+                    "type": "varchar(255)",
+                    "key": "",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "role",
+                    "type": "enum('Admin','User')",
+                    "key": "",
+                    "nullable": false,
+                    "default": "User"
+                },
+                {
+                    "name": "newsletter_subscribed",
+                    "type": "tinyint(1)",
+                    "key": "",
+                    "nullable": false,
+                    "default": "0"
+                },
+                {
+                    "name": "newsletter_subscribed_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "remember_token",
+                    "type": "varchar(100)",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "deleted_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        },
+        {
+            "name": "wishlists",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint(20) unsigned",
+                    "key": "PRI",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "user_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "product_id",
+                    "type": "bigint(20) unsigned",
+                    "key": "MUL",
+                    "nullable": false,
+                    "default": null
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "key": "",
+                    "nullable": true,
+                    "default": null
+                }
+            ]
+        }
+    ],
+    "relations": [
+        {
+            "from_table": "blog_categories",
+            "from_column": "created_by",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "blog_comment_reports",
+            "from_column": "blog_comment_id",
+            "to_table": "blog_comments",
+            "to_column": "id"
+        },
+        {
+            "from_table": "blog_comment_reports",
+            "from_column": "reported_by",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "blog_comment_reports",
+            "from_column": "reviewed_by",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "blog_comments",
+            "from_column": "blog_post_id",
+            "to_table": "blog_posts",
+            "to_column": "id"
+        },
+        {
+            "from_table": "blog_comments",
+            "from_column": "moderated_by",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "blog_comments",
+            "from_column": "parent_id",
+            "to_table": "blog_comments",
+            "to_column": "id"
+        },
+        {
+            "from_table": "blog_comments",
+            "from_column": "user_id",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "blog_post_translations",
+            "from_column": "blog_post_id",
+            "to_table": "blog_posts",
+            "to_column": "id"
+        },
+        {
+            "from_table": "blog_posts",
+            "from_column": "author_id",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "blog_posts",
+            "from_column": "blog_category_id",
+            "to_table": "blog_categories",
+            "to_column": "id"
+        },
+        {
+            "from_table": "blog_posts",
+            "from_column": "last_edited_by",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "cart_item_locations",
+            "from_column": "cart_location_id",
+            "to_table": "cart_locations",
+            "to_column": "id"
+        },
+        {
+            "from_table": "cart_item_locations",
+            "from_column": "product_id",
+            "to_table": "products",
+            "to_column": "id"
+        },
+        {
+            "from_table": "cart_items",
+            "from_column": "cart_id",
+            "to_table": "carts",
+            "to_column": "id"
+        },
+        {
+            "from_table": "cart_items",
+            "from_column": "product_id",
+            "to_table": "products",
+            "to_column": "id"
+        },
+        {
+            "from_table": "cart_items",
+            "from_column": "special_offer_id",
+            "to_table": "special_offers",
+            "to_column": "id"
+        },
+        {
+            "from_table": "cart_locations",
+            "from_column": "user_id",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "carts",
+            "from_column": "user_id",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "cookies",
+            "from_column": "user_id",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "messages",
+            "from_column": "sender_id",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "messages",
+            "from_column": "user_id",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "newsletter_sends",
+            "from_column": "newsletter_id",
+            "to_table": "newsletters",
+            "to_column": "id"
+        },
+        {
+            "from_table": "newsletter_sends",
+            "from_column": "user_id",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "newsletter_subscriptions",
+            "from_column": "user_id",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "newsletters",
+            "from_column": "created_by",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "newsletters",
+            "from_column": "updated_by",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "order_item_locations",
+            "from_column": "order_location_id",
+            "to_table": "order_locations",
+            "to_column": "id"
+        },
+        {
+            "from_table": "order_item_locations",
+            "from_column": "product_id",
+            "to_table": "products",
+            "to_column": "id"
+        },
+        {
+            "from_table": "order_items",
+            "from_column": "order_id",
+            "to_table": "orders",
+            "to_column": "id"
+        },
+        {
+            "from_table": "order_items",
+            "from_column": "product_id",
+            "to_table": "products",
+            "to_column": "id"
+        },
+        {
+            "from_table": "order_items",
+            "from_column": "special_offer_id",
+            "to_table": "special_offers",
+            "to_column": "id"
+        },
+        {
+            "from_table": "order_locations",
+            "from_column": "inspected_by",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "order_locations",
+            "from_column": "user_id",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "order_returns",
+            "from_column": "approved_by",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "order_returns",
+            "from_column": "inspected_by",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "order_returns",
+            "from_column": "order_id",
+            "to_table": "orders",
+            "to_column": "id"
+        },
+        {
+            "from_table": "order_returns",
+            "from_column": "order_item_id",
+            "to_table": "order_items",
+            "to_column": "id"
+        },
+        {
+            "from_table": "order_returns",
+            "from_column": "user_id",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "order_status_transitions",
+            "from_column": "order_id",
+            "to_table": "orders",
+            "to_column": "id"
+        },
+        {
+            "from_table": "orders",
+            "from_column": "user_id",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "product_likes",
+            "from_column": "product_id",
+            "to_table": "products",
+            "to_column": "id"
+        },
+        {
+            "from_table": "product_likes",
+            "from_column": "user_id",
+            "to_table": "users",
+            "to_column": "id"
+        },
+        {
+            "from_table": "products",
+            "from_column": "category_id",
+            "to_table": "categories",
+            "to_column": "id"
+        },
+        {
+            "from_table": "products",
+            "from_column": "rental_category_id",
+            "to_table": "rental_categories",
+            "to_column": "id"
+        },
+        {
+            "from_table": "special_offers",
+            "from_column": "product_id",
+            "to_table": "products",
+            "to_column": "id"
+        },
+        {
+            "from_table": "wishlists",
+            "from_column": "product_id",
+            "to_table": "products",
+            "to_column": "id"
+        },
+        {
+            "from_table": "wishlists",
+            "from_column": "user_id",
+            "to_table": "users",
+            "to_column": "id"
+        }
+    ]
+}

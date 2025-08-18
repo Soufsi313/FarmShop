@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votre location a démarré</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background-color: #f3f4f6;
+        }
+        
+        .email-container {
+            max-width: 650px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #374151;
+        }
+        
+        .greeting .name {
+            color: #059669;
+            font-weight: 600;
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-left: 5px solid #10b981;
+            border-radius: 0 8px 8px 0;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);
+        }
+        
+        .alert-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .alert-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+        
+        .alert-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #065f46;
+        }
+        
+        .alert-text {
+            color: #047857;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        .status-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .order-details {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 5px solid #3b82f6;
+            border-radius: 0 12px 12px 0;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 20px;
+        }
+        
+        .section-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #1e40af;
+        }
+        
+        .detail-value {
+            color: #1f2937;
+            font-weight: 500;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            color: #059669;
+            font-weight: 700;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .items-section {
+            margin-bottom: 30px;
+        }
+        
+        .items-title {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        
+        .item-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .item-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+        
+        .item-icon {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            color: #059669;
+            border-radius: 50%;
+            padding: 12px;
+            margin-right: 16px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .item-details {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+            font-size: 16px;
+        }
+        
+        .item-info {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .info-section {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 5px solid #f59e0b;
+            border-radius: 0 8px 8px 0;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .info-title {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 15px;
+        }
+        
+        .info-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            color: #92400e;
+        }
+        
+        .info-bullet {
+            color: #f59e0b;
+            margin-right: 10px;
+            margin-top: 2px;
+            font-weight: bold;
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .cta-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .cta-text {
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background-color: #ffffff;
+            color: #059669;
+            font-weight: 600;
+            padding: 14px 28px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .cta-button:hover {
+            background-color: #f9fafb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+        
+        .contact-section {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .contact-title {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .contact-text {
+            color: #4b5563;
+            margin-bottom: 20px;
+        }
+        
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            color: #6b7280;
+        }
+        
+        .contact-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            fill: currentColor;
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .footer-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .footer-text {
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 8px;
+        }
+        
+        .footer-note {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            
+            .content, .header {
+                padding: 25px 20px;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            
+            .contact-info {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <span class="header-icon">🚀</span>
+                <h1>Votre location a démarré !</h1>
+                <p>Commande LOC-202508137698</p>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Greeting -->
+            <div class="greeting">
+                Bonjour <span class="name">Meftah Soufiane</span>,
+            </div>
+
+            <!-- Success Alert -->
+            <div class="alert-success">
+                <div class="alert-header">
+                    <span class="alert-icon">🎉</span>
+                    <h2 class="alert-title">Excellente nouvelle !</h2>
+                </div>
+                <p class="alert-text">
+                    Votre location a officiellement démarré aujourd'hui et est maintenant <strong>ACTIVE</strong>.
+                </p>
+                <div class="status-badge">
+                    🟢 STATUT : ACTIVE
+                </div>
+            </div>
+
+            <!-- Order Details -->
+            <div class="order-details">
+                <h3 class="section-title">
+                    <span class="section-icon">📋</span>
+                    Détails de votre location
+                </h3>
+                <div class="detail-row">
+                    <span class="detail-label">Numéro de commande :</span>
+                    <span class="detail-value">LOC-202508137698</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date de début :</span>
+                    <span class="detail-value">14/08/2025</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date de fin :</span>
+                    <span class="detail-value">21/08/2025</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Durée :</span>
+                    <span class="detail-value">8 jour(s)</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Statut :</span>
+                    <span class="status-indicator">
+                        <span class="status-dot"></span>
+                        ACTIVE
+                    </span>
+                </div>
+            </div>
+
+            <!-- Rented Items -->
+            <div class="items-section">
+                <h3 class="items-title">
+                    <span class="section-icon">📦</span>
+                    Articles en location
+                </h3>
+                                <div class="item-card">
+                    <div class="item-icon">🔧</div>
+                    <div class="item-details">
+                        <div class="item-name"></div>
+                        <div class="item-info">
+                            Quantité : 1 • Prix journalier : 0.00€
+                        </div>
+                    </div>
+                </div>
+                            </div>
+
+            <!-- Important Info -->
+            <div class="info-section">
+                <h3 class="info-title">
+                    <span class="section-icon">⚠️</span>
+                    Informations importantes
+                </h3>
+                <ul class="info-list">
+                    <li class="info-item">
+                        <span class="info-bullet">•</span>
+                        <span>Utilisez le matériel conformément aux instructions fournies</span>
+                    </li>
+                    <li class="info-item">
+                        <span class="info-bullet">•</span>
+                        <span>Entretenez le matériel régulièrement pendant la location</span>
+                    </li>
+                    <li class="info-item">
+                        <span class="info-bullet">•</span>
+                        <span>En cas de problème, contactez-nous immédiatement</span>
+                    </li>
+                    <li class="info-item">
+                        <span class="info-bullet">•</span>
+                        <span>Préparez le retour du matériel en bon état à la date prévue</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="cta-section">
+                <h3 class="cta-title">
+                    <span class="section-icon">📱</span>
+                    Suivez votre location
+                </h3>
+                <p class="cta-text">Consultez l'état de votre location en cours</p>
+                <a href="http://localhost:3000/rental-orders/1" class="cta-button">
+                    Voir ma location
+                </a>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="contact-section">
+                <h3 class="contact-title">
+                    <span class="section-icon">🆘</span>
+                    Besoin d'aide ?
+                </h3>
+                <p class="contact-text">Notre équipe est disponible pour toute question concernant votre location.</p>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <svg class="contact-icon" viewBox="0 0 20 20">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                        </svg>
+                        <span>support@farmshop.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <svg class="contact-icon" viewBox="0 0 20 20">
+                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                        </svg>
+                        <span>+33 1 23 45 67 89</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <h3 class="footer-title">
+                <span class="section-icon">🌾</span>
+                FarmShop - Location Matériel Agricole
+            </h3>
+            <p class="footer-text">Merci de votre confiance. Bonne utilisation de votre matériel !</p>
+            <p class="footer-note">
+                Cet email a été envoyé automatiquement lors du démarrage de votre location.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+                        <span class="font-medium text-blue-700">Numéro de commande :</span>
+                        <span class="text-gray-800 font-semibold">LOC-202508137698</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-blue-200">
+                        <span class="font-medium text-blue-700">Date de début :</span>
+                        <span class="text-gray-800">14/08/2025</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-blue-200">
+                        <span class="font-medium text-blue-700">Date de fin :</span>
+                        <span class="text-gray-800">21/08/2025</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-blue-200">
+                        <span class="font-medium text-blue-700">Durée :</span>
+                        <span class="text-gray-800 font-semibold">8 jour(s)</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2">
+                        <span class="font-medium text-blue-700">Statut :</span>
+                        <span class="text-green-600 font-bold flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                            ACTIVE
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rented Items -->
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="text-xl mr-2">📦</span>
+                    Articles en location
+                </h3>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-3 flex items-center">
+                    <div class="bg-green-100 text-green-600 rounded-full p-2 mr-4">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-semibold text-gray-800"></div>
+                        <div class="text-gray-600">
+                            Quantité : 1 • 
+                            Prix journalier : 0.00€
+                        </div>
+                    </div>
+                </div>
+                            </div>
+
+            <!-- Important Info -->
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8 rounded-r-lg">
+                <h3 class="text-lg font-bold text-yellow-800 mb-4 flex items-center">
+                    <span class="text-xl mr-2">⚠️</span>
+                    Informations importantes
+                </h3>
+                <div class="space-y-3 text-yellow-700">
+                    <div class="flex items-start">
+                        <div class="text-yellow-500 mr-2 mt-1">•</div>
+                        <div>Utilisez le matériel conformément aux instructions fournies</div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="text-yellow-500 mr-2 mt-1">•</div>
+                        <div>Entretenez le matériel régulièrement pendant la location</div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="text-yellow-500 mr-2 mt-1">•</div>
+                        <div>En cas de problème, contactez-nous immédiatement</div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="text-yellow-500 mr-2 mt-1">•</div>
+                        <div>Préparez le retour du matériel en bon état à la date prévue</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="bg-purple-50 border-l-4 border-purple-400 p-6 mb-8 rounded-r-lg">
+                <h3 class="text-lg font-bold text-purple-800 mb-4 flex items-center">
+                    <span class="text-xl mr-2">📅</span>
+                    Prochaines étapes
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-4 mt-1">1</div>
+                        <div>
+                            <div class="font-semibold text-purple-800">Utilisation du matériel</div>
+                            <div class="text-purple-700">Profitez de votre matériel selon vos besoins</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-4 mt-1">2</div>
+                        <div>
+                            <div class="font-semibold text-purple-800">Rappel de fin</div>
+                            <div class="text-purple-700">Vous recevrez un rappel avant la fin de location</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-4 mt-1">3</div>
+                        <div>
+                            <div class="font-semibold text-purple-800">Retour du matériel</div>
+                            <div class="text-purple-700">Retournez le matériel à la date prévue</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-4 mt-1">4</div>
+                        <div>
+                            <div class="font-semibold text-purple-800">Inspection et remboursement</div>
+                            <div class="text-purple-700">Inspection du matériel et remboursement de la caution</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg p-6 text-center mb-8">
+                <h3 class="text-xl font-bold text-white mb-2 flex items-center justify-center">
+                    <span class="text-2xl mr-2">📱</span>
+                    Suivez votre location
+                </h3>
+                <p class="text-green-100 mb-4">Consultez l'état de votre location en cours</p>
+                <a href="http://localhost:3000/rental-orders/1" 
+                   class="inline-block bg-white text-green-600 font-semibold px-8 py-3 rounded-lg hover:bg-gray-50 transition duration-300 shadow-lg">
+                    Voir ma location
+                </a>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="text-xl mr-2">🆘</span>
+                    Besoin d'aide ?
+                </h3>
+                <p class="text-gray-700 mb-4">Notre équipe est disponible pour toute question concernant votre location.</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="flex items-center text-gray-600">
+                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                        </svg>
+                        <div>
+                            <div class="font-medium">Email</div>
+                            <div class="text-sm">support@farmshop.com</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                        </svg>
+                        <div>
+                            <div class="font-medium">Téléphone</div>
+                            <div class="text-sm">+33 1 23 45 67 89</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success message -->
+            <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                <p class="text-green-700">
+                    <span class="font-semibold">🎯 Succès :</span> Votre location est maintenant active ! 
+                    Profitez bien de votre matériel et n'hésitez pas à nous contacter si vous avez des questions.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-green-800 text-white p-6 text-center">
+            <h3 class="text-lg font-bold mb-2 flex items-center justify-center">
+                <span class="text-xl mr-2">🌾</span>
+                FarmShop - Location Matériel Agricole
+            </h3>
+            <p class="text-green-200 mb-2">Merci de votre confiance. Bonne utilisation de votre matériel !</p>
+            <p class="text-xs text-green-300">
+                Cet email a été envoyé automatiquement lors du démarrage de votre location.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+            
+            <div class="alert">
+                <h4>⚠️ Rappel important :</h4>
+                <p>Votre location se termine le <strong>21/08/2025</strong>.</p>
+                <p>Vous recevrez un rappel 24h avant la date de fin. Pensez à retourner le matériel en bon état pour éviter des frais supplémentaires.</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="http://localhost:8000/my-rentals" class="btn">📱 Gérer ma location</a>
+            </div>
+            
+            <h3>📞 Besoin d'aide ?</h3>
+            <p>Si vous avez des questions ou rencontrez un problème, n'hésitez pas à nous contacter :</p>
+            <ul>
+                <li>📧 Email : support@farmshop.com</li>
+                <li>📱 WhatsApp : +33 6 XX XX XX XX</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p>Merci de faire confiance à FarmShop !</p>
+            <p>Cet email a été envoyé automatiquement suite au démarrage de votre location.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -238,9 +238,14 @@ class CartLocationController extends Controller
             ], 404);
         }
 
+        $today = now()->format('Y-m-d');
         $validated = $request->validate([
-            'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date'
+            // MODIFICATION TEMPORAIRE POUR TESTS : Permettre les locations le jour même
+            "start_date" => "required|date|after_or_equal:{$today}",
+            'end_date' => 'required|date|after_or_equal:start_date'
+        ], [
+            'start_date.after_or_equal' => 'La date de début doit être aujourd\'hui ou plus tard',
+            'end_date.after_or_equal' => 'La date de fin doit être postérieure ou égale à la date de début',
         ]);
 
         try {
@@ -443,9 +448,14 @@ class CartLocationController extends Controller
         $user = Auth::user();
         $cartLocation = $user->getOrCreateActiveCartLocation();
 
+        $today = now()->format('Y-m-d');
         $validated = $request->validate([
-            'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date'
+            // MODIFICATION TEMPORAIRE POUR TESTS : Permettre les locations le jour même
+            "start_date" => "required|date|after_or_equal:{$today}",
+            'end_date' => 'required|date|after_or_equal:start_date'
+        ], [
+            'start_date.after_or_equal' => 'La date de début doit être aujourd\'hui ou plus tard',
+            'end_date.after_or_equal' => 'La date de fin doit être postérieure ou égale à la date de début',
         ]);
 
         try {

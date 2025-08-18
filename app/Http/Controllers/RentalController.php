@@ -146,10 +146,15 @@ class RentalController extends Controller
      */
     public function calculateRentalCost(Request $request, Product $product)
     {
+        $today = now()->format('Y-m-d');
         $validated = $request->validate([
-            'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date',
+            // MODIFICATION TEMPORAIRE POUR TESTS : Permettre les locations le jour même
+            "start_date" => "required|date|after_or_equal:{$today}",
+            'end_date' => 'required|date|after_or_equal:start_date',
             'quantity' => 'required|integer|min:1'
+        ], [
+            'start_date.after_or_equal' => 'La date de début doit être aujourd\'hui ou plus tard',
+            'end_date.after_or_equal' => 'La date de fin doit être postérieure ou égale à la date de début',
         ]);
 
         if (!$product->isRentable()) {

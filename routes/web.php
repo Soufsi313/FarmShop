@@ -139,11 +139,7 @@ Route::middleware('auth')->group(function () {
     
     // Route du panier de location
     Route::get('/cart-location', function () {
-        // Récupérer toutes les traductions des noms de produits pour la langue courante
-        $locale = app()->getLocale();
-        $productNames = __('app.product_names', [], $locale);
-        
-        return view('cart-location.index', compact('productNames'));
+        return view('cart-location.index');
     })->name('cart-location.index');
     
     // Route AJAX pour récupérer les données du panier

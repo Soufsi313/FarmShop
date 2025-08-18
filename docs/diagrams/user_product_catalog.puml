@@ -1,0 +1,165 @@
+@startuml User_Product_Catalog
+
+!theme plain
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+
+' Configuration des couleurs
+skinparam class {
+    BackgroundColor<<User>> #E3F2FD
+    BorderColor<<User>> #1976D2
+    BackgroundColor<<Product>> #FFF3E0
+    BorderColor<<Product>> #F57C00
+    BackgroundColor<<Other>> #F5F5F5
+    BorderColor<<Other>> #757575
+}
+
+skinparam arrow {
+    Color #2196F3
+    FontColor #1976D2
+}
+
+title User & Product Catalog System
+
+' ============================
+' UTILISATEURS
+' ============================
+
+class User <<User>> {
+  + id : Integer
+  + username : String
+  + name : String  
+  + email : String
+  + password : String
+  + role : Enum(Admin, User)
+  + newsletter_subscribed : Boolean
+  + phone : String
+  + address : String
+  + address_line_2 : String
+  + city : String
+  + postal_code : String
+  + country : String
+  + email_verified_at : DateTime
+  + remember_token : String
+  + created_at : DateTime
+  + updated_at : DateTime
+  + deleted_at : DateTime
+}
+
+' ============================
+' CATALOGUE PRODUITS
+' ============================
+
+class Category <<Product>> {
+  + id : Integer
+  + name : String
+  + slug : String
+  + description : Text
+  + is_active : Boolean
+  + meta_title : String
+  + meta_description : String
+  + meta_keywords : String
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class RentalCategory <<Product>> {
+  + id : Integer
+  + name : String
+  + slug : String
+  + description : Text
+  + is_active : Boolean
+  + meta_title : String
+  + meta_description : String
+  + meta_keywords : String
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class Product <<Product>> {
+  + id : Integer
+  + name : String
+  + slug : String
+  + description : Text
+  + short_description : String
+  + price : Decimal
+  + rental_price_per_day : Decimal
+  + deposit_amount : Decimal
+  + min_rental_days : Integer
+  + max_rental_days : Integer
+  + available_days : JSON
+  + type : Enum(purchase, rental, both)
+  + quantity : Integer
+  + critical_threshold : Integer
+  + low_stock_threshold : Integer
+  + out_of_stock_threshold : Integer
+  + unit_symbol : String
+  + sku : String
+  + weight : Decimal
+  + dimensions : String
+  + main_image : String
+  + image_alt : String
+  + gallery_images : JSON
+  + images : JSON
+  + is_active : Boolean
+  + is_featured : Boolean
+  + likes_count : Integer
+  + views_count : Integer
+  + category_id : Integer [FK]
+  + rental_category_id : Integer [FK]
+  + meta_title : String
+  + meta_description : String
+  + meta_keywords : String
+  + created_at : DateTime
+  + updated_at : DateTime
+  + deleted_at : DateTime
+}
+
+class SpecialOffer <<Product>> {
+  + id : Integer
+  + product_id : Integer [FK]
+  + name : String
+  + discount_type : Enum(percentage, fixed)
+  + discount_value : Decimal
+  + valid_from : DateTime
+  + valid_to : DateTime
+  + is_active : Boolean
+  + max_usage : Integer
+  + current_usage : Integer
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+' ============================
+' INTERACTIONS UTILISATEUR-PRODUIT
+' ============================
+
+class Wishlist <<Other>> {
+  + id : Integer
+  + user_id : Integer [FK]
+  + product_id : Integer [FK]
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+class ProductLike <<Other>> {
+  + id : Integer
+  + user_id : Integer [FK]
+  + product_id : Integer [FK]
+  + created_at : DateTime
+  + updated_at : DateTime
+}
+
+' ============================
+' RELATIONS
+' ============================
+
+Category ||--o{ Product : "1..* catégorise"
+RentalCategory ||--o{ Product : "1..* catégorise_pour_location"
+Product ||--o{ Wishlist : "1..* souhaité"
+Product ||--o{ ProductLike : "1..* aimé"
+Product ||--o{ SpecialOffer : "1..* a_des_offres"
+User ||--o{ Wishlist : "1..* désire"
+User ||--o{ ProductLike : "1..* aime"
+
+@enduml

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('app.checkout_rental.meta_title'))
+@section('title', 'Finaliser ma location - FarmShop')
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8" x-data="checkoutRentalData()">
@@ -15,7 +15,7 @@
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-9 9a1 1 0 101.414 1.414L9 4.414V17a1 1 0 102 0V4.414l7.293 7.293a1 1 0 001.414-1.414l-9-9z"></path>
                             </svg>
-                            {{ __('app.checkout_rental.breadcrumb_home') }}
+                            Accueil
                         </a>
                     </li>
                     <li>
@@ -24,7 +24,7 @@
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                             </svg>
                             <a href="{{ route('cart-location.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">
-                                {{ __('app.checkout_rental.breadcrumb_cart') }}
+                                Panier de Location
                             </a>
                         </div>
                     </li>
@@ -33,14 +33,14 @@
                             <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                             </svg>
-                            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">{{ __('app.checkout_rental.breadcrumb_checkout') }}</span>
+                            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Finaliser ma location</span>
                         </div>
                     </li>
                 </ol>
             </nav>
             
-            <h1 class="text-3xl font-bold text-gray-900 mb-2 mt-4">{{ __('app.checkout_rental.title') }}</h1>
-            <p class="text-gray-600">{{ __('app.checkout_rental.description') }}</p>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2 mt-4">Finaliser ma location</h1>
+            <p class="text-gray-600">Vérifiez vos informations avant de confirmer votre commande de location</p>
         </div>
 
         @if(session('success'))
@@ -82,7 +82,7 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <h3 class="text-sm font-medium text-red-800">{{ __('app.checkout_rental.validation_errors') }}</h3>
+                    <h3 class="text-sm font-medium text-red-800">Erreurs de validation :</h3>
                     <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -102,11 +102,11 @@
                 
                 <!-- Période de location -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.checkout_rental.rental_period_title') }}</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Période de location</h2>
                     
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.checkout_rental.start_date_label') }}</label>
+                            <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Date de début</label>
                             <input type="date" 
                                    id="start_date" 
                                    name="start_date" 
@@ -117,7 +117,7 @@
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
                         </div>
                         <div>
-                            <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.checkout_rental.end_date_label') }}</label>
+                            <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
                             <input type="date" 
                                    id="end_date" 
                                    name="end_date" 
@@ -131,43 +131,43 @@
                     
                     <div class="mt-4 p-4 bg-purple-50 rounded-lg">
                         <p class="text-sm text-purple-800">
-                            <span class="font-medium">{{ __('app.checkout_rental.rental_duration') }}</span> 
-                            <span x-text="calculateRentalDays()"></span> {{ __('app.checkout_rental.days') }}
+                            <span class="font-medium">Durée de location :</span> 
+                            <span x-text="calculateRentalDays()"></span> jour(s)
                         </p>
                     </div>
                 </div>
 
                 <!-- Adresses de récupération et retour -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.checkout_rental.addresses_title') }}</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Adresses de récupération et retour</h2>
                     
                     <div class="space-y-6">
                         <!-- Adresse de récupération -->
                         <div>
-                            <h3 class="font-medium text-gray-900 mb-3">{{ __('app.checkout_rental.pickup_address_title') }}</h3>
+                            <h3 class="font-medium text-gray-900 mb-3">Adresse de récupération</h3>
                             <textarea name="pickup_address" 
                                       required
                                       rows="3"
-                                      placeholder="{{ __('app.checkout_rental.pickup_address_placeholder') }}"
+                                      placeholder="Indiquez l'adresse où vous souhaitez récupérer le matériel"
                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">{{ old('pickup_address', auth()->user()->address . ', ' . auth()->user()->postal_code . ' ' . auth()->user()->city) }}</textarea>
                         </div>
                         
                         <!-- Adresse de retour -->
                         <div>
-                            <h3 class="font-medium text-gray-900 mb-3">{{ __('app.checkout_rental.return_address_title') }}</h3>
+                            <h3 class="font-medium text-gray-900 mb-3">Adresse de retour</h3>
                             <div class="flex items-center space-x-2 mb-3">
                                 <input type="checkbox" 
                                        id="same_address"
                                        x-model="sameAsPickup"
                                        @change="toggleSameAddress()"
                                        class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
-                                <label for="same_address" class="text-sm text-gray-600">{{ __('app.checkout_rental.same_address_checkbox') }}</label>
+                                <label for="same_address" class="text-sm text-gray-600">Même adresse que la récupération</label>
                             </div>
                             <textarea name="return_address" 
                                       required
                                       rows="3"
                                       x-bind:readonly="sameAsPickup"
-                                      placeholder="{{ __('app.checkout_rental.return_address_placeholder') }}"
+                                      placeholder="Indiquez l'adresse où vous souhaitez retourner le matériel"
                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                       x-bind:class="sameAsPickup ? 'bg-gray-100 text-gray-500' : ''">{{ old('return_address', auth()->user()->address . ', ' . auth()->user()->postal_code . ' ' . auth()->user()->city) }}</textarea>
                         </div>
@@ -176,10 +176,10 @@
 
                 <!-- Notes additionnelles -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.checkout_rental.notes_title') }}</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Notes additionnelles</h2>
                     <textarea name="notes" 
                               rows="4"
-                              placeholder="{{ __('app.checkout_rental.notes_placeholder') }}"
+                              placeholder="Informations supplémentaires sur votre location (instructions spéciales, créneaux de disponibilité, etc.)"
                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">{{ old('notes') }}</textarea>
                 </div>
             </div>
@@ -187,23 +187,23 @@
             <!-- Colonne de droite: Récapitulatif -->
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-lg shadow p-6 sticky top-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.checkout_rental.summary_title') }}</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Récapitulatif de location</h2>
                     
                     <!-- Liste des produits -->
                     <div class="space-y-4 mb-6">
                         @foreach($cartLocation->items as $item)
                         <div class="flex space-x-3 pb-4 border-b border-gray-200 last:border-b-0">
                             <img src="{{ $item->product->image_url }}" 
-                                 alt="{{ __('app.product_names.' . $item->product->slug, [], app()->getLocale()) ?: $item->product_name }}" 
+                                 alt="{{ $item->product_name }}" 
                                  class="w-16 h-16 object-cover rounded-lg">
                             
                             <div class="flex-1">
-                                <h4 class="font-medium text-gray-900">{{ __('app.product_names.' . $item->product->slug, [], app()->getLocale()) ?: $item->product_name }}</h4>
-                                <p class="text-sm text-gray-600">{{ __('app.checkout_rental.quantity_label') }} {{ $item->quantity }}</p>
-                                <p class="text-sm text-gray-600">{{ number_format($item->product->rental_price_per_day, 2) }}{{ __('app.checkout_rental.per_day') }}</p>
+                                <h4 class="font-medium text-gray-900">{{ $item->product_name }}</h4>
+                                <p class="text-sm text-gray-600">Quantité: {{ $item->quantity }}</p>
+                                <p class="text-sm text-gray-600">{{ number_format($item->product->rental_price_per_day, 2) }}€/jour</p>
                                 <p class="text-sm font-medium text-purple-600">
-                                    {{ __('app.checkout_rental.period_label') }} {{ $item->start_date->format('d/m/Y') }} - {{ $item->end_date->format('d/m/Y') }}
-                                    ({{ $item->duration_days }} {{ __('app.checkout_rental.days') }})
+                                    Période: {{ $item->start_date->format('d/m/Y') }} - {{ $item->end_date->format('d/m/Y') }}
+                                    ({{ $item->duration_days }} jours)
                                 </p>
                             </div>
                         </div>
@@ -213,30 +213,30 @@
                     <!-- Total -->
                     <div class="space-y-2 pt-4 border-t border-gray-200">
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __('app.checkout_rental.subtotal_rental') }}</span>
+                            <span class="text-gray-600">Sous-total location</span>
                             <span>{{ number_format($summary['total_amount'], 2) }}€</span>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __('app.checkout_rental.total_deposit') }}</span>
+                            <span class="text-gray-600">Caution totale</span>
                             <span>{{ number_format($summary['total_deposit'], 2) }}€</span>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __('app.checkout_rental.vat') }}</span>
+                            <span class="text-gray-600">TVA (21%)</span>
                             <span>{{ number_format($summary['total_tva'], 2) }}€</span>
                         </div>
                         <div class="flex justify-between text-lg font-semibold pt-2 border-t border-gray-200">
-                            <span>{{ __('app.checkout_rental.total_to_pay') }}</span>
+                            <span>Total à payer</span>
                             <span>{{ number_format($summary['total_with_tax'], 2) }}€</span>
                         </div>
                         <p class="text-xs text-gray-500 mt-2">
-                            {{ __('app.checkout_rental.deposit_note') }}
+                            * La caution sera bloquée sur votre carte et libérée au retour du matériel en bon état
                         </p>
                     </div>
                     
                     <!-- Bouton de validation -->
                     <button type="submit" 
                             class="w-full mt-6 bg-purple-600 text-white py-3 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 font-medium">
-                        {{ __('app.checkout_rental.confirm_rental') }}
+                        Confirmer ma location
                     </button>
                 </div>
             </div>

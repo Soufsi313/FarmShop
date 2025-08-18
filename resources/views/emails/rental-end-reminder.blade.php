@@ -289,7 +289,7 @@
             
             <!-- Order Information -->
             <div class="order-info">
-                <h3>📋 Détails de votre location</h3>
+                <h3>� Détails de votre location</h3>
                 <div class="info-row">
                     <span class="info-label">Numéro de commande :</span>
                     <span class="info-value">#{{ $orderLocation->order_number }}</span>
@@ -302,28 +302,20 @@
                     <span class="info-label">Durée totale :</span>
                     <span class="info-value">{{ $totalDays }} jour{{ $totalDays > 1 ? 's' : '' }}</span>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">Fin de location :</span>
-                    <span class="info-value"><strong>{{ $endTomorrow }}</strong></span>
-                </div>
             </div>
             
-            <!-- Products Section -->
+            <!-- Products List -->
             <div class="products-section">
-                <h3>🚛 Matériel à retourner</h3>
-                @if(count($items) > 0)
-                    @foreach($items as $item)
-                    <div class="product-item">
-                        <div class="product-name">{{ $item->product_name ?? 'Produit non spécifié' }} ({{ $item->quantity ?? 1 }}x)</div>
-                        <p>À retourner demain en bon état</p>
+                <h3>📦 Matériel à retourner</h3>
+                @foreach($items as $item)
+                <div class="product-item">
+                    <div class="product-name">{{ $item->product_name }}</div>
+                    <div style="color: #666; font-size: 14px;">
+                        Quantité : {{ $item->quantity }} | 
+                        Prix/jour : {{ number_format($item->daily_rate, 2) }}€
                     </div>
-                    @endforeach
-                @else
-                    <div class="product-item">
-                        <div class="product-name">Matériel agricole loué</div>
-                        <p>À retourner demain en bon état</p>
-                    </div>
-                @endif
+                </div>
+                @endforeach
             </div>
             
             <!-- Checklist -->

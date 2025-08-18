@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logos FarmShop - Export PNG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'farm-green': {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        'farm-orange': '#ea580c',
+                        'farm-yellow': '#eab308'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .logo-export {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 40px;
+            margin: 20px;
+            display: inline-block;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Styles pour une meilleure qualité d'export */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f9fafb;
+        }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-12 text-gray-800">Logos FarmShop - Export PNG pour Rapport</h1>
+        
+        <div class="text-center mb-8">
+            <p class="text-lg text-gray-600">Faites un clic droit sur chaque logo → "Enregistrer l'image sous..." pour obtenir les PNG</p>
+            <p class="text-sm text-gray-500 mt-2">Ou utilisez un outil de capture d'écran pour une qualité optimale</p>
+        </div>
+
+        <!-- Logo Français -->
+        <div class="text-center mb-12">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-700">🇫🇷 Version Française</h2>
+            <div class="logo-export" id="logo-fr">
+                <div class="logo-container">
+                    <div class="relative mr-4">
+                        <!-- Cercle principal avec paysage agricole -->
+                        <div class="w-24 h-24 border-6 border-farm-green-500 rounded-full bg-gradient-to-br from-farm-green-100 to-farm-green-200 flex items-center justify-center relative overflow-hidden shadow-lg">
+                            
+                            <!-- Soleil avec rayons -->
+                            <div class="absolute top-2 right-2 w-4 h-4 bg-farm-yellow rounded-full shadow-sm">
+                                <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-farm-yellow"></div>
+                                <div class="absolute -right-1 top-1/2 transform -translate-y-1/2 w-2 h-0.5 bg-farm-yellow"></div>
+                                <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-farm-yellow"></div>
+                                <div class="absolute -left-1 top-1/2 transform -translate-y-1/2 w-2 h-0.5 bg-farm-yellow"></div>
+                            </div>
+                            
+                            <!-- Collines en plusieurs couches -->
+                            <div class="absolute bottom-0 left-0 w-full h-9 bg-gradient-to-t from-farm-green-500 to-farm-green-400 rounded-b-full opacity-70"></div>
+                            <div class="absolute bottom-0 right-0 w-12 h-5 bg-gradient-to-t from-farm-green-600 to-farm-green-500 rounded-bl-full opacity-90"></div>
+                            <div class="absolute bottom-0 left-4 w-10 h-3 bg-gradient-to-t from-farm-green-700 to-farm-green-600 rounded-bl-full opacity-60"></div>
+                            
+                            <!-- Plantes/épis de blé -->
+                            <div class="absolute bottom-3 left-1/2 transform -translate-x-1/2">
+                                <div class="w-0.5 h-6 bg-yellow-800 shadow-sm"></div>
+                                <div class="absolute -top-1 -left-1 w-3 h-2 bg-farm-yellow rounded-full transform rotate-12 shadow-sm"></div>
+                            </div>
+                            
+                            <!-- Plantes supplémentaires -->
+                            <div class="absolute bottom-2 left-1/4">
+                                <div class="w-0.5 h-4 bg-yellow-800"></div>
+                                <div class="absolute -top-1 -left-1 w-2 h-1.5 bg-farm-yellow rounded-full transform rotate-45"></div>
+                            </div>
+                            <div class="absolute bottom-2 right-1/4">
+                                <div class="w-0.5 h-4 bg-yellow-800"></div>
+                                <div class="absolute -top-1 -left-1 w-2 h-1.5 bg-farm-yellow rounded-full transform -rotate-12"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Indicateur shopping/e-commerce -->
+                        <div class="absolute top-0 -right-1 w-8 h-8 bg-farm-orange rounded-full border-2 border-white flex items-center justify-center shadow-lg">
+                            <div class="w-3 h-3 bg-white rounded-sm"></div>
+                            <!-- Point de notification -->
+                            <div class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Texte du logo -->
+                    <div class="flex flex-col">
+                        <div class="text-4xl font-bold tracking-tight">
+                            <span class="text-farm-green-500 drop-shadow-sm">Farm</span><span class="text-farm-orange drop-shadow-sm">Shop</span>
+                        </div>
+                        <div class="text-sm text-gray-600 tracking-wide uppercase font-medium">
+                            Marché Bio
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logo Anglais -->
+        <div class="text-center mb-12">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-700">🇬🇧 Version Anglaise</h2>
+            <div class="logo-export" id="logo-en">
+                <div class="logo-container">
+                    <div class="relative mr-4">
+                        <!-- Cercle principal avec paysage agricole -->
+                        <div class="w-24 h-24 border-6 border-farm-green-500 rounded-full bg-gradient-to-br from-farm-green-100 to-farm-green-200 flex items-center justify-center relative overflow-hidden shadow-lg">
+                            
+                            <!-- Soleil avec rayons -->
+                            <div class="absolute top-2 right-2 w-4 h-4 bg-farm-yellow rounded-full shadow-sm">
+                                <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-farm-yellow"></div>
+                                <div class="absolute -right-1 top-1/2 transform -translate-y-1/2 w-2 h-0.5 bg-farm-yellow"></div>
+                                <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-farm-yellow"></div>
+                                <div class="absolute -left-1 top-1/2 transform -translate-y-1/2 w-2 h-0.5 bg-farm-yellow"></div>
+                            </div>
+                            
+                            <!-- Collines en plusieurs couches -->
+                            <div class="absolute bottom-0 left-0 w-full h-9 bg-gradient-to-t from-farm-green-500 to-farm-green-400 rounded-b-full opacity-70"></div>
+                            <div class="absolute bottom-0 right-0 w-12 h-5 bg-gradient-to-t from-farm-green-600 to-farm-green-500 rounded-bl-full opacity-90"></div>
+                            <div class="absolute bottom-0 left-4 w-10 h-3 bg-gradient-to-t from-farm-green-700 to-farm-green-600 rounded-bl-full opacity-60"></div>
+                            
+                            <!-- Plantes/épis de blé -->
+                            <div class="absolute bottom-3 left-1/2 transform -translate-x-1/2">
+                                <div class="w-0.5 h-6 bg-yellow-800 shadow-sm"></div>
+                                <div class="absolute -top-1 -left-1 w-3 h-2 bg-farm-yellow rounded-full transform rotate-12 shadow-sm"></div>
+                            </div>
+                            
+                            <!-- Plantes supplémentaires -->
+                            <div class="absolute bottom-2 left-1/4">
+                                <div class="w-0.5 h-4 bg-yellow-800"></div>
+                                <div class="absolute -top-1 -left-1 w-2 h-1.5 bg-farm-yellow rounded-full transform rotate-45"></div>
+                            </div>
+                            <div class="absolute bottom-2 right-1/4">
+                                <div class="w-0.5 h-4 bg-yellow-800"></div>
+                                <div class="absolute -top-1 -left-1 w-2 h-1.5 bg-farm-yellow rounded-full transform -rotate-12"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Indicateur shopping/e-commerce -->
+                        <div class="absolute top-0 -right-1 w-8 h-8 bg-farm-orange rounded-full border-2 border-white flex items-center justify-center shadow-lg">
+                            <div class="w-3 h-3 bg-white rounded-sm"></div>
+                            <!-- Point de notification -->
+                            <div class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Texte du logo -->
+                    <div class="flex flex-col">
+                        <div class="text-4xl font-bold tracking-tight">
+                            <span class="text-farm-green-500 drop-shadow-sm">Farm</span><span class="text-farm-orange drop-shadow-sm">Shop</span>
+                        </div>
+                        <div class="text-sm text-gray-600 tracking-wide uppercase font-medium">
+                            Organic Market
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logo Néerlandais -->
+        <div class="text-center mb-12">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-700">🇳🇱 Version Néerlandaise</h2>
+            <div class="logo-export" id="logo-nl">
+                <div class="logo-container">
+                    <div class="relative mr-4">
+                        <!-- Cercle principal avec paysage agricole -->
+                        <div class="w-24 h-24 border-6 border-farm-green-500 rounded-full bg-gradient-to-br from-farm-green-100 to-farm-green-200 flex items-center justify-center relative overflow-hidden shadow-lg">
+                            
+                            <!-- Soleil avec rayons -->
+                            <div class="absolute top-2 right-2 w-4 h-4 bg-farm-yellow rounded-full shadow-sm">
+                                <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-farm-yellow"></div>
+                                <div class="absolute -right-1 top-1/2 transform -translate-y-1/2 w-2 h-0.5 bg-farm-yellow"></div>
+                                <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-farm-yellow"></div>
+                                <div class="absolute -left-1 top-1/2 transform -translate-y-1/2 w-2 h-0.5 bg-farm-yellow"></div>
+                            </div>
+                            
+                            <!-- Collines en plusieurs couches -->
+                            <div class="absolute bottom-0 left-0 w-full h-9 bg-gradient-to-t from-farm-green-500 to-farm-green-400 rounded-b-full opacity-70"></div>
+                            <div class="absolute bottom-0 right-0 w-12 h-5 bg-gradient-to-t from-farm-green-600 to-farm-green-500 rounded-bl-full opacity-90"></div>
+                            <div class="absolute bottom-0 left-4 w-10 h-3 bg-gradient-to-t from-farm-green-700 to-farm-green-600 rounded-bl-full opacity-60"></div>
+                            
+                            <!-- Plantes/épis de blé -->
+                            <div class="absolute bottom-3 left-1/2 transform -translate-x-1/2">
+                                <div class="w-0.5 h-6 bg-yellow-800 shadow-sm"></div>
+                                <div class="absolute -top-1 -left-1 w-3 h-2 bg-farm-yellow rounded-full transform rotate-12 shadow-sm"></div>
+                            </div>
+                            
+                            <!-- Plantes supplémentaires -->
+                            <div class="absolute bottom-2 left-1/4">
+                                <div class="w-0.5 h-4 bg-yellow-800"></div>
+                                <div class="absolute -top-1 -left-1 w-2 h-1.5 bg-farm-yellow rounded-full transform rotate-45"></div>
+                            </div>
+                            <div class="absolute bottom-2 right-1/4">
+                                <div class="w-0.5 h-4 bg-yellow-800"></div>
+                                <div class="absolute -top-1 -left-1 w-2 h-1.5 bg-farm-yellow rounded-full transform -rotate-12"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Indicateur shopping/e-commerce -->
+                        <div class="absolute top-0 -right-1 w-8 h-8 bg-farm-orange rounded-full border-2 border-white flex items-center justify-center shadow-lg">
+                            <div class="w-3 h-3 bg-white rounded-sm"></div>
+                            <!-- Point de notification -->
+                            <div class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Texte du logo -->
+                    <div class="flex flex-col">
+                        <div class="text-4xl font-bold tracking-tight">
+                            <span class="text-farm-green-500 drop-shadow-sm">Farm</span><span class="text-farm-orange drop-shadow-sm">Shop</span>
+                        </div>
+                        <div class="text-sm text-gray-600 tracking-wide uppercase font-medium">
+                            Bio Markt
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions pour l'export -->
+        <div class="bg-blue-50 p-6 rounded-lg mt-12">
+            <h3 class="text-lg font-semibold text-blue-800 mb-3">📸 Instructions pour obtenir les PNG :</h3>
+            <div class="text-blue-700 space-y-2">
+                <p><strong>Méthode 1 - Clic droit :</strong></p>
+                <ul class="list-disc ml-6 space-y-1">
+                    <li>Clic droit sur chaque logo → "Enregistrer l'image sous..."</li>
+                    <li>Nommer : <code>logo-farmshop-fr.png</code>, <code>logo-farmshop-en.png</code>, <code>logo-farmshop-nl.png</code></li>
+                </ul>
+                
+                <p><strong>Méthode 2 - Capture d'écran (recommandée) :</strong></p>
+                <ul class="list-disc ml-6 space-y-1">
+                    <li>Utilise l'outil de capture Windows (Win + Shift + S)</li>
+                    <li>Sélectionne précisément chaque logo avec son cadre</li>
+                    <li>Qualité PNG optimale pour ton rapport</li>
+                </ul>
+                
+                <p><strong>Méthode 3 - Navigateur :</strong></p>
+                <ul class="list-disc ml-6 space-y-1">
+                    <li>F12 → Console → <code>window.print()</code> pour un export PDF haute qualité</li>
+                    <li>Puis convertir PDF → PNG si nécessaire</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Version compacte pour header -->
+        <div class="text-center mb-12 mt-16">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-700">📱 Version Header Compacte</h2>
+            <div class="logo-export" id="logo-header">
+                <div class="logo-container">
+                    <div class="relative mr-3">
+                        <!-- Version moyenne pour header -->
+                        <div class="w-16 h-16 border-4 border-farm-green-500 rounded-full bg-gradient-to-br from-farm-green-100 to-farm-green-200 flex items-center justify-center relative overflow-hidden">
+                            <div class="absolute top-1 right-1 w-3 h-3 bg-farm-yellow rounded-full"></div>
+                            <div class="absolute bottom-0 left-0 w-full h-6 bg-farm-green-500 rounded-b-full opacity-60"></div>
+                            <div class="absolute bottom-0 right-0 w-10 h-4 bg-farm-green-600 rounded-bl-full opacity-80"></div>
+                            <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                                <div class="w-0.5 h-4 bg-yellow-800"></div>
+                                <div class="absolute -top-1 -left-1 w-3 h-2 bg-farm-yellow rounded-full transform rotate-12"></div>
+                            </div>
+                        </div>
+                        <div class="absolute top-0 -right-1 w-6 h-6 bg-farm-orange rounded-full border-2 border-white flex items-center justify-center">
+                            <div class="w-2 h-2 bg-white rounded-sm"></div>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold tracking-tight">
+                        <span class="text-farm-green-500">Farm</span><span class="text-farm-orange">Shop</span>
+                    </div>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 mt-4">Version utilisée dans la navigation du site</p>
+        </div>
+    </div>
+
+    <script>
+        // Script pour améliorer la qualité d'export
+        document.addEventListener('DOMContentLoaded', function() {
+            // Optimiser les logos pour l'export
+            const logos = document.querySelectorAll('.logo-export');
+            logos.forEach(logo => {
+                logo.style.imageRendering = 'crisp-edges';
+                logo.style.imageRendering = '-webkit-optimize-contrast';
+            });
+        });
+    </script>
+</body>
+</html>
