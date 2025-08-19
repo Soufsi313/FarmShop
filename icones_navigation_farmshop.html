@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icônes Navigation FarmShop - Téléchargement</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .icon-item {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            background: #fafafa;
+        }
+        .icon-item h3 {
+            margin-top: 10px;
+            color: #333;
+        }
+        .icon-item svg {
+            width: 48px;
+            height: 48px;
+            color: #16a34a;
+        }
+        .download-btn {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .download-btn:hover {
+            background: #15803d;
+        }
+        .instructions {
+            background: #e0f2fe;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Icônes de Navigation FarmShop</h1>
+        
+        <div class="instructions">
+            <h3>Instructions de téléchargement :</h3>
+            <ol>
+                <li>Cliquez sur le bouton "Télécharger SVG" sous l'icône souhaitée</li>
+                <li>Pour convertir en PNG/JPG, visitez <a href="https://svgtopng.com/" target="_blank">svgtopng.com</a></li>
+                <li>Uploadez le fichier SVG téléchargé et choisissez la taille et le format souhaités</li>
+            </ol>
+        </div>
+
+        <div class="icon-grid">
+            <!-- Icône Accueil -->
+            <div class="icon-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <h3>Accueil</h3>
+                <button class="download-btn" onclick="downloadSVG('home', this.parentElement.querySelector('svg'))">Télécharger SVG</button>
+            </div>
+
+            <!-- Icône Produits -->
+            <div class="icon-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
+                <h3>Produits</h3>
+                <button class="download-btn" onclick="downloadSVG('products', this.parentElement.querySelector('svg'))">Télécharger SVG</button>
+            </div>
+
+            <!-- Icône Locations -->
+            <div class="icon-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <h3>Locations</h3>
+                <button class="download-btn" onclick="downloadSVG('rentals', this.parentElement.querySelector('svg'))">Télécharger SVG</button>
+            </div>
+
+            <!-- Icône Blog -->
+            <div class="icon-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                </svg>
+                <h3>Blog</h3>
+                <button class="download-btn" onclick="downloadSVG('blog', this.parentElement.querySelector('svg'))">Télécharger SVG</button>
+            </div>
+
+            <!-- Icône Contact -->
+            <div class="icon-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <h3>Contact</h3>
+                <button class="download-btn" onclick="downloadSVG('contact', this.parentElement.querySelector('svg'))">Télécharger SVG</button>
+            </div>
+
+            <!-- Icône Wishlist -->
+            <div class="icon-item">
+                <svg fill="currentColor" viewBox="0 0 24 24" style="color: #ef4444;">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <h3>Wishlist</h3>
+                <button class="download-btn" onclick="downloadSVG('wishlist', this.parentElement.querySelector('svg'))">Télécharger SVG</button>
+            </div>
+
+            <!-- Icône Mes achats -->
+            <div class="icon-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                </svg>
+                <h3>Mes achats</h3>
+                <button class="download-btn" onclick="downloadSVG('orders', this.parentElement.querySelector('svg'))">Télécharger SVG</button>
+            </div>
+
+            <!-- Icône Mes locations -->
+            <div class="icon-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a4 4 0 118 0v4m-4 8h0m0-8h0m-4.5 8h9a2 2 0 002-2V9a2 2 0 00-2-2h-9a2 2 0 00-2 2v6a2 2 0 002 2z"/>
+                </svg>
+                <h3>Mes locations</h3>
+                <button class="download-btn" onclick="downloadSVG('rental-orders', this.parentElement.querySelector('svg'))">Télécharger SVG</button>
+            </div>
+
+            <!-- Réseaux sociaux -->
+            <div class="icon-item">
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+                </svg>
+                <h3>Twitter</h3>
+                <button class="download-btn" onclick="downloadSVG('twitter', this.parentElement.querySelector('svg'))">Télécharger SVG</button>
+            </div>
+
+            <div class="icon-item">
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987s11.987-5.367 11.987-11.987C24.014 5.367 18.647.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.326-1.297s-1.297-1.888-1.297-3.185c0-1.297.49-2.448 1.297-3.326s1.888-1.297 3.185-1.297c1.297 0 2.448.49 3.326 1.297s1.297 1.888 1.297 3.185c0 1.297-.49 2.448-1.297 3.326s-1.888 1.297-3.185 1.297z"/>
+                </svg>
+                <h3>Instagram</h3>
+                <button class="download-btn" onclick="downloadSVG('instagram', this.parentElement.querySelector('svg'))">Télécharger SVG</button>
+            </div>
+
+            <div class="icon-item">
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+                <h3>LinkedIn</h3>
+                <button class="download-btn" onclick="downloadSVG('linkedin', this.parentElement.querySelector('svg'))">Télécharger SVG</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function downloadSVG(name, svgElement) {
+            // Cloner l'élément SVG
+            const svgClone = svgElement.cloneNode(true);
+            
+            // Ajouter les attributs nécessaires
+            svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            svgClone.setAttribute('width', '64');
+            svgClone.setAttribute('height', '64');
+            
+            // Créer le contenu SVG complet
+            const svgContent = new XMLSerializer().serializeToString(svgClone);
+            
+            // Créer un blob et télécharger
+            const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `farmshop_icon_${name}.svg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

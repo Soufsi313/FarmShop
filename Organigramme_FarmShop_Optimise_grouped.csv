@@ -1,0 +1,13 @@
+Thème,Fonctionnalités,Phase,Tâches principales,Importance,Validation
+Gestion utilisateur,F1-F5,Développement,Création de compte, connexion, consultation/modification profil, désinscription,5,Versionning Github
+Catalogue produits,F6-F14,Développement,Consultation catalogue, filtrage, ajout/modification/suppression panier, sélection offres spéciales,5,Versionning Github
+Location,F15-F18,Développement,Location produits, gestion panier location,5,Versionning Github
+Blog,F19-F24,Développement,Consultation articles, commentaires, signalement, recherche/filtrage blog,2,Versionning Github
+Facturation,F25-F26,Développement,Consultation et téléchargement factures PDF,5,Versionning Github
+Newsletter,F27-F28,Développement,Abonnement/désabonnement newsletter,2,Versionning Github
+Contact et langue,F29-F30,Développement,Formulaire contact admin, changement langue,5,Versionning Github
+Wishlist et commandes,F31-F33,Développement,Ajout wishlist, passage/annulation commande,5,Versionning Github
+Administration produits,A1-A3,Développement,Ajout/modification/suppression produits (admin),5,Versionning Github
+Administration blog,A4-A7,Développement,Ajout/modification/suppression articles blog, gestion signalements (admin),5,Versionning Github
+Administration utilisateurs,A8-A10,Développement,Ajout/modification/suppression utilisateurs (admin),5,Versionning Github
+Exigences non-fonctionnelles,N1-N9,Développement,Navigation fluide, déconnexion auto, sécurisation données, pénalités, gestion cookies,4-5,Versionning Github
