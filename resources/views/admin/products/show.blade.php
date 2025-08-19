@@ -42,12 +42,14 @@
                     <div>
                         <dt class="text-sm font-medium text-gray-500">Type</dt>
                         <dd class="text-sm text-gray-900">
-                            @if($product->type === 'purchase')
-                                Achat uniquement
+                            @if($product->type === 'sale')
+                                Vente uniquement
                             @elseif($product->type === 'rental')
                                 Location uniquement
+                            @elseif($product->type === 'both')
+                                Vente et Location
                             @else
-                                Achat et Location
+                                Non défini
                             @endif
                         </dd>
                     </div>
@@ -70,7 +72,7 @@
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Prix et disponibilité</h3>
                 
                 <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    @if($product->type === 'purchase' || $product->type === 'both')
+                    @if($product->type === 'sale' || $product->type === 'both')
                     <div>
                         <dt class="text-sm font-medium text-gray-500">Prix de vente</dt>
                         <dd class="text-lg font-semibold text-gray-900">{{ number_format($product->price, 2) }} €</dd>

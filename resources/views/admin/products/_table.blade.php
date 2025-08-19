@@ -83,17 +83,21 @@
                     </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    @if($product->type === 'purchase')
+                    @if($product->type === 'sale')
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            🛒 Achat
+                            🛒 Vente uniquement
                         </span>
                     @elseif($product->type === 'rental')
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                            📅 Location
+                            📅 Location uniquement
                         </span>
-                    @else
+                    @elseif($product->type === 'both')
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                             🔄 Mixte
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            ❓ Non défini
                         </span>
                     @endif
                 </td>

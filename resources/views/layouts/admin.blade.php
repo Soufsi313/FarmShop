@@ -63,7 +63,7 @@
                         </div>
                         <div>
                             <h2 class="text-xl font-bold text-white">FarmShop</h2>
-                            <p class="text-xs text-slate-400 font-medium">Administration</p>
+                            <p class="text-xs text-slate-400 font-medium">{{ __("app.pages.admin") }}</p>
                         </div>
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                                 </svg>
                             </div>
-                            <span>Tableau de bord</span>
+                            <span>{{ __("app.pages.dashboard") }}</span>
                         </a>
                     </div>
 
@@ -126,7 +126,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                     </svg>
                                 </div>
-                                <span>Catégories</span>
+                                <span>{{ __("app.ecommerce.categories") }}</span>
                             </a>
 
                             <a href="{{ route('admin.special-offers.index') }}" 
@@ -209,7 +209,7 @@
                     <div class="mt-8">
                         <div class="flex items-center px-4 mb-4">
                             <div class="w-8 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"></div>
-                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Commandes</h3>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __("app.ecommerce.orders") }}</h3>
                         </div>
                         <div class="space-y-2">
                             <a href="{{ route('admin.orders.index') }}" 
@@ -248,7 +248,7 @@
                     <div class="mt-8">
                         <div class="flex items-center px-4 mb-4">
                             <div class="w-8 h-0.5 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full"></div>
-                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Contenu</h3>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __("app.forms.content") }}</h3>
                         </div>
                         <div class="space-y-2">
                             <a href="{{ route('admin.blog.index') }}" 
@@ -298,7 +298,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                     </svg>
                                 </div>
-                                <span>Newsletter</span>
+                                <span>{{ __("app.nav.newsletter") }}</span>
                             </a>
                         </div>
                     </div>
@@ -336,7 +336,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                                     </svg>
                                 </div>
-                                <span>Statistiques</span>
+                                <span>{{ __("app.pages.statistics") }}</span>
                                 <span class="ml-auto w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
                             </a>
 
@@ -358,7 +358,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     </svg>
                                 </div>
-                                <span>Paramètres</span>
+                                <span>{{ __("app.pages.settings") }}</span>
                             </a>
                         </div>
                     </div>
@@ -397,7 +397,7 @@
                 </div>
                 <nav class="flex-1 px-4">
                     <a href="{{ route('admin.dashboard') }}" class="block py-2 text-white">Dashboard</a>
-                    <a href="{{ route('admin.statistics') }}" class="block py-2 text-white">Statistiques</a>
+                    <a href="{{ route('admin.statistics') }}" class="block py-2 text-white">{{ __("app.pages.statistics") }}</a>
                     <!-- Autres liens... -->
                 </nav>
             </div>
@@ -418,6 +418,63 @@
                     </div>
                     
                     <div class="flex items-center space-x-4">
+                        <!-- Sélecteur de langue -->
+                        <div class="relative" x-data="{ langDropdownOpen: false }">
+                            <button @click="langDropdownOpen = !langDropdownOpen" class="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50 transition-colors">
+                                @if(app()->getLocale() === 'fr')
+                                    <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-4 w-4 rounded border shadow-sm" />
+                                    <span>FR</span>
+                                @elseif(app()->getLocale() === 'en')
+                                    <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-4 w-4 rounded border shadow-sm" />
+                                    <span>EN</span>
+                                @else
+                                    <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-4 w-4 rounded border shadow-sm" />
+                                    <span>NL</span>
+                                @endif
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            
+                            <div x-show="langDropdownOpen" 
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                 @click.away="langDropdownOpen = false"
+                                 class="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                                <a href="{{ request()->fullUrlWithQuery(['lang' => 'fr']) }}" title="Français" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() === 'fr' ? 'bg-emerald-50 text-emerald-700' : '' }}">
+                                    <img src="https://flagcdn.com/fr.svg" alt="FR" class="h-4 w-4 rounded border shadow-sm mr-3" />
+                                    Français
+                                    @if(app()->getLocale() === 'fr')
+                                        <svg class="w-4 h-4 text-emerald-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                </a>
+                                <a href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" title="English" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() === 'en' ? 'bg-emerald-50 text-emerald-700' : '' }}">
+                                    <img src="https://flagcdn.com/gb.svg" alt="EN" class="h-4 w-4 rounded border shadow-sm mr-3" />
+                                    English
+                                    @if(app()->getLocale() === 'en')
+                                        <svg class="w-4 h-4 text-emerald-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                </a>
+                                <a href="{{ request()->fullUrlWithQuery(['lang' => 'nl']) }}" title="Nederlands" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() === 'nl' ? 'bg-emerald-50 text-emerald-700' : '' }}">
+                                    <img src="https://flagcdn.com/nl.svg" alt="NL" class="h-4 w-4 rounded border shadow-sm mr-3" />
+                                    Nederlands
+                                    @if(app()->getLocale() === 'nl')
+                                        <svg class="w-4 h-4 text-emerald-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                </a>
+                            </div>
+                        </div>
+                        
                         <a href="{{ url('/') }}" class="text-emerald-600 hover:text-emerald-800 text-sm font-medium flex items-center">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>

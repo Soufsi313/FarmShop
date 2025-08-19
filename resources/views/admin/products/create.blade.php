@@ -123,9 +123,9 @@
                                     required
                                     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 @error('type') border-red-500 @enderror">
                                 <option value="">Sélectionner un type</option>
-                                <option value="purchase" {{ old('type') == 'purchase' ? 'selected' : '' }}>Achat uniquement</option>
+                                <option value="sale" {{ old('type') == 'sale' ? 'selected' : '' }}>Vente uniquement</option>
                                 <option value="rental" {{ old('type') == 'rental' ? 'selected' : '' }}>Location uniquement</option>
-                                <option value="both" {{ old('type') == 'both' ? 'selected' : '' }}>Achat et Location</option>
+                                <option value="both" {{ old('type') == 'both' ? 'selected' : '' }}>Vente et Location</option>
                             </select>
                             @error('type')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -151,7 +151,7 @@
                         </div>
 
                         <!-- Prix d'achat -->
-                        <div x-show="formData.type === 'purchase' || formData.type === 'both'">
+                        <div x-show="formData.type === 'sale' || formData.type === 'both'">
                             <label for="price" class="block text-sm font-medium text-gray-700 mb-1">Prix de vente (€) *</label>
                             <input type="number" 
                                    id="price" 
