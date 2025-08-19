@@ -1056,11 +1056,15 @@ return array (
   array (
     'pending' => 'En attente',
     'confirmed' => 'Confirmée',
+    'preparing' => 'En préparation',
     'shipped' => 'Expédiée',
     'delivered' => 'Livrée',
     'cancelled' => 'Annulée',
     'return_requested' => 'Retour demandé',
     'returned' => 'Retournée',
+    'active' => 'Active',
+    'completed' => 'Terminée',
+    'closed' => 'Clôturée',
   ),
   'buttons' => 
   array (
@@ -1080,18 +1084,30 @@ return array (
     'placed_on' => 'Passée le',
     'other_items' => 'autres articles',
     'download_invoice' => 'Télécharger la facture',
-    'order_number' => 'Commande',
+    'view_details' => 'Voir les détails',
+    'order_number' => 'Commande #:number',
     'back_to_orders' => 'Retour à mes commandes',
     'ordered_items' => 'Articles commandés',
     'billing_address' => 'Adresse de facturation',
     'order_summary' => 'Résumé de la commande',
     'actions' => 'Actions',
+    'refund_processed' => 'Remboursement effectué',
+    'refund_processing' => 'Remboursement en cours',
+    'tracking_number' => 'Numéro de suivi',
+    'shipping_cost' => 'Frais de livraison',
+    'shipping_free' => 'GRATUITE',
     'payment_method' => 'Méthode',
     'payment_status' => 'Statut',
     'paid_on' => 'Payé le',
     'cancel_order' => 'Annuler la commande',
+    'cancel_order_confirm' => 'Êtes-vous sûr de vouloir annuler cette commande ?',
     'reorder' => 'Renouveler cette commande',
+    'reorder_confirm' => 'Voulez-vous vraiment ajouter tous les produits de cette commande à votre panier ?',
     'request_return' => 'Demander un retour',
+    'request_return_modal_title' => 'Demander un retour',
+    'return_reason' => 'Raison du retour',
+    'return_reason_placeholder' => 'Expliquez pourquoi vous souhaitez retourner cette commande...',
+    'expired' => 'expiré',
     'sort' => array(
       'most_recent' => 'Plus récentes',
       'oldest' => 'Plus anciennes',
@@ -1099,4 +1115,31 @@ return array (
       'amount_asc' => 'Montant croissant',
     ),
   ),
+
+  // Boutons communs
+  'buttons' => array(
+    'sort_by' => 'Trier par',
+    'delete' => 'Supprimer',
+    'edit' => 'Modifier',
+    'cancel' => 'Annuler',
+    'save' => 'Sauvegarder',
+    'close' => 'Fermer',
+  ),
+
+  'payment_status' => 
+  array (
+    'paid' => 'Payé',
+    'pending' => 'En attente',
+    'failed' => 'Échec',
+    'refunded' => 'Remboursé',
+  ),
+
+  'payment' => 
+  array (
+    'card' => 'Carte bancaire',
+    'bank_transfer' => 'Virement bancaire',
+  ),
+
+  // Traductions de produits (slugs)
+  'bache-de-protection-6x4m-8419' => 'Bâche de Protection 6x4m',
 );
