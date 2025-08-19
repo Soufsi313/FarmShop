@@ -27,7 +27,8 @@ class OrderController extends Controller
     {
         $this->checkAdminAccess();
 
-        $query = Order::with(['user', 'items.product.category']);
+        $query = Order::with(['user', 'items.product.category'])
+                     ->withCount('items');
 
         // Recherche
         if ($request->filled('search')) {

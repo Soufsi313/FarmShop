@@ -63,7 +63,7 @@
                         </div>
                         <div>
                             <h2 class="text-xl font-bold text-white">FarmShop</h2>
-                            <p class="text-xs text-slate-400 font-medium">{{ __("app.pages.admin") }}</p>
+                            <p class="text-xs text-slate-400 font-medium">Administration</p>
                         </div>
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                                 </svg>
                             </div>
-                            <span>{{ __("app.pages.dashboard") }}</span>
+                            <span>Tableau de bord</span>
                         </a>
                     </div>
 
@@ -126,7 +126,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                     </svg>
                                 </div>
-                                <span>{{ __("app.ecommerce.categories") }}</span>
+                                <span>Catégories</span>
                             </a>
 
                             <a href="{{ route('admin.special-offers.index') }}" 
@@ -209,7 +209,7 @@
                     <div class="mt-8">
                         <div class="flex items-center px-4 mb-4">
                             <div class="w-8 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"></div>
-                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __("app.ecommerce.orders") }}</h3>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Commandes</h3>
                         </div>
                         <div class="space-y-2">
                             <a href="{{ route('admin.orders.index') }}" 
@@ -248,7 +248,7 @@
                     <div class="mt-8">
                         <div class="flex items-center px-4 mb-4">
                             <div class="w-8 h-0.5 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full"></div>
-                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __("app.forms.content") }}</h3>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Contenu</h3>
                         </div>
                         <div class="space-y-2">
                             <a href="{{ route('admin.blog.index') }}" 
@@ -298,7 +298,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                     </svg>
                                 </div>
-                                <span>{{ __("app.nav.newsletter") }}</span>
+                                <span>Newsletter</span>
                             </a>
                         </div>
                     </div>
@@ -336,7 +336,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                                     </svg>
                                 </div>
-                                <span>{{ __("app.pages.statistics") }}</span>
+                                <span>Statistiques</span>
                                 <span class="ml-auto w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
                             </a>
 
@@ -358,7 +358,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     </svg>
                                 </div>
-                                <span>{{ __("app.pages.settings") }}</span>
+                                <span>Paramètres</span>
                             </a>
                         </div>
                     </div>
@@ -397,7 +397,7 @@
                 </div>
                 <nav class="flex-1 px-4">
                     <a href="{{ route('admin.dashboard') }}" class="block py-2 text-white">Dashboard</a>
-                    <a href="{{ route('admin.statistics') }}" class="block py-2 text-white">{{ __("app.pages.statistics") }}</a>
+                    <a href="{{ route('admin.statistics') }}" class="block py-2 text-white">Statistiques</a>
                     <!-- Autres liens... -->
                 </nav>
             </div>

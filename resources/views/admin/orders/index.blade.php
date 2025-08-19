@@ -221,8 +221,22 @@
                         @foreach($orders as $order)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">#{{ $order->id }}</div>
-                                    <div class="text-sm text-gray-500">{{ $order->items_count }} article(s)</div>
+                                    <div class="text-sm font-medium text-gray-900">{{ $order->order_number ?: '#' . $order->id }}</div>
+                                    <div class="text-xs text-gray-500 max-w-xs truncate">
+                                        @if($order->items && $order->items->count() > 0)
+                                            @php
+                                                $itemNames = $order->items->map(function($item) {
+                                                    return $item->product_name ?? ($item->product ? $item->product->name : 'Produit');
+                                                })->take(3)->join(', ');
+                                                if($order->items->count() > 3) {
+                                                    $itemNames .= ' +' . ($order->items->count() - 3) . ' autre(s)';
+                                                }
+                                            @endphp
+                                            {{ $itemNames }}
+                                        @else
+                                            {{ $order->items_count ?? 0 }} article(s)
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900">{{ $order->user->name }}</div>

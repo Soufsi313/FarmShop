@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Mes locations - FarmShop')
+@section('title', __('app.rental_orders.my_rentals') . ' - FarmShop')
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8">
@@ -8,34 +8,34 @@
         
         <!-- En-tête -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Mes Locations</h1>
-            <p class="text-gray-600">Gérez vos locations et suivez leur statut</p>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ __('app.rental_orders.my_rentals') }}</h1>
+            <p class="text-gray-600">{{ __('app.rental_orders.description') }}</p>
         </div>
 
         <!-- Filtres -->
         <div class="bg-white rounded-lg shadow p-6 mb-6">
             <form method="GET" action="{{ route('rental-orders.index') }}" class="flex flex-wrap gap-4 items-center">
                 <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Filtrer par statut</label>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.rental_orders.filter_by_status') }}</label>
                     <select name="status" id="status" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <option value="">Tous les statuts</option>
-                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>{{ __("app.status.pending") }}<//option>
-                        <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmée</option>
-                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Terminée</option>
-                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Annulée</option>
-                        <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>Clôturée</option>
+                        <option value="">{{ __('app.rental_orders.all_statuses') }}</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>{{ __("app.status.pending") }}</option>
+                        <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>{{ __("app.status.confirmed") }}</option>
+                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>{{ __("app.status.active") }}</option>
+                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>{{ __("app.status.completed") }}</option>
+                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>{{ __("app.status.cancelled") }}</option>
+                        <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>{{ __("app.status.closed") }}</option>
                     </select>
                 </div>
                 
                 <div>
-                    <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Date de début</label>
+                    <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.rental_orders.start_date') }}</label>
                     <input type="date" name="start_date" id="start_date" value="{{ request('start_date') }}" 
                            class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
                 
                 <div>
-                    <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
+                    <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.rental_orders.end_date') }}</label>
                     <input type="date" name="end_date" id="end_date" value="{{ request('end_date') }}" 
                            class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
@@ -45,7 +45,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
-                        Filtrer
+                        {{ __('app.rental_orders.filter') }}
                     </button>
                 </div>
             </form>
