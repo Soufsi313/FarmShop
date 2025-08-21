@@ -1,0 +1,171 @@
+@startuml communication_blog
+title Schéma Base de Données - Communication & Blog
+
+entity "newsletters" as newsletters {
+  *id : bigint
+  *title : string
+  *subject : string
+  content : text
+  excerpt : text
+  featured_image : string
+  status : enum(draft,scheduled,sent,cancelled)
+  scheduled_at : timestamp
+  sent_at : timestamp
+  recipients_count : integer
+  sent_count : integer
+  failed_count : integer
+  opened_count : integer
+  clicked_count : integer
+  unsubscribed_count : integer
+  tags : json
+  metadata : json
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "newsletter_subscriptions" as newsletter_subscriptions {
+  *id : bigint
+  *email : string (unique)
+  *user_id : bigint
+  status : enum(active,unsubscribed,bounced)
+  source : string
+  subscribed_at : timestamp
+  unsubscribed_at : timestamp
+  unsubscribe_reason : string
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "newsletter_sends" as newsletter_sends {
+  *id : bigint
+  *newsletter_id : bigint
+  *subscription_id : bigint
+  status : enum(pending,sent,failed,bounced)
+  sent_at : timestamp
+  opened_at : timestamp
+  clicked_at : timestamp
+  bounced_at : timestamp
+  error_message : text
+  tracking_id : string
+  email_provider_id : string
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "email_logs" as email_logs {
+  *id : bigint
+  *to_email : string
+  subject : string
+  body : text
+  status : enum(pending,sent,failed)
+  sent_at : timestamp
+  error_message : text
+  provider : string
+  provider_message_id : string
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "blog_categories" as blog_categories {
+  *id : bigint
+  *name : string (unique)
+  description : text
+  *slug : string (unique)
+  parent_id : bigint
+  sort_order : integer
+  is_active : boolean
+  meta_title : string
+  meta_description : text
+  meta_keywords : string
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "blog_posts" as blog_posts {
+  *id : bigint
+  *blog_category_id : bigint
+  *title : string
+  *slug : string (unique)
+  excerpt : text
+  content : longtext
+  featured_image : string
+  gallery : json
+  status : enum(draft,published,scheduled,archived)
+  published_at : timestamp
+  scheduled_for : timestamp
+  meta_title : string
+  meta_description : text
+  meta_keywords : string
+  metadata : json
+  tags : json
+  views_count : integer
+  likes_count : integer
+  comments_count : integer
+  is_featured : boolean
+  --Traductions--
+  title_en : string
+  title_fr : string
+  excerpt_en : text
+  excerpt_fr : text
+  content_en : longtext
+  content_fr : longtext
+  meta_title_en : string
+  meta_title_fr : string
+  meta_description_en : text
+  meta_description_fr : text
+  slug_en : string
+  slug_fr : string
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "blog_comments" as blog_comments {
+  *id : bigint
+  *blog_post_id : bigint
+  *user_id : bigint
+  parent_id : bigint
+  content : text
+  status : enum(pending,approved,rejected,spam)
+  is_pinned : boolean
+  approved_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "blog_comment_reports" as blog_comment_reports {
+  *id : bigint
+  *blog_comment_id : bigint
+  *user_id : bigint
+  reason : enum(spam,inappropriate,offensive,other)
+  description : text
+  status : enum(pending,reviewed,resolved)
+  reviewed_by : bigint
+  reviewed_at : timestamp
+  admin_notes : text
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "blog_post_translations" as blog_post_translations {
+  *id : bigint
+  *blog_post_id : bigint
+  *locale : string
+  *title : string
+  *slug : string
+  excerpt : text
+  content : longtext
+  meta_title : string
+  meta_description : text
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+newsletters ||--o{ newsletter_sends : newsletter_id
+newsletter_subscriptions ||--o{ newsletter_sends : subscription_id
+blog_categories ||--o{ blog_posts : blog_category_id
+blog_categories ||--o{ blog_categories : parent_id
+blog_posts ||--o{ blog_comments : blog_post_id
+blog_comments ||--o{ blog_comment_reports : blog_comment_id
+blog_comments ||--o{ blog_comments : parent_id
+blog_posts ||--o{ blog_post_translations : blog_post_id
+@enduml

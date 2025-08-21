@@ -1,0 +1,107 @@
+@startuml products_categories
+title Schéma Base de Données - Produits & Catégories
+
+entity "categories" as categories {
+  *id : bigint
+  *name : string (unique)
+  description : text
+  *slug : string (unique)
+  food_type : enum(fruit,legume,autre)
+  --SEO--
+  meta_title : string
+  meta_description : text
+  meta_keywords : string
+  --Système--
+  is_active : boolean
+  deleted_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "rental_categories" as rental_categories {
+  *id : bigint
+  *name : string (unique)
+  description : text
+  *slug : string (unique)
+  is_returnable : boolean
+  --SEO--
+  meta_title : string
+  meta_description : text
+  meta_keywords : string
+  --Système--
+  is_active : boolean
+  deleted_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "products" as products {
+  *id : bigint
+  *category_id : bigint
+  *name : string
+  description : text
+  *slug : string (unique)
+  *price : decimal(10,2)
+  quantity : integer
+  critical_threshold : integer
+  unit_symbol : enum(kg,pièce,litre,gramme,tonne)
+  main_image : string
+  gallery_images : json
+  --Location--
+  deposit_amount : decimal(10,2)
+  rental_stock : integer
+  min_rental_days : integer
+  max_rental_days : integer
+  --Gestion--
+  is_active : boolean
+  is_featured : boolean
+  likes_count : integer
+  views_count : integer
+  --SEO--
+  meta_title : string
+  meta_description : text
+  meta_keywords : string
+  --Système--
+  deleted_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "product_likes" as product_likes {
+  *id : bigint
+  *user_id : bigint
+  *product_id : bigint
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "wishlists" as wishlists {
+  *id : bigint
+  *user_id : bigint
+  *product_id : bigint
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "special_offers" as special_offers {
+  *id : bigint
+  *product_id : bigint
+  *name : string
+  description : text
+  discount_type : enum(percentage,fixed)
+  discount_value : decimal(8,2)
+  start_date : date
+  end_date : date
+  is_active : boolean
+  max_uses : integer
+  current_uses : integer
+  deleted_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+categories ||--o{ products : category_id
+products ||--o{ product_likes : product_id
+products ||--o{ wishlists : product_id
+products ||--o{ special_offers : product_id
+@enduml

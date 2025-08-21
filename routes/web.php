@@ -139,19 +139,7 @@ Route::middleware('auth')->group(function () {
     
     // Route du panier de location
     Route::get('/cart-location', function () {
-        // Récupérer seulement les traductions de produits selon la langue actuelle
-        $locale = app()->getLocale();
-        $allTranslations = trans('app', [], $locale);
-        
-        // Filtrer seulement les slugs de produits (ceux qui contiennent des tirets et des chiffres)
-        $productNames = [];
-        foreach ($allTranslations as $key => $value) {
-            if (is_string($value) && preg_match('/^[a-z0-9-]+$/', $key) && strpos($key, '-') !== false) {
-                $productNames[$key] = $value;
-            }
-        }
-        
-        return view('cart-location.index', compact('productNames'));
+        return view('cart-location.index');
     })->name('cart-location.index');
     
     // Route AJAX pour récupérer les données du panier

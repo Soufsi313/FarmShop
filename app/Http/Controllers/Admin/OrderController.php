@@ -27,8 +27,7 @@ class OrderController extends Controller
     {
         $this->checkAdminAccess();
 
-        $query = Order::with(['user', 'items.product.category'])
-                     ->withCount('items');
+        $query = Order::with(['user', 'items.product.category'])->withCount('items');
 
         // Recherche
         if ($request->filled('search')) {
@@ -82,12 +81,15 @@ class OrderController extends Controller
         // Statistiques pour le dashboard
         $stats = [
             'total_orders' => Order::count(),
-            'pending_orders' => Order::where('status', 'pending')->count(),
+            'delivered' => Order::where('status', 'delivered')->count(),
+            'pending' => Order::where('status', 'pending')->count(),
+            'preparing' => Order::where('status', 'preparing')->count(),
+            'total_revenue' => Order::whereIn('status', ['delivered', 'shipped'])->sum('total_amount'),
             'revenue_today' => Order::whereDate('created_at', today())
-                                   ->where('payment_status', 'paid')
+                                   ->whereIn('status', ['delivered', 'shipped'])
                                    ->sum('total_amount'),
             'revenue_month' => Order::whereMonth('created_at', now()->month)
-                                   ->where('payment_status', 'paid')
+                                   ->whereIn('status', ['delivered', 'shipped'])
                                    ->sum('total_amount'),
         ];
 

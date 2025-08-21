@@ -221,26 +221,12 @@
                         @foreach($orders as $order)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">{{ $order->order_number ?: '#' . $order->id }}</div>
-                                    <div class="text-xs text-gray-500 max-w-xs truncate">
-                                        @if($order->items && $order->items->count() > 0)
-                                            @php
-                                                $itemNames = $order->items->map(function($item) {
-                                                    return $item->product_name ?? ($item->product ? $item->product->name : 'Produit');
-                                                })->take(3)->join(', ');
-                                                if($order->items->count() > 3) {
-                                                    $itemNames .= ' +' . ($order->items->count() - 3) . ' autre(s)';
-                                                }
-                                            @endphp
-                                            {{ $itemNames }}
-                                        @else
-                                            {{ $order->items_count ?? 0 }} article(s)
-                                        @endif
-                                    </div>
+                                    <div class="text-sm font-medium text-gray-900">#{{ $order->order_number ?? $order->id }}</div>
+                                    <div class="text-sm text-gray-500">{{ $order->items_count }} article(s)</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $order->user->name }}</div>
-                                    <div class="text-sm text-gray-500">{{ $order->user->email }}</div>
+                                    <div class="text-sm text-gray-900">{{ $order->user->name ?? trim(($order->user->first_name ?? '') . ' ' . ($order->user->last_name ?? '')) ?: 'Client inconnu' }}</div>
+                                    <div class="text-sm text-gray-500">{{ $order->user->email ?? 'Email non disponible' }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php
@@ -289,7 +275,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    €{{ number_format($order->total, 2) }}
+                                    €{{ number_format($order->total_amount ?? 0, 2) }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {{ $order->created_at->format('d/m/Y H:i') }}

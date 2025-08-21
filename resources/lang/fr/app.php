@@ -111,8 +111,6 @@ return array (
   array (
     'total' => 'Total',
     'category' => 'Catégorie',
-    'categories' => 'Catégories',
-    'orders' => 'Commandes',
     'subtotal' => 'Sous-total',
     'tax' => 'TVA',
     'payment' => 'Paiement',
@@ -120,7 +118,6 @@ return array (
   'forms' => 
   array (
     'delivery_address' => 'Adresse de livraison',
-    'content' => 'Contenu',
   ),
   'rental_orders' => 
   array (
@@ -138,6 +135,7 @@ return array (
     'placed_on' => 'Passée le',
     'order_number' => 'Commande',
     'other_items' => 'autres articles',
+    'deleted_product' => 'Produit supprimé',
     'see_details' => 'Voir les détails',
     'no_rentals' => 'Aucune location trouvée',
     'no_rentals_description' => 'Vous n\'avez pas encore de location.',
@@ -221,10 +219,6 @@ return array (
     'category' => 'Catégorie',
     'contact' => 'Contact',
     'rentals' => 'Location',
-    'admin' => 'Administration',
-    'dashboard' => 'Tableau de bord',
-    'statistics' => 'Statistiques',
-    'settings' => 'Paramètres',
   ),
   'auth' => 
   array (
@@ -672,8 +666,6 @@ return array (
     'loading_cart' => 'Chargement du panier...',
     'cart_load_error' => 'Erreur lors du chargement du panier',
     'clear_cart_confirm' => 'Êtes-vous sûr de vouloir vider votre panier ?',
-    'error_quantity_update' => 'Erreur lors de la mise à jour de la quantité',
-    'error_remove_item' => 'Erreur lors de la suppression de l\'article'
   ),
   
   'cart' => 
@@ -714,16 +706,6 @@ return array (
     'total_rental_items' => 'Articles de location',
     'total_rental_amount' => 'Montant total location',
     'rental_savings' => 'Économies location',
-    'unit_price_ht_text' => 'Prix unitaire HT:',
-    'unit_price_ttc_text' => 'Prix unitaire TTC:',
-    'normal_price_ttc_text' => 'Prix normal TTC:',
-    'discounted_price_ttc_text' => 'Prix réduit TTC:',
-    'tva_on_amount' => 'TVA %s%% sur %s €:',
-    'tva_rate' => 'TVA (%s%%) :',
-    'articles_count' => '%s article(s)',
-    'free' => 'GRATUIT',
-    'items_text' => 'article(s)',
-    'subtotal_ht_text' => 'Sous-total HT:',
   ),
   
   'cart_location' => 
@@ -1075,15 +1057,11 @@ return array (
   array (
     'pending' => 'En attente',
     'confirmed' => 'Confirmée',
-    'preparing' => 'En préparation',
     'shipped' => 'Expédiée',
     'delivered' => 'Livrée',
     'cancelled' => 'Annulée',
     'return_requested' => 'Retour demandé',
     'returned' => 'Retournée',
-    'active' => 'Active',
-    'completed' => 'Terminée',
-    'closed' => 'Clôturée',
   ),
   'buttons' => 
   array (
@@ -1110,23 +1088,29 @@ return array (
     'billing_address' => 'Adresse de facturation',
     'order_summary' => 'Résumé de la commande',
     'actions' => 'Actions',
-    'refund_processed' => 'Remboursement effectué',
-    'refund_processing' => 'Remboursement en cours',
-    'tracking_number' => 'Numéro de suivi',
-    'shipping_cost' => 'Frais de livraison',
-    'shipping_free' => 'GRATUITE',
     'payment_method' => 'Méthode',
     'payment_status' => 'Statut',
     'paid_on' => 'Payé le',
     'cancel_order' => 'Annuler la commande',
-    'cancel_order_confirm' => 'Êtes-vous sûr de vouloir annuler cette commande ?',
     'reorder' => 'Renouveler cette commande',
-    'reorder_confirm' => 'Voulez-vous vraiment ajouter tous les produits de cette commande à votre panier ?',
     'request_return' => 'Demander un retour',
-    'request_return_modal_title' => 'Demander un retour',
+    'cancel_order_confirm' => 'Êtes-vous sûr de vouloir annuler cette commande ?',
+    'expired' => 'expiré',
+    'non_returnable_products' => 'Produits non retournables',
+    'non_returnable_message' => 'Cette commande contient uniquement des produits alimentaires qui ne peuvent pas être retournés pour des raisons d\'hygiène et de sécurité alimentaire.',
+    'understood' => 'J\'ai compris',
+    'return_period_expired' => 'Délai de retour expiré',
+    'return_period_expired_message' => 'Le délai de 14 jours pour retourner cette commande est malheureusement dépassé.',
+    'paid' => 'Payée',
+    'payment_pending' => 'Paiement en attente',
+    'no_orders_with_status' => 'Aucune commande avec le statut ":status" trouvée.',
+    'no_orders_yet' => 'Vous n\'avez pas encore passé de commande.',
+    'view_all_orders' => 'Voir toutes les commandes',
+    'discover_products' => 'Découvrir nos produits',
     'return_reason' => 'Raison du retour',
     'return_reason_placeholder' => 'Expliquez pourquoi vous souhaitez retourner cette commande...',
-    'expired' => 'expiré',
+    'refund_processed' => 'Remboursement effectué',
+    'refund_processing' => 'Remboursement en cours',
     'sort' => array(
       'most_recent' => 'Plus récentes',
       'oldest' => 'Plus anciennes',
@@ -1135,30 +1119,9 @@ return array (
     ),
   ),
 
-  // Boutons communs
-  'buttons' => array(
-    'sort_by' => 'Trier par',
-    'delete' => 'Supprimer',
-    'edit' => 'Modifier',
-    'cancel' => 'Annuler',
-    'save' => 'Sauvegarder',
+  // Common translations
+  'common' => array(
     'close' => 'Fermer',
+    'cancel' => 'Annuler',
   ),
-
-  'payment_status' => 
-  array (
-    'paid' => 'Payé',
-    'pending' => 'En attente',
-    'failed' => 'Échec',
-    'refunded' => 'Remboursé',
-  ),
-
-  'payment' => 
-  array (
-    'card' => 'Carte bancaire',
-    'bank_transfer' => 'Virement bancaire',
-  ),
-
-  // Traductions de produits (slugs)
-  'bache-de-protection-6x4m-8419' => 'Bâche de Protection 6x4m',
 );

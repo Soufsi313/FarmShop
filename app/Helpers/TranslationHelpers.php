@@ -31,6 +31,13 @@ if (!function_exists('trans_product')) {
         
         // Utiliser les fichiers de langue Laravel pour les traductions
         if ($field === 'name') {
+            // Essayer d'abord app.slug (nouvelle structure)
+            $translation = __('app.' . $product->slug, [], $locale);
+            if ($translation !== 'app.' . $product->slug) {
+                return $translation;
+            }
+            
+            // Fallback vers l'ancienne structure app.product_names.slug
             $translation = __('app.product_names.' . $product->slug, [], $locale);
             if ($translation !== 'app.product_names.' . $product->slug) {
                 return $translation;

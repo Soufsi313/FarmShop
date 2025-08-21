@@ -110,8 +110,6 @@ return array (
   array (
     'total' => 'Total',
     'category' => 'Category',
-    'categories' => 'Categories',
-    'orders' => 'Orders',
     'subtotal' => 'Subtotal',
     'tax' => 'Tax',
     'payment' => 'Payment',
@@ -119,7 +117,6 @@ return array (
   'forms' => 
   array (
     'delivery_address' => 'Delivery address',
-    'content' => 'Content',
   ),
   'rental_orders' => 
   array (
@@ -137,6 +134,7 @@ return array (
     'placed_on' => 'Placed on',
     'order_number' => 'Order',
     'other_items' => 'other items',
+    'deleted_product' => 'Deleted product',
     'see_details' => 'See details',
     'no_rentals' => 'No rentals found',
     'no_rentals_description' => 'You don\'t have any rentals yet.',
@@ -220,10 +218,6 @@ return array (
     'category' => 'Category',
     'contact' => 'Contact',
     'rentals' => 'Rentals',
-    'admin' => 'Administration',
-    'dashboard' => 'Dashboard',
-    'statistics' => 'Statistics',
-    'settings' => 'Settings',
   ),
   'products' => 
   array (
@@ -1096,15 +1090,11 @@ return array (
   array (
     'pending' => 'Pending',
     'confirmed' => 'Confirmed',
-    'preparing' => 'Preparing',
     'shipped' => 'Shipped',
     'delivered' => 'Delivered',
     'cancelled' => 'Cancelled',
     'return_requested' => 'Return requested',
     'returned' => 'Returned',
-    'active' => 'Active',
-    'completed' => 'Completed',
-    'closed' => 'Closed',
   ),
   'orders' => 
   array (
@@ -1116,43 +1106,35 @@ return array (
     'other_items' => 'other items',
     'download_invoice' => 'Download invoice',
     'view_details' => 'View details',
-  // ...existing code...
-
-  'order' => [
     'order_number' => 'Order #:number',
-    'placed_on' => 'Placed on',
     'back_to_orders' => 'Back to my orders',
     'ordered_items' => 'Ordered items',
     'billing_address' => 'Billing address',
     'order_summary' => 'Order summary',
     'actions' => 'Actions',
-    'refund_processed' => 'Refund processed',
-    'refund_pending' => 'Refund pending',
-    'tracking_number' => 'Tracking number',
-    'shipping_cost' => 'Shipping cost',
-    'shipping_free' => 'FREE',
     'payment_method' => 'Method',
     'payment_status' => 'Status',
     'paid_on' => 'Paid on',
     'cancel_order' => 'Cancel order',
-    'cancel_confirmation' => 'Are you sure you want to cancel this order?',
-    'download_invoice' => 'Download invoice',
-    'return_order' => 'Return order',
-    'renew_order' => 'Reorder this order',
-    'renew_confirmation' => 'Do you really want to add all products from this order to your cart?',
-  ],
-    'payment_method' => 'Method',
-    'payment_status' => 'Status',
-    'paid_on' => 'Paid on',
-    'cancel_order' => 'Cancel order',
-    'cancel_order_confirm' => 'Are you sure you want to cancel this order?',
     'reorder' => 'Reorder this order',
     'request_return' => 'Request return',
-    'expired' => 'Return (expired)',
-    'sort_recent' => 'Most recent',
-    'sort_oldest' => 'Oldest',
-    'sort_total_desc' => 'Amount descending',
-    'sort_total_asc' => 'Amount ascending',
+    'cancel_order_confirm' => 'Are you sure you want to cancel this order?',
+    'expired' => 'expired',
+    'non_returnable_products' => 'Non-returnable products',
+    'non_returnable_message' => 'This order contains only food products that cannot be returned for hygiene and food safety reasons.',
+    'understood' => 'I understand',
+    'return_period_expired' => 'Return period expired',
+    'return_period_expired_message' => 'The 14-day period to return this order has unfortunately passed.',
+    'paid' => 'Paid',
+    'payment_pending' => 'Payment pending',
+    'no_orders_with_status' => 'No orders with status ":status" found.',
+    'no_orders_yet' => 'You haven\'t placed any orders yet.',
+    'view_all_orders' => 'View all orders',
+    'discover_products' => 'Discover our products',
+    'return_reason' => 'Return reason',
+    'return_reason_placeholder' => 'Explain why you want to return this order...',
+    'refund_processed' => 'Refund processed',
+    'refund_processing' => 'Refund processing',
     'sort' => array(
       'most_recent' => 'Most recent',
       'oldest' => 'Oldest',
@@ -1161,30 +1143,9 @@ return array (
     ),
   ),
 
-  // Common buttons
-  'buttons' => array(
-    'sort_by' => 'Sort by',
-    'delete' => 'Delete',
-    'edit' => 'Edit',
-    'cancel' => 'Cancel',
-    'save' => 'Save',
+  // Common translations
+  'common' => array(
     'close' => 'Close',
+    'cancel' => 'Cancel',
   ),
-
-  'payment_status' => 
-  array (
-    'paid' => 'Paid',
-    'pending' => 'Pending',
-    'failed' => 'Failed',
-    'refunded' => 'Refunded',
-  ),
-
-  'payment' => 
-  array (
-    'card' => 'Credit card',
-    'bank_transfer' => 'Bank transfer',
-  ),
-
-  // Product translations (slugs)
-  'bache-de-protection-6x4m-8419' => '6x4m Protection Tarp',
 );

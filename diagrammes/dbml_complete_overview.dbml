@@ -1,0 +1,265 @@
+// Vue d'ensemble complète - FarmShop Database
+// https://dbdiagram.io/
+// ATTENTION: Ce fichier contient TOUS les schémas. 
+// Pour une meilleure lisibilité, utiliser les fichiers séparés par thème.
+
+//==============================================================================
+// 1. UTILISATEURS & AUTHENTIFICATION
+//==============================================================================
+
+Table users {
+  id bigint [pk, increment]
+  username varchar(255) [unique, not null]
+  name varchar(255) [null]
+  email varchar(255) [unique, not null]
+  email_verified_at timestamp [null]
+  password varchar(255) [not null]
+  role enum('Admin','User') [default: 'User']
+  newsletter_subscribed boolean [default: false]
+  newsletter_subscribed_at timestamp [null]
+  address varchar(255) [null]
+  city varchar(255) [null]
+  postal_code varchar(20) [null]
+  country varchar(100) [null]
+  phone varchar(20) [null]
+  remember_token varchar(100) [null]
+  deleted_at timestamp [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table password_reset_tokens {
+  email varchar(255) [pk]
+  token varchar(255) [not null]
+  created_at timestamp [null]
+}
+
+Table messages {
+  id bigint [pk, increment]
+  user_id bigint [ref: > users.id]
+  name varchar(255) [not null]
+  email varchar(255) [not null]
+  subject varchar(255) [not null]
+  content text [not null]
+  status enum('unread','read','replied') [default: 'unread']
+  admin_reply text [null]
+  replied_at timestamp [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+//==============================================================================
+// 2. PRODUITS & CATÉGORIES
+//==============================================================================
+
+Table categories {
+  id bigint [pk, increment]
+  name varchar(255) [unique, not null]
+  description text [null]
+  slug varchar(255) [unique, not null]
+  food_type enum('fruit','legume','autre') [null]
+  meta_title varchar(255) [null]
+  meta_description text [null]
+  meta_keywords varchar(255) [null]
+  is_active boolean [default: true]
+  deleted_at timestamp [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table products {
+  id bigint [pk, increment]
+  category_id bigint [ref: > categories.id]
+  name varchar(255) [not null]
+  description text [not null]
+  slug varchar(255) [unique, not null]
+  price decimal(10,2) [not null]
+  quantity integer [default: 0]
+  unit_symbol enum('kg','pièce','litre','gramme','tonne') [not null]
+  deposit_amount decimal(10,2) [null]
+  rental_stock integer [null]
+  is_active boolean [default: true]
+  is_featured boolean [default: false]
+  likes_count integer [default: 0]
+  views_count integer [default: 0]
+  meta_title varchar(255) [null]
+  meta_description text [null]
+  deleted_at timestamp [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table special_offers {
+  id bigint [pk, increment]
+  product_id bigint [ref: > products.id]
+  name varchar(255) [not null]
+  discount_type enum('percentage','fixed') [not null]
+  discount_value decimal(8,2) [not null]
+  start_date date [not null]
+  end_date date [not null]
+  is_active boolean [default: true]
+  deleted_at timestamp [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+//==============================================================================
+// 3. COMMANDES & ACHATS
+//==============================================================================
+
+Table carts {
+  id bigint [pk, increment]
+  user_id bigint [ref: > users.id]
+  subtotal decimal(10,2) [default: 0.00]
+  tax_amount decimal(10,2) [default: 0.00]
+  total decimal(10,2) [default: 0.00]
+  status enum('active','abandoned','converted') [default: 'active']
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table cart_items {
+  id bigint [pk, increment]
+  cart_id bigint [ref: > carts.id]
+  product_id bigint [ref: > products.id]
+  special_offer_id bigint [ref: > special_offers.id, null]
+  quantity integer [not null]
+  unit_price decimal(10,2) [not null]
+  total_price decimal(10,2) [not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table orders {
+  id bigint [pk, increment]
+  order_number varchar(255) [unique, not null]
+  user_id bigint [ref: > users.id]
+  status enum('pending','confirmed','preparing','shipped','delivered','cancelled','returned') [default: 'pending']
+  subtotal decimal(10,2) [not null]
+  tax_amount decimal(10,2) [default: 0.00]
+  total_amount decimal(10,2) [not null]
+  payment_status varchar(255) [default: 'pending']
+  stripe_payment_intent varchar(255) [null]
+  paid_at timestamp [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table order_items {
+  id bigint [pk, increment]
+  order_id bigint [ref: > orders.id]
+  product_id bigint [ref: > products.id]
+  special_offer_id bigint [ref: > special_offers.id, null]
+  product_name varchar(255) [not null]
+  quantity integer [not null]
+  unit_price decimal(10,2) [not null]
+  total_price decimal(10,2) [not null]
+  is_returned boolean [default: false]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+//==============================================================================
+// 4. LOCATIONS & GESTION
+//==============================================================================
+
+Table order_locations {
+  id bigint [pk, increment]
+  order_number varchar(255) [unique, not null]
+  user_id bigint [ref: > users.id]
+  start_date date [not null]
+  end_date date [not null]
+  rental_days integer [not null]
+  total_rental_cost decimal(10,2) [not null]
+  deposit_amount decimal(10,2) [not null]
+  total_amount decimal(10,2) [not null]
+  status enum('pending','confirmed','active','completed','closed','overdue','cancelled') [default: 'pending']
+  payment_status varchar(255) [default: 'pending']
+  stripe_payment_intent varchar(255) [null]
+  paid_at timestamp [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table order_item_locations {
+  id bigint [pk, increment]
+  order_location_id bigint [ref: > order_locations.id]
+  product_id bigint [ref: > products.id]
+  product_name varchar(255) [not null]
+  quantity integer [not null]
+  daily_rate decimal(10,2) [not null]
+  total_cost decimal(10,2) [not null]
+  status enum('pending','confirmed','active','returned','overdue') [default: 'pending']
+  return_condition enum('good','damaged','lost') [null]
+  returned_at timestamp [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+//==============================================================================
+// 5. COMMUNICATION & BLOG
+//==============================================================================
+
+Table newsletters {
+  id bigint [pk, increment]
+  title varchar(255) [not null]
+  subject varchar(255) [not null]
+  content text [not null]
+  status enum('draft','scheduled','sent','cancelled') [default: 'draft']
+  sent_at timestamp [null]
+  recipients_count integer [default: 0]
+  opened_count integer [default: 0]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table newsletter_subscriptions {
+  id bigint [pk, increment]
+  email varchar(255) [unique, not null]
+  user_id bigint [ref: > users.id, null]
+  status enum('active','unsubscribed','bounced') [default: 'active']
+  subscribed_at timestamp [not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table blog_categories {
+  id bigint [pk, increment]
+  name varchar(255) [unique, not null]
+  slug varchar(255) [unique, not null]
+  description text [null]
+  is_active boolean [default: true]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table blog_posts {
+  id bigint [pk, increment]
+  blog_category_id bigint [ref: > blog_categories.id]
+  title varchar(255) [not null]
+  slug varchar(255) [unique, not null]
+  content longtext [not null]
+  status enum('draft','published','scheduled','archived') [default: 'draft']
+  published_at timestamp [null]
+  views_count integer [default: 0]
+  likes_count integer [default: 0]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table blog_comments {
+  id bigint [pk, increment]
+  blog_post_id bigint [ref: > blog_posts.id]
+  user_id bigint [ref: > users.id]
+  parent_id bigint [ref: > blog_comments.id, null]
+  content text [not null]
+  status enum('pending','approved','rejected','spam') [default: 'pending']
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+//==============================================================================
+// RELATIONS SUPPLÉMENTAIRES
+//==============================================================================
+
+Ref: password_reset_tokens.email - users.email

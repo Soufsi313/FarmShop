@@ -20,24 +20,24 @@
                     <select id="status-filter" onchange="filterByStatus(this.value)" 
                             class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         <option value="">{{ __('app.orders.all_statuses') }}</option>
-                        <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>{{ __("app.status.pending") }}</option>
-                        <option value="confirmed" {{ $currentStatus == 'confirmed' ? 'selected' : '' }}>{{ __("app.status.confirmed") }}</option>
-                        <option value="shipped" {{ $currentStatus == 'shipped' ? 'selected' : '' }}>{{ __("app.status.shipped") }}</option>
-                        <option value="delivered" {{ $currentStatus == 'delivered' ? 'selected' : '' }}>{{ __("app.status.delivered") }}</option>
-                        <option value="cancelled" {{ $currentStatus == 'cancelled' ? 'selected' : '' }}>{{ __("app.status.cancelled") }}</option>
-                        <option value="return_requested" {{ $currentStatus == 'return_requested' ? 'selected' : '' }}>{{ __("app.status.return_requested") }}</option>
-                        <option value="returned" {{ $currentStatus == 'returned' ? 'selected' : '' }}>{{ __("app.status.returned") }}</option>
+                        <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>{{ __('app.status.pending') }}</option>
+                        <option value="confirmed" {{ $currentStatus == 'confirmed' ? 'selected' : '' }}>{{ __('app.status.confirmed') }}</option>
+                        <option value="shipped" {{ $currentStatus == 'shipped' ? 'selected' : '' }}>{{ __('app.status.shipped') }}</option>
+                        <option value="delivered" {{ $currentStatus == 'delivered' ? 'selected' : '' }}>{{ __('app.status.delivered') }}</option>
+                        <option value="cancelled" {{ $currentStatus == 'cancelled' ? 'selected' : '' }}>{{ __('app.status.cancelled') }}</option>
+                        <option value="return_requested" {{ $currentStatus == 'return_requested' ? 'selected' : '' }}>{{ __('app.status.return_requested') }}</option>
+                        <option value="returned" {{ $currentStatus == 'returned' ? 'selected' : '' }}>{{ __('app.status.returned') }}</option>
                     </select>
                 </div>
                 
                 <div>
-                    <label for="sort-filter" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.buttons.sort_by") }}</label>
+                    <label for="sort-filter" class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.orders.sort_by') }}</label>
                     <select id="sort-filter" onchange="sortBy(this.value)"
                             class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <option value="recent" {{ $currentSort == 'recent' ? 'selected' : '' }}>{{ __("app.orders.sort.most_recent") }}</option>
-                        <option value="oldest" {{ $currentSort == 'oldest' ? 'selected' : '' }}>{{ __("app.orders.sort.oldest") }}</option>
-                        <option value="total_desc" {{ $currentSort == 'total_desc' ? 'selected' : '' }}>{{ __("app.orders.sort.amount_desc") }}</option>
-                        <option value="total_asc" {{ $currentSort == 'total_asc' ? 'selected' : '' }}>{{ __("app.orders.sort.amount_asc") }}</option>
+                        <option value="recent" {{ $currentSort == 'recent' ? 'selected' : '' }}>{{ __('app.orders.sort.most_recent') }}</option>
+                        <option value="oldest" {{ $currentSort == 'oldest' ? 'selected' : '' }}>{{ __('app.orders.sort.oldest') }}</option>
+                        <option value="total_desc" {{ $currentSort == 'total_desc' ? 'selected' : '' }}>{{ __('app.orders.sort.amount_desc') }}</option>
+                        <option value="total_asc" {{ $currentSort == 'total_asc' ? 'selected' : '' }}>{{ __('app.orders.sort.amount_asc') }}</option>
                     </select>
                 </div>
             </div>
@@ -104,7 +104,7 @@
                                       }">
                                     <span x-show="order.status === 'pending'">🟡 {{ __('app.status.pending') }}</span>
                                     <span x-show="order.status === 'confirmed'">🔵 {{ __('app.status.confirmed') }}</span>
-                                    <span x-show="order.status === 'preparing'">🟠 {{ __('app.status.preparing') }}</span>
+                                    <span x-show="order.status === 'preparing'">🟠 {{ __('app.orders.timeline_processing') }}</span>
                                     <span x-show="order.status === 'shipped'">🟣 {{ __('app.status.shipped') }}</span>
                                     <span x-show="order.status === 'delivered'">🟢 {{ __('app.status.delivered') }}</span>
                                     <span x-show="order.status === 'cancelled'">🔴 {{ __('app.status.cancelled') }}</span>
@@ -123,7 +123,10 @@
                         <div class="flex flex-wrap gap-2">
                             @foreach($order->items->take(3) as $item)
                             <div class="flex items-center space-x-2 bg-gray-50 rounded-lg px-3 py-2">
-                                <span class="text-sm">{{ $item->product ? trans_product($item->product) : $item->product_name }}</span>
+                                @php
+                                    $translatedName = $item->product ? trans_product($item->product) : $item->product_name;
+                                @endphp
+                                <span class="text-sm">{{ $translatedName }}</span>
                                 <span class="text-xs text-gray-600">×{{ $item->quantity }}</span>
                             </div>
                             @endforeach
@@ -142,25 +145,25 @@
                             <!-- Voir les détails -->
                             <a href="{{ route('orders.show', $order) }}" 
                                class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                👁️ {{ __("app.orders.view_details") }}
+                                👁️ {{ __('app.orders.view_details') }}
                             </a>
                             
                             <!-- Télécharger la facture (si payée) -->
                             <a x-show="order.payment_status === 'paid' && order.invoice_number" 
                                href="{{ route('orders.invoice', $order) }}" 
                                class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                📄 {{ __("app.orders.download_invoice") }}
+                                📄 {{ __('app.orders.download_invoice') }}
                             </a>
 
                             <!-- Annuler la commande (si pas encore expédiée) -->
                             <form x-show="order.can_be_cancelled && ['pending', 'confirmed', 'preparing'].includes(order.status)" 
                                   method="POST" action="{{ route('orders.cancel', $order) }}" 
-                                                                    onsubmit="return confirm('{{ __("app.orders.cancel_order_confirm") }}')"
-                                                                    class="inline">
-                                                                @csrf
-                                                                <button type="submit" class="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                                                        ❌ {{ __("app.orders.cancel_order") }}
-                                                                </button>
+                                  onsubmit="return confirm('{{ __('app.orders.cancel_order_confirm') }}')"
+                                  class="inline">
+                                @csrf
+                                <button type="submit" class="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                    ❌ {{ __('app.orders.cancel_order') }}
+                                </button>
                             </form>
 
                             <!-- Retourner la commande (toujours visible si livrée) -->
@@ -190,28 +193,28 @@
                                         <a x-show="returnButtonAction === 'direct'" 
                                            href="{{ route('orders.return.confirm', $order) }}" 
                                            class="bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                            🔄 {{ __("app.orders.request_return") }}
+                                            🔄 {{ __('app.orders.request_return') }}
                                         </a>
                                         
                                         <!-- Retour mixte (produits partiellement retournables) -->
                                         <a x-show="returnButtonAction === 'mixed'" 
                                            href="{{ route('orders.return.confirm', $order) }}" 
                                            class="bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                            🔄 {{ __("app.orders.request_return") }}
+                                            🔄 {{ __('app.orders.request_return') }}
                                         </a>
                                         
                                         <!-- Produits non retournables -->
                                         <button x-show="returnButtonAction === 'non_returnable'" 
                                                 @click="showNonReturnableModal = true"
                                                 class="bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                            🔄 {{ __("app.orders.request_return") }}
+                                            🔄 {{ __('app.orders.request_return') }}
                                         </button>
                                         
                                         <!-- Délai expiré -->
                                         <button x-show="returnButtonAction === 'expired'" 
                                                 @click="showExpiredModal = true"
                                                 class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-not-allowed opacity-60">
-                                            🔄 {{ __("app.orders.expired") }}
+                                            🔄 {{ __('app.orders.request_return') }} ({{ __('app.orders.expired') }})
                                         </button>
                                     </div>
                                 </template>
@@ -228,16 +231,16 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"/>
                                                 </svg>
                                             </div>
-                                            <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">Produits non retournables</h3>
+                                            <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">{{ __('app.orders.non_returnable_products') }}</h3>
                                             <div class="mt-2 px-7 py-3">
                                                 <p class="text-sm text-gray-500">
-                                                    Cette commande contient uniquement des produits alimentaires qui ne peuvent pas être retournés pour des raisons d'hygiène et de sécurité alimentaire.
+                                                    {{ __('app.orders.non_returnable_message') }}
                                                 </p>
                                             </div>
                                             <div class="items-center px-4 py-3">
                                                 <button @click="showNonReturnableModal = false" 
                                                         class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700">
-                                                    J'ai compris
+                                                    {{ __('app.orders.understood') }}
                                                 </button>
                                             </div>
                                         </div>
@@ -256,16 +259,16 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                 </svg>
                                             </div>
-                                            <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">Délai de retour expiré</h3>
+                                            <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">{{ __('app.orders.return_period_expired') }}</h3>
                                             <div class="mt-2 px-7 py-3">
                                                 <p class="text-sm text-gray-500">
-                                                    Le délai de 14 jours pour retourner cette commande est malheureusement dépassé.
+                                                    {{ __('app.orders.return_period_expired_message') }}
                                                 </p>
                                             </div>
                                             <div class="items-center px-4 py-3">
                                                 <button @click="showExpiredModal = false" 
                                                         class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700">
-                                                    Fermer
+                                                    {{ __('app.common.close') }}
                                                 </button>
                                             </div>
                                         </div>
@@ -276,9 +279,9 @@
                         
                         <div class="text-sm text-gray-600">
                             @if($order->payment_status == 'paid')
-                                ✅ Payée
+                                ✅ {{ __('app.orders.paid') }}
                             @elseif($order->payment_status == 'pending')
-                                ⏳ Paiement en attente
+                                ⏳ {{ __('app.orders.payment_pending') }}
                             @else
                                 ❌ {{ ucfirst($order->payment_status) }}
                             @endif
@@ -296,24 +299,24 @@
             <!-- Aucune commande -->
             <div class="text-center py-12">
                 <div class="text-6xl mb-4">📦</div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune commande trouvée</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('app.orders.no_orders') }}</h3>
                 <p class="text-gray-600 mb-6">
                     @if($currentStatus)
-                        Aucune commande avec le statut "{{ $currentStatus }}" trouvée.
+                        {{ __('app.orders.no_orders_with_status', ['status' => $currentStatus]) }}
                     @else
-                        Vous n'avez pas encore passé de commande.
+                        {{ __('app.orders.no_orders_yet') }}
                     @endif
                 </p>
                 <div class="space-x-4">
                     @if($currentStatus)
                     <a href="{{ route('orders.index') }}" 
                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                        Voir toutes les commandes
+                        {{ __('app.orders.view_all_orders') }}
                     </a>
                     @endif
                     <a href="{{ route('products.index') }}" 
                        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
-                        Découvrir nos produits
+                        {{ __('app.orders.discover_products') }}
                     </a>
                 </div>
             </div>
@@ -326,27 +329,27 @@
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 text-center mb-4">
-                Demander un retour
+                {{ __('app.orders.request_return') }}
             </h3>
             <form id="returnForm" method="POST" action="">
                 @csrf
                 <div class="mb-4">
                     <label for="return_reason" class="block text-sm font-medium text-gray-700 mb-2">
-                        Raison du retour *
+                        {{ __('app.orders.return_reason') }} *
                     </label>
                     <textarea name="reason" id="return_reason" rows="4" 
                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                              placeholder="Expliquez pourquoi vous souhaitez retourner cette commande..."
+                              placeholder="{{ __('app.orders.return_reason_placeholder') }}"
                               required></textarea>
                 </div>
                 <div class="flex gap-3">
                     <button type="button" onclick="closeReturnModal()" 
                             class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
-                        Annuler
+                        {{ __('app.common.cancel') }}
                     </button>
                     <button type="submit" 
                             class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700">
-                        Demander le retour
+                        {{ __('app.orders.request_return') }}
                     </button>
                 </div>
             </form>

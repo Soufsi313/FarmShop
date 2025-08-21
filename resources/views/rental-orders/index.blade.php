@@ -19,12 +19,12 @@
                     <label for="status" class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.rental_orders.filter_by_status') }}</label>
                     <select name="status" id="status" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         <option value="">{{ __('app.rental_orders.all_statuses') }}</option>
-                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>{{ __("app.status.pending") }}</option>
-                        <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>{{ __("app.status.confirmed") }}</option>
-                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>{{ __("app.status.active") }}</option>
-                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>{{ __("app.status.completed") }}</option>
-                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>{{ __("app.status.cancelled") }}</option>
-                        <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>{{ __("app.status.closed") }}</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>{{ __('app.rental_status.pending') }}</option>
+                        <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>{{ __('app.rental_status.confirmed') }}</option>
+                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>{{ __('app.rental_status.active') }}</option>
+                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>{{ __('app.rental_status.completed') }}</option>
+                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>{{ __('app.rental_status.cancelled') }}</option>
+                        <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>{{ __('app.rental_status.closed') }}</option>
                     </select>
                 </div>
                 
@@ -59,10 +59,10 @@
                         <div class="flex items-center justify-between mb-4">
                             <div>
                                 <h3 class="text-lg font-semibold text-gray-900">
-                                    Commande #{{ $order->order_number }}
+                                    {{ __('app.rental_orders.order_number') }} #{{ $order->order_number }}
                                 </h3>
                                 <p class="text-sm text-gray-600">
-                                    Passée le {{ $order->created_at->format('d/m/Y à H:i') }}
+                                    {{ __('app.rental_orders.placed_on') }} {{ $order->created_at->format('d/m/Y à H:i') }}
                                 </p>
                             </div>
                             
@@ -78,12 +78,12 @@
                                         @elseif($order->status === 'closed') bg-gray-100 text-gray-800
                                         @else bg-gray-100 text-gray-800
                                         @endif">
-                                        @if($order->status === 'pending') 🟡 En attente
-                                        @elseif($order->status === 'confirmed') 🔵 Confirmée
-                                        @elseif($order->status === 'active') 🟢 Active
-                                        @elseif($order->status === 'completed') 🟣 Terminée
-                                        @elseif($order->status === 'cancelled') 🔴 Annulée
-                                        @elseif($order->status === 'closed') 🔒 Clôturée
+                                        @if($order->status === 'pending') 🟡 {{ __('app.rental_status.pending') }}
+                                        @elseif($order->status === 'confirmed') 🔵 {{ __('app.rental_status.confirmed') }}
+                                        @elseif($order->status === 'active') 🟢 {{ __('app.rental_status.active') }}
+                                        @elseif($order->status === 'completed') 🟣 {{ __('app.rental_status.completed') }}
+                                        @elseif($order->status === 'cancelled') 🔴 {{ __('app.rental_status.cancelled') }}
+                                        @elseif($order->status === 'closed') 🔒 {{ __('app.rental_status.closed') }}
                                         @else 🔘 {{ $order->status_label }}
                                         @endif
                                     </span>
@@ -96,8 +96,8 @@
                                         @elseif($order->payment_status === 'refunded') bg-blue-100 text-blue-800
                                         @else bg-gray-100 text-gray-800
                                         @endif">
-                                        @if($order->payment_status === 'pending') 💳 En attente
-                                        @elseif($order->payment_status === 'paid') 💚 Payé
+                                        @if($order->payment_status === 'pending') 💳 {{ __('app.payment_status.pending') }}
+                                        @elseif($order->payment_status === 'paid') 💚 {{ __('app.payment_status.paid') }}
                                         @elseif($order->payment_status === 'failed') 💔 Échec
                                         @elseif($order->payment_status === 'refunded') 💙 Remboursé
                                         @else 💳 {{ $order->payment_status_label }}
@@ -146,14 +146,17 @@
                                                  alt="{{ $item->product->name }}" 
                                                  class="w-6 h-6 object-cover rounded">
                                         @endif
-                                        <span class="text-sm">{{ $item->product->name ?? 'Produit supprimé' }}</span>
+                                        @php
+                                            $translatedName = $item->product ? trans_product($item->product) : __('app.rental_orders.deleted_product');
+                                        @endphp
+                                        <span class="text-sm">{{ $translatedName }}</span>
                                         <span class="text-xs text-gray-600">×{{ $item->quantity }}</span>
                                     </div>
                                 @endforeach
                                 
                                 @if($order->items->count() > 3)
                                     <div class="flex items-center px-3 py-2 text-sm text-gray-600">
-                                        +{{ $order->items->count() - 3 }} autres articles
+                                        +{{ $order->items->count() - 3 }} {{ __('app.rental_orders.other_items') }}
                                     </div>
                                 @endif
                             </div>

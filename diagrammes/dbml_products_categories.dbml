@@ -1,0 +1,141 @@
+// Schéma 2: Produits & Catégories
+// https://dbdiagram.io/
+
+// Table utilisateurs (référence simplifiée pour les relations)
+Table users {
+  id bigint [pk, increment]
+  username varchar(255) [unique, not null]
+  email varchar(255) [unique, not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  Note: 'Table utilisateurs (référence pour les relations FK)'
+}
+
+Table categories {
+  id bigint [pk, increment]
+  name varchar(255) [unique, not null]
+  description text [null]
+  slug varchar(255) [unique, not null]
+  food_type enum('fruit','legume','autre') [null]
+  
+  // SEO
+  meta_title varchar(255) [null]
+  meta_description text [null]
+  meta_keywords varchar(255) [null]
+  
+  // Système
+  is_active boolean [default: true]
+  deleted_at timestamp [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  Note: 'Catégories de produits alimentaires'
+}
+
+Table rental_categories {
+  id bigint [pk, increment]
+  name varchar(255) [unique, not null]
+  description text [null]
+  slug varchar(255) [unique, not null]
+  is_returnable boolean [default: true]
+  
+  // SEO
+  meta_title varchar(255) [null]
+  meta_description text [null]
+  meta_keywords varchar(255) [null]
+  
+  // Système
+  is_active boolean [default: true]
+  deleted_at timestamp [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  Note: 'Catégories spécifiques aux équipements de location'
+}
+
+Table products {
+  id bigint [pk, increment]
+  category_id bigint [ref: > categories.id]
+  rental_category_id bigint [ref: > rental_categories.id, null]
+  name varchar(255) [not null]
+  description text [not null]
+  slug varchar(255) [unique, not null]
+  price decimal(10,2) [not null]
+  quantity integer [default: 0]
+  critical_threshold integer [default: 5]
+  unit_symbol enum('kg','pièce','litre','gramme','tonne') [not null]
+  main_image varchar(255) [null]
+  gallery_images json [null]
+  
+  // Location
+  deposit_amount decimal(10,2) [null]
+  rental_stock integer [null]
+  min_rental_days integer [null]
+  max_rental_days integer [null]
+  
+  // Gestion
+  is_active boolean [default: true]
+  is_featured boolean [default: false]
+  likes_count integer [default: 0]
+  views_count integer [default: 0]
+  
+  // SEO
+  meta_title varchar(255) [null]
+  meta_description text [null]
+  meta_keywords varchar(255) [null]
+  
+  // Système
+  deleted_at timestamp [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  Note: 'Produits avec gestion vente et location'
+}
+
+Table product_likes {
+  id bigint [pk, increment]
+  user_id bigint [ref: > users.id]
+  product_id bigint [ref: > products.id]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  indexes {
+    (user_id, product_id) [unique]
+  }
+  
+  Note: 'Likes des produits par les utilisateurs'
+}
+
+Table wishlists {
+  id bigint [pk, increment]
+  user_id bigint [ref: > users.id]
+  product_id bigint [ref: > products.id]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  indexes {
+    (user_id, product_id) [unique]
+  }
+  
+  Note: 'Listes de souhaits des utilisateurs'
+}
+
+Table special_offers {
+  id bigint [pk, increment]
+  product_id bigint [ref: > products.id]
+  name varchar(255) [not null]
+  description text [null]
+  discount_type enum('percentage','fixed') [not null]
+  discount_value decimal(8,2) [not null]
+  start_date date [not null]
+  end_date date [not null]
+  is_active boolean [default: true]
+  max_uses integer [null]
+  current_uses integer [default: 0]
+  deleted_at timestamp [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  Note: 'Offres spéciales et promotions sur les produits'
+}

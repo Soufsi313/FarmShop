@@ -47,22 +47,7 @@ const translations = {
     totalTtc: '{{ __("app.cart.total_ttc") }}',
     totalItems: '{{ __("app.cart.total_items") }}',
     discountOffer: '{{ __("app.cart.discount_offer") }}',
-    savings: '{{ __("app.cart.savings") }}',
-    delete: '{{ __("app.cart.delete") }}',
-    unitPriceHtText: '{{ __("app.cart.unit_price_ht_text") }}',
-    unitPriceTtcText: '{{ __("app.cart.unit_price_ttc_text") }}',
-    normalPriceTtcText: '{{ __("app.cart.normal_price_ttc_text") }}',
-    discountedPriceTtcText: '{{ __("app.cart.discounted_price_ttc_text") }}',
-    tvaOnAmount: '{{ __("app.cart.tva_on_amount") }}',
-    tvaRate: '{{ __("app.cart.tva_rate") }}',
-    articlesCount: '{{ __("app.cart.articles_count") }}',
-    free: '{{ __("app.cart.free") }}',
-    itemsText: '{{ __("app.cart.items_text") }}',
-    cartEmpty: '{{ __("app.messages.cart_empty") }}',
-    cartEmptyDescription: '{{ __("app.messages.cart_empty_description") }}',
-    errorQuantityUpdate: 'Erreur lors de la mise à jour de la quantité',
-    errorRemoveItem: 'Erreur lors de la suppression de l\'article',
-    errorLoadCart: '{{ __("app.messages.cart_load_error") }}'
+    savings: '{{ __("app.cart.savings") }}'
 };
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -174,8 +174,6 @@ return array (
   array (
     'total' => 'Totaal',
     'category' => 'Categorie',
-    'categories' => 'Categorieën',
-    'orders' => 'Bestellingen',
     'subtotal' => 'Subtotaal',
     'tax' => 'BTW',
     'payment' => 'Betaling',
@@ -183,7 +181,6 @@ return array (
   'forms' => 
   array (
     'delivery_address' => 'Bezorgadres',
-    'content' => 'Inhoud',
   ),
   'rental_orders' => 
   array (
@@ -201,6 +198,7 @@ return array (
     'placed_on' => 'Geplaatst op',
     'order_number' => 'Bestelling',
     'other_items' => 'andere artikelen',
+    'deleted_product' => 'Verwijderd product',
     'see_details' => 'Bekijk details',
     'no_rentals' => 'Geen verhuur gevonden',
     'no_rentals_description' => 'U heeft nog geen verhuur.',
@@ -289,10 +287,6 @@ return array (
     'category' => 'Categorie',
     'contact' => 'Contact',
     'rentals' => 'Verhuur',
-    'admin' => 'Beheer',
-    'dashboard' => 'Dashboard',
-    'statistics' => 'Statistieken',
-    'settings' => 'Instellingen',
   ),
   'products' => 
   array (
@@ -1149,15 +1143,11 @@ return array (
   array (
     'pending' => 'In afwachting',
     'confirmed' => 'Bevestigd',
-    'preparing' => 'In voorbereiding',
     'shipped' => 'Verzonden',
     'delivered' => 'Geleverd',
     'cancelled' => 'Geannuleerd',
     'return_requested' => 'Retour aangevraagd',
     'returned' => 'Geretourneerd',
-    'active' => 'Actief',
-    'completed' => 'Voltooid',
-    'closed' => 'Gesloten',
   ),
   'orders' => 
   array (
@@ -1169,43 +1159,35 @@ return array (
     'other_items' => 'andere artikelen',
     'download_invoice' => 'Factuur downloaden',
     'view_details' => 'Details bekijken',
-  // ...existing code...
-
-  'order' => [
     'order_number' => 'Bestelling #:number',
-    'placed_on' => 'Geplaatst op',
     'back_to_orders' => 'Terug naar mijn bestellingen',
     'ordered_items' => 'Bestelde artikelen',
     'billing_address' => 'Factuuradres',
     'order_summary' => 'Bestellingsoverzicht',
     'actions' => 'Acties',
-    'refund_processed' => 'Terugbetaling verwerkt',
-    'refund_pending' => 'Terugbetaling lopende',
-    'tracking_number' => 'Trackingnummer',
-    'shipping_cost' => 'Verzendkosten',
-    'shipping_free' => 'GRATIS',
     'payment_method' => 'Methode',
     'payment_status' => 'Status',
     'paid_on' => 'Betaald op',
     'cancel_order' => 'Bestelling annuleren',
-    'cancel_confirmation' => 'Weet je zeker dat je deze bestelling wilt annuleren?',
-    'download_invoice' => 'Factuur downloaden',
-    'return_order' => 'Bestelling retourneren',
-    'renew_order' => 'Deze bestelling herbestellen',
-    'renew_confirmation' => 'Wil je echt alle producten van deze bestelling aan je winkelwagen toevoegen?',
-  ],
-    'payment_method' => 'Methode',
-    'payment_status' => 'Status',
-    'paid_on' => 'Betaald op',
-    'cancel_order' => 'Bestelling annuleren',
-    'cancel_order_confirm' => 'Weet u zeker dat u deze bestelling wilt annuleren?',
     'reorder' => 'Deze bestelling opnieuw bestellen',
     'request_return' => 'Retour aanvragen',
-    'expired' => 'Retour (verlopen)',
-    'sort_recent' => 'Meest recent',
-    'sort_oldest' => 'Oudste',
-    'sort_total_desc' => 'Bedrag aflopend',
-    'sort_total_asc' => 'Bedrag oplopend',
+    'cancel_order_confirm' => 'Weet u zeker dat u deze bestelling wilt annuleren?',
+    'expired' => 'verlopen',
+    'non_returnable_products' => 'Niet-retourneerbare producten',
+    'non_returnable_message' => 'Deze bestelling bevat alleen voedingsproducten die om hygiëne- en voedselveiligheidsredenen niet kunnen worden geretourneerd.',
+    'understood' => 'Ik begrijp het',
+    'return_period_expired' => 'Retourperiode verlopen',
+    'return_period_expired_message' => 'De periode van 14 dagen om deze bestelling te retourneren is helaas verstreken.',
+    'paid' => 'Betaald',
+    'payment_pending' => 'Betaling in behandeling',
+    'no_orders_with_status' => 'Geen bestellingen met status ":status" gevonden.',
+    'no_orders_yet' => 'U heeft nog geen bestellingen geplaatst.',
+    'view_all_orders' => 'Alle bestellingen bekijken',
+    'discover_products' => 'Ontdek onze producten',
+    'return_reason' => 'Retour reden',
+    'return_reason_placeholder' => 'Leg uit waarom u deze bestelling wilt retourneren...',
+    'refund_processed' => 'Terugbetaling verwerkt',
+    'refund_processing' => 'Terugbetaling wordt verwerkt',
     'sort' => array(
       'most_recent' => 'Meest recent',
       'oldest' => 'Oudste',
@@ -1214,30 +1196,9 @@ return array (
     ),
   ),
 
-  // Gemeenschappelijke knoppen
-  'buttons' => array(
-    'sort_by' => 'Sorteren op',
-    'delete' => 'Verwijderen',
-    'edit' => 'Bewerken',
-    'cancel' => 'Annuleren',
-    'save' => 'Opslaan',
+  // Common translations
+  'common' => array(
     'close' => 'Sluiten',
+    'cancel' => 'Annuleren',
   ),
-
-  'payment_status' => 
-  array (
-    'paid' => 'Betaald',
-    'pending' => 'In afwachting',
-    'failed' => 'Mislukt',
-    'refunded' => 'Terugbetaald',
-  ),
-
-  'payment' => 
-  array (
-    'card' => 'Creditcard',
-    'bank_transfer' => 'Bankoverschrijving',
-  ),
-
-  // Product vertalingen (slugs)
-  'bache-de-protection-6x4m-8419' => '6x4m Beschermingszeil',
 );
