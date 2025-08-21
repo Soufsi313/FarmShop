@@ -161,7 +161,7 @@
                         <option value="">Tous les statuts</option>
                         <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>En attente</option>
                         <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmée</option>
-                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>En cours</option>
                         <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Terminée</option>
                         <option value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>Fermée</option>
                         <option value="inspecting" {{ request('status') === 'inspecting' ? 'selected' : '' }}>Inspection</option>

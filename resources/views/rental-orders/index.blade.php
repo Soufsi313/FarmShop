@@ -23,8 +23,10 @@
                         <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>{{ __('app.rental_status.confirmed') }}</option>
                         <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>{{ __('app.rental_status.active') }}</option>
                         <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>{{ __('app.rental_status.completed') }}</option>
-                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>{{ __('app.rental_status.cancelled') }}</option>
                         <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>{{ __('app.rental_status.closed') }}</option>
+                        <option value="inspecting" {{ request('status') == 'inspecting' ? 'selected' : '' }}>{{ __('app.rental_status.inspecting') }}</option>
+                        <option value="finished" {{ request('status') == 'finished' ? 'selected' : '' }}>{{ __('app.rental_status.finished') }}</option>
+                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>{{ __('app.rental_status.cancelled') }}</option>
                     </select>
                 </div>
                 
@@ -74,16 +76,20 @@
                                         @elseif($order->status === 'confirmed') bg-blue-100 text-blue-800
                                         @elseif($order->status === 'active') bg-green-100 text-green-800
                                         @elseif($order->status === 'completed') bg-purple-100 text-purple-800
+                                        @elseif($order->status === 'closed') bg-orange-100 text-orange-800
+                                        @elseif($order->status === 'inspecting') bg-indigo-100 text-indigo-800
+                                        @elseif($order->status === 'finished') bg-emerald-100 text-emerald-800
                                         @elseif($order->status === 'cancelled') bg-red-100 text-red-800
-                                        @elseif($order->status === 'closed') bg-gray-100 text-gray-800
                                         @else bg-gray-100 text-gray-800
                                         @endif">
                                         @if($order->status === 'pending') 🟡 {{ __('app.rental_status.pending') }}
                                         @elseif($order->status === 'confirmed') 🔵 {{ __('app.rental_status.confirmed') }}
                                         @elseif($order->status === 'active') 🟢 {{ __('app.rental_status.active') }}
                                         @elseif($order->status === 'completed') 🟣 {{ __('app.rental_status.completed') }}
-                                        @elseif($order->status === 'cancelled') 🔴 {{ __('app.rental_status.cancelled') }}
-                                        @elseif($order->status === 'closed') 🔒 {{ __('app.rental_status.closed') }}
+                                        @elseif($order->status === 'closed') 🟠 {{ __('app.rental_status.closed') }}
+                                        @elseif($order->status === 'inspecting') � {{ __('app.rental_status.inspecting') }}
+                                        @elseif($order->status === 'finished') ✅ {{ __('app.rental_status.finished') }}
+                                        @elseif($order->status === 'cancelled') � {{ __('app.rental_status.cancelled') }}
                                         @else 🔘 {{ $order->status_label }}
                                         @endif
                                     </span>

@@ -561,17 +561,41 @@
                     </div>
                 </div>
                 
-                <div class="bg-white rounded-lg p-3 border border-green-100">
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600">Locations actives</span>
-                        <span class="text-sm font-medium text-orange-600">{{ $stats['rentals']['active_orders'] ?? 0 }}</span>
+                <!-- Détails des statuts de location -->
+                <div class="space-y-2">
+                    <div class="bg-white rounded-lg p-2 border border-green-100">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">🟢 Locations actives</span>
+                            <span class="text-sm font-medium text-green-600">{{ $stats['rentals']['active_orders'] ?? 0 }}</span>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="bg-white rounded-lg p-3 border border-green-100">
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600">Retours en attente</span>
-                        <span class="text-sm font-medium text-red-600">{{ $stats['rentals']['pending_returns'] ?? 0 }}</span>
+                    
+                    <div class="bg-white rounded-lg p-2 border border-green-100">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">🟠 Clôturées (en attente inspection)</span>
+                            <span class="text-sm font-medium text-orange-600">{{ $stats['rentals']['closed_orders'] ?? 0 }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-2 border border-green-100">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">🔍 Inspection en cours</span>
+                            <span class="text-sm font-medium text-indigo-600">{{ $stats['rentals']['inspecting_orders'] ?? 0 }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-2 border border-green-100">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">✅ Inspection terminée</span>
+                            <span class="text-sm font-medium text-emerald-600">{{ $stats['rentals']['finished_orders'] ?? 0 }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-2 border border-green-100">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">🟣 Retours en attente</span>
+                            <span class="text-sm font-medium text-purple-600">{{ $stats['rentals']['pending_returns'] ?? 0 }}</span>
+                        </div>
                     </div>
                 </div>
             </div>

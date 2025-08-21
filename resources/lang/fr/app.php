@@ -204,6 +204,8 @@ return array (
     'completed' => 'Terminée',
     'cancelled' => 'Annulée',
     'closed' => 'Clôturée',
+    'inspecting' => 'Inspection en cours',
+    'finished' => 'Inspection terminée',
   ),
   'payment_status' => 
   array (

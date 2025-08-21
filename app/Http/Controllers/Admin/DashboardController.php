@@ -1764,9 +1764,15 @@ class DashboardController extends Controller
         try {
             $totalOrders = \DB::table('order_locations')->count();
             $activeOrders = \DB::table('order_locations')->where('status', 'active')->count();
-            $pendingReturns = \DB::table('order_locations')->where('status', 'completed')->count();
+            $confirmedOrders = \DB::table('order_locations')->where('status', 'confirmed')->count();
+            $completedOrders = \DB::table('order_locations')->where('status', 'completed')->count();
+            $closedOrders = \DB::table('order_locations')->where('status', 'closed')->count();
+            $inspectingOrders = \DB::table('order_locations')->where('status', 'inspecting')->count();
+            $finishedOrders = \DB::table('order_locations')->where('status', 'finished')->count();
+            $cancelledOrders = \DB::table('order_locations')->where('status', 'cancelled')->count();
+            $pendingReturns = $completedOrders; // Retours en attente = terminées
             $monthlyRevenue = \DB::table('order_locations')
-                ->where('status', 'finished')
+                ->whereIn('status', ['finished', 'closed', 'inspecting'])
                 ->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
                 ->sum('subtotal') ?? 0;
@@ -1774,6 +1780,12 @@ class DashboardController extends Controller
             // Si la table n'existe pas, utiliser des valeurs par défaut
             $totalOrders = 0;
             $activeOrders = 0;
+            $confirmedOrders = 0;
+            $completedOrders = 0;
+            $closedOrders = 0;
+            $inspectingOrders = 0;
+            $finishedOrders = 0;
+            $cancelledOrders = 0;
             $pendingReturns = 0;
             $monthlyRevenue = 0;
         }
@@ -1782,10 +1794,20 @@ class DashboardController extends Controller
         $occupancyRate = $activeOrders > 0 ? min(($activeOrders / ($categoriesCount * 10)) * 100, 100) : 0;
             
         return [
-            'categories_count' => $categoriesCount, // Clé corrigée
-            'active_rentals' => $activeOrders, // Clé corrigée
-            'total_revenue' => number_format($monthlyRevenue, 2), // Clé corrigée
-            'occupancy_rate' => number_format($occupancyRate, 1) // Clé corrigée
+            'categories_count' => $categoriesCount,
+            'total_orders' => $totalOrders,
+            'active_orders' => $activeOrders,
+            'confirmed_orders' => $confirmedOrders,
+            'completed_orders' => $completedOrders,
+            'closed_orders' => $closedOrders,
+            'inspecting_orders' => $inspectingOrders,
+            'finished_orders' => $finishedOrders,
+            'cancelled_orders' => $cancelledOrders,
+            'pending_returns' => $pendingReturns,
+            'monthly_revenue' => number_format($monthlyRevenue, 2),
+            'total_revenue' => number_format($monthlyRevenue, 2),
+            'occupancy_rate' => number_format($occupancyRate, 1),
+            'active_rentals' => $activeOrders,
         ];
     }
 }
