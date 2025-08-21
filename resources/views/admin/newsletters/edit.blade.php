@@ -180,7 +180,7 @@
                         Tags (séparés par des virgules)
                     </label>
                     <input type="text" name="tags" id="tags"
-                           value="{{ old('tags', $newsletter->tags) }}"
+                           value="{{ old('tags', is_array($newsletter->tags) ? implode(', ', $newsletter->tags) : $newsletter->tags) }}"
                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                            placeholder="Ex: promotion, nouveauté, été"
                            {{ $newsletter->status == 'sent' ? 'readonly' : '' }}>

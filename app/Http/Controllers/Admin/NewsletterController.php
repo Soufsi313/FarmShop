@@ -749,4 +749,89 @@ class NewsletterController extends Controller
             'message' => 'Utilisateur désabonné avec succès'
         ]);
     }
+
+    /**
+     * Renvoyer une newsletter déjà envoyée
+     */
+    public function resend(Newsletter $newsletter)
+    {
+        // Vérifier que la newsletter a déjà été envoyée
+        if ($newsletter->status !== 'sent') {
+            return redirect()->back()->with('error', 'Seules les newsletters déjà envoyées peuvent être renvoyées.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Récupérer tous les abonnés actifs
+            $subscribers = User::where('newsletter_subscribed', true)->get();
+
+            if ($subscribers->isEmpty()) {
+                return redirect()->back()->with('error', 'Aucun abonné actif trouvé.');
+            }
+
+            $successCount = 0;
+            $failedCount = 0;
+
+            foreach ($subscribers as $subscriber) {
+                try {
+                    // Créer un nouvel enregistrement d'envoi
+                    $send = \App\Models\NewsletterSend::create([
+                        'newsletter_id' => $newsletter->id,
+                        'user_id' => $subscriber->id,
+                        'email' => $subscriber->email,
+                        'tracking_token' => \Str::random(32),
+                        'unsubscribe_token' => \Str::random(32),
+                        'status' => 'pending'
+                    ]);
+
+                    // Générer les URLs de tracking
+                    $send->tracking_url = route('newsletter.track', ['token' => $send->tracking_token]);
+                    $send->unsubscribe_url = route('newsletter.unsubscribe.token', ['token' => $send->unsubscribe_token]);
+                    $send->save();
+
+                    // Envoyer l'email
+                    \Mail::to($subscriber->email)->send(new \App\Mail\NewsletterMail($newsletter, $subscriber, $send));
+
+                    // Marquer comme envoyé
+                    $send->update([
+                        'status' => 'sent',
+                        'sent_at' => now()
+                    ]);
+
+                    $successCount++;
+
+                } catch (\Exception $e) {
+                    $failedCount++;
+                    
+                    if (isset($send)) {
+                        $send->update([
+                            'status' => 'failed',
+                            'error_message' => $e->getMessage()
+                        ]);
+                    }
+                }
+            }
+
+            // Mettre à jour les statistiques de la newsletter (sans changer le statut)
+            $newsletter->increment('sent_count', $successCount);
+            $newsletter->increment('failed_count', $failedCount);
+            $newsletter->increment('recipients_count', $successCount + $failedCount);
+            $newsletter->updated_by = Auth::id();
+            $newsletter->save();
+
+            DB::commit();
+
+            $message = "Newsletter renvoyée avec succès ! {$successCount} envois réussis";
+            if ($failedCount > 0) {
+                $message .= ", {$failedCount} échecs";
+            }
+
+            return redirect()->back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Erreur lors du renvoi : ' . $e->getMessage());
+        }
+    }
 }

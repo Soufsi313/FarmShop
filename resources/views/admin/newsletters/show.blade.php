@@ -110,7 +110,11 @@
                 @if($newsletter->tags)
                 <div>
                     <span class="text-gray-600">Tags:</span><br>
-                    <span class="font-medium">{{ $newsletter->tags }}</span>
+                    <div class="flex flex-wrap gap-1 mt-1">
+                        @foreach($newsletter->tags as $tag)
+                            <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{{ $tag }}</span>
+                        @endforeach
+                    </div>
                 </div>
                 @endif
             </div>

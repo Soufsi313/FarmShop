@@ -655,6 +655,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Gestion des newsletters
     Route::resource('newsletters', AdminNewsletterController::class);
     Route::post('/newsletters/{newsletter}/send', [AdminNewsletterController::class, 'send'])->name('newsletters.send');
+    Route::post('/newsletters/{newsletter}/resend', [AdminNewsletterController::class, 'resend'])->name('newsletters.resend');
     Route::post('/newsletters/{newsletter}/send-to-me', [AdminNewsletterController::class, 'sendToMe'])->name('newsletters.send-to-me');
     Route::post('/newsletters/{newsletter}/test', [AdminNewsletterController::class, 'sendTest'])->name('newsletters.test');
     Route::get('/newsletters/{newsletter}/subscribers', [AdminNewsletterController::class, 'subscribers'])->name('newsletters.subscribers');
