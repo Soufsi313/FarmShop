@@ -120,14 +120,14 @@
                                 <!-- Nom du produit -->
                                 <h3 class="text-lg font-semibold text-gray-900 mb-2 hover:text-green-600 transition-colors">
                                     <a href="{{ route('products.show', $product->slug) }}">
-                                        {{ __('app.product_names.' . $product->slug) ?: $product->name }}
+                                        {{ $product->translated_name }}
                                     </a>
                                 </h3>
 
                                 <!-- Description courte -->
                                 @if($product->short_description)
                                     <p class="text-sm text-gray-600 mb-3 line-clamp-2">
-                                        {{ __('app.product_descriptions.' . $product->slug) ?: $product->short_description }}
+                                        {{ $product->translated_short_description }}
                                     </p>
                                 @endif
 

@@ -250,6 +250,60 @@ class Product extends Model
         return $this->quantity <= 0;
     }
 
+    /**
+     * Accesseur pour le nom traduit
+     */
+    public function getTranslatedNameAttribute()
+    {
+        $name = $this->attributes['name'] ?? '';
+        
+        if (is_string($name) && str_starts_with($name, '{')) {
+            $nameArray = json_decode($name, true);
+            if (is_array($nameArray)) {
+                $locale = app()->getLocale();
+                return $nameArray[$locale] ?? $nameArray['fr'] ?? $name;
+            }
+        }
+        
+        return $name;
+    }
+
+    /**
+     * Accesseur pour la description traduite
+     */
+    public function getTranslatedDescriptionAttribute()
+    {
+        $description = $this->attributes['description'] ?? '';
+        
+        if (is_string($description) && str_starts_with($description, '{')) {
+            $descArray = json_decode($description, true);
+            if (is_array($descArray)) {
+                $locale = app()->getLocale();
+                return $descArray[$locale] ?? $descArray['fr'] ?? $description;
+            }
+        }
+        
+        return $description;
+    }
+
+    /**
+     * Accesseur pour la description courte traduite
+     */
+    public function getTranslatedShortDescriptionAttribute()
+    {
+        $shortDescription = $this->attributes['short_description'] ?? '';
+        
+        if (is_string($shortDescription) && str_starts_with($shortDescription, '{')) {
+            $descArray = json_decode($shortDescription, true);
+            if (is_array($descArray)) {
+                $locale = app()->getLocale();
+                return $descArray[$locale] ?? $descArray['fr'] ?? $shortDescription;
+            }
+        }
+        
+        return $shortDescription;
+    }
+
     public function getStockStatusAttribute()
     {
         if ($this->is_out_of_stock) {

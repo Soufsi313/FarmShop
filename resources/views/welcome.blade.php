@@ -212,10 +212,10 @@
                                     <!-- Contenu du produit -->
                                     <div class="p-6 flex flex-col justify-center">
                                         <h3 class="text-2xl font-bold text-farm-green-700 mb-3">
-                                            {{ __('app.product_names.' . $product->slug) ?: $product->name }}
+                                            {{ $product->translated_name }}
                                         </h3>
                                         <p class="text-farm-orange-600 text-lg mb-4 line-clamp-3">
-                                            {{ __('app.product_descriptions.' . $product->slug) ?: $product->short_description }}
+                                            {{ $product->translated_short_description ?: $product->translated_description }}
                                         </p>
                                         
                                         <!-- Prix et unité -->
