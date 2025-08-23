@@ -129,8 +129,18 @@ class ProductController extends Controller
             $validated['sku'] = $this->generateSku($validated['name']);
         }
 
-        // Génération du slug
-        $validated['slug'] = Str::slug($validated['name']);
+        // Génération du slug unique
+        $baseSlug = Str::slug($validated['name']);
+        $slug = $baseSlug;
+        $counter = 1;
+        
+        // Vérifier si le slug existe déjà
+        while (Product::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+        
+        $validated['slug'] = $slug;
 
         // Upload de l'image principale
         if ($request->hasFile('main_image')) {
@@ -275,10 +285,21 @@ class ProductController extends Controller
         
         $validated['images'] = $currentImages;
 
-        // Mise à jour du slug si le nom a changé
-        if ($product->name !== $validated['name']) {
-            $validated['slug'] = Str::slug($validated['name']);
+        // Mise à jour du slug - toujours générer un slug unique
+        $baseSlug = Str::slug($validated['name']);
+        $slug = $baseSlug;
+        $counter = 1;
+        
+        // Vérifier si le slug existe déjà (en excluant le produit actuel)
+        while (Product::where('slug', $slug)->where('id', '!=', $product->id)->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
         }
+        
+        $validated['slug'] = $slug;
+        
+        // Log pour debug
+        \Log::info("Updating product {$product->id}: name='{$validated['name']}', baseSlug='{$baseSlug}', finalSlug='{$slug}'");
 
         // Valeurs par défaut
         $validated['is_active'] = $request->has('is_active');

@@ -1,0 +1,26 @@
+digraph navigation {
+    rankdir=TB;
+    node [shape=box, style=filled];
+    graph [label="PROCESSUS D'ACHAT - FarmShop", labelloc=t, fontsize=16];
+
+    step0 [label="Page d'Accueil\n/products", fillcolor=lightgreen];
+    step1 [label="Catalogue/Recherche\n/products/search", fillcolor=lightblue];
+    step2 [label="Détail Produit\n/products/{slug}", fillcolor=lightblue];
+    step3 [label="Ajouter au Panier\n/cart/add", fillcolor=lightblue];
+    step4 [label="Voir Panier\n/cart", fillcolor=lightblue];
+    step5 [label="Connexion/Inscription\n/login", fillcolor=orange];
+    step6 [label="Checkout\n/checkout", fillcolor=lightblue];
+    step7 [label="Paiement Stripe\n/payment/{order}", fillcolor=lightcoral];
+    step8 [label="Confirmation\n/orders/{order}", fillcolor=lightgreen];
+    step9 [label="Mes Commandes\n/orders", fillcolor=plum];
+
+    step0 -> step1;
+    step1 -> step2;
+    step2 -> step3;
+    step3 -> step4;
+    step4 -> step5;
+    step5 -> step6;
+    step6 -> step7;
+    step7 -> step8;
+    step8 -> step9;
+}

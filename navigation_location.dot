@@ -1,0 +1,28 @@
+digraph navigation {
+    rankdir=TB;
+    node [shape=box, style=filled];
+    graph [label="PROCESSUS DE LOCATION - FarmShop", labelloc=t, fontsize=16];
+
+    step0 [label="Catalogue Location\n/rentals", fillcolor=lightgreen];
+    step1 [label="Filtrage Équipements\n/rentals/filter", fillcolor=lightblue];
+    step2 [label="Détail Équipement\n/rentals/{slug}", fillcolor=lightblue];
+    step3 [label="Vérifier Disponibilité\n/rentals/availability", fillcolor=orange];
+    step4 [label="Ajouter au Panier Location\n/cart-location/add", fillcolor=lightblue];
+    step5 [label="Sélection Dates\n/cart-location", fillcolor=orange];
+    step6 [label="Checkout Location\n/checkout-rental", fillcolor=lightblue];
+    step7 [label="Paiement + Caution\n/payment-rental", fillcolor=lightcoral];
+    step8 [label="Location Confirmée\n/rental-orders/{order}", fillcolor=lightgreen];
+    step9 [label="Mes Locations\n/rental-orders", fillcolor=plum];
+    step10 [label="Retour Équipement\n/rental-returns", fillcolor=plum];
+
+    step0 -> step1;
+    step1 -> step2;
+    step2 -> step3;
+    step3 -> step4;
+    step4 -> step5;
+    step5 -> step6;
+    step6 -> step7;
+    step7 -> step8;
+    step8 -> step9;
+    step9 -> step10;
+}

@@ -16,8 +16,8 @@ if ($existingProcess) {
 } else {
     Write-Host "Démarrage du worker de queue..." -ForegroundColor Blue
     
-    # Démarrer le worker en arrière-plan
-    Start-Process -FilePath "php" -ArgumentList "artisan", "queue:work", "--timeout=300", "--tries=3", "--daemon" -WindowStyle Hidden
+    # Démarrer le worker en arrière-plan avec timeout de 5h pour présentation
+    Start-Process -FilePath "php" -ArgumentList "artisan", "queue:work", "--timeout=18000", "--tries=3", "--daemon" -WindowStyle Hidden
     
     Write-Host "Worker de queue démarré en arrière-plan !" -ForegroundColor Green
     Write-Host "La progression automatique des commandes est maintenant active." -ForegroundColor Green

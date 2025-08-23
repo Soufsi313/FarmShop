@@ -11,7 +11,7 @@ echo.
 
 :start
 echo [%date% %time%] Demarrage du worker...
-php artisan queue:work --daemon --tries=3 --timeout=300 --sleep=1
+php artisan queue:work --daemon --tries=3 --timeout=18000 --sleep=1
 
 echo.
 echo [%date% %time%] Worker arrete - Redemarrage dans 5 secondes...

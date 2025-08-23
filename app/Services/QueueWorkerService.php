@@ -42,8 +42,8 @@ class QueueWorkerService
             Log::info('🚀 Démarrage automatique du worker de queue');
             
             if (PHP_OS_FAMILY === 'Windows') {
-                // Windows - démarrer en arrière-plan
-                $command = 'start /B php artisan queue:work --daemon --tries=3 --timeout=300 --sleep=1 > nul 2>&1';
+                // Windows - démarrer en arrière-plan avec timeout de 5h
+                $command = 'start /B php artisan queue:work --daemon --tries=3 --timeout=18000 --sleep=1 > nul 2>&1';
                 shell_exec($command);
                 
                 // Attendre un peu et vérifier
@@ -58,8 +58,8 @@ class QueueWorkerService
                 
                 return $isRunning;
             } else {
-                // Linux/Mac
-                $command = 'nohup php artisan queue:work --daemon --tries=3 --timeout=300 --sleep=1 > /dev/null 2>&1 &';
+                // Linux/Mac - timeout de 5h
+                $command = 'nohup php artisan queue:work --daemon --tries=3 --timeout=18000 --sleep=1 > /dev/null 2>&1 &';
                 shell_exec($command);
                 
                 sleep(2);

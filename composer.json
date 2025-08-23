@@ -11,6 +11,7 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "darkaonline/l5-swagger": "^9.0",
         "dompdf/dompdf": "^3.1",
+        "intervention/image": "*",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
         "phpoffice/phpspreadsheet": "^4.4",

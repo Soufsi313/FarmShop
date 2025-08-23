@@ -204,35 +204,99 @@
     </div>
 
     <!-- Section Gestion de Stock -->
-    <div class="bg-white shadow rounded-lg" x-data="stockManagement">
+    <div class="bg-white shadow rounded-lg relative" x-data="stockManagement">
+        <!-- Indicateurs de notification -->
+        @if(($stats['stock']['out_of_stock'] ?? 0) > 0)
+            <div class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full border-2 border-white flex items-center justify-center animate-pulse">
+                <span class="text-white text-xs font-bold">!</span>
+            </div>
+        @elseif(($stats['stock']['critical_stock'] ?? 0) > 0)
+            <div class="absolute -top-2 -right-2 w-6 h-6 bg-orange-500 rounded-full border-2 border-white flex items-center justify-center animate-pulse">
+                <span class="text-white text-xs font-bold">{{ $stats['stock']['critical_stock'] }}</span>
+            </div>
+        @elseif(($stats['stock']['low_stock'] ?? 0) > 0)
+            <div class="absolute -top-2 -right-2 w-6 h-6 bg-yellow-500 rounded-full border-2 border-white flex items-center justify-center animate-pulse">
+                <span class="text-white text-xs font-bold">{{ $stats['stock']['low_stock'] }}</span>
+            </div>
+        @endif
+        
         <div class="px-4 py-5 sm:p-6">
             <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">📦 Gestion de Stock</h3>
-                    <p class="text-sm text-gray-500">Surveillance automatique et gestion intelligente des stocks</p>
+                <div class="flex items-center">
+                    <div class="flex flex-col">
+                        <div class="flex items-center">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">📦 Gestion de Stock</h3>
+                            <!-- Indicateurs d'état inline -->
+                            @if(($stats['stock']['out_of_stock'] ?? 0) > 0)
+                                <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse">
+                                    <span class="w-2 h-2 bg-red-400 rounded-full mr-1"></span>
+                                    {{ $stats['stock']['out_of_stock'] }} rupture(s)
+                                </span>
+                            @elseif(($stats['stock']['critical_stock'] ?? 0) > 0)
+                                <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 animate-pulse">
+                                    <span class="w-2 h-2 bg-orange-400 rounded-full mr-1"></span>
+                                    {{ $stats['stock']['critical_stock'] }} critique(s)
+                                </span>
+                            @elseif(($stats['stock']['low_stock'] ?? 0) > 0)
+                                <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    <span class="w-2 h-2 bg-yellow-400 rounded-full mr-1"></span>
+                                    {{ $stats['stock']['low_stock'] }} stock bas
+                                </span>
+                            @else
+                                <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <span class="w-2 h-2 bg-green-400 rounded-full mr-1"></span>
+                                    Tout va bien
+                                </span>
+                            @endif
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">Surveillance automatique et gestion intelligente des stocks</p>
+                    </div>
                 </div>
-                <div class="flex space-x-2">
-                    <button @click="refreshStockData()" 
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                        Actualiser
-                    </button>
-                    <a href="{{ route('admin.products.index') }}" 
-                       class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
-                        Gérer Produits
-                    </a>
+                <div class="flex flex-col space-y-2">
+                    <div class="flex space-x-2">
+                        <button @click="refreshStockData()" 
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            Actualiser
+                        </button>
+                        <a href="{{ route('admin.products.index') }}" 
+                           class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                            Gérer Produits
+                        </a>
+                    </div>
+                    
+                    <!-- Contrôles de notifications -->
+                    <div class="flex space-x-2 text-xs">
+                        <button @click="toggleSoundNotifications()" 
+                                :class="notifications.sound ? 'bg-purple-100 text-purple-800 border-purple-300' : 'bg-gray-100 text-gray-600 border-gray-300'"
+                                class="border px-3 py-1 rounded-full transition-colors flex items-center">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728m-9.9-2.828a5 5 0 007.072 0m2.828-9.9a9 9 0 000 12.728M6.343 6.343L4.93 4.93m12.728 12.728L16.24 16.24"/>
+                            </svg>
+                            <span x-text="notifications.sound ? '🔊 Son ON' : '🔇 Son OFF'"></span>
+                        </button>
+                        
+                        <button @click="toggleDesktopNotifications()" 
+                                :class="notifications.desktop ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : 'bg-gray-100 text-gray-600 border-gray-300'"
+                                class="border px-3 py-1 rounded-full transition-colors flex items-center">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 4.828A4 4 0 015.858 4H9a4 4 0 014 4v1a1.97 1.97 0 00.971 1.691l2.026 1.18a2 2 0 011.003 1.73V17h-5"/>
+                            </svg>
+                            <span x-text="notifications.desktop ? '🔔 Desktop ON' : '🔕 Desktop OFF'"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Statistiques de Stock -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <!-- Rupture de Stock -->
-                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div class="@if(($stats['stock']['out_of_stock'] ?? 0) > 0) bg-red-50 border-red-300 shadow-lg shadow-red-200 card-alert-critical stock-critical @else bg-red-50 @endif border border-red-200 rounded-lg p-4 transition-all-smooth">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center">
+                            <div class="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center @if(($stats['stock']['out_of_stock'] ?? 0) > 0) animate-bounce notification-bubble @endif">
                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
                                 </svg>
@@ -241,15 +305,18 @@
                         <div class="ml-3">
                             <p class="text-2xl font-bold text-red-900">{{ $stats['stock']['out_of_stock'] }}</p>
                             <p class="text-sm text-red-700">Rupture de stock</p>
+                            @if(($stats['stock']['out_of_stock'] ?? 0) > 0)
+                                <p class="text-xs text-red-600 font-medium mt-1 animate-pulse-fast">⚠️ Action requise</p>
+                            @endif
                         </div>
                     </div>
                 </div>
 
                 <!-- Stock Critique -->
-                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <div class="@if(($stats['stock']['critical_stock'] ?? 0) > 0) bg-orange-50 border-orange-300 shadow-md shadow-orange-200 card-alert-warning stock-warning @else bg-orange-50 @endif border border-orange-200 rounded-lg p-4 transition-all-smooth">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-orange-500 rounded-md flex items-center justify-center">
+                            <div class="w-8 h-8 bg-orange-500 rounded-md flex items-center justify-center @if(($stats['stock']['critical_stock'] ?? 0) > 0) animate-pulse @endif">
                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
                                 </svg>
@@ -258,15 +325,18 @@
                         <div class="ml-3">
                             <p class="text-2xl font-bold text-orange-900">{{ $stats['stock']['critical_stock'] }}</p>
                             <p class="text-sm text-orange-700">Stock critique</p>
+                            @if(($stats['stock']['critical_stock'] ?? 0) > 0)
+                                <p class="text-xs text-orange-600 font-medium mt-1 animate-pulse">⚡ Réapprovisionnement recommandé</p>
+                            @endif
                         </div>
                     </div>
                 </div>
 
                 <!-- Stock Bas -->
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div class="@if(($stats['stock']['low_stock'] ?? 0) > 0) bg-yellow-50 border-yellow-300 shadow-sm shadow-yellow-200 card-alert-info @else bg-yellow-50 @endif border border-yellow-200 rounded-lg p-4 transition-all-smooth">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                            <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center @if(($stats['stock']['low_stock'] ?? 0) > 0) stock-notification-dot @endif">
                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                                 </svg>
@@ -275,6 +345,9 @@
                         <div class="ml-3">
                             <p class="text-2xl font-bold text-yellow-900">{{ $stats['stock']['low_stock'] }}</p>
                             <p class="text-sm text-yellow-700">Stock bas</p>
+                            @if(($stats['stock']['low_stock'] ?? 0) > 0)
+                                <p class="text-xs text-yellow-600 font-medium mt-1">📋 Surveillance nécessaire</p>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -1132,6 +1205,124 @@ document.addEventListener('alpine:init', () => {
             weeklyReports: localStorage.getItem('weeklyReports') === 'true',
             supplierIntegration: localStorage.getItem('supplierIntegration') === 'true'
         },
+        notifications: {
+            sound: localStorage.getItem('stockNotificationSound') !== 'false',
+            desktop: localStorage.getItem('stockNotificationDesktop') !== 'false'
+        },
+        
+        init() {
+            // Vérifier les notifications au chargement
+            this.checkStockAlerts();
+            
+            // Vérifier périodiquement toutes les 5 minutes
+            setInterval(() => {
+                this.checkStockAlerts();
+            }, 300000); // 5 minutes
+        },
+        
+        // Vérifier les alertes de stock
+        checkStockAlerts() {
+            const outOfStock = {{ $stats['stock']['out_of_stock'] ?? 0 }};
+            const criticalStock = {{ $stats['stock']['critical_stock'] ?? 0 }};
+            const lowStock = {{ $stats['stock']['low_stock'] ?? 0 }};
+            
+            if (outOfStock > 0) {
+                this.showStockAlert('Rupture de stock détectée!', `${outOfStock} produit(s) en rupture de stock`, 'error');
+            } else if (criticalStock > 0) {
+                this.showStockAlert('Stock critique!', `${criticalStock} produit(s) en stock critique`, 'warning');
+            } else if (lowStock > 0) {
+                this.showStockAlert('Stock bas', `${lowStock} produit(s) en stock bas`, 'info');
+            }
+        },
+        
+        // Afficher une alerte de stock
+        showStockAlert(title, message, type = 'info') {
+            // Notification sonore
+            if (this.notifications.sound) {
+                this.playNotificationSound(type);
+            }
+            
+            // Notification desktop (si autorisée)
+            if (this.notifications.desktop && 'Notification' in window) {
+                if (Notification.permission === 'granted') {
+                    new Notification(title, {
+                        body: message,
+                        icon: '/favicon.ico',
+                        badge: '/favicon.ico'
+                    });
+                } else if (Notification.permission !== 'denied') {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            new Notification(title, {
+                                body: message,
+                                icon: '/favicon.ico'
+                            });
+                        }
+                    });
+                }
+            }
+        },
+        
+        // Jouer un son de notification
+        playNotificationSound(type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            let frequency;
+            
+            switch(type) {
+                case 'error':
+                    frequency = [800, 600]; // Son d'alerte grave
+                    break;
+                case 'warning':
+                    frequency = [600, 800]; // Son d'avertissement
+                    break;
+                default:
+                    frequency = [400, 500]; // Son d'information
+            }
+            
+            frequency.forEach((freq, index) => {
+                setTimeout(() => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = freq;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                }, index * 200);
+            });
+        },
+        
+        // Basculer les notifications sonores
+        toggleSoundNotifications() {
+            this.notifications.sound = !this.notifications.sound;
+            localStorage.setItem('stockNotificationSound', this.notifications.sound);
+            this.showNotification(
+                this.notifications.sound ? 'Notifications sonores activées' : 'Notifications sonores désactivées',
+                'success'
+            );
+        },
+        
+        // Basculer les notifications desktop
+        toggleDesktopNotifications() {
+            this.notifications.desktop = !this.notifications.desktop;
+            localStorage.setItem('stockNotificationDesktop', this.notifications.desktop);
+            
+            if (this.notifications.desktop && 'Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+            
+            this.showNotification(
+                this.notifications.desktop ? 'Notifications desktop activées' : 'Notifications desktop désactivées',
+                'success'
+            );
+        },
         
         // Actualiser les données de stock
         async refreshStockData() {
@@ -1538,4 +1729,106 @@ function showDashboardNotification(message, type = 'info') {
     }, 3000);
 }
 </script>
+
+<style>
+/* Styles personnalisés pour les notifications de stock */
+@keyframes stockAlert {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+        transform: scale(1.02);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+        transform: scale(1);
+    }
+}
+
+@keyframes stockWarning {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+        transform: scale(1.01);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+        transform: scale(1);
+    }
+}
+
+@keyframes notificationBounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-3px);
+    }
+    60% {
+        transform: translateY(-1px);
+    }
+}
+
+/* Application des animations selon les conditions de stock */
+.stock-critical {
+    animation: stockAlert 2s infinite;
+}
+
+.stock-warning {
+    animation: stockWarning 3s infinite;
+}
+
+.notification-bubble {
+    animation: notificationBounce 2s infinite;
+}
+
+/* Animation pour le pouls des badges */
+.animate-pulse-fast {
+    animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Amélioration des transitions */
+.transition-all-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Style pour les indicateurs de notification */
+.stock-notification-dot {
+    position: relative;
+}
+
+.stock-notification-dot::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: #ef4444;
+    border-radius: 50%;
+    border: 2px solid white;
+    animation: pulse 2s infinite;
+}
+
+/* Style spécial pour les cartes en alerte */
+.card-alert-critical {
+    border-left: 4px solid #ef4444 !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+}
+
+.card-alert-warning {
+    border-left: 4px solid #f59e0b !important;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+}
+
+.card-alert-info {
+    border-left: 4px solid #3b82f6 !important;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+}
+</style>
 @endsection

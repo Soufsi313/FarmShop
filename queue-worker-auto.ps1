@@ -17,8 +17,8 @@ function Start-QueueWorker {
     
     while ($true) {
         try {
-            # Démarrer le worker
-            $process = Start-Process -FilePath "php" -ArgumentList "artisan", "queue:work", "--daemon", "--tries=3", "--timeout=300", "--sleep=1" -WorkingDirectory $ProjectPath -PassThru -NoNewWindow
+            # Démarrer le worker avec timeout de 5h pour présentation
+            $process = Start-Process -FilePath "php" -ArgumentList "artisan", "queue:work", "--daemon", "--tries=3", "--timeout=18000", "--sleep=1" -WorkingDirectory $ProjectPath -PassThru -NoNewWindow
             
             Write-Log "✅ Worker démarré (PID: $($process.Id))"
             

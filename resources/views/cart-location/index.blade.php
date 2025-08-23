@@ -552,8 +552,33 @@ document.addEventListener('alpine:init', () => {
             if (window.productTranslations && window.productTranslations[product.slug]) {
                 return window.productTranslations[product.slug];
             }
-            // Fallback to database name if translation not found
-            return product.name || product.slug;
+            
+            // Fallback to database name - handle JSON format
+            if (product.name) {
+                // Si c'est déjà une chaîne simple, la retourner
+                if (typeof product.name === 'string' && !product.name.startsWith('{')) {
+                    return product.name;
+                }
+                
+                // Si c'est un objet JSON ou une chaîne JSON
+                let nameObj = product.name;
+                if (typeof nameObj === 'string') {
+                    try {
+                        nameObj = JSON.parse(nameObj);
+                    } catch (e) {
+                        return nameObj; // Retourner la chaîne telle quelle si parsing échoue
+                    }
+                }
+                
+                // Extraire la traduction française ou la première disponible
+                if (typeof nameObj === 'object' && nameObj !== null) {
+                    const locale = document.documentElement.lang || 'fr';
+                    return nameObj[locale] || nameObj.fr || nameObj.en || nameObj.nl || Object.values(nameObj)[0] || 'Produit';
+                }
+            }
+            
+            // Dernier recours
+            return product.slug || 'Produit';
         },
 
         showNotification(message, type = 'info') {

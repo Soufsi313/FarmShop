@@ -1804,8 +1804,8 @@ class DashboardController extends Controller
             'finished_orders' => $finishedOrders,
             'cancelled_orders' => $cancelledOrders,
             'pending_returns' => $pendingReturns,
-            'monthly_revenue' => number_format($monthlyRevenue, 2),
-            'total_revenue' => number_format($monthlyRevenue, 2),
+            'monthly_revenue' => $monthlyRevenue, // Garder la valeur numérique pour number_format() dans la vue
+            'total_revenue' => $monthlyRevenue,   // Garder la valeur numérique pour number_format() dans la vue
             'occupancy_rate' => number_format($occupancyRate, 1),
             'active_rentals' => $activeOrders,
         ];
