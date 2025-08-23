@@ -1,35 +1,39 @@
 # 🌱 FarmShop - Plateforme E-commerce Agricole
 
-**Application web Laravel p- **Thème moderne et professionnel**
-
-## 🚀 Nouveautés BETA v1.0.0-beta
-
-### 💳 Processus d'Achat Complet
-- **Intégration Stripe native** avec cartes, PayPal, virements
-- **Webhooks sécurisés** pour confirmation automatique
-- **Gestion d'états avancée** (pending → confirmed → preparing → shipped → delivered)
-- **Système de remboursement** avec restauration automatique du stock
-
-### 📊 Surveillance Intelligente des Stocks
-- **Observer Pattern** pour monitoring temps réel
-- **Seuils configurables** (critique, bas stock, rupture)
-- **Alertes multi-niveaux** avec notifications WebSocket
-- **Dashboard administrateur** avec actions rapides
-- **Protection anti-spam** avec système de cooldown
-
-### 📧 Système de Newsletters Professionnel
-- **Campagnes email marketing** avec éditeur visuel
-- **Gestion complète des abonnés** (filtres, actions en lot)
-- **Statistiques détaillées** (ouvertures, clics, désabonnements)
-- **Programmation d'envois** avec gestion des fuseaux horaires
-- **Templates personnalisables** pour différents types de contenus
-
-## 🔧 Prérequis la vente et location de produits agricoles biologiques**
+**Application web Laravel pour la vente et location de produits agricoles biologiques**
 
 ![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.4+-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![MariaDB](https://img.shields.io/badge/MariaDB-11.5+-003545?style=for-the-badge&logo=mariadb&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+
+## 🚀 Installation Rapide
+
+```bash
+# 1. Cloner le projet
+git clone https://github.com/Soufsi313/FarmShop.git
+cd FarmShop
+
+# 2. Installer les dépendances
+composer install
+npm install
+
+# 3. Configuration
+cp .env.example .env
+php artisan key:generate
+
+# 4. Base de données (créer d'abord la DB MySQL/MariaDB)
+php artisan migrate --seed
+
+# 5. Compiler les assets et démarrer
+npm run dev
+php artisan serve
+```
+
+**🎯 Accès rapide :** http://localhost:8000  
+**👤 Admin :** admin@farmshop.local / password  
+
+---
 
 ## 📋 Table des Matières
 
@@ -301,35 +305,50 @@ php artisan serve --port=8080
 ### 3. Accéder à l'Application
 
 🌐 **Frontend :** http://localhost:8000
-
-- **Accueil :** `/`
-- **Produits :** `/products`
-- **Locations :** `/rentals`
-- **Connexion :** `/login`
-- **Inscription :** `/register`
+- **Accueil :** `/` - Page d'accueil avec carrousel de produits
+- **Produits :** `/products` - Catalogue des produits à l'achat
+- **Locations :** `/rentals` - Équipements à louer
+- **Connexion :** `/login` - Authentification utilisateur
+- **Inscription :** `/register` - Création de compte
 
 🔧 **Administration :** http://localhost:8000/admin
+- **Dashboard :** Statistiques et alertes de stock
+- **Produits :** Gestion complète du catalogue
+- **Commandes :** Suivi des ventes et locations
+- **Utilisateurs :** Administration des comptes
+
+## 🎯 Premiers Pas
+
+1. **Connectez-vous en admin :** `admin@farmshop.be` / `password`
+2. **Explorez le dashboard :** Vérifiez les notifications de stock
+3. **Testez les achats :** Créez un compte utilisateur et passez commande
+4. **Configurez les emails :** Modifiez `.env` pour les notifications
+5. **Personnalisez :** Ajoutez vos propres produits via l'admin
 
 ## 👤 Comptes de Test
 
-### Administrateur
+### 🔑 Administrateur Principal
 ```
 Email: admin@farmshop.be
 Mot de passe: password
-Accès: Dashboard admin complet
+Rôle: Super Admin
+Accès: Dashboard complet, gestion des produits, commandes, utilisateurs
 ```
 
-### Utilisateur Standard
+### 🛒 Utilisateur Client
 ```
 Email: user@farmshop.be
 Mot de passe: password
-Accès: Interface utilisateur
+Rôle: Client
+Accès: Achats, locations, wishlist, profil
 ```
 
-### Autres Utilisateurs
-Les seeders créent 100+ utilisateurs de test avec des emails de format :
-- `user1@example.com` à `user100@example.com`
-- Mot de passe : `password`
+### 📊 Données de Test Incluses
+- **159 produits** réalistes (légumes, outils, équipements)
+- **11 catégories** organisées (Légumes, Machines, Équipements, etc.)
+- **100+ utilisateurs** générés automatiquement
+- **Commandes d'exemple** pour tester les workflows
+- **Notifications de stock** pré-configurées
 
 ## 📁 Structure du Projet
 
@@ -485,6 +504,20 @@ Ce projet est open-source sous licence [MIT](https://opensource.org/licenses/MIT
 
 ---
 
-**Développé avec ❤️ pour l'agriculture biologique belge**
+## 📋 Informations du Projet
 
-*Projet personnel de développement web - FarmShop v1.0.0-alpha*
+**Version :** v1.2.0 (Version Finale)  
+**Laravel :** 11.45.1  
+**PHP :** 8.4+  
+**Base de données :** MySQL/MariaDB  
+**Frontend :** Tailwind CSS, Alpine.js  
+
+## 🤝 Contribution
+
+Ce projet est développé comme application de démonstration. Les contributions sont les bienvenues !
+
+---
+
+**🌱 FarmShop - Cultiver l'avenir du commerce agricole**
+
+*Développé avec ❤️ pour l'agriculture biologique belge*
