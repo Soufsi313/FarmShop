@@ -432,7 +432,7 @@
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m1.6 0L7 13m0 0l-1.5 8h13M7 13v8a2 2 0 002 2h6a2 2 0 002-2v-8m-8 0V9a2 2 0 012-2h4a2 2 0 012 2v4.01"/>
                                     </svg>
-                                    <span>Panier</span>
+                                    <span>{{ __('app.nav.cart') }}</span>
                                     <svg class="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
@@ -451,14 +451,14 @@
                                         <svg class="h-4 w-4 mr-3 text-farm-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                                         </svg>
-                                        <span>Panier Achat</span>
+                                        <span>{{ __('app.nav.cart_purchase') }}</span>
                                         <span id="cart-count" class="ml-2 bg-green-600 text-white text-xs rounded-full px-2 py-1 hidden">0</span>
                                     </a>
                                     <a href="{{ route('cart-location.index') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <svg class="h-4 w-4 mr-3 text-farm-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
-                                        <span>Panier Location</span>
+                                        <span>{{ __('app.nav.cart_rental') }}</span>
                                         <span id="cart-location-count" class="ml-2 bg-orange-500 text-white text-xs rounded-full px-2 py-1 hidden">0</span>
                                     </a>
                                 </div>
@@ -467,19 +467,19 @@
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                                 </svg>
-                                <span>Mes achats</span>
+                                <span>{{ __('app.nav.my_orders') }}</span>
                             </a>
                             <a href="{{ route('rental-orders.index') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a4 4 0 118 0v4m-4 8h0m0-8h0m-4.5 8h9a2 2 0 002-2V9a2 2 0 00-2-2h-9a2 2 0 00-2 2v6a2 2 0 002 2z"/>
                                 </svg>
-                                <span>Mes locations</span>
+                                <span>{{ __('app.nav.my_rentals') }}</span>
                             </a>
                             <a href="{{ route('wishlist.index') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1">
                                 <svg class="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                 </svg>
-                                <span>Wishlist</span>
+                                <span>{{ __('app.nav.wishlist') }}</span>
                                 <span id="wishlist-count" class="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-1 hidden">0</span>
                             </a>
                         @endauth
@@ -634,28 +634,28 @@
                                  x-transition:leave-end="transform opacity-0 scale-95"
                                  @click.away="userMenuOpen = false"
                                  class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
-                                <a href="{{ route('users.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mon profil</a>
+                                <a href="{{ route('users.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ __('app.nav.profile') }}</a>
                                 @if(auth()->user()->isAdmin())
                                     <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 font-medium">
                                         🛠️ Dashboard Admin
                                     </a>
                                     <div class="border-t border-gray-100 my-1"></div>
                                 @endif
-                                <a href="{{ route('orders.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mes achats</a>
-                                <a href="{{ route('rental-orders.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mes locations</a>
+                                <a href="{{ route('orders.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ __('app.nav.my_orders') }}</a>
+                                <a href="{{ route('rental-orders.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ __('app.nav.my_rentals') }}</a>
                                 <a href="{{ route('wishlist.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     <div class="flex items-center">
                                         <svg class="w-4 h-4 mr-2 text-red-500" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                         </svg>
-                                        Ma Wishlist
+                                        {{ __('app.nav.wishlist') }}
                                         <span id="wishlist-count-dropdown" class="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-1 hidden">0</span>
                                     </div>
                                 </a>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit" onclick="localStorage.removeItem('cookie_consent_given'); localStorage.removeItem('cookie_consent_date'); console.log('🍪 localStorage des cookies nettoyé à la déconnexion');" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        Déconnexion
+                                        {{ __('app.nav.logout') }}
                                     </button>
                                 </form>
                             </div>
@@ -696,12 +696,12 @@
                             <svg class="w-4 h-4 mr-2 text-red-500" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                             </svg>
-                            Wishlist
+                            {{ __('app.nav.wishlist') }}
                             <span id="wishlist-count-mobile" class="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-1 hidden">0</span>
                         </a>
-                        <a href="{{ route('orders.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Mes achats</a>
-                        <a href="{{ route('rental-orders.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Mes locations</a>
-                        <a href="{{ route('users.profile') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Mon profil</a>
+                        <a href="{{ route('orders.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">{{ __('app.nav.my_orders') }}</a>
+                        <a href="{{ route('rental-orders.index') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">{{ __('app.nav.my_rentals') }}</a>
+                        <a href="{{ route('users.profile') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">{{ __('app.nav.profile') }}</a>
                     @endauth
                     
                     <a href="{{ route('contact') }}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">{{ __('app.nav.contact') }}</a>
@@ -759,7 +759,7 @@
                             <form method="POST" action="/logout">
                                 @csrf
                                 <button type="submit" onclick="localStorage.removeItem('cookie_consent_given'); localStorage.removeItem('cookie_consent_date'); console.log('🍪 localStorage des cookies nettoyé à la déconnexion mobile');" class="text-red-600 hover:text-red-800 block px-3 py-2 rounded-md text-base font-medium w-full text-left">
-                                    Déconnexion
+                                    {{ __('app.nav.logout') }}
                                 </button>
                             </form>
                         </div>

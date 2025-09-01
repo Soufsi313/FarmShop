@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Finaliser ma commande - FarmShop')
+@section('title', __('app.checkout.page_title') . ' - FarmShop')
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8" x-data="checkoutData()">
@@ -8,8 +8,8 @@
         
         <!-- En-tête -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Finaliser ma commande</h1>
-            <p class="text-gray-600">Vérifiez vos informations avant de confirmer votre commande</p>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ __('app.checkout.page_title') }}</h1>
+            <p class="text-gray-600">{{ __('app.checkout.page_subtitle') }}</p>
         </div>
 
         <form method="POST" action="{{ route('checkout.create-order') }}" class="grid lg:grid-cols-3 gap-8">
@@ -29,7 +29,7 @@
                                    x-model="useProfileAddresses"
                                    @change="toggleProfileAddresses()"
                                    class="rounded border-gray-300 text-green-600 focus:ring-green-500">
-                            <span class="text-sm text-gray-600">Utiliser l'adresse de mon profil</span>
+                            <span class="text-sm text-gray-600">{{ __('app.checkout.use_profile_address') }}</span>
                         </label>
                     </div>
 
@@ -52,7 +52,7 @@
                         <div class="grid grid-cols-1 gap-4">
                             <!-- Adresse de facturation -->
                             <div>
-                                <h3 class="font-medium text-gray-900 mb-3">Adresse de facturation</h3>
+                                <h3 class="font-medium text-gray-900 mb-3">{{ __('app.checkout.billing_address') }}</h3>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label for="billing_name" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.forms.full_name") }}<//label>
@@ -113,7 +113,7 @@
                                        @change="copybillingToShipping()"
                                        class="rounded border-gray-300 text-green-600 focus:ring-green-500">
                                 <label for="same_shipping_address" class="text-sm text-gray-600">
-                                    Utiliser la même adresse pour la livraison
+                                    {{ __('app.checkout.use_same_address') }}
                                 </label>
                             </div>
 
@@ -178,7 +178,7 @@
 
                 <!-- Méthode de paiement -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Méthode de paiement</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.checkout.payment_method') }}</h2>
                     <div class="space-y-3">
                         <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                             <input type="radio" name="payment_method" value="card" checked 
@@ -188,8 +188,8 @@
                                     💳
                                 </div>
                                 <div>
-                                    <p class="font-medium text-gray-900">Carte bancaire</p>
-                                    <p class="text-sm text-gray-600">Paiement sécurisé par Stripe</p>
+                                    <p class="font-medium text-gray-900">{{ __('app.checkout.payment_card') }}</p>
+                                    <p class="text-sm text-gray-600">{{ __('app.checkout.payment_card_desc') }}</p>
                                 </div>
                             </div>
                         </label>
@@ -202,8 +202,8 @@
                                     PP
                                 </div>
                                 <div>
-                                    <p class="font-medium text-gray-900">PayPal</p>
-                                    <p class="text-sm text-gray-600">Paiement via votre compte PayPal</p>
+                                    <p class="font-medium text-gray-900">{{ __('app.checkout.payment_paypal') }}</p>
+                                    <p class="text-sm text-gray-600">{{ __('app.checkout.payment_paypal_desc') }}</p>
                                 </div>
                             </div>
                         </label>
@@ -216,8 +216,8 @@
                                     🏦
                                 </div>
                                 <div>
-                                    <p class="font-medium text-gray-900">Virement bancaire</p>
-                                    <p class="text-sm text-gray-600">Paiement après réception de la facture</p>
+                                    <p class="font-medium text-gray-900">{{ __('app.checkout.payment_bank') }}</p>
+                                    <p class="text-sm text-gray-600">{{ __('app.checkout.payment_bank_desc') }}</p>
                                 </div>
                             </div>
                         </label>
@@ -229,7 +229,7 @@
             <!-- Colonne de droite: Résumé de commande -->
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-lg shadow p-6 sticky top-4">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Résumé de votre commande</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.checkout.order_summary') }}</h2>
                     
                     <!-- Articles -->
                     <div class="space-y-3 mb-4">
@@ -252,33 +252,33 @@
                     <!-- Totaux -->
                     <div class="border-t pt-4 space-y-2">
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Sous-total HT</span>
+                            <span class="text-gray-600">{{ __('app.checkout.subtotal_ht') }}</span>
                             <span>{{ $cartSummary['formatted']['subtotal_ht'] }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __("app.ecommerce.tax") }}<//span>
+                            <span class="text-gray-600">{{ __("app.ecommerce.tax") }}</span>
                             <span>{{ $cartSummary['formatted']['tax_amount'] }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Total produits</span>
+                            <span class="text-gray-600">{{ __('app.checkout.total_products') }}</span>
                             <span>{{ $cartSummary['formatted']['total_ttc'] }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Frais de livraison</span>
+                            <span class="text-gray-600">{{ __('app.checkout.shipping_costs') }}</span>
                             <span class="{{ $cartSummary['is_free_shipping'] ? 'text-green-600' : '' }}">
-                                {{ $cartSummary['is_free_shipping'] ? 'GRATUITE' : $cartSummary['formatted']['shipping_cost'] }}
+                                {{ $cartSummary['is_free_shipping'] ? __('app.checkout.free_shipping') : $cartSummary['formatted']['shipping_cost'] }}
                             </span>
                         </div>
                         
                         @if(!$cartSummary['is_free_shipping'])
                         <div class="text-xs text-orange-600 bg-orange-50 p-2 rounded">
-                            Ajoutez encore {{ $cartSummary['formatted']['remaining_for_free_shipping'] }} pour bénéficier de la livraison gratuite
+                            {{ __('app.checkout.remaining_free_shipping', ['amount' => $cartSummary['formatted']['remaining_for_free_shipping']]) }}
                         </div>
                         @endif
 
                         <div class="border-t pt-2">
                             <div class="flex justify-between text-lg font-semibold">
-                                <span>Total à payer</span>
+                                <span>{{ __('app.checkout.total_to_pay') }}</span>
                                 <span>{{ $cartSummary['formatted']['total_with_shipping'] }}</span>
                             </div>
                         </div>
@@ -287,7 +287,7 @@
                     <!-- Bouton de validation -->
                     <button type="submit" 
                             class="w-full mt-6 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors">
-                        Confirmer la commande
+                        {{ __('app.checkout.confirm_order') }}
                     </button>
 
                     <!-- Retour au panier -->

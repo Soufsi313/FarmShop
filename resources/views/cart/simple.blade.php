@@ -47,7 +47,21 @@ const translations = {
     totalTtc: '{{ __("app.cart.total_ttc") }}',
     totalItems: '{{ __("app.cart.total_items") }}',
     discountOffer: '{{ __("app.cart.discount_offer") }}',
-    savings: '{{ __("app.cart.savings") }}'
+    savings: '{{ __("app.cart.savings") }}',
+    subtotalHtLabel: '{{ __("app.cart.subtotal_ht_label") }}',
+    vatLabel: '{{ __("app.cart.vat_label") }}',
+    vatRateLabel: '{{ __("app.cart.vat_rate_label") }}',
+    vatAmountLabel: '{{ __("app.cart.vat_amount_label") }}',
+    shippingCostLabel: '{{ __("app.cart.shipping_cost_label") }}',
+    freeShippingLabel: '{{ __("app.cart.free_shipping_label") }}',
+    remainingFreeShippingText: '{{ __("app.cart.remaining_free_shipping_text") }}',
+    totalSavingsLabel: '{{ __("app.cart.total_savings_label") }}',
+    totalTtcLabel: '{{ __("app.cart.total_ttc_label") }}',
+    totalItemsLabel: '{{ __("app.cart.total_items_label") }}',
+    loadingError: '{{ __("app.cart.loading_error") }}',
+    noItems: '{{ __("app.cart.no_items") }}',
+    oneItem: '{{ __("app.cart.one_item") }}',
+    multipleItems: '{{ __("app.cart.multiple_items") }}'
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -61,6 +75,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Fonction pour formater le nombre d'articles
+function formatItemCount(count) {
+    console.log('formatItemCount called with count:', count);
+    console.log('translations object:', translations);
+    
+    if (count === 0) {
+        return translations.noItems || 'Aucun article';
+    } else if (count === 1) {
+        return translations.oneItem || '1 article';
+    } else {
+        const multiple = translations.multipleItems || 'articles';
+        return count + ' ' + multiple;
+    }
+}
+
 function loadCart() {
     fetch('/cart/data')
         .then(response => response.json())
@@ -68,7 +97,7 @@ function loadCart() {
             displayCart(data);
         })
         .catch(error => {
-            console.error('Erreur:', error);
+            console.error(translations.loadingError + ':', error);
             document.getElementById('cart-content').innerHTML = 
                 '<div class="text-center text-red-600">{{ __("app.messages.cart_load_error") }}</div>';
         });
@@ -107,20 +136,20 @@ function displayCart(data) {
                                         ${item.special_offer ? `
                                             <div class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs mb-1">
                                                 <span class="font-semibold">🔥 ${item.special_offer.title}</span>
-                                                <span class="block text-xs">${item.special_offer.discount_percentage}% de réduction</span>
+                                                <span class="block text-xs">${item.special_offer.discount_percentage}% ${translations.discountPercentage}</span>
                                             </div>
                                             <div class="space-y-1">
                                                 <div class="flex items-center gap-2">
-                                                    <span class="line-through text-red-500">Prix normal TTC: ${item.special_offer.original_price_ttc_formatted}</span>
+                                                    <span class="line-through text-red-500">${translations.normalPriceTtc}: ${item.special_offer.original_price_ttc_formatted}</span>
                                                 </div>
-                                                <div class="text-green-600 font-medium">Prix réduit TTC: ${item.price_per_unit_ttc_formatted}</div>
-                                                <div class="text-xs">Prix unitaire HT: ${item.price_per_unit_ht_formatted}</div>
-                                                <div class="text-xs">TVA ${item.tax_rate_formatted}: ${(item.price_per_unit_ttc - item.price_per_unit_ht).toFixed(2)} €</div>
+                                                <div class="text-green-600 font-medium">${translations.discountedPriceTtc}: ${item.price_per_unit_ttc_formatted}</div>
+                                                <div class="text-xs">${translations.unitPriceHt}: ${item.price_per_unit_ht_formatted}</div>
+                                                <div class="text-xs">${translations.taxAmount} ${item.tax_rate_formatted}: ${(item.price_per_unit_ttc - item.price_per_unit_ht).toFixed(2)} €</div>
                                             </div>
                                         ` : `
-                                            <div>Prix unitaire HT: ${item.price_per_unit_ht_formatted}</div>
-                                            <div>TVA ${item.tax_rate_formatted}: ${(item.price_per_unit_ttc - item.price_per_unit_ht).toFixed(2)} €</div>
-                                            <div class="font-medium">Prix unitaire TTC: ${item.price_per_unit_ttc_formatted}</div>
+                                            <div>${translations.unitPriceHt}: ${item.price_per_unit_ht_formatted}</div>
+                                            <div>${translations.taxAmount} ${item.tax_rate_formatted}: ${(item.price_per_unit_ttc - item.price_per_unit_ht).toFixed(2)} €</div>
+                                            <div class="font-medium">${translations.normalPriceTtc}: ${item.price_per_unit_ttc_formatted}</div>
                                         `}
                                     </div>
                                 </div>
@@ -134,17 +163,17 @@ function displayCart(data) {
                                     </div>
                                     <div class="text-right">
                                         <div class="text-xs text-gray-500">
-                                            <div>Sous-total HT: ${item.subtotal_formatted}</div>
-                                            <div>TVA: ${item.tax_amount_formatted}</div>
+                                            <div>${translations.subtotalHt}: ${item.subtotal_formatted}</div>
+                                            <div>${translations.taxAmount}: ${item.tax_amount_formatted}</div>
                                             ${item.special_offer ? `
                                                 <div class="text-green-600 font-medium">
-                                                    Économie: ${item.special_offer.savings_total_ttc_formatted}
+                                                    ${translations.savings}: ${item.special_offer.savings_total_ttc_formatted}
                                                 </div>
                                             ` : ''}
                                         </div>
                                         <div class="text-lg font-bold text-gray-900">${item.total_formatted}</div>
                                         <button onclick="removeItem(${item.id})" 
-                                                class="text-red-600 hover:text-red-800 text-xs mt-1">{{ __("app.buttons.delete") }}</button>
+                                                class="text-red-600 hover:text-red-800 text-xs mt-1">{{ __("app.cart.delete") }}</button>
                                     </div>
                                 </div>
                             </div>
@@ -161,7 +190,7 @@ function displayCart(data) {
             <div class="mt-6 bg-gray-50 px-6 py-4 rounded-lg">
                 <div class="space-y-2">
                     <div class="flex justify-between text-base font-medium text-gray-900">
-                        <span>Sous-total HT:</span>
+                        <span>${translations.subtotalHtLabel}</span>
                         <span>${data.subtotal}</span>
                     </div>`;
                     
@@ -171,7 +200,7 @@ function displayCart(data) {
             Object.values(data.tva_details).forEach(tvaDetail => {
                 html += `
                     <div class="flex justify-between text-sm text-gray-500">
-                        <span>TVA ${tvaDetail.rate}% sur ${(tvaDetail.subtotal_ht).toFixed(2)} €:</span>
+                        <span>${translations.vatLabel} (${tvaDetail.rate}%)</span>
                         <span>${(tvaDetail.tax_amount).toFixed(2)} €</span>
                     </div>`;
             });
@@ -180,26 +209,26 @@ function displayCart(data) {
             const tvaDetail = Object.values(data.tva_details)[0];
             html += `
                 <div class="flex justify-between text-sm text-gray-500">
-                    <span>TVA (${tvaDetail.rate}%):</span>
+                    <span>${translations.vatLabel} (${tvaDetail.rate}%)</span>
                     <span>${data.tva_amount}</span>
                 </div>`;
         } else {
             // Fallback
             html += `
                 <div class="flex justify-between text-sm text-gray-500">
-                    <span>TVA:</span>
+                    <span>${translations.vatLabel}</span>
                     <span>${data.tva_amount}</span>
                 </div>`;
         }
         
         html += `
                     <div class="flex justify-between text-sm text-gray-500">
-                        <span>Frais de livraison:</span>
-                        <span>${data.is_free_shipping ? 'GRATUIT' : data.shipping_cost}</span>
+                        <span>${translations.shippingCostLabel}</span>
+                        <span>${data.is_free_shipping ? translations.freeShippingLabel : data.shipping_cost}</span>
                     </div>
                     ${!data.is_free_shipping ? `
                     <div class="flex justify-between text-sm text-green-600">
-                        <span>Plus que ${data.remaining_for_free_shipping} pour la livraison gratuite !</span>
+                        <span>${translations.remainingFreeShippingText.replace('%s', data.remaining_for_free_shipping)}</span>
                         <span></span>
                     </div>
                     ` : ''}`;
@@ -217,7 +246,7 @@ function displayCart(data) {
         if (hasOffers) {
             html += `
                     <div class="flex justify-between text-sm text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
-                        <span>🎉 Économies totales:</span>
+                        <span>${translations.totalSavingsLabel}</span>
                         <span>-${totalSavings.toFixed(2)} €</span>
                     </div>`;
         }
@@ -225,11 +254,11 @@ function displayCart(data) {
         html += `
                     <div class="border-t pt-2">
                         <div class="flex justify-between text-lg font-bold text-gray-900">
-                            <span>Total TTC:</span>
+                            <span>${translations.totalTtcLabel}</span>
                             <span>${data.total_with_shipping}</span>
                         </div>
                         <div class="text-sm text-gray-500 text-right">
-                            ${data.total_items} article(s)
+                            ${formatItemCount(data.total_items)}
                         </div>
                     </div>
                 </div>

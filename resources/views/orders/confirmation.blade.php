@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Confirmation de commande - FarmShop')
+@section('title', __('app.order_confirmation.page_title') . ' - FarmShop')
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8">
@@ -15,8 +15,8 @@
                     </svg>
                 </div>
             </div>
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Paiement confirmé !</h1>
-            <p class="text-lg text-gray-600">Votre commande a été validée avec succès</p>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ __('app.order_confirmation.payment_confirmed') }}</h1>
+            <p class="text-lg text-gray-600">{{ __('app.order_confirmation.order_validated') }}</p>
         </div>
 
         <!-- Détails de la commande -->
@@ -24,15 +24,15 @@
             <div class="border-b pb-4 mb-6">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-900">Commande #{{ $order->order_number }}</h2>
-                        <p class="text-sm text-gray-600 mt-1">Passée le {{ $order->created_at->format('d/m/Y à H:i') }}</p>
+                        <h2 class="text-xl font-semibold text-gray-900">{{ __('app.order_confirmation.order_number', ['number' => $order->order_number]) }}</h2>
+                        <p class="text-sm text-gray-600 mt-1">{{ __('app.order_confirmation.placed_on', ['date' => $order->created_at->format('d/m/Y à H:i')]) }}</p>
                     </div>
                     <div class="mt-2 sm:mt-0">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                             <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                             </svg>
-                            Payée
+                            {{ __('app.order_confirmation.paid_status') }}
                         </span>
                     </div>
                 </div>
@@ -40,33 +40,37 @@
 
             <!-- Articles commandés -->
             <div class="mb-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Articles commandés</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('app.order_confirmation.ordered_items') }}</h3>
                 <div class="space-y-4">
-                    @foreach($order->items as $item)
-                    <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                        @if($item->product_image)
-                        <div class="flex-shrink-0">
-                            <img src="{{ Storage::url($item->product_image) }}" 
-                                 alt="{{ $item->product_name }}" 
-                                 class="w-16 h-16 object-cover rounded-lg">
-                        </div>
-                        @endif
-                        <div class="flex-1">
-                            <h4 class="text-sm font-medium text-gray-900">{{ $item->product_name }}</h4>
-                            <p class="text-sm text-gray-600">
-                                {{ $item->quantity }} × {{ number_format($item->unit_price / 1.06, 2) }} € HT
-                                @if($item->product_category['food_type'] === 'alimentaire')
-                                    (TVA 6%)
+                    @forelse($order->items as $item)
+                        <div class="bg-white rounded-lg shadow-sm p-4 flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                @if($item->product && $item->product->image)
+                                    <img src="{{ asset('storage/' . $item->product->image) }}" 
+                                         alt="{{ $item->product_name }}" 
+                                         class="w-16 h-16 object-cover rounded-lg">
                                 @else
-                                    (TVA 21%)
+                                    <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
                                 @endif
-                            </p>
+                                <div>
+                                    <h4 class="font-medium text-gray-900">{{ $item->product_name }}</h4>
+                                    <p class="text-sm text-gray-600">{{ __('app.content.quantity') }}: {{ $item->quantity }}</p>
+                                    <p class="text-sm text-gray-600">{{ number_format($item->unit_price, 2) }} € × {{ $item->quantity }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-medium text-gray-900">{{ number_format($item->total_price, 2) }} €</p>
+                            </div>
                         </div>
-                        <div class="text-right">
-                            <p class="text-sm font-medium text-gray-900">{{ number_format($item->total_price, 2) }} €</p>
+                    @empty
+                        <div class="text-center py-8">
+                            <p class="text-gray-500">{{ __('app.order_confirmation.no_items_found') }}</p>
                         </div>
-                    </div>
-                    @endforeach
+                    @endforelse
                 </div>
             </div>
 
@@ -74,7 +78,7 @@
             <div class="border-t pt-4">
                 <div class="space-y-2">
                     <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Sous-total HT</span>
+                        <span class="text-gray-600">{{ __('app.order_confirmation.subtotal_ht') }}</span>
                         <span>{{ number_format($order->subtotal, 2) }} €</span>
                     </div>
                     <div class="flex justify-between text-sm">
@@ -82,17 +86,17 @@
                         <span>{{ number_format($order->tax_amount, 2) }} €</span>
                     </div>
                     <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Frais de livraison</span>
+                        <span class="text-gray-600">{{ __('app.order_confirmation.shipping_costs') }}</span>
                         <span>
                             @if($order->shipping_cost > 0)
                                 {{ number_format($order->shipping_cost, 2) }} €
                             @else
-                                GRATUITE
+                                {{ __('app.order_confirmation.free_shipping') }}
                             @endif
                         </span>
                     </div>
                     <div class="flex justify-between text-lg font-semibold border-t pt-2">
-                        <span>Total payé</span>
+                        <span>{{ __('app.order_confirmation.total_paid') }}</span>
                         <span>{{ number_format($order->total_amount, 2) }} €</span>
                     </div>
                 </div>
@@ -103,15 +107,15 @@
         <div class="grid md:grid-cols-2 gap-6 mb-6">
             <!-- Adresse de facturation -->
             <div class="bg-white rounded-lg shadow-sm p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Adresse de facturation</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('app.order_confirmation.billing_address') }}</h3>
                 <div class="text-sm text-gray-600 space-y-1">
                     <p class="font-medium text-gray-900">{{ $order->billing_address['name'] ?? $order->billing_address['firstName'] . ' ' . $order->billing_address['lastName'] }}</p>
-                    @if(!empty($order->billing_address['company']))
-                        <p>{{ $order->billing_address['company'] }}</p>
+                    @if(!empty($order->billing_address['company'] ?? ''))
+                        <p>{{ $order->billing_address['company'] ?? '' }}</p>
                     @endif
                     <p>{{ $order->billing_address['address'] }}</p>
-                    @if(!empty($order->billing_address['addressComplement']))
-                        <p>{{ $order->billing_address['addressComplement'] }}</p>
+                    @if(!empty($order->billing_address['addressComplement'] ?? ''))
+                        <p>{{ $order->billing_address['addressComplement'] ?? '' }}</p>
                     @endif
                     <p>{{ $order->billing_address['postalCode'] ?? $order->billing_address['postal_code'] }} {{ $order->billing_address['city'] }}</p>
                     <p>{{ $order->billing_address['country'] }}</p>
@@ -120,15 +124,15 @@
 
             <!-- Adresse de livraison -->
             <div class="bg-white rounded-lg shadow-sm p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __("app.forms.delivery_address") }}<//h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __("app.forms.delivery_address") }}</h3>
                 <div class="text-sm text-gray-600 space-y-1">
                     <p class="font-medium text-gray-900">{{ $order->shipping_address['name'] ?? $order->shipping_address['firstName'] . ' ' . $order->shipping_address['lastName'] }}</p>
-                    @if(!empty($order->shipping_address['company']))
-                        <p>{{ $order->shipping_address['company'] }}</p>
+                    @if(!empty($order->shipping_address['company'] ?? ''))
+                        <p>{{ $order->shipping_address['company'] ?? '' }}</p>
                     @endif
                     <p>{{ $order->shipping_address['address'] }}</p>
-                    @if(!empty($order->shipping_address['addressComplement']))
-                        <p>{{ $order->shipping_address['addressComplement'] }}</p>
+                    @if(!empty($order->shipping_address['addressComplement'] ?? ''))
+                        <p>{{ $order->shipping_address['addressComplement'] ?? '' }}</p>
                     @endif
                     <p>{{ $order->shipping_address['postalCode'] ?? $order->shipping_address['postal_code'] }} {{ $order->shipping_address['city'] }}</p>
                     <p>{{ $order->shipping_address['country'] }}</p>
@@ -143,19 +147,19 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                     </svg>
-                    <span class="text-sm font-medium">Un email de confirmation a été envoyé à {{ $order->user->email }}</span>
+                    <span class="text-sm font-medium">{{ __('app.order_confirmation.confirmation_email', ['email' => $order->user->email]) }}</span>
                 </div>
             </div>
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('orders.show', $order) }}" 
                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                    Voir ma commande
+                    {{ __('app.order_confirmation.view_order') }}
                 </a>
                 
                 <a href="{{ route('home') }}" 
                    class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                    Continuer mes achats
+                    {{ __('app.order_confirmation.continue_shopping') }}
                 </a>
             </div>
         </div>

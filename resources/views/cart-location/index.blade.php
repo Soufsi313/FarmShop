@@ -348,18 +348,18 @@ document.addEventListener('alpine:init', () => {
                     this.cartItems = response.data.cart.items || [];
                     this.cartSummary = response.data.summary || {};
                 } else {
-                    this.showNotification(response.message || 'Erreur lors du chargement du panier', 'error');
+                    this.showNotification(response.message || '{{ __("app.messages.cart_load_error") }}', 'error');
                 }
             } catch (error) {
                 console.error('Error loading cart:', error);
                 if (error.message.includes('401')) {
-                    this.showNotification('Vous devez être connecté pour accéder au panier de location', 'error');
+                    this.showNotification('{{ __("app.auth.login_required") }}', 'error');
                     // Rediriger vers la page de connexion après 2 secondes
                     setTimeout(() => {
                         window.location.href = '/login';
                     }, 2000);
                 } else {
-                    this.showNotification('Erreur lors du chargement du panier', 'error');
+                    this.showNotification('{{ __("app.messages.cart_load_error") }}', 'error');
                 }
             } finally {
                 this.isLoading = false;
@@ -378,18 +378,18 @@ document.addEventListener('alpine:init', () => {
 
                 if (response.success) {
                     await this.loadCart();
-                    this.showNotification('Quantité mise à jour', 'success');
+                    this.showNotification('{{ __("app.messages.quantity_updated") }}', 'success');
                 } else {
-                    this.showNotification(response.message || 'Erreur lors de la mise à jour', 'error');
+                    this.showNotification(response.message || '{{ __("app.messages.update_error") }}', 'error');
                 }
             } catch (error) {
-                this.showNotification('Erreur lors de la mise à jour de la quantité', 'error');
+                this.showNotification('{{ __("app.messages.quantity_update_error") }}', 'error');
             }
         },
 
         // Remove item
         async removeItem(itemId) {
-            if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) return;
+            if (!confirm('{{ __("app.messages.confirm_remove_item") }}')) return;
 
             try {
                 const response = await this.makeApiCall(`/api/cart-location-items/${itemId}`, {
@@ -398,18 +398,18 @@ document.addEventListener('alpine:init', () => {
 
                 if (response.success) {
                     await this.loadCart();
-                    this.showNotification('Article supprimé du panier', 'success');
+                    this.showNotification('{{ __("app.messages.item_removed") }}', 'success');
                 } else {
-                    this.showNotification(response.message || 'Erreur lors de la suppression', 'error');
+                    this.showNotification(response.message || '{{ __("app.messages.remove_error") }}', 'error');
                 }
             } catch (error) {
-                this.showNotification('Erreur lors de la suppression', 'error');
+                this.showNotification('{{ __("app.messages.remove_error") }}', 'error');
             }
         },
 
         // Clear cart
         async clearCart() {
-            if (!confirm('Êtes-vous sûr de vouloir vider complètement votre panier ?')) return;
+            if (!confirm('{{ __("app.messages.confirm_clear_cart") }}')) return;
 
             try {
                 const response = await this.makeApiCall('/api/cart-location/clear', {
@@ -418,12 +418,12 @@ document.addEventListener('alpine:init', () => {
 
                 if (response.success) {
                     await this.loadCart();
-                    this.showNotification('Panier vidé', 'success');
+                    this.showNotification('{{ __("app.messages.cart_cleared") }}', 'success');
                 } else {
-                    this.showNotification(response.message || 'Erreur lors du vidage du panier', 'error');
+                    this.showNotification(response.message || '{{ __("app.messages.clear_cart_error") }}', 'error');
                 }
             } catch (error) {
-                this.showNotification('Erreur lors du vidage du panier', 'error');
+                this.showNotification('{{ __("app.messages.clear_cart_error") }}', 'error');
             }
         },
 
@@ -438,7 +438,7 @@ document.addEventListener('alpine:init', () => {
         // Save date changes
         async saveDateChanges() {
             if (!this.editForm.start_date || !this.editForm.end_date) {
-                this.showNotification('Veuillez sélectionner les dates', 'error');
+                this.showNotification('{{ __("app.messages.select_dates") }}', 'error');
                 return;
             }
 
@@ -454,10 +454,10 @@ document.addEventListener('alpine:init', () => {
                 if (response.success) {
                     await this.loadCart();
                     this.showDateModal = false;
-                    this.showNotification('Dates mises à jour', 'success');
+                    this.showNotification('{{ __("app.messages.dates_updated") }}', 'success');
                 } else if (response.status === 422) {
                     // Gestion des erreurs de validation
-                    let errorMessage = 'Erreur de validation :';
+                    let errorMessage = '{{ __("app.messages.validation_error") }} :';
                     
                     if (response.errors) {
                         // Afficher toutes les erreurs de validation
@@ -472,17 +472,17 @@ document.addEventListener('alpine:init', () => {
                     
                     this.showNotification(errorMessage, 'error');
                 } else {
-                    this.showNotification(response.message || 'Erreur lors de la mise à jour des dates', 'error');
+                    this.showNotification(response.message || '{{ __("app.messages.dates_update_error") }}', 'error');
                 }
             } catch (error) {
-                this.showNotification('Erreur lors de la mise à jour des dates', 'error');
+                this.showNotification('{{ __("app.messages.dates_update_error") }}', 'error');
             }
         },
 
         // Proceed to checkout
         proceedToCheckout() {
             if (this.cartItems.length === 0) {
-                this.showNotification('Votre panier est vide', 'error');
+                this.showNotification('{{ __("app.messages.cart_empty") }}', 'error');
                 return;
             }
             
@@ -523,12 +523,12 @@ document.addEventListener('alpine:init', () => {
                 data = JSON.parse(text);
             } catch (e) {
                 console.error('Response was not JSON:', text);
-                throw new Error('La réponse du serveur n\'est pas au format JSON');
+                throw new Error('{{ __("app.messages.invalid_server_response") }}');
             }
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    throw new Error('HTTP error! status: 401 - Non autorisé');
+                    throw new Error('HTTP error! status: 401 - {{ __("app.messages.unauthorized") }}');
                 }
                 
                 // Pour les erreurs 422 (validation), retournons les données avec le statut
@@ -537,7 +537,7 @@ document.addEventListener('alpine:init', () => {
                         success: false,
                         status: 422,
                         errors: data.errors || {},
-                        message: data.message || 'Erreur de validation'
+                        message: data.message || '{{ __("app.messages.validation_error") }}'
                     };
                 }
                 
@@ -573,12 +573,12 @@ document.addEventListener('alpine:init', () => {
                 // Extraire la traduction française ou la première disponible
                 if (typeof nameObj === 'object' && nameObj !== null) {
                     const locale = document.documentElement.lang || 'fr';
-                    return nameObj[locale] || nameObj.fr || nameObj.en || nameObj.nl || Object.values(nameObj)[0] || 'Produit';
+                    return nameObj[locale] || nameObj.fr || nameObj.en || nameObj.nl || Object.values(nameObj)[0] || '{{ __("app.common.product") }}';
                 }
             }
             
             // Dernier recours
-            return product.slug || 'Produit';
+            return product.slug || '{{ __("app.common.product") }}';
         },
 
         showNotification(message, type = 'info') {

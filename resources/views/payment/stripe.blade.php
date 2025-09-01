@@ -8,15 +8,15 @@
         
         <!-- Header -->
         <div class="bg-white rounded-lg shadow p-6 mb-6">
-            <h1 class="text-2xl font-bold">Paiement - Commande #{{ $order->order_number }}</h1>
-            <p class="text-gray-600">Total: {{ number_format($order->total_amount, 2) }} €</p>
+            <h1 class="text-2xl font-bold">{{ __('app.payment.page_title', ['order_number' => $order->order_number]) }}</h1>
+            <p class="text-gray-600">{{ __('app.payment.total_amount', ['amount' => number_format($order->total_amount, 2)]) }}</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
             <!-- Résumé -->
             <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-xl font-semibold mb-4">Résumé de la commande</h2>
+                <h2 class="text-xl font-semibold mb-4">{{ __('app.payment.order_summary') }}</h2>
                 
                 @foreach($order->items as $item)
                 <div class="flex justify-between items-center py-2 border-b">
@@ -44,7 +44,7 @@
                     <form @submit.prevent="processPayment()">
                         
                         <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Numéro de carte</label>
+                            <label class="block text-sm font-medium mb-2">{{ __('app.payment.card_number') }}</label>
                             <input type="text" 
                                    x-model="cardNumber"
                                    @input="formatCard()"
@@ -54,7 +54,7 @@
                         
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div>
-                                <label class="block text-sm font-medium mb-2">Expiration</label>
+                                <label class="block text-sm font-medium mb-2">{{ __('app.payment.expiration') }}</label>
                                 <input type="text" 
                                        x-model="expiry"
                                        @input="formatExpiry()"
@@ -62,7 +62,7 @@
                                        class="w-full border rounded px-3 py-2">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium mb-2">CVC</label>
+                                <label class="block text-sm font-medium mb-2">{{ __('app.payment.cvc') }}</label>
                                 <input type="text" 
                                        x-model="cvc"
                                        @input="formatCvc()"
@@ -74,7 +74,7 @@
                         <div class="mb-4">
                             <label class="flex items-center">
                                 <input type="checkbox" x-model="acceptTerms" class="mr-2">
-                                <span class="text-sm">J'accepte les conditions générales</span>
+                                <span class="text-sm">{{ __('app.payment.accept_terms') }}</span>
                             </label>
                         </div>
                         
