@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Paiement réussi - Location')
+@section('title', __('app.rental_confirmation.page_title') . ' - FarmShop')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-12">
@@ -12,8 +12,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
             </div>
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">🎉 Paiement réussi !</h1>
-            <p class="text-lg text-gray-600">Votre location a été confirmée avec succès</p>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">{{ __('app.rental_confirmation.payment_successful') }}</h1>
+            <p class="text-lg text-gray-600">{{ __('app.rental_confirmation.rental_confirmed') }}</p>
         </div>
 
         <!-- Carte principale -->
@@ -22,12 +22,12 @@
             <div class="bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-8 text-white">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-2xl font-bold">Commande #{{ $orderLocation->order_number }}</h2>
-                        <p class="text-green-100 mt-1">Payée le {{ now()->format('d/m/Y à H:i') }}</p>
+                        <h2 class="text-2xl font-bold">{{ __('app.rental_confirmation.order_number', ['number' => $orderLocation->order_number]) }}</h2>
+                        <p class="text-green-100 mt-1">{{ __('app.rental_confirmation.paid_on', ['date' => now()->format('d/m/Y à H:i')]) }}</p>
                     </div>
                     <div class="text-right">
                         <div class="text-3xl font-bold">{{ number_format($orderLocation->total_amount, 2) }}€</div>
-                        <div class="text-green-100">Montant total</div>
+                        <div class="text-green-100">{{ __('app.rental_confirmation.total_amount') }}</div>
                     </div>
                 </div>
             </div>
@@ -37,53 +37,53 @@
                 <!-- Statut -->
                 <div class="flex items-center justify-center mb-6">
                     <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
-                        ✅ Paiement confirmé
+                        {{ __('app.rental_confirmation.payment_confirmed') }}
                     </span>
                 </div>
 
                 <!-- Informations de la location -->
                 <div class="grid md:grid-cols-2 gap-6 mb-6">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">📅 Période de location</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ __('app.rental_confirmation.rental_period') }}</h3>
                         <div class="bg-gray-50 rounded-lg p-4">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-gray-600">Début</span>
+                                <span class="text-gray-600">{{ __('app.rental_confirmation.start_date') }}</span>
                                 <span class="font-medium">{{ \Carbon\Carbon::parse($orderLocation->start_date)->format('d/m/Y') }}</span>
                             </div>
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-gray-600">Fin</span>
+                                <span class="text-gray-600">{{ __('app.rental_confirmation.end_date') }}</span>
                                 <span class="font-medium">{{ \Carbon\Carbon::parse($orderLocation->end_date)->format('d/m/Y') }}</span>
                             </div>
                             <div class="flex items-center justify-between border-t pt-2">
-                                <span class="text-gray-600">Durée</span>
-                                <span class="font-medium">{{ \Carbon\Carbon::parse($orderLocation->start_date)->diffInDays(\Carbon\Carbon::parse($orderLocation->end_date)) + 1 }} jour(s)</span>
+                                <span class="text-gray-600">{{ __('app.rental_confirmation.duration') }}</span>
+                                <span class="font-medium">{{ \Carbon\Carbon::parse($orderLocation->start_date)->diffInDays(\Carbon\Carbon::parse($orderLocation->end_date)) + 1 }} {{ __('app.rental_confirmation.days') }}</span>
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">💰 Détails du paiement</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ __('app.rental_confirmation.payment_details') }}</h3>
                         <div class="bg-gray-50 rounded-lg p-4">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-gray-600">Sous-total location</span>
+                                <span class="text-gray-600">{{ __('app.rental_confirmation.rental_subtotal') }}</span>
                                 <span class="font-medium">{{ number_format($orderLocation->subtotal ?? 0, 2) }}€</span>
                             </div>
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-gray-600">TVA (21%)</span>
+                                <span class="text-gray-600">{{ __('app.rental_confirmation.vat_rate') }}</span>
                                 <span class="font-medium">{{ number_format($orderLocation->tax_amount ?? 0, 2) }}€</span>
                             </div>
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-gray-600">Dépôt de garantie</span>
+                                <span class="text-gray-600">{{ __('app.rental_confirmation.deposit_amount') }}</span>
                                 <span class="font-medium">{{ number_format($orderLocation->deposit_amount ?? 0, 2) }}€</span>
                             </div>
                             @if($orderLocation->delivery_fee > 0)
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-gray-600">{{ __("app.ecommerce.delivery") }}<//span>
+                                <span class="text-gray-600">{{ __('app.rental_confirmation.delivery_fee') }}</span>
                                 <span class="font-medium">{{ number_format($orderLocation->delivery_fee, 2) }}€</span>
                             </div>
                             @endif
                             <div class="flex items-center justify-between border-t pt-2">
-                                <span class="text-gray-600 font-medium">{{ __("app.ecommerce.total") }}</span>
+                                <span class="text-gray-600 font-medium">{{ __('app.rental_confirmation.total') }}</span>
                                 <span class="font-bold text-green-600">{{ number_format($orderLocation->total_amount, 2) }}€</span>
                             </div>
                         </div>
@@ -92,7 +92,7 @@
 
                 <!-- Articles loués -->
                 <div class="mb-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-3">📦 Articles loués</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ __('app.rental_confirmation.rented_items') }}</h3>
                     <div class="space-y-3">
                         @foreach($orderLocation->items as $item)
                         <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -109,15 +109,15 @@
                                 <div>
                                     <div class="font-medium text-gray-900">{{ $item->product_name }}</div>
                                     <div class="text-sm text-gray-600">
-                                        Quantité: {{ $item->quantity }} | 
-                                        {{ $item->rental_days }} jour{{ $item->rental_days > 1 ? 's' : '' }}
+                                        {{ __('app.rental_confirmation.quantity_label') }}: {{ $item->quantity }} | 
+                                        {{ $item->rental_days }} {{ $item->rental_days > 1 ? __('app.rental_confirmation.days') : __('app.rental_confirmation.day') }}
                                     </div>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="font-medium">{{ number_format($item->daily_rate ?? 0, 2) }}€/jour</div>
-                                <div class="text-sm text-gray-600">{{ number_format($item->subtotal ?? 0, 2) }}€ total</div>
-                                <div class="text-xs text-gray-500">Dépôt: {{ number_format($item->total_deposit ?? 0, 2) }}€</div>
+                                <div class="font-medium">{{ number_format($item->daily_rate ?? 0, 2) }}€{{ __('app.rental_confirmation.per_day') }}</div>
+                                <div class="text-sm text-gray-600">{{ number_format($item->subtotal ?? 0, 2) }}€ {{ __('app.rental_confirmation.total_price') }}</div>
+                                <div class="text-xs text-gray-500">{{ __('app.rental_confirmation.deposit_label') }}: {{ number_format($item->total_deposit ?? 0, 2) }}€</div>
                             </div>
                         </div>
                         @endforeach
@@ -126,12 +126,12 @@
 
                 <!-- Prochaines étapes -->
                 <div class="bg-blue-50 rounded-lg p-4 mb-6">
-                    <h3 class="text-lg font-semibold text-blue-900 mb-2">🚀 Prochaines étapes</h3>
+                    <h3 class="text-lg font-semibold text-blue-900 mb-2">{{ __('app.rental_confirmation.next_steps_title') }}</h3>
                     <ul class="text-blue-800 space-y-1">
-                        <li>✉️ Vous recevrez un email de confirmation sous peu</li>
-                        <li>📦 Préparez-vous pour la livraison/récupération le {{ \Carbon\Carbon::parse($orderLocation->start_date)->format('d/m/Y') }}</li>
-                        <li>📱 Suivez l'état de votre location dans votre espace client</li>
-                        <li>📞 Notre équipe vous contactera si nécessaire</li>
+                        <li>{{ __('app.rental_confirmation.next_step_email') }}</li>
+                        <li>{{ __('app.rental_confirmation.next_step_delivery', ['date' => \Carbon\Carbon::parse($orderLocation->start_date)->format('d/m/Y')]) }}</li>
+                        <li>{{ __('app.rental_confirmation.next_step_follow') }}</li>
+                        <li>{{ __('app.rental_confirmation.next_step_contact') }}</li>
                     </ul>
                 </div>
 
@@ -139,15 +139,15 @@
                 <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
                     <a href="{{ route('rental-orders.show', $orderLocation) }}" 
                        class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
-                        📋 Voir ma location
+                        {{ __('app.rental_confirmation.view_my_rental') }}
                     </a>
                     <a href="{{ route('rental-orders.index') }}" 
                        class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
-                        📝 Mes locations
+                        {{ __('app.rental_confirmation.my_rentals') }}
                     </a>
                     <a href="{{ route('home') }}" 
                        class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
-                        🏠 Retour à l'accueil
+                        {{ __('app.rental_confirmation.back_home') }}
                     </a>
                 </div>
             </div>
@@ -156,9 +156,9 @@
         <!-- Informations de contact -->
         <div class="text-center mt-8">
             <p class="text-gray-600">
-                Une question ? Contactez-nous au 
+                {{ __('app.rental_confirmation.contact_question') }} 
                 <a href="tel:+33123456789" class="text-green-600 hover:text-green-700 font-medium">01 23 45 67 89</a>
-                ou par email à 
+                {{ __('app.rental_confirmation.or_email') }} 
                 <a href="mailto:support@farmshop.com" class="text-green-600 hover:text-green-700 font-medium">support@farmshop.com</a>
             </p>
         </div>

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Catégorie: ' . $category->name . ' - FarmShop Admin')
-@section('page-title', 'Détails de la catégorie')
+@section('title', __('app.admin.categories.category_details') . ': ' . $category->name . ' - FarmShop Admin')
+@section('page-title', __('app.admin.categories.category_details'))
 
 @section('content')
 <div class="max-w-7xl mx-auto">
@@ -16,7 +16,7 @@
             </a>
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">{{ $category->name }}</h1>
-                <p class="text-gray-600">Détails et statistiques de la catégorie</p>
+                <p class="text-gray-600">{{ __('app.admin.categories.details_and_stats') }}</p>
             </div>
         </div>
         
@@ -26,7 +26,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                 </svg>
-                <span>Modifier</span>
+                <span>{{ __('app.admin.categories.edit') }}</span>
             </a>
         </div>
     </div>
@@ -37,53 +37,53 @@
             <!-- Détails de la catégorie -->
             <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Informations générales</h3>
+                    <h3 class="text-lg font-medium text-gray-900">{{ __('app.admin.categories.general_info') }}</h3>
                 </div>
                 <div class="px-6 py-4 space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.admin.categories.name') }}</label>
                             <p class="text-sm text-gray-900">{{ $category->name }}</p>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.admin.categories.slug') }}</label>
                             <p class="text-sm text-gray-900 font-mono">{{ $category->slug }}</p>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.admin.categories.type') }}</label>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                 {{ $category->food_type === 'alimentaire' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
-                                {{ ucfirst($category->food_type ?? 'Non défini') }}
+                                {{ $category->food_type ? ucfirst($category->food_type) : __('app.admin.categories.undefined') }}
                             </span>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.admin.categories.status') }}</label>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                 {{ $category->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                {{ $category->is_active ? 'Actif' : 'Inactif' }}
+                                {{ $category->is_active ? __('app.admin.categories.active') : __('app.admin.categories.inactive') }}
                             </span>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Retournable</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.admin.categories.returnable') }}</label>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                 {{ $category->is_returnable ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                {{ $category->is_returnable ? 'Oui' : 'Non' }}
+                                {{ $category->is_returnable ? __('app.admin.categories.yes') : __('app.admin.categories.no') }}
                             </span>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Créée le</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.admin.categories.created_on') }}</label>
                             <p class="text-sm text-gray-900">{{ $category->created_at->format('d/m/Y à H:i') }}</p>
                         </div>
                     </div>
                     
                     @if($category->description)
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('app.admin.categories.description') }}</label>
                         <p class="text-sm text-gray-900">{{ $category->description }}</p>
                     </div>
                     @endif
@@ -94,14 +94,14 @@
             <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                     <h3 class="text-lg font-medium text-gray-900">
-                        Produits associés
+                        {{ __('app.admin.categories.associated_products') }}
                         <span class="ml-2 bg-gray-100 text-gray-800 text-sm px-2 py-1 rounded-full">
                             {{ $category->products->count() }}
                         </span>
                     </h3>
                     <a href="{{ route('admin.products.create', ['category' => $category->id]) }}" 
                        class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                        Ajouter un produit
+                        {{ __('app.admin.categories.add_product') }}
                     </a>
                 </div>
                 <div class="px-6 py-4">
@@ -130,7 +130,7 @@
                                 <div class="flex items-center space-x-2" onclick="event.stopPropagation()">
                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                                         {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                        {{ $product->is_active ? 'Actif' : 'Inactif' }}
+                                        {{ $product->is_active ? __('app.admin.categories.active') : __('app.admin.categories.inactive') }}
                                     </span>
                                     <a href="{{ route('admin.products.show', $product) }}" 
                                        class="text-blue-600 hover:text-blue-800">
@@ -148,12 +148,12 @@
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                             </svg>
-                            <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun produit</h3>
-                            <p class="mt-1 text-sm text-gray-500">Cette catégorie ne contient aucun produit pour le moment.</p>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('app.admin.categories.no_products') }}</h3>
+                            <p class="mt-1 text-sm text-gray-500">{{ __('app.admin.categories.no_products_message') }}</p>
                             <div class="mt-6">
                                 <a href="{{ route('admin.products.create', ['category' => $category->id]) }}" 
                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                                    Ajouter le premier produit
+                                    {{ __('app.admin.categories.add_first_product') }}
                                 </a>
                             </div>
                         </div>
@@ -167,19 +167,19 @@
             <!-- Statistiques -->
             <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Statistiques</h3>
+                    <h3 class="text-lg font-medium text-gray-900">{{ __('app.admin.categories.statistics') }}</h3>
                 </div>
                 <div class="px-6 py-4 space-y-4">
                     <div class="flex justify-between">
-                        <span class="text-sm text-gray-600">Produits totaux</span>
+                        <span class="text-sm text-gray-600">{{ __('app.admin.categories.total_products') }}</span>
                         <span class="text-sm font-medium text-gray-900">{{ $category->products->count() }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-sm text-gray-600">Produits actifs</span>
+                        <span class="text-sm text-gray-600">{{ __('app.admin.categories.active_products') }}</span>
                         <span class="text-sm font-medium text-gray-900">{{ $category->products->where('is_active', true)->count() }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-sm text-gray-600">Produits inactifs</span>
+                        <span class="text-sm text-gray-600">{{ __('app.admin.categories.inactive_products') }}</span>
                         <span class="text-sm font-medium text-gray-900">{{ $category->products->where('is_active', false)->count() }}</span>
                     </div>
                 </div>
@@ -188,7 +188,7 @@
             <!-- Actions rapides -->
             <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Actions rapides</h3>
+                    <h3 class="text-lg font-medium text-gray-900">{{ __('app.admin.categories.quick_actions') }}</h3>
                 </div>
                 <div class="px-6 py-4 space-y-3">
                     <a href="{{ route('admin.categories.edit', $category) }}" 
@@ -196,7 +196,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>
-                        Modifier la catégorie
+                        {{ __('app.admin.categories.edit_category_action') }}
                     </a>
                     
                     <a href="{{ route('admin.products.create', ['category' => $category->id]) }}" 
@@ -204,7 +204,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                         </svg>
-                        Ajouter un produit
+                        {{ __('app.admin.categories.add_product_action') }}
                     </a>
                 </div>
             </div>

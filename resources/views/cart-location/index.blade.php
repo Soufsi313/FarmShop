@@ -111,7 +111,7 @@
                                 <div class="flex flex-col md:flex-row md:items-start md:justify-between">
                                     <div class="flex-1">
                                         <h3 class="text-lg font-semibold text-gray-900" x-text="getTranslatedProductName(item.product)"></h3>
-                                        <p class="text-sm text-gray-500 mt-1" x-text="item.rental_category_name"></p>
+                                        <p class="text-sm text-gray-500 mt-1" x-text="item.translated_category_name"></p>
                                         <p class="text-sm text-gray-600 mt-1" x-text="item.product.sku"></p>
                                         
                                         <!-- Rental Period -->

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Paiement Location - Commande #' . $orderLocation->order_number)
+@section('title', __('app.rental_payment.title') . ' - ' . __('app.rental_payment.order_number', ['number' => $orderLocation->order_number]))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -10,15 +10,18 @@
         <div class="bg-white rounded-lg shadow p-6 mb-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl font-bold">Paiement Location - Commande #{{ $orderLocation->order_number }}</h1>
+                    <h1 class="text-2xl font-bold">{{ __('app.rental_payment.title') }} - {{ __('app.rental_payment.order_number', ['number' => $orderLocation->order_number]) }}</h1>
                     <p class="text-gray-600 mt-1">
-                        Période: {{ $orderLocation->start_date->format('d/m/Y') }} - {{ $orderLocation->end_date->format('d/m/Y') }}
-                        ({{ $orderLocation->rental_days }} jours)
+                        {{ __('app.rental_payment.period', [
+                            'start' => $orderLocation->start_date->format('d/m/Y'),
+                            'end' => $orderLocation->end_date->format('d/m/Y'),
+                            'days' => $orderLocation->rental_days
+                        ]) }}
                     </p>
                 </div>
                 <div class="text-right">
                     <p class="text-2xl font-bold text-purple-600">{{ number_format($orderLocation->total_amount, 2) }} €</p>
-                    <p class="text-sm text-gray-500">dont {{ number_format($orderLocation->deposit_amount, 2) }}€ de caution</p>
+                    <p class="text-sm text-gray-500">{{ __('app.rental_payment.including_deposit', ['amount' => number_format($orderLocation->deposit_amount, 2)]) }}</p>
                 </div>
             </div>
         </div>
@@ -42,7 +45,7 @@
             
             <!-- Résumé -->
             <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-xl font-semibold mb-4">Résumé de la location</h2>
+                <h2 class="text-xl font-semibold mb-4">{{ __('app.rental_payment.summary') }}</h2>
                 
                 <!-- Produits loués -->
                 <div class="space-y-4 mb-6">
@@ -63,8 +66,8 @@
                         <div class="flex-1">
                             <h3 class="font-medium text-gray-900">{{ $item->product_name }}</h3>
                             <div class="text-sm text-gray-600 mt-1">
-                                <p>{{ $item->quantity }} × {{ number_format($item->daily_price, 2) }}€/jour × {{ $item->total_days }} jours</p>
-                                <p class="text-purple-600 font-medium">Caution: {{ number_format($item->deposit_amount, 2) }}€</p>
+                                <p>{{ $item->quantity }} × {{ number_format($item->daily_price, 2) }}€{{ __('app.rental_payment.per_day') }} × {{ $item->total_days }} {{ __('app.rental_payment.days') }}</p>
+                                <p class="text-purple-600 font-medium">{{ __('app.rental_payment.deposit', ['amount' => number_format($item->deposit_amount, 2)]) }}</p>
                             </div>
                         </div>
                         <div class="text-right">
@@ -77,19 +80,19 @@
                 <!-- Détails du total -->
                 <div class="space-y-2 pt-4 border-t border-gray-200">
                     <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Sous-total location</span>
+                        <span class="text-gray-600">{{ __('app.rental_payment.subtotal') }}</span>
                         <span>{{ number_format($orderLocation->subtotal, 2) }}€</span>
                     </div>
                     <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">TVA ({{ $orderLocation->tax_rate }}%)</span>
+                        <span class="text-gray-600">{{ __('app.rental_payment.tax', ['rate' => $orderLocation->tax_rate]) }}</span>
                         <span>{{ number_format($orderLocation->tax_amount, 2) }}€</span>
                     </div>
                     <div class="flex justify-between text-sm text-purple-600">
-                        <span>Caution (bloquée temporairement)</span>
+                        <span>{{ __('app.rental_payment.deposit_blocked') }}</span>
                         <span>{{ number_format($orderLocation->deposit_amount, 2) }}€</span>
                     </div>
                     <div class="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
-                        <span>Total à payer</span>
+                        <span>{{ __('app.rental_payment.total_to_pay') }}</span>
                         <span>{{ number_format($orderLocation->total_amount, 2) }}€</span>
                     </div>
                 </div>
@@ -100,14 +103,14 @@
                         <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                         </svg>
-                        <strong>Important :</strong> La caution sera bloquée sur votre carte et libérée au retour du matériel en bon état.
+                        {{ __('app.rental_payment.deposit_notice') }}
                     </p>
                 </div>
             </div>
 
             <!-- Formulaire de paiement -->
             <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-xl font-semibold mb-4">Informations de paiement</h2>
+                <h2 class="text-xl font-semibold mb-4">{{ __('app.rental_payment.payment_info') }}</h2>
                 
                 <div x-data="rentalPaymentForm()">
                     <form @submit.prevent="processPayment()">
@@ -115,7 +118,7 @@
                         <!-- Informations de carte -->
                         <div class="space-y-4 mb-6">
                             <div>
-                                <label class="block text-sm font-medium mb-2">Numéro de carte</label>
+                                <label class="block text-sm font-medium mb-2">{{ __('app.rental_payment.card_number') }}</label>
                                 <input type="text" 
                                        x-model="cardNumber"
                                        @input="formatCard()"
@@ -126,7 +129,7 @@
                             
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium mb-2">Expiration</label>
+                                    <label class="block text-sm font-medium mb-2">{{ __('app.rental_payment.expiration') }}</label>
                                     <input type="text" 
                                            x-model="expiry"
                                            @input="formatExpiry()"
@@ -135,7 +138,7 @@
                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium mb-2">CVC</label>
+                                    <label class="block text-sm font-medium mb-2">{{ __('app.rental_payment.cvc') }}</label>
                                     <input type="text" 
                                            x-model="cvc"
                                            placeholder="123"
@@ -145,7 +148,7 @@
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium mb-2">Nom sur la carte</label>
+                                <label class="block text-sm font-medium mb-2">{{ __('app.rental_payment.card_name') }}</label>
                                 <input type="text" 
                                        x-model="cardName"
                                        placeholder="Jean Dupont"
@@ -160,8 +163,7 @@
                                        x-model="acceptTerms"
                                        class="mt-1 rounded border-gray-300 text-purple-600 focus:ring-purple-500">
                                 <span class="text-sm text-gray-700">
-                                    J'accepte les <a href="#" class="text-purple-600 hover:underline">conditions générales de location</a> 
-                                    et je comprends que la caution sera bloquée sur ma carte jusqu'au retour du matériel.
+                                    {{ __('app.rental_payment.terms_accept') }}
                                 </span>
                             </label>
                         </div>
@@ -172,13 +174,13 @@
                                     :disabled="!acceptTerms || isProcessing"
                                     :class="{ 'opacity-50 cursor-not-allowed': !acceptTerms || isProcessing }"
                                     class="w-full bg-purple-600 text-white py-3 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 font-medium">
-                                <span x-show="!isProcessing">Payer {{ number_format($orderLocation->total_amount, 2) }}€</span>
-                                <span x-show="isProcessing">Traitement en cours...</span>
+                                <span x-show="!isProcessing">{{ __('app.rental_payment.pay_button', ['amount' => number_format($orderLocation->total_amount, 2)]) }}</span>
+                                <span x-show="isProcessing">{{ __('app.rental_payment.processing') }}</span>
                             </button>
                             
                             <a href="{{ route('rental-orders.show', $orderLocation) }}" 
                                class="block w-full text-center py-3 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                                Annuler et retourner à la commande
+                                {{ __('app.rental_payment.cancel_return') }}
                             </a>
                         </div>
                     </form>
@@ -213,7 +215,7 @@ document.addEventListener('alpine:init', () => {
         // Traitement du paiement
         async processPayment() {
             if (!this.acceptTerms) {
-                alert('Veuillez accepter les conditions générales');
+                alert('{{ __('app.rental_payment.accept_terms_alert') }}');
                 return;
             }
             
@@ -241,11 +243,11 @@ document.addEventListener('alpine:init', () => {
                     // Rediriger vers la page de succès
                     window.location.href = '{{ route("rental.payment.success", $orderLocation) }}';
                 } else {
-                    alert(data.message || 'Erreur lors du paiement');
+                    alert(data.message || '{{ __('app.rental_payment.payment_error') }}');
                 }
             } catch (error) {
                 console.error('Erreur:', error);
-                alert('Erreur lors du traitement du paiement');
+                alert('{{ __('app.rental_payment.processing_error') }}');
             } finally {
                 this.isProcessing = false;
             }

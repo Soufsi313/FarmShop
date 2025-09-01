@@ -93,7 +93,7 @@ class CartLocation extends Model
             'unit_deposit' => $product->deposit_amount ?? 0,
             'product_name' => $product->name,
             'product_sku' => $product->sku,
-            'rental_category_name' => $product->rentalCategory?->name,
+            'rental_category_name' => $product->rentalCategory?->translated_name ?? $product->rentalCategory?->name,
             'notes' => $notes
         ]);
 

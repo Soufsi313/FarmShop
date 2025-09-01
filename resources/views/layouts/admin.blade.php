@@ -479,12 +479,12 @@
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                             </svg>
-                            Retour au site
+                            {{ __('app.admin.categories.back_to_site') }}
                         </a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="text-gray-500 hover:text-gray-700 text-sm font-medium">
-                                Déconnexion
+                                {{ __('app.admin.logout') }}
                             </button>
                         </form>
                     </div>

@@ -43,6 +43,10 @@ class CartItemLocation extends Model
         'metadata' => 'array'
     ];
 
+    protected $appends = [
+        'translated_category_name'
+    ];
+
     // Taux de TVA par défaut
     const TVA_RATE = 0.20; // 20%
 
@@ -126,6 +130,36 @@ class CartItemLocation extends Model
     }
 
     /**
+     * Obtenir le nom de catégorie traduit
+     */
+    public function getTranslatedCategoryName(): string
+    {
+        // Mapping des noms de catégories français vers les clés de traduction
+        $translationKeys = [
+            'Outils agricoles' => 'outils-agricoles',
+            'Machines' => 'machines',
+            'Équipements' => 'equipements',
+        ];
+        
+        $translationKey = $translationKeys[$this->rental_category_name] ?? null;
+        
+        if ($translationKey) {
+            return __('app.rental_categories.' . $translationKey);
+        }
+        
+        // Fallback vers le nom original si pas de traduction trouvée
+        return $this->rental_category_name;
+    }
+
+    /**
+     * Accesseur pour le nom de catégorie traduit (attribut calculé)
+     */
+    public function getTranslatedCategoryNameAttribute(): string
+    {
+        return $this->getTranslatedCategoryName();
+    }
+
+    /**
      * Obtenir les informations de disponibilité du produit
      */
     public function getAvailabilityInfo(): array
@@ -187,7 +221,7 @@ class CartItemLocation extends Model
                 'id' => $this->product_id,
                 'name' => $this->product_name,
                 'sku' => $this->product_sku,
-                'rental_category' => $this->rental_category_name,
+                'rental_category' => $this->getTranslatedCategoryName(),
                 'current_stock' => $this->product?->quantity ?? 0
             ],
             'rental_period' => [

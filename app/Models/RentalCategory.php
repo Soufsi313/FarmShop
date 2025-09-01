@@ -84,6 +84,30 @@ class RentalCategory extends Model
     }
 
     /**
+     * Mapping des noms de catégories vers les clés de traduction
+     */
+    private static $translationKeys = [
+        'Outils agricoles' => 'outils-agricoles',
+        'Machines' => 'machines',
+        'Équipements' => 'equipements',
+    ];
+
+    /**
+     * Obtenir le nom traduit de la catégorie
+     */
+    public function getTranslatedNameAttribute(): string
+    {
+        $translationKey = self::$translationKeys[$this->name] ?? null;
+        
+        if ($translationKey) {
+            return __('app.rental_categories.' . $translationKey);
+        }
+        
+        // Fallback vers le nom original si pas de traduction trouvée
+        return $this->name;
+    }
+
+    /**
      * Vérifier si la catégorie de location a des produits
      */
     public function hasRentalProducts(): bool
