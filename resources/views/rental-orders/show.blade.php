@@ -44,7 +44,7 @@
                     <div>
                         <h1 class="text-3xl font-bold text-gray-900">{{ __('app.rental_orders.rental_order') }} #{{ $orderLocation->order_number }}</h1>
                         <p class="mt-2 text-sm text-gray-600">
-                            {{ __('app.rental_orders.placed_on') }} {{ $orderLocation->created_at->format('d/m/Y à H:i') }}
+                            {{ __('app.rental_orders.placed_on') }} {{ $orderLocation->created_at->format(__('app.date_format.datetime')) }}
                         </p>
                     </div>
                     
@@ -102,8 +102,10 @@
                         <div>
                             <h3 class="text-sm font-medium text-gray-700 mb-2">{{ __('app.rental_orders.period') }}</h3>
                             <p class="text-sm text-gray-900">
-                                Du {{ $orderLocation->start_date->format('d/m/Y') }} 
-                                au {{ $orderLocation->end_date->format('d/m/Y') }}
+                                {{ __('app.rental_orders.period_from_to', [
+                                    'start' => $orderLocation->start_date->format(__('app.date_format.date')),
+                                    'end' => $orderLocation->end_date->format(__('app.date_format.date'))
+                                ]) }}
                             </p>
                             <p class="text-sm text-purple-600 font-medium">
                                 ({{ $orderLocation->rental_days }} {{ __('app.rental_orders.days') }})

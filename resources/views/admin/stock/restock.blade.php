@@ -1,24 +1,24 @@
 @extends('layouts.admin')
 
-@section('title', 'Réapprovisionnement - Gestion de Stock')
-@section('page-title', 'Réapprovisionnement')
+@section('title', __('stock.restock_page_title'))
+@section('page-title', __('stock.header.restock'))
 
 @section('content')
 <div class="space-y-6" x-data="stockRestock">
     <!-- En-tête -->
     <div class="flex justify-between items-center">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">🔄 Réapprovisionnement Automatique</h1>
-            <p class="text-gray-600">Suggestions intelligentes et gestion du réapprovisionnement</p>
+            <h1 class="text-3xl font-bold text-gray-900">{{ __('stock.restock_title') }}</h1>
+            <p class="text-gray-600">{{ __('stock.restock_subtitle') }}</p>
         </div>
         <div class="flex space-x-3">
             <a href="{{ route('admin.stock.index') }}" 
                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
-                ← Retour
+                {{ __('stock.back_button') }}
             </a>
             <button @click="generateAllSuggestions()" 
                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-                Actualiser Suggestions
+                {{ __('stock.refresh_suggestions') }}
             </button>
         </div>
     </div>
@@ -28,7 +28,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-600 text-sm font-medium">Produits à Réapprovisionner</p>
+                    <p class="text-gray-600 text-sm font-medium">{{ __('stock.products_to_restock') }}</p>
                     <p class="text-2xl font-bold text-gray-900">{{ count($suggestions) }}</p>
                 </div>
                 <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -42,7 +42,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-600 text-sm font-medium">Coût Total Estimé</p>
+                    <p class="text-gray-600 text-sm font-medium">{{ __('stock.estimated_total_cost') }}</p>
                     <p class="text-2xl font-bold text-gray-900">
                         {{ number_format(collect($suggestions)->sum('estimated_cost'), 2) }}€
                     </p>
@@ -58,7 +58,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-600 text-sm font-medium">Priorité Urgente</p>
+                    <p class="text-gray-600 text-sm font-medium">{{ __('stock.urgent_priority') }}</p>
                     <p class="text-2xl font-bold text-red-900">
                         {{ collect($suggestions)->where('priority', 'urgent')->count() }}
                     </p>
@@ -74,7 +74,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-600 text-sm font-medium">Quantité Totale</p>
+                    <p class="text-gray-600 text-sm font-medium">{{ __('stock.total_quantity') }}</p>
                     <p class="text-2xl font-bold text-gray-900">
                         {{ collect($suggestions)->sum('quantity_to_order') }}
                     </p>
@@ -93,11 +93,19 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200">
             <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold text-gray-900">💡 Suggestions de Réapprovisionnement</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ __('stock.restock_suggestions') }}</h3>
                     <div class="flex space-x-2">
                         <button @click="selectAllSuggestions()" 
                                 class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                            Sélectionner Tout
+                            {{ __('stock.select_all') }}
+                        </button>
+                        <button @click="applySelectedSuggestions()" 
+                                class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                            {{ __('stock.apply_selection') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
                         </button>
                         <button @click="applySelectedSuggestions()" 
                                 class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors">
@@ -124,34 +132,34 @@
                                             <h4 class="font-medium text-gray-900">{{ $suggestion['product']->name }}</h4>
                                             @if($suggestion['priority'] === 'urgent')
                                                 <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">
-                                                    URGENT
+                                                    {{ __('stock.urgent_tag') }}
                                                 </span>
                                             @elseif($suggestion['priority'] === 'high')
                                                 <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full font-medium">
-                                                    ÉLEVÉ
+                                                    {{ __('stock.high_tag') }}
                                                 </span>
                                             @endif
                                         </div>
-                                        <p class="text-sm text-gray-600">{{ $suggestion['product']->category->name ?? 'Sans catégorie' }}</p>
+                                        <p class="text-sm text-gray-600">{{ $suggestion['product']->category->name ?? __('stock.no_category') }}</p>
                                         
                                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
                                             <div>
-                                                <span class="text-gray-500">Stock actuel:</span>
+                                                <span class="text-gray-500">{{ __('stock.current_stock') }}:</span>
                                                 <span class="font-medium 
                                                       {{ $suggestion['current_stock'] == 0 ? 'text-red-600' : 'text-gray-900' }}">
                                                     {{ $suggestion['current_stock'] }}
                                                 </span>
                                             </div>
                                             <div>
-                                                <span class="text-gray-500">Stock recommandé:</span>
+                                                <span class="text-gray-500">{{ __('stock.recommended_stock') }}:</span>
                                                 <span class="font-medium text-green-600">{{ $suggestion['recommended_stock'] }}</span>
                                             </div>
                                             <div>
-                                                <span class="text-gray-500">À commander:</span>
+                                                <span class="text-gray-500">{{ __('stock.to_order') }}:</span>
                                                 <span class="font-medium text-blue-600">{{ $suggestion['quantity_to_order'] }}</span>
                                             </div>
                                             <div>
-                                                <span class="text-gray-500">Ventes mensuelles:</span>
+                                                <span class="text-gray-500">{{ __('stock.monthly_sales') }}:</span>
                                                 <span class="font-medium text-gray-900">{{ $suggestion['monthly_sales'] }}</span>
                                             </div>
                                         </div>
@@ -171,11 +179,11 @@
                                     <div class="flex flex-col space-y-2">
                                         <button @click="openCustomRestockModal({{ $suggestion['product']->id }}, '{{ $suggestion['product']->name }}', {{ $suggestion['quantity_to_order'] }})" 
                                                 class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs transition-colors">
-                                            Personnaliser
+                                            {{ __('stock.customize_button') }}
                                         </button>
                                         <button @click="applyQuickRestock({{ $suggestion['product']->id }}, {{ $suggestion['quantity_to_order'] }})" 
                                                 class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs transition-colors">
-                                            Appliquer
+                                            {{ __('stock.apply_button') }}
                                         </button>
                                     </div>
                                 </div>
@@ -191,8 +199,8 @@
                 <svg class="mx-auto h-12 w-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-green-600">Aucun réapprovisionnement nécessaire !</h3>
-                <p class="mt-1 text-sm text-gray-500">Tous vos produits ont un stock suffisant.</p>
+                <h3 class="mt-2 text-sm font-medium text-green-600">{{ __('stock.no_restock_needed') }}</h3>
+                <p class="mt-1 text-sm text-gray-500">{{ __('stock.no_restock_needed_desc') }}</p>
             </div>
         </div>
     @endif
@@ -201,7 +209,7 @@
     @if($recentRestocks->count() > 0)
         <div class="bg-white rounded-xl shadow-sm border border-gray-200">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">📋 Historique des Réapprovisionnements</h3>
+                <h3 class="text-lg font-semibold text-gray-900">{{ __('stock.restock_history') }}</h3>
             </div>
             <div class="p-6">
                 <div class="space-y-3">
@@ -239,17 +247,17 @@
              x-transition:leave="ease-in duration-200"
              x-transition:leave-start="opacity-100 scale-100"
              x-transition:leave-end="opacity-0 scale-95">
-            <h3 class="text-lg font-medium mb-4">🔧 Réapprovisionnement Personnalisé</h3>
+            <h3 class="text-lg font-medium mb-4">{{ __('stock.custom_restock_title') }}</h3>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Produit</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('stock.product_label') }}</label>
                     <p class="text-gray-900" x-text="customRestockProductName"></p>
                 </div>
                 <div>
                     <label for="customRestockQuantity" class="block text-sm font-medium text-gray-700 mb-2">
-                        Quantité à ajouter
+                        {{ __('stock.quantity_to_add') }}
                         <span class="text-gray-500">
-                            (suggéré: <span x-text="suggestedQuantity"></span>)
+                            ({{ __('stock.suggested_quantity') }}: <span x-text="suggestedQuantity"></span>)
                         </span>
                     </label>
                     <input type="number" 
@@ -262,11 +270,11 @@
             <div class="mt-6 flex space-x-3">
                 <button @click="closeCustomRestockModal()" 
                         class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded transition-colors">
-                    Annuler
+                    {{ __('stock.cancel_button') }}
                 </button>
                 <button @click="applyCustomRestock()" 
                         class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors">
-                    Appliquer
+                    {{ __('stock.apply_button') }}
                 </button>
             </div>
         </div>

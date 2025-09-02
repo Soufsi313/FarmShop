@@ -64,7 +64,7 @@
                                     {{ __('app.rental_orders.order_number') }} #{{ $order->order_number }}
                                 </h3>
                                 <p class="text-sm text-gray-600">
-                                    {{ __('app.rental_orders.placed_on') }} {{ $order->created_at->format('d/m/Y à H:i') }}
+                                    {{ __('app.rental_orders.placed_on') }} {{ $order->created_at->format(__('app.date_format.datetime')) }}
                                 </p>
                             </div>
                             
@@ -104,8 +104,8 @@
                                         @endif">
                                         @if($order->payment_status === 'pending') 💳 {{ __('app.payment_status.pending') }}
                                         @elseif($order->payment_status === 'paid') 💚 {{ __('app.payment_status.paid') }}
-                                        @elseif($order->payment_status === 'failed') 💔 Échec
-                                        @elseif($order->payment_status === 'refunded') 💙 Remboursé
+                                        @elseif($order->payment_status === 'failed') {{ __('app.rental_orders.payment_failed') }}
+                                        @elseif($order->payment_status === 'refunded') {{ __('app.rental_orders.payment_refunded') }}
                                         @else 💳 {{ $order->payment_status_label }}
                                         @endif
                                     </span>
@@ -119,22 +119,24 @@
                         <!-- Informations de location -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-gray-50 rounded-lg p-4">
                             <div>
-                                <p class="text-sm font-medium text-gray-500">Période de location</p>
+                                <p class="text-sm font-medium text-gray-500">{{ __('app.rental_orders.rental_period_label') }}</p>
                                 <p class="text-sm text-gray-900">
-                                    Du {{ \Carbon\Carbon::parse($order->start_date)->format('d/m/Y') }} 
-                                    au {{ \Carbon\Carbon::parse($order->end_date)->format('d/m/Y') }}
+                                    {{ __('app.rental_orders.period_from_to', [
+                                        'start' => \Carbon\Carbon::parse($order->start_date)->format(__('app.date_format.date')),
+                                        'end' => \Carbon\Carbon::parse($order->end_date)->format(__('app.date_format.date'))
+                                    ]) }}
                                 </p>
-                                <p class="text-xs text-gray-500">⏱️ {{ $order->rental_days }} jour(s)</p>
+                                <p class="text-xs text-gray-500">⏱️ {{ $order->rental_days }} {{ __('app.rental_orders.rental_days') }}</p>
                             </div>
                             
                             <div>
-                                <p class="text-sm font-medium text-gray-500">Articles</p>
-                                <p class="text-sm text-gray-900">📦 {{ $order->items->count() }} article(s)</p>
+                                <p class="text-sm font-medium text-gray-500">{{ __('app.rental_orders.items_label') }}</p>
+                                <p class="text-sm text-gray-900">📦 {{ $order->items->count() }} {{ __('app.rental_orders.items') }}</p>
                             </div>
                             
                             <div>
-                                <p class="text-sm font-medium text-gray-500">Dernière mise à jour</p>
-                                <p class="text-xs text-gray-500">📅 {{ $order->updated_at->format('d/m/Y à H:i') }}</p>
+                                <p class="text-sm font-medium text-gray-500">{{ __('app.rental_orders.last_update_label') }}</p>
+                                <p class="text-xs text-gray-500">📅 {{ $order->updated_at->format(__('app.date_format.datetime')) }}</p>
                             </div>
                         </div>
                         
@@ -185,7 +187,7 @@
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
-                                    Télécharger facture
+                                    {{ __('app.rental_orders.download_invoice') }}
                                 </a>
                             @endif
                             
@@ -196,7 +198,7 @@
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                     </svg>
-                                    Clôturer la location
+                                    {{ __('app.rental_orders.close_rental') }}
                                 </button>
                             @endif
                             
@@ -207,7 +209,7 @@
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
-                                    Annuler
+                                    {{ __('app.rental_orders.cancel') }}
                                 </button>
                             @endif
                         </div>
@@ -226,14 +228,14 @@
                     <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                     </svg>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune commande de location</h3>
-                    <p class="text-gray-600 mb-6">Vous n'avez pas encore passé de commande de location.</p>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('app.rental_orders.no_rental_orders') }}</h3>
+                    <p class="text-gray-600 mb-6">{{ __('app.rental_orders.no_rental_orders_desc') }}</p>
                     <a href="{{ route('products.index') }}" 
                        class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                         </svg>
-                        Découvrir nos produits
+                        {{ __('app.rental_orders.discover_products') }}
                     </a>
                 </div>
             </div>
@@ -253,24 +255,24 @@
                         </svg>
                     </div>
                     <h3 class="ml-3 text-lg font-medium text-gray-900">
-                        Annuler la commande de location
+                        {{ __('app.rental_orders.cancel_rental_modal_title') }}
                     </h3>
                 </div>
                 
                 <p class="text-sm text-gray-500 mb-4">
-                    Êtes-vous sûr de vouloir annuler cette commande de location ? Cette action ne peut pas être annulée.
+                    {{ __('app.rental_orders.cancel_confirmation_text') }}
                 </p>
                 
                 <div class="mb-4">
                     <label for="cancellation_reason" class="block text-sm font-medium text-gray-700 mb-2">
-                        Raison de l'annulation *
+                        {{ __('app.rental_orders.cancellation_reason') }} *
                     </label>
                     <textarea 
                         id="cancellation_reason" 
                         name="cancellation_reason" 
                         rows="3" 
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                        placeholder="Veuillez expliquer la raison de l'annulation..."
+                        placeholder="{{ __('app.rental_orders.cancellation_reason_placeholder') }}"
                         required></textarea>
                 </div>
                 
@@ -278,7 +280,7 @@
                     <button type="button" 
                             onclick="closeCancelModal()" 
                             class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Annuler
+                        {{ __('app.rental_orders.cancel') }}
                     </button>
                     <button type="button" 
                             onclick="confirmCancellation()" 
@@ -286,7 +288,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
-                        Confirmer l'annulation
+                        {{ __('app.rental_orders.confirm_cancellation') }}
                     </button>
                 </div>
             </div>
@@ -306,13 +308,13 @@
                         </svg>
                     </div>
                     <h3 class="ml-3 text-xl font-semibold text-gray-900">
-                        🔒 Clôture de location
+                        {{ __('app.rental_orders.close_rental_modal_title') }}
                     </h3>
                 </div>
                 
                 <div class="mb-6">
                     <p class="text-gray-700 mb-4">
-                        Êtes-vous sûr de vouloir clôturer cette location ?
+                        {{ __('app.rental_orders.close_rental_confirmation') }}
                     </p>
                     
                     <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
@@ -320,12 +322,12 @@
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                             </svg>
-                            Cette action confirme que :
+                            {{ __('app.rental_orders.close_rental_checklist_title') }}
                         </h4>
                         <ul class="text-sm text-green-700 space-y-1">
-                            <li>• Vous avez rendu tout le matériel</li>
-                            <li>• Le matériel est en bon état</li>
-                            <li>• Vous acceptez l'inspection admin</li>
+                            <li>{{ __('app.rental_orders.close_rental_checklist.equipment_returned') }}</li>
+                            <li>{{ __('app.rental_orders.close_rental_checklist.equipment_good_condition') }}</li>
+                            <li>{{ __('app.rental_orders.close_rental_checklist.accept_inspection') }}</li>
                         </ul>
                     </div>
                     
@@ -334,10 +336,10 @@
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                             </svg>
-                            Important à savoir
+                            {{ __('app.rental_orders.close_rental_warning_title') }}
                         </h4>
                         <p class="text-sm text-yellow-700">
-                            Cette action ne peut pas être annulée et déclenchera l'inspection par l'administration.
+                            {{ __('app.rental_orders.close_rental_warning') }}
                         </p>
                     </div>
                 </div>
@@ -346,7 +348,7 @@
                     <button type="button" 
                             onclick="closeCloseModal()" 
                             class="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors">
-                        Annuler
+                        {{ __('app.rental_orders.cancel') }}
                     </button>
                     <button type="button" 
                             onclick="confirmClose()" 
@@ -354,7 +356,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                         </svg>
-                        Confirmer la clôture
+                        {{ __('app.rental_orders.confirm_close') }}
                     </button>
                 </div>
             </div>
@@ -374,19 +376,19 @@
                         </svg>
                     </div>
                     <h3 class="ml-3 text-lg font-medium text-gray-900">
-                        Annulation impossible
+                        {{ __('app.rental_orders.cancellation_impossible') }}
                     </h3>
                 </div>
                 
                 <p class="text-sm text-gray-500 mb-4">
-                    Il n'est pas possible d'annuler une location en cours. Veuillez contacter notre service client pour toute assistance.
+                    {{ __('app.rental_orders.active_rental_cancellation_text') }}
                 </p>
                 
                 <div class="flex justify-end">
                     <button type="button" 
                             onclick="closeInfoModal()" 
                             class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Compris
+                        {{ __('app.rental_orders.understand') }}
                     </button>
                 </div>
             </div>

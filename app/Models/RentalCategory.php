@@ -100,11 +100,34 @@ class RentalCategory extends Model
         $translationKey = self::$translationKeys[$this->name] ?? null;
         
         if ($translationKey) {
-            return __('app.rental_categories.' . $translationKey);
+            $translation = __('app.rental_categories.' . $translationKey);
+            // Si la traduction n'est pas trouvée, Laravel retourne la clé
+            if ($translation !== 'app.rental_categories.' . $translationKey) {
+                return $translation;
+            }
         }
         
         // Fallback vers le nom original si pas de traduction trouvée
         return $this->name;
+    }
+
+    /**
+     * Obtenir la description traduite de la catégorie
+     */
+    public function getTranslatedDescriptionAttribute(): string
+    {
+        $translationKey = self::$translationKeys[$this->name] ?? null;
+        
+        if ($translationKey) {
+            $translation = __('app.rental_categories_descriptions.' . $translationKey);
+            // Si la traduction n'est pas trouvée, Laravel retourne la clé
+            if ($translation !== 'app.rental_categories_descriptions.' . $translationKey) {
+                return $translation;
+            }
+        }
+        
+        // Fallback vers la description originale si pas de traduction trouvée
+        return $this->description ?? '';
     }
 
     /**

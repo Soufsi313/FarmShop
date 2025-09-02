@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Gestion des Articles de Blog - FarmShop Admin')
-@section('page-title', 'Gestion des Articles de Blog')
+@section('title', __('blog.admin.page_title'))
+@section('page-title', __('blog.admin.title'))
 
 @push('styles')
 <style>
@@ -33,29 +33,29 @@
                     <svg class="h-8 w-8 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
                     </svg>
-                    Articles de Blog
+                    {{ __('blog.admin.blog_articles') }}
                 </h1>
-                <p class="mt-2 text-sm text-gray-600">Gérez et consultez tous les articles de votre blog FarmShop</p>
+                <p class="mt-2 text-sm text-gray-600">{{ __('blog.admin.subtitle') }}</p>
             </div>
             <div class="mt-4 sm:mt-0 sm:flex sm:space-x-3">
                 <a href="{{ route('admin.blog-categories.index') }}" class="inline-flex items-center px-6 py-3 border border-purple-300 rounded-lg shadow-sm text-base font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors">
                     <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                     </svg>
-                    Gérer Catégories
+                    {{ __('blog.admin.manage_categories') }}
                 </a>
                 <a href="/blog" target="_blank" class="inline-flex items-center px-6 py-3 border border-green-300 rounded-lg shadow-sm text-base font-medium text-green-700 bg-green-50 hover:bg-green-100 transition-colors">
                     <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                     </svg>
-                    Voir le Blog Public
+                    {{ __('blog.admin.view_public_blog') }}
                 </a>
                 <a href="{{ route('admin.blog.create') }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">
                     <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
-                    Nouvel Article
+                    {{ __('blog.admin.new_article') }}
                 </a>
             </div>
         </div>
@@ -74,7 +74,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Total Articles</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('blog.admin.total_articles') }}</dt>
                             <dd class="text-2xl font-bold text-gray-900">{{ $posts->total() }}</dd>
                         </dl>
                     </div>
@@ -94,7 +94,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Publiés</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('blog.admin.published') }}</dt>
                             <dd class="text-2xl font-bold text-green-600">{{ $posts->filter(function($post) { return $post->status === 'published'; })->count() }}</dd>
                         </dl>
                     </div>
@@ -114,7 +114,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Brouillons</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('blog.admin.drafts') }}</dt>
                             <dd class="text-2xl font-bold text-yellow-600">{{ $posts->filter(function($post) { return $post->status === 'draft'; })->count() }}</dd>
                         </dl>
                     </div>
@@ -134,7 +134,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Catégories</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('blog.admin.categories') }}</dt>
                             <dd class="text-2xl font-bold text-blue-600">{{ $categories->count() }}</dd>
                         </dl>
                     </div>
@@ -150,7 +150,7 @@
                 <svg class="h-5 w-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                 </svg>
-                Recherche et Filtres Avancés
+                {{ __('blog.admin.search_filters_title') }}
             </h3>
         </div>
         <div class="p-6">
@@ -162,13 +162,13 @@
                             <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
-                            Recherche d'articles
+                            {{ __('blog.admin.search_articles') }}
                         </label>
                         <input type="text" 
                                name="search" 
                                id="search" 
                                value="{{ request('search') }}" 
-                               placeholder="Titre, contenu, extrait, tags..." 
+                               placeholder="{{ __('blog.admin.search_placeholder_admin') }}" 
                                class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 text-sm">
                     </div>
 
@@ -178,13 +178,13 @@
                             <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                             </svg>
-                            Catégorie
+                            {{ __('blog.admin.category') }}
                         </label>
                         <select name="category_id" id="category_id" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 text-sm">
-                            <option value="">Toutes les catégories</option>
+                            <option value="">{{ __('blog.admin.all_categories_admin') }}</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }} ({{ $category->posts->count() }} articles)
+                                    {{ $category->name }} ({{ __('blog.admin.articles_count', ['count' => $category->posts->count()]) }})
                                 </option>
                             @endforeach
                         </select>
@@ -196,13 +196,13 @@
                             <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            Statut de publication
+                            {{ __('blog.admin.publication_status') }}
                         </label>
                         <select name="status" id="status" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 text-sm">
-                            <option value="">Tous les statuts</option>
-                            <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>✅ Publié</option>
-                            <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>📝 Brouillon</option>
-                            <option value="scheduled" {{ request('status') == 'scheduled' ? 'selected' : '' }}>⏰ Programmé</option>
+                            <option value="">{{ __('blog.admin.all_statuses') }}</option>
+                            <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>{{ __('blog.admin.published_status') }}</option>
+                            <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>{{ __('blog.admin.draft_status') }}</option>
+                            <option value="scheduled" {{ request('status') == 'scheduled' ? 'selected' : '' }}>{{ __('blog.admin.scheduled_status') }}</option>
                         </select>
                     </div>
                 </div>
@@ -215,10 +215,10 @@
                             <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
-                            Auteur
+                            {{ __('blog.admin.author') }}
                         </label>
                         <select name="author_id" id="author_id" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 text-sm">
-                            <option value="">Tous les auteurs</option>
+                            <option value="">{{ __('blog.admin.all_authors') }}</option>
                             @foreach($authors as $author)
                                 <option value="{{ $author->id }}" {{ request('author_id') == $author->id ? 'selected' : '' }}>
                                     {{ $author->name }}
@@ -233,14 +233,14 @@
                             <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
                             </svg>
-                            Trier par
+                            {{ __('blog.admin.sort_by') }}
                         </label>
                         <select name="sort_by" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 text-sm">
-                            <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Date de création</option>
-                            <option value="updated_at" {{ request('sort_by') == 'updated_at' ? 'selected' : '' }}>Dernière modification</option>
-                            <option value="published_at" {{ request('sort_by') == 'published_at' ? 'selected' : '' }}>Date de publication</option>
-                            <option value="views_count" {{ request('sort_by') == 'views_count' ? 'selected' : '' }}>Nombre de vues</option>
-                            <option value="title" {{ request('sort_by') == 'title' ? 'selected' : '' }}>Titre alphabétique</option>
+                            <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>{{ __('blog.admin.sort_creation_date') }}</option>
+                            <option value="updated_at" {{ request('sort_by') == 'updated_at' ? 'selected' : '' }}>{{ __('blog.admin.sort_update_date') }}</option>
+                            <option value="published_at" {{ request('sort_by') == 'published_at' ? 'selected' : '' }}>{{ __('blog.admin.sort_publication_date') }}</option>
+                            <option value="views_count" {{ request('sort_by') == 'views_count' ? 'selected' : '' }}>{{ __('blog.admin.sort_views_count') }}</option>
+                            <option value="title" {{ request('sort_by') == 'title' ? 'selected' : '' }}>{{ __('blog.admin.sort_title') }}</option>
                         </select>
                     </div>
 
@@ -250,11 +250,11 @@
                             <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
                             </svg>
-                            Ordre
+                            {{ __('blog.admin.order') }}
                         </label>
                         <select name="sort_direction" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 text-sm">
-                            <option value="desc" {{ request('sort_direction') == 'desc' ? 'selected' : '' }}>↓ Décroissant</option>
-                            <option value="asc" {{ request('sort_direction') == 'asc' ? 'selected' : '' }}>↑ Croissant</option>
+                            <option value="desc" {{ request('sort_direction') == 'desc' ? 'selected' : '' }}>{{ __('blog.admin.descending') }}</option>
+                            <option value="asc" {{ request('sort_direction') == 'asc' ? 'selected' : '' }}>{{ __('blog.admin.ascending') }}</option>
                         </select>
                     </div>
                 </div>
@@ -267,20 +267,20 @@
                             <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"/>
                             </svg>
-                            <span x-text="showAdvanced ? 'Masquer filtres avancés' : 'Filtres avancés'"></span>
+                            <span x-text="showAdvanced ? '{{ __('blog.admin.hide_advanced_filters') }}' : '{{ __('blog.admin.advanced_filters') }}'"></span>
                         </button>
                         <a href="{{ route('admin.blog.index') }}" class="inline-flex items-center px-5 py-3 border border-gray-300 rounded-lg text-base font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
                             <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                             </svg>
-                            Réinitialiser
+                            {{ __('blog.admin.reset') }}
                         </a>
                     </div>
                     <button type="submit" class="inline-flex items-center px-8 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all">
                         <svg class="h-5 w-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
-                        Rechercher
+                        {{ __('blog.admin.search_button') }}
                     </button>
                 </div>
             </form>
@@ -291,10 +291,10 @@
     <div class="mt-8 bg-white shadow rounded-lg">
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex justify-between items-center">
-                <h3 class="text-lg font-medium text-gray-900">Articles ({{ $posts->total() }})</h3>
+                <h3 class="text-lg font-medium text-gray-900">{{ __('blog.admin.articles_list_title', ['count' => $posts->total()]) }}</h3>
                 <div class="flex space-x-2">
                     <span class="text-sm text-gray-500">
-                        Tri par {{ request('sort_by', 'created_at') }} ({{ request('sort_direction', 'desc') }})
+                        {{ __('blog.admin.sorted_by', ['sort_by' => request('sort_by', 'created_at'), 'direction' => request('sort_direction', 'desc')]) }}
                     </span>
                 </div>
             </div>
@@ -306,25 +306,25 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Article
+                                {{ __('blog.admin.table_article') }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Catégorie
+                                {{ __('blog.admin.table_category') }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Auteur
+                                {{ __('blog.admin.table_author') }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Statut
+                                {{ __('blog.admin.table_status') }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Date
+                                {{ __('blog.admin.table_date') }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Vues
+                                {{ __('blog.admin.table_views') }}
                             </th>
                             <th class="relative px-6 py-3">
-                                <span class="sr-only">Actions</span>
+                                <span class="sr-only">{{ __('blog.admin.table_actions') }}</span>
                             </th>
                         </tr>
                     </thead>
@@ -347,7 +347,7 @@
                                                 {{ Str::limit($post->title, 50) }}
                                                 @if($post->is_featured)
                                                     <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                        ★ Mis en avant
+                                                        {{ __('blog.admin.featured_badge') }}
                                                     </span>
                                                 @endif
                                             </div>
@@ -364,7 +364,7 @@
                                             {{ $post->category->name }}
                                         </span>
                                     @else
-                                        <span class="text-gray-400">Sans catégorie</span>
+                                        <span class="text-gray-400">{{ __('blog.admin.no_category') }}</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -375,17 +375,17 @@
                                     @switch($post->status)
                                         @case('published')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                Publié
+                                                {{ __('blog.admin.status_published') }}
                                             </span>
                                             @break
                                         @case('draft')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                Brouillon
+                                                {{ __('blog.admin.status_draft') }}
                                             </span>
                                             @break
                                         @case('scheduled')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                Programmé
+                                                {{ __('blog.admin.status_scheduled') }}
                                             </span>
                                             @break
                                     @endswitch
@@ -402,7 +402,7 @@
                                         @if($post->status === 'published')
                                             <a href="/blog/{{ $post->slug }}" target="_blank" 
                                                class="text-blue-600 hover:text-blue-900 p-2 rounded-lg hover:bg-blue-50 transition-colors" 
-                                               title="Voir l'article">
+                                               title="{{ __('blog.admin.view_article') }}">
                                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -412,7 +412,7 @@
                                         
                                         <a href="{{ route('admin.blog.edit', $post) }}" 
                                            class="text-green-600 hover:text-green-900 p-2 rounded-lg hover:bg-green-50 transition-colors" 
-                                           title="Modifier l'article">
+                                           title="{{ __('blog.admin.edit_article') }}">
                                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                             </svg>
@@ -420,7 +420,7 @@
                                         
                                         <button @click="deletePost({{ $post->id }}, '{{ addslashes($post->title) }}')" 
                                                 class="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50 transition-colors" 
-                                                title="Supprimer l'article">
+                                                title="{{ __('blog.admin.delete_article') }}">
                                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                             </svg>
@@ -442,12 +442,12 @@
                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun article</h3>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('blog.admin.no_articles') }}</h3>
                 <p class="mt-1 text-sm text-gray-500">
                     @if(request()->hasAny(['search', 'category_id', 'status', 'author_id']))
-                        Aucun article ne correspond à vos critères de recherche.
+                        {{ __('blog.admin.no_articles_match_criteria') }}
                     @else
-                        Commencez par créer votre premier article de blog.
+                        {{ __('blog.admin.create_first_article') }}
                     @endif
                 </p>
             </div>
@@ -463,17 +463,17 @@
                 </svg>
             </div>
             <div class="ml-4">
-                <h3 class="text-lg font-medium text-blue-900">💡 Information sur la gestion des articles</h3>
+                <h3 class="text-lg font-medium text-blue-900">{{ __('blog.admin.info_title') }}</h3>
                 <div class="mt-2 text-sm text-blue-800">
-                    <p class="mb-2">Cette interface permet la <strong>consultation et le filtrage</strong> des articles existants.</p>
-                    <p>La gestion complète (création, édition, suppression) est disponible via <strong>l'API REST</strong>. Consultez la documentation API pour plus de détails.</p>
+                    <p class="mb-2">{!! __('blog.admin.info_description_1') !!}</p>
+                    <p>{!! __('blog.admin.info_description_2') !!}</p>
                 </div>
                 <div class="mt-4 flex space-x-3">
                     <a href="#" class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
-                        📖 Documentation API
+                        {{ __('blog.admin.api_documentation') }}
                     </a>
                     <a href="/blog" target="_blank" class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors">
-                        🌐 Voir le blog public
+                        {{ __('blog.admin.view_public_blog_info') }}
                     </a>
                 </div>
             </div>
@@ -507,7 +507,7 @@
             <!-- En-tête -->
             <div class="px-6 py-4 border-b">
                 <h3 class="text-lg font-medium text-gray-900">
-                    Confirmer la suppression
+                    {{ __('blog.admin.confirm_deletion') }}
                 </h3>
             </div>
             
@@ -521,10 +521,10 @@
                     </div>
                     <div class="ml-3">
                         <p class="text-sm text-gray-700">
-                            Êtes-vous sûr de vouloir supprimer l'article <strong x-text="deletePostData.title"></strong> ?
+                            {{ __('blog.admin.delete_confirmation_question') }} <strong x-text="deletePostData.title"></strong>
                         </p>
                         <p class="text-sm text-gray-500 mt-1">
-                            Cette action est irréversible.
+                            {{ __('blog.admin.irreversible_action') }}
                         </p>
                     </div>
                 </div>
@@ -534,18 +534,18 @@
             <div class="px-6 py-4 bg-gray-50 border-t flex justify-end space-x-3">
                 <button @click="cancelDelete()" 
                         class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
-                    Annuler
+                    {{ __('blog.admin.cancel') }}
                 </button>
                 <button @click="confirmDelete()" 
                         :disabled="loading"
                         class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                    <span x-show="!loading">Supprimer</span>
+                    <span x-show="!loading">{{ __('blog.admin.delete') }}</span>
                     <span x-show="loading" class="flex items-center">
                         <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        Suppression...
+                        {{ __('blog.admin.deleting') }}
                     </span>
                 </button>
             </div>

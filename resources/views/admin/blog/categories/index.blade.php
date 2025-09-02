@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Gestion des Catégories de Blog - FarmShop Admin')
-@section('page-title', 'Gestion des Catégories de Blog')
+@section('title', __('app.admin.categories.page_title'))
+@section('page-title', __('app.admin.categories.section_title'))
 
 @push('styles')
 <style>
@@ -352,23 +352,23 @@
                     <svg class="h-8 w-8 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                     </svg>
-                    Catégories de Blog
+                    {{ __('app.admin.categories.title') }}
                 </h1>
-                <p class="mt-2 text-sm text-gray-600">Organisez vos articles par catégories pour une meilleure navigation</p>
+                <p class="mt-2 text-sm text-gray-600">{{ __('app.admin.categories.description') }}</p>
             </div>
             <div class="mt-4 sm:mt-0 sm:flex sm:space-x-3">
                 <a href="{{ route('admin.blog.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
                     <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                     </svg>
-                    Voir Articles
+                    {{ __('app.admin.categories.view_articles') }}
                 </a>
                 <button @click="showCreateModal = true" 
                         type="button" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 transition-colors">
                     <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
-                    Nouvelle Catégorie
+                    {{ __('app.admin.categories.new_category_btn') }}
                 </button>
             </div>
         </div>
@@ -377,19 +377,19 @@
     <!-- Statistiques -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div class="stats-card rounded-lg p-6">
-            <h3 class="text-sm font-medium">Total Catégories</h3>
+            <h3 class="text-sm font-medium">{{ __('app.admin.categories.total_stats') }}</h3>
             <p class="text-3xl font-bold stats-value">{{ $categories->total() }}</p>
         </div>
         <div class="bg-white rounded-lg p-6 border border-gray-200">
-            <h3 class="text-sm font-medium text-gray-500">Catégories Actives</h3>
+            <h3 class="text-sm font-medium text-gray-500">{{ __('app.admin.categories.active_stats') }}</h3>
             <p class="text-3xl font-bold text-green-600">{{ $categories->where('is_active', true)->count() }}</p>
         </div>
         <div class="bg-white rounded-lg p-6 border border-gray-200">
-            <h3 class="text-sm font-medium text-gray-500">Catégories Inactives</h3>
+            <h3 class="text-sm font-medium text-gray-500">{{ __('app.admin.categories.inactive_stats') }}</h3>
             <p class="text-3xl font-bold text-red-600">{{ $categories->where('is_active', false)->count() }}</p>
         </div>
         <div class="bg-white rounded-lg p-6 border border-gray-200">
-            <h3 class="text-sm font-medium text-gray-500">Articles Total</h3>
+            <h3 class="text-sm font-medium text-gray-500">{{ __('app.admin.categories.articles_total') }}</h3>
             <p class="text-3xl font-bold text-blue-600">{{ $categories->sum('articles_count') }}</p>
         </div>
     </div>
@@ -397,8 +397,8 @@
     <!-- Filtres et recherche -->
     <div class="bg-white shadow-lg rounded-xl p-8">
         <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Recherche et Filtres</h3>
-            <p class="text-sm text-gray-600">Trouvez rapidement les catégories que vous recherchez</p>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ __('app.admin.categories.search_and_filters') }}</h3>
+            <p class="text-sm text-gray-600">{{ __('app.admin.categories.search_and_filters_description') }}</p>
         </div>
         
         <form method="GET" action="{{ route('admin.blog-categories.index') }}" class="space-y-6">
@@ -408,10 +408,10 @@
                         <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
-                        Rechercher une catégorie
+                        {{ __('app.admin.categories.search_category_placeholder') }}
                     </label>
                     <input type="text" name="search" id="search" value="{{ request('search') }}" 
-                           placeholder="Tapez le nom d'une catégorie..." 
+                           placeholder="{{ __('app.admin.categories.search_category_placeholder') }}..." 
                            class="form-input w-full">
                 </div>
                 
@@ -420,23 +420,23 @@
                         <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        Statut de la catégorie
+                        {{ __('app.admin.categories.category_status') }}
                     </label>
                     <select name="status" id="status" class="form-select w-full">
-                        <option value="">Tous les statuts</option>
-                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>✅ Catégories actives</option>
-                        <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>❌ Catégories inactives</option>
+                        <option value="">{{ __('app.admin.categories.all_categories') }}</option>
+                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>{{ __('app.admin.categories.status_active') }}</option>
+                        <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>{{ __('app.admin.categories.status_inactive') }}</option>
                     </select>
                 </div>
                 
                 <div class="space-y-2">
-                    <label class="form-label">Actions</label>
+                    <label class="form-label">{{ __('app.admin.categories.actions_title') }}</label>
                     <div class="flex space-x-3">
                         <button type="submit" class="form-button form-button-primary flex-1">
                             <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"/>
                             </svg>
-                            Filtrer
+                            {{ __('app.admin.categories.filter_button') }}
                         </button>
                         <a href="{{ route('admin.blog-categories.index') }}" class="form-button form-button-secondary">
                             <svg class="inline w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -452,7 +452,7 @@
     <!-- Liste des catégories -->
     <div class="bg-white shadow-lg rounded-xl border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900">Catégories ({{ $categories->total() }})</h3>
+            <h3 class="text-lg font-semibold text-gray-900">{{ __('app.admin.categories.categories_count') }} ({{ $categories->total() }})</h3>
         </div>
 
         @if($categories->count() > 0)
@@ -468,10 +468,10 @@
                                         <p class="text-sm text-gray-600 mt-1">{{ $category->description }}</p>
                                     @endif
                                     <div class="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                                        <span>Ordre: {{ $category->sort_order }}</span>
-                                        <span>Articles: {{ $category->articles_count ?? 0 }}</span>
+                                        <span>{{ __('app.admin.categories.order_label') }} {{ $category->sort_order }}</span>
+                                        <span>{{ __('app.admin.categories.articles_label') }} {{ $category->articles_count ?? 0 }}</span>
                                         <span class="px-2 py-1 rounded-full text-xs {{ $category->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                            {{ $category->is_active ? 'Active' : 'Inactive' }}
+                                            {{ $category->is_active ? __('app.admin.categories.status_active') : __('app.admin.categories.status_inactive') }}
                                         </span>
                                     </div>
                                 </div>
@@ -504,12 +504,12 @@
                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune catégorie</h3>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('app.admin.categories.no_categories_title') }}</h3>
                 <p class="mt-1 text-sm text-gray-500">
                     @if(request()->hasAny(['search', 'status']))
-                        Aucune catégorie ne correspond à vos critères de recherche.
+                        {{ __('app.admin.categories.no_search_results') }}
                     @else
-                        Commencez par créer votre première catégorie de blog.
+                        {{ __('app.admin.categories.create_first_blog_category') }}
                     @endif
                 </p>
                 <div class="mt-6">
@@ -517,7 +517,7 @@
                         <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
-                        Créer une catégorie
+                        {{ __('app.admin.categories.create_category_btn') }}
                     </button>
                 </div>
             </div>
@@ -545,7 +545,7 @@
                                 <svg class="h-5 w-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                 </svg>
-                                Créer une nouvelle catégorie
+                                {{ __('app.admin.categories.create_new_category') }}
                             </h3>
                         </div>
                         
@@ -555,10 +555,10 @@
                                     <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                     </svg>
-                                    Nom de la catégorie *
+                                    {{ __('app.admin.categories.category_name_label') }}
                                 </label>
                                 <input type="text" name="name" id="create_name" required x-model="newCategory.name"
-                                       placeholder="Ex: Jardinage, Agriculture bio..."
+                                       placeholder="{{ __('app.admin.categories.category_name_placeholder') }}"
                                        class="form-input w-full">
                             </div>
                             
@@ -567,10 +567,10 @@
                                     <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
                                     </svg>
-                                    Description
+                                    {{ __('app.admin.categories.description_label') }}
                                 </label>
                                 <textarea name="description" id="create_description" rows="4" x-model="newCategory.description"
-                                          placeholder="Décrivez cette catégorie et son contenu..."
+                                          placeholder="{{ __('app.admin.categories.description_placeholder') }}"
                                           class="form-textarea w-full"></textarea>
                             </div>
                             
@@ -580,7 +580,7 @@
                                         <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 3H5a2 2 0 00-2 2v12a4 4 0 004 4h2V3z"/>
                                         </svg>
-                                        Couleur thématique
+                                        {{ __('app.admin.categories.color_label') }}
                                     </label>
                                     <input type="color" name="color" id="create_color" x-model="newCategory.color"
                                            class="form-color-input">
@@ -591,10 +591,10 @@
                                         <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
                                         </svg>
-                                        Ordre d'affichage
+                                        {{ __('app.admin.categories.sort_order_label') }}
                                     </label>
                                     <input type="number" name="sort_order" id="create_sort_order" min="0" x-model="newCategory.sort_order"
-                                           placeholder="0"
+                                           placeholder="{{ __('app.admin.categories.sort_order_placeholder') }}"
                                            class="form-input w-full">
                                 </div>
                             </div>
@@ -606,7 +606,7 @@
                                     <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
-                                    Catégorie active et visible
+                                    {{ __('app.admin.categories.active_visible_category') }}
                                 </label>
                             </div>
                         </div>
@@ -618,21 +618,21 @@
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                                 </svg>
-                                Créer la catégorie
+                                {{ __('app.admin.categories.create_button') }}
                             </span>
                             <span x-show="isSubmitting" class="flex items-center justify-center">
                                 <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                Création en cours...
+                                {{ __('app.admin.categories.creating_category') }}
                             </span>
                         </button>
                         <button type="button" @click="showCreateModal = false" class="form-button form-button-secondary mt-3 sm:mt-0 w-full sm:w-auto">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
-                            Annuler
+                            {{ __('app.admin.categories.cancel_button') }}
                         </button>
                     </div>
                 </form>

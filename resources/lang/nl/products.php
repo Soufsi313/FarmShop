@@ -64,4 +64,109 @@ return [
     'sort_price_desc' => 'Prijs: Hoog naar Laag',
     'sort_name_asc' => 'Naam A-Z',
     'sort_name_desc' => 'Naam Z-A',
+    
+    // Admin section
+    'admin' => [
+        'title' => 'Productbeheer - FarmShop Admin',
+        'page_title' => 'Productbeheer',
+        'catalog_title' => 'Productcatalogus',
+        'advanced_interface' => 'Geavanceerde voorraadbeheersinterface met zoek- en filterfuncties',
+        'total_products' => 'Totaal Producten',
+        
+        // Statistieken
+        'stats' => [
+            'total_products' => 'Totaal producten',
+            'active_products' => 'Actieve producten',
+            'low_stock' => 'Lage voorraad',
+            'out_of_stock' => 'Niet op voorraad',
+        ],
+        
+        // Snelle acties
+        'actions' => [
+            'new_product' => 'Nieuw Product',
+            'export' => 'Exporteren',
+            'import' => 'Importeren',
+            'filter' => 'Filteren',
+            'clear_filters' => 'Wissen',
+        ],
+        
+        // Weergave
+        'display' => [
+            'showing' => 'Weergave:',
+            'per_page' => 'per pagina',
+            '15_per_page' => '15 per pagina',
+            '30_per_page' => '30 per pagina',
+            '50_per_page' => '50 per pagina',
+            '100_per_page' => '100 per pagina',
+        ],
+        
+        // Zoeken en filters
+        'search' => [
+            'title' => 'Zoeken en Filters',
+            'description' => 'Snel producten vinden in uw catalogus',
+            'general_search' => 'Algemeen zoeken',
+            'placeholder' => 'Naam, SKU, beschrijving...',
+            'category' => 'Categorie',
+            'all_categories' => 'Alle categorieën',
+            'product_type' => 'Producttype',
+            'all_types' => 'Alle types',
+            'status' => 'Status',
+            'all_statuses' => 'Alle statussen',
+        ],
+        
+        // Producttypes
+        'types' => [
+            'sale_only' => '🛒 Alleen verkoop',
+            'rental_only' => '📅 Alleen verhuur',
+        ],
+        
+        // Statussen
+        'statuses' => [
+            'active_only' => 'Alleen actief',
+            'inactive_only' => 'Alleen inactief',
+            'featured' => 'Uitgelicht',
+            'low_stock' => 'Lage voorraad',
+            'out_of_stock' => 'Niet op voorraad',
+        ],
+        
+        // Berichten
+        'messages' => [
+            'no_products' => 'Geen producten gevonden',
+            'products_filtered' => 'producten gefilterd',
+            'confirm_delete' => 'Weet je zeker dat je dit product wilt verwijderen?',
+            'success_created' => 'Product succesvol aangemaakt',
+            'success_updated' => 'Product succesvol bijgewerkt',
+            'success_deleted' => 'Product succesvol verwijderd',
+        ],
+        
+        // Tabelkopjes
+        'table' => [
+            'product' => 'Product',
+            'category' => 'Categorie',
+            'price' => 'Prijs',
+            'stock' => 'Voorraad',
+            'type' => 'Type',
+            'status' => 'Status',
+            'actions' => 'Acties',
+            'sku' => 'SKU',
+            'view' => 'Bekijken',
+            'edit' => 'Bewerken',
+            'delete' => 'Verwijderen',
+            'in_stock' => 'Op voorraad',
+            'low_stock' => 'Laag',
+            'critical_stock' => 'Kritiek',
+            'out_of_stock' => 'Niet op voorraad',
+            'sale_only' => '🛒 Alleen verkoop',
+            'rental_only' => '📅 Alleen verhuur',
+            'rental_only_text' => 'Alleen verhuur',
+            'both_types' => '🔄 Gemixed',
+            'undefined_type' => '❓ Ongedefinieerd',
+            'active' => '✅ Actief',
+            'inactive' => '❌ Inactief',
+            'featured' => '⭐ Uitgelicht',
+            'per_day' => '€/dag',
+            'no_products_found' => 'Geen producten gevonden',
+            'try_different_criteria' => 'Probeer je zoekcriteria te wijzigen.',
+        ],
+    ],
 ];

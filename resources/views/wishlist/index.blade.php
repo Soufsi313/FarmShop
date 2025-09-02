@@ -156,11 +156,11 @@
                                     <!-- Statut stock -->
                                     @if($product->quantity > 0)
                                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            En stock
+                                            {{ __('app.wishlist.in_stock') }}
                                         </span>
                                     @else
                                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                            Rupture
+                                            {{ __('app.wishlist.out_of_stock') }}
                                         </span>
                                     @endif
                                 </div>
@@ -168,7 +168,7 @@
                                 @if($product->quantity > 0)
                                     <!-- Contrôles de quantité -->
                                     <div class="flex items-center space-x-2 mb-3">
-                                        <label class="text-sm font-medium text-gray-700">Quantité :</label>
+                                        <label class="text-sm font-medium text-gray-700">{{ __('app.wishlist.quantity_label') }}</label>
                                         <div class="flex items-center">
                                             <button type="button" 
                                                     onclick="decreaseQuantity({{ $product->id }})"

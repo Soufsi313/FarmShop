@@ -1,6 +1,6 @@
 ﻿@extends('layouts.admin')
 
-@section('title', 'Gestion des Commandes')
+@section('title', __('orders.page_title'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -13,15 +13,15 @@
                         <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                         </svg>
-                        Gérez et suivez toutes les commandes
+                        {{ __('orders.manage_track_orders') }}
                     </h1>
                     <p class="mt-2 text-blue-100">
-                        Interface avancée de gestion des commandes avec recherche et filtres
+                        {{ __('orders.advanced_interface') }}
                     </p>
                 </div>
                 <div class="text-right">
                     <div class="text-2xl font-bold">{{ $orders->total() }}</div>
-                    <div class="text-blue-100">Commandes totales</div>
+                    <div class="text-blue-100">{{ __('orders.total_orders') }}</div>
                 </div>
             </div>
         </div>
@@ -38,7 +38,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-green-600">{{ $stats['delivered'] ?? 0 }}</div>
-                    <div class="text-sm text-green-700">Livrées</div>
+                    <div class="text-sm text-green-700">{{ __('orders.delivered') }}</div>
                 </div>
             </div>
         </div>
@@ -52,7 +52,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-blue-600">{{ $stats['pending'] ?? 0 }}</div>
-                    <div class="text-sm text-blue-700">En attente</div>
+                    <div class="text-sm text-blue-700">{{ __('orders.pending') }}</div>
                 </div>
             </div>
         </div>
@@ -66,7 +66,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-orange-600">{{ $stats['preparing'] ?? 0 }}</div>
-                    <div class="text-sm text-orange-700">En préparation</div>
+                    <div class="text-sm text-orange-700">{{ __('orders.preparing') }}</div>
                 </div>
             </div>
         </div>
@@ -80,7 +80,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-purple-600">€{{ number_format($stats['total_revenue'] ?? 0, 2) }}</div>
-                    <div class="text-sm text-purple-700">Chiffre d'affaires</div>
+                    <div class="text-sm text-purple-700">{{ __('orders.total_revenue') }}</div>
                 </div>
             </div>
         </div>
@@ -93,7 +93,7 @@
                 <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
-                Recherche et filtres avancés
+                {{ __('orders.search_advanced_filters') }}
             </h2>
         </div>
         
@@ -105,13 +105,13 @@
                         <svg class="inline w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
-                        Recherche générale
+                        {{ __('orders.general_search') }}
                     </label>
                     <input 
                         type="text" 
                         name="search" 
                         value="{{ request('search') }}" 
-                        placeholder="N° commande, email client..."
+                        placeholder="{{ __('orders.search_placeholder') }}"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                 </div>
 
@@ -121,20 +121,20 @@
                         <svg class="inline w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        Statut de commande
+                        {{ __('orders.order_status') }}
                     </label>
                     <select 
                         name="status"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-colors">
-                        <option value="">Tous les statuts</option>
-                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>⏳ En attente</option>
-                        <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>✅ Confirmée</option>
-                        <option value="preparing" {{ request('status') == 'preparing' ? 'selected' : '' }}>📦 En préparation</option>
-                        <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>🚚 Expédiée</option>
-                        <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>✅ Livrée</option>
-                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>❌ Annulée</option>
-                        <option value="return_requested" {{ request('status') == 'return_requested' ? 'selected' : '' }}>🔄 Retour demandé</option>
-                        <option value="returned" {{ request('status') == 'returned' ? 'selected' : '' }}>📤 Retournée</option>
+                        <option value="">{{ __('orders.all_statuses') }}</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>⏳ {{ __('orders.status_pending') }}</option>
+                        <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>✅ {{ __('orders.status_confirmed') }}</option>
+                        <option value="preparing" {{ request('status') == 'preparing' ? 'selected' : '' }}>📦 {{ __('orders.status_preparing') }}</option>
+                        <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>🚚 {{ __('orders.status_shipped') }}</option>
+                        <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>✅ {{ __('orders.status_delivered') }}</option>
+                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>❌ {{ __('orders.status_cancelled') }}</option>
+                        <option value="return_requested" {{ request('status') == 'return_requested' ? 'selected' : '' }}>🔄 {{ __('orders.status_return_requested') }}</option>
+                        <option value="returned" {{ request('status') == 'returned' ? 'selected' : '' }}>📤 {{ __('orders.status_returned') }}</option>
                     </select>
                 </div>
 
@@ -143,16 +143,16 @@
                         <svg class="inline w-4 h-4 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
                         </svg>
-                        Statut de paiement
+                        {{ __('orders.payment_status') }}
                     </label>
                     <select 
                         name="payment_status"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-colors">
-                        <option value="">Tous les paiements</option>
-                        <option value="pending" {{ request('payment_status') == 'pending' ? 'selected' : '' }}>⏳ En attente</option>
-                        <option value="paid" {{ request('payment_status') == 'paid' ? 'selected' : '' }}>💳 Payé</option>
-                        <option value="failed" {{ request('payment_status') == 'failed' ? 'selected' : '' }}>❌ Échec</option>
-                        <option value="refunded" {{ request('payment_status') == 'refunded' ? 'selected' : '' }}>💰 Remboursé</option>
+                        <option value="">{{ __('orders.all_payments') }}</option>
+                        <option value="pending" {{ request('payment_status') == 'pending' ? 'selected' : '' }}>⏳ {{ __('orders.payment_pending') }}</option>
+                        <option value="paid" {{ request('payment_status') == 'paid' ? 'selected' : '' }}>💳 {{ __('orders.payment_completed') }}</option>
+                        <option value="failed" {{ request('payment_status') == 'failed' ? 'selected' : '' }}>❌ {{ __('orders.payment_failed') }}</option>
+                        <option value="refunded" {{ request('payment_status') == 'refunded' ? 'selected' : '' }}>💰 {{ __('orders.payment_refunded') }}</option>
                     </select>
                 </div>
 
@@ -161,7 +161,7 @@
                         <svg class="inline w-4 h-4 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
                         </svg>
-                        Trier par
+                        {{ __('orders.date_range') }}
                     </label>
                     <select 
                         name="sort_by"
@@ -177,11 +177,11 @@
             <div class="flex justify-end space-x-3 mt-6">
                 <a href="{{ route('admin.orders.index') }}" 
                    class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                    Réinitialiser
+                    {{ __('orders.reset_button') }}
                 </a>
                 <button type="submit" 
                         class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    Appliquer les filtres
+                    {{ __('orders.search_button') }}
                 </button>
             </div>
         </form>
@@ -195,25 +195,25 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Commande
+                                {{ __('orders.order_number') }}
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Client
+                                {{ __('orders.customer') }}
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Statut
+                                {{ __('orders.status') }}
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Paiement
+                                {{ __('orders.payment') }}
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Total
+                                {{ __('orders.amount') }}
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Date
+                                {{ __('orders.date') }}
                             </th>
                             <th class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions
+                                {{ __('orders.actions') }}
                             </th>
                         </tr>
                     </thead>
@@ -222,23 +222,23 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">#{{ $order->order_number ?? $order->id }}</div>
-                                    <div class="text-sm text-gray-500">{{ $order->items_count }} article(s)</div>
+                                    <div class="text-sm text-gray-500">{{ $order->items_count }} {{ __('orders.items_count') }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $order->user->name ?? trim(($order->user->first_name ?? '') . ' ' . ($order->user->last_name ?? '')) ?: 'Client inconnu' }}</div>
-                                    <div class="text-sm text-gray-500">{{ $order->user->email ?? 'Email non disponible' }}</div>
+                                    <div class="text-sm text-gray-900">{{ $order->user->name ?? trim(($order->user->first_name ?? '') . ' ' . ($order->user->last_name ?? '')) ?: __('orders.unknown_customer') }}</div>
+                                    <div class="text-sm text-gray-500">{{ $order->user->email ?? __('orders.email_not_available') }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php
                                         $statusLabels = [
-                                            'pending' => 'En attente',
-                                            'confirmed' => 'Confirmée',
-                                            'preparing' => 'En préparation',
-                                            'shipped' => 'Expédiée',
-                                            'delivered' => 'Livrée',
-                                            'cancelled' => 'Annulée',
-                                            'return_requested' => 'Retour demandé',
-                                            'returned' => 'Retournée',
+                                            'pending' => __('orders.status_pending'),
+                                            'confirmed' => __('orders.status_confirmed'),
+                                            'preparing' => __('orders.status_preparing'),
+                                            'shipped' => __('orders.status_shipped'),
+                                            'delivered' => __('orders.status_delivered'),
+                                            'cancelled' => __('orders.status_cancelled'),
+                                            'return_requested' => __('orders.status_return_requested'),
+                                            'returned' => __('orders.status_returned'),
                                         ];
                                         $statusColors = [
                                             'pending' => 'bg-yellow-100 text-yellow-800',
@@ -258,10 +258,10 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php
                                         $paymentLabels = [
-                                            'pending' => 'En attente',
-                                            'paid' => 'Payé',
-                                            'failed' => 'Échec',
-                                            'refunded' => 'Remboursé',
+                                            'pending' => __('orders.payment_pending'),
+                                            'paid' => __('orders.payment_completed'),
+                                            'failed' => __('orders.payment_failed'),
+                                            'refunded' => __('orders.payment_refunded'),
                                         ];
                                         $paymentColors = [
                                             'pending' => 'bg-yellow-100 text-yellow-800',
@@ -296,12 +296,12 @@
                                         @if(in_array($order->status, ['pending', 'confirmed']))
                                             <form method="POST" 
                                                   action="{{ route('admin.orders.cancel', $order) }}" 
-                                                  class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')">
+                                                  class="inline" onsubmit="return confirm('{{ __('orders.confirm_cancel') }}')">>
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="submit" 
                                                         class="text-red-600 hover:text-red-900 transition-colors" 
-                                                        title="Annuler la commande">
+                                                        title="{{ __('orders.cancel_order') }}">
                                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                                     </svg>
@@ -315,11 +315,11 @@
                                                 <!-- Commande entièrement retournable -->
                                                 <form method="POST" 
                                                       action="{{ route('orders.return', $order) }}" 
-                                                      class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir initier un retour pour cette commande ?')">
+                                                      class="inline" onsubmit="return confirm('{{ __('orders.confirm_return') }}')">>
                                                     @csrf
                                                     <button type="submit" 
                                                             class="text-orange-600 hover:text-orange-900 transition-colors" 
-                                                            title="Initier un retour">
+                                                            title="{{ __('orders.initiate_return') }}">
                                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
                                                         </svg>
@@ -329,7 +329,7 @@
                                                 <!-- Commande contenant des produits alimentaires non retournables -->
                                                 <button onclick="showNonReturnableModal()" 
                                                         class="text-orange-600 hover:text-orange-900 transition-colors" 
-                                                        title="Information sur le retour">
+                                                        title="{{ __('orders.return_info') }}">
                                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
                                                     </svg>
@@ -341,12 +341,12 @@
                                         @if($order->status === 'cancelled' || $order->created_at->diffInDays() > 90)
                                             <form method="POST" 
                                                   action="{{ route('admin.orders.destroy', $order) }}" 
-                                                  class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande ? Cette action est irréversible.')">
+                                                  class="inline" onsubmit="return confirm('{{ __('orders.confirm_delete') }}')">>
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
                                                         class="text-red-600 hover:text-red-900 transition-colors" 
-                                                        title="Supprimer la commande">
+                                                        title="{{ __('orders.delete_order') }}">
                                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                     </svg>
@@ -370,12 +370,12 @@
                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune commande trouvée</h3>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('orders.no_orders_found') }}</h3>
                 <p class="mt-1 text-sm text-gray-500">
                     @if(request()->hasAny(['search', 'status', 'payment_status']))
-                        Aucune commande ne correspond à vos critères de recherche.
+                        {{ __('orders.no_orders_match_criteria') }}
                     @else
-                        Les commandes apparaîtront ici une fois que les clients commenceront à acheter.
+                        {{ __('orders.orders_appear_here') }}
                     @endif
                 </p>
             </div>
@@ -392,19 +392,19 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"/>
                 </svg>
             </div>
-            <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">Produits non retournables</h3>
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">{{ __('orders.non_returnable_products') }}</h3>
             <div class="mt-2 px-7 py-3">
                 <p class="text-sm text-gray-500">
-                    Cette commande contient uniquement des produits alimentaires qui ne peuvent pas être retournés pour des raisons d'hygiène et de sécurité alimentaire.
+                    {{ __('orders.non_returnable_message') }}
                 </p>
                 <p class="text-sm text-gray-500 mt-2">
-                    Si vous avez un problème avec votre commande, veuillez nous contacter directement.
+                    {{ __('orders.contact_us_message') }}
                 </p>
             </div>
             <div class="items-center px-4 py-3">
                 <button onclick="closeNonReturnableModal()" 
                         class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                    J'ai compris
+                    {{ __('orders.understood') }}
                 </button>
             </div>
         </div>

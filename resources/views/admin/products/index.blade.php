@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Gestion des Produits - FarmShop Admin')
-@section('page-title', 'Gestion des Produits')
+@section('title', __('products.admin.title'))
+@section('page-title', __('products.admin.page_title'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8" x-data="productManager">
@@ -14,15 +14,15 @@
                         <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                         </svg>
-                        Catalogue de Produits
+                        {{ __('products.admin.catalog_title') }}
                     </h1>
                     <p class="mt-2 text-green-100">
-                        Interface avancée de gestion de l'inventaire avec recherche et filtres
+                        {{ __('products.admin.advanced_interface') }}
                     </p>
                 </div>
                 <div class="text-right">
                     <div class="text-2xl font-bold">{{ $stats['total'] ?? 0 }}</div>
-                    <div class="text-green-100">Produits totaux</div>
+                    <div class="text-green-100">{{ __('products.admin.total_products') }}</div>
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-green-600">{{ $stats['total'] ?? 0 }}</div>
-                    <div class="text-sm text-green-700">Total produits</div>
+                    <div class="text-sm text-green-700">{{ __('products.admin.stats.total_products') }}</div>
                 </div>
             </div>
         </div>
@@ -53,7 +53,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-blue-600">{{ $stats['active'] ?? 0 }}</div>
-                    <div class="text-sm text-blue-700">Produits actifs</div>
+                    <div class="text-sm text-blue-700">{{ __('products.admin.stats.active_products') }}</div>
                 </div>
             </div>
         </div>
@@ -67,7 +67,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-yellow-600">{{ $stats['low_stock'] ?? 0 }}</div>
-                    <div class="text-sm text-yellow-700">Stock faible</div>
+                    <div class="text-sm text-yellow-700">{{ __('products.admin.stats.low_stock') }}</div>
                 </div>
             </div>
         </div>
@@ -81,7 +81,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-red-600">{{ $stats['out_of_stock'] ?? 0 }}</div>
-                    <div class="text-sm text-red-700">Rupture stock</div>
+                    <div class="text-sm text-red-700">{{ __('products.admin.stats.out_of_stock') }}</div>
                 </div>
             </div>
         </div>
@@ -95,7 +95,7 @@
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                 </svg>
-                Nouveau Produit
+                {{ __('products.admin.actions.new_product') }}
             </a>
             
             <button @click="exportProducts()" 
@@ -103,7 +103,7 @@
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
-                Exporter
+                {{ __('products.admin.actions.export') }}
             </button>
             
             <button @click="importProducts()" 
@@ -111,18 +111,18 @@
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
                 </svg>
-                Importer
+                {{ __('products.admin.actions.import') }}
             </button>
         </div>
 
         <div class="flex items-center space-x-2 text-sm text-gray-600">
-            <span>Affichage :</span>
+            <span>{{ __('products.admin.display.showing') }}</span>
             <select x-model="itemsPerPage" @change="filterProducts()" 
                     class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
-                <option value="15">15 par page</option>
-                <option value="30">30 par page</option>
-                <option value="50">50 par page</option>
-                <option value="100">100 par page</option>
+                <option value="15">{{ __('products.admin.display.15_per_page') }}</option>
+                <option value="30">{{ __('products.admin.display.30_per_page') }}</option>
+                <option value="50">{{ __('products.admin.display.50_per_page') }}</option>
+                <option value="100">{{ __('products.admin.display.100_per_page') }}</option>
             </select>
         </div>
     </div>
@@ -130,19 +130,19 @@
     <!-- Filtres et recherche -->
     <div class="bg-white shadow-lg rounded-xl p-6 mb-6">
         <div class="mb-4">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Recherche et Filtres</h3>
-            <p class="text-sm text-gray-600">Trouvez rapidement les produits de votre catalogue</p>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ __('products.admin.search.title') }}</h3>
+            <p class="text-sm text-gray-600">{{ __('products.admin.search.description') }}</p>
         </div>
         
         <form @submit.prevent="filterProducts()" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="space-y-2">
-                    <label class="text-sm font-medium text-gray-700">Recherche générale</label>
+                    <label class="text-sm font-medium text-gray-700">{{ __('products.admin.search.general_search') }}</label>
                     <div class="relative">
                         <input type="text" 
                                x-model="searchTerm"
                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" 
-                               placeholder="Nom, SKU, description...">
+                               placeholder="{{ __('products.admin.search.placeholder') }}">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
                             <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -152,10 +152,10 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-sm font-medium text-gray-700">Catégorie</label>
+                    <label class="text-sm font-medium text-gray-700">{{ __('products.admin.search.category') }}</label>
                     <select x-model="selectedCategory" 
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white">
-                        <option value="">Toutes les catégories</option>
+                        <option value="">{{ __('products.admin.search.all_categories') }}</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                         @endforeach
@@ -163,25 +163,25 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-sm font-medium text-gray-700">Type de produit</label>
+                    <label class="text-sm font-medium text-gray-700">{{ __('products.admin.search.product_type') }}</label>
                     <select x-model="selectedType" 
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white">
-                        <option value="">Tous les types</option>
-                        <option value="sale">🛒 Vente uniquement</option>
-                        <option value="rental">📅 Location uniquement</option>
+                        <option value="">{{ __('products.admin.search.all_types') }}</option>
+                        <option value="sale">{{ __('products.admin.types.sale_only') }}</option>
+                        <option value="rental">{{ __('products.admin.types.rental_only') }}</option>
                     </select>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-sm font-medium text-gray-700">Statut</label>
+                    <label class="text-sm font-medium text-gray-700">{{ __('products.admin.search.status') }}</label>
                     <select x-model="selectedStatus" 
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white">
-                        <option value="">Tous les statuts</option>
-                        <option value="active">Actifs uniquement</option>
-                        <option value="inactive">Inactifs uniquement</option>
-                        <option value="featured">En vedette</option>
-                        <option value="low_stock">Stock faible</option>
-                        <option value="out_of_stock">Rupture de stock</option>
+                        <option value="">{{ __('products.admin.search.all_statuses') }}</option>
+                        <option value="active">{{ __('products.admin.statuses.active_only') }}</option>
+                        <option value="inactive">{{ __('products.admin.statuses.inactive_only') }}</option>
+                        <option value="featured">{{ __('products.admin.statuses.featured') }}</option>
+                        <option value="low_stock">{{ __('products.admin.statuses.low_stock') }}</option>
+                        <option value="out_of_stock">{{ __('products.admin.statuses.out_of_stock') }}</option>
                     </select>
                 </div>
 
@@ -191,7 +191,7 @@
                         <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
-                        Filtrer
+                        {{ __('products.admin.actions.filter') }}
                     </button>
                     <button type="button" 
                             @click="clearFilters()" 
@@ -199,6 +199,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
+                        <span class="ml-1">{{ __('products.admin.actions.clear_filters') }}</span>
                     </button>
                 </div>
             </div>

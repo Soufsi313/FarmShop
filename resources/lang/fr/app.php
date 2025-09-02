@@ -1,6 +1,21 @@
 <?php
 
 return array (
+  // User roles
+  'user_roles' => array(
+    'administrator' => 'Administrateur',
+    'admin' => 'Admin',
+    'user' => 'Utilisateur',
+    'customer' => 'Client',
+  ),
+  
+  // Formats de date
+  'date_format' => array(
+    'datetime' => 'd/m/Y à H:i',
+    'date' => 'd/m/Y',
+    'time' => 'H:i',
+  ),
+  
   'nav' => 
   array (
     'home' => 'Accueil',
@@ -8,6 +23,7 @@ return array (
     'rentals' => 'Location',
     'blog' => 'Blog',
     'contact' => 'Contact',
+    'newsletter' => 'Newsletter',
     'login' => 'Connexion',
     'register' => 'Inscription',
     'cart' => 'Panier',
@@ -120,9 +136,35 @@ return array (
     'subtotal' => 'Sous-total',
     'tax' => 'TVA',
     'payment' => 'Paiement',
+    'orders' => 'Commandes Achat',
+    'order_locations' => 'Commandes Location',
+    'rental_returns' => 'Retours Location',
+    'orders_section' => 'Commandes',
+    
+    // Admin navigation sections
+    'user_management_section' => 'Gestion Utilisateurs',
+    'catalog_section' => 'Catalogue',
+    'stock_management_section' => 'Gestion de Stock',
+    'communication_section' => 'Communication',
+    'tools_analytics_section' => 'Outils & Analytics',
+    
+    // Admin navigation items
+    'user_management' => 'Gestion Utilisateurs',
+    'special_offers' => 'Offres Spéciales',
+    'stock_overview' => 'Vue d\'ensemble',
+    'alerts_thresholds' => 'Alertes & Seuils',
+    'restocking' => 'Réapprovisionnement',
+    'reports_analysis' => 'Rapports & Analyses',
+    'blog_articles' => 'Articles Blog',
+    'blog_categories' => 'Catégories Blog',
+    'blog_comments' => 'Commentaires Blog',
+    'reports' => 'Signalements',
+    'contact_messages' => 'Messages Contact',
+    'cookie_management' => 'Gestion Cookies',
   ),
   'forms' => 
   array (
+    'content' => 'Gestion du Contenu',
     'delivery_address' => 'Adresse de livraison',
     'full_name' => 'Nom complet',
     'phone' => 'Téléphone',
@@ -207,6 +249,30 @@ return array (
     'download_invoice' => 'Télécharger facture',
     'close_rental' => 'Clôturer la location',
     'discover_products' => 'Découvrir nos produits',
+    
+    // Textes additionnels manquants
+    'no_rental_orders' => 'Aucune commande de location',
+    'no_rental_orders_desc' => 'Vous n\'avez pas encore passé de commande de location.',
+    'understand' => 'Compris',
+    'close_rental_modal_title' => '🔒 Clôture de location',
+    'close_rental_confirmation' => 'Êtes-vous sûr de vouloir clôturer cette location ?',
+    'close_rental_checklist_title' => 'Cette action confirme que :',
+    'close_rental_checklist' => [
+        'equipment_returned' => '• Vous avez rendu tout le matériel',
+        'equipment_good_condition' => '• Le matériel est en bon état', 
+        'accept_inspection' => '• Vous acceptez l\'inspection admin'
+    ],
+    'close_rental_warning_title' => 'Important à savoir',
+    'close_rental_warning' => 'Cette action ne peut pas être annulée et déclenchera l\'inspection par l\'administration.',
+    'confirm_close' => 'Confirmer la clôture',
+    'payment_failed' => '💔 Échec',
+    'payment_refunded' => '💙 Remboursé',
+    'rental_period_label' => 'Période de location',
+    'items_label' => 'Articles', 
+    'last_update_label' => 'Dernière mise à jour',
+    
+    // Formats de période
+    'period_from_to' => 'Du :start au :end',
   ),
   'rental_status' => 
   array (
@@ -228,11 +294,184 @@ return array (
   ),
   'pages' => 
   array (
+    'admin' => 'Panneau d\'Administration',
     'our_products' => 'Nos Produits',
     'blog' => 'Blog',
     'category' => 'Catégorie',
     'contact' => 'Contact',
     'rentals' => 'Location',
+    'statistics' => 'Statistiques',
+    'settings' => 'Paramètres',
+    'dashboard_title' => 'Tableau de Bord',
+    'dashboard' => 
+    array (
+      // Statistiques principales
+      'stats' => 
+      array (
+        'users' => 'Utilisateurs',
+        'products' => 'Produits',
+        'categories' => 'Catégories',
+        'orders' => 'Commandes',
+        'blog_posts' => 'Articles Blog',
+        'blog_categories' => 'Catégories Blog',
+        'comments' => 'Commentaires',
+        'reports' => 'Signalements',
+        'pending_comments' => 'en attente',
+        'pending_reports' => 'à traiter',
+      ),
+      
+      // Gestion de stock
+      'stock' => 
+      array (
+        'title' => 'Gestion de Stock',
+        'description' => 'Surveillance automatique et gestion intelligente des stocks',
+        'out_of_stock' => 'rupture(s)',
+        'critical_stock' => 'critique(s)',
+        'low_stock' => 'stock bas',
+        'all_good' => 'Tout va bien',
+        'refresh' => 'Actualiser',
+        'manage_products' => 'Gérer Produits',
+        'sound_on' => '🔊 Son ON',
+        'sound_off' => '🔇 Son OFF',
+        'desktop_on' => '🔔 Desktop ON',
+        'desktop_off' => '🔕 Desktop OFF',
+        'out_of_stock_title' => 'Rupture de stock',
+        'critical_stock_title' => 'Stock critique',
+        'low_stock_title' => 'Stock bas',
+        'normal_stock' => 'Stock normal',
+        'low_stock_monitoring' => '📋 Surveillance nécessaire',
+        'critical_products_title' => '🚨 Produits en Stock Critique',
+        'products_count' => 'produits',
+        'no_category' => 'Sans catégorie',
+        'stock_label' => 'Stock',
+        'threshold_label' => 'Seuil',
+        'edit_action' => 'Modifier',
+        'restock_suggestions' => '🔄 Suggestions de Réapprovisionnement',
+        'restock_description' => 'Cliquez pour générer automatiquement les quantités recommandées',
+        'generate_action' => 'Générer',
+        'no_critical_stock' => 'Aucun produit en stock critique',
+        'recent_alerts_title' => '📢 Alertes Stock Récentes',
+        'last_days' => '7 derniers jours',
+        'no_recent_alerts' => 'Aucune alerte récente',
+        'urgent_priority' => 'Urgent',
+        'high_priority' => 'Élevé',
+        'normal_priority' => 'Normal',
+        'critical_stock_value' => 'Valeur stock critique',
+        'monitoring_required' => 'Produits nécessitant attention',
+        'total_stock_value' => 'Valeur totale du stock',
+      ),
+      
+      // Analytics
+      'analytics' => 
+      array (
+        'title' => 'Fréquentation',
+        'description' => 'Analytics du site',
+        'unique_visitors' => 'Visiteurs uniques',
+        'page_views' => 'Pages vues',
+        'bounce_rate' => 'Taux de rebond',
+        'avg_session_duration' => 'Durée moyenne',
+        'visitors_total' => 'Visiteurs totaux',
+        'monthly_growth' => 'ce mois',
+      ),
+      
+      // Newsletter
+      'newsletter' => 
+      array (
+        'title' => 'Newsletter',
+        'description' => 'Performance email',
+        'active_subscribers' => 'Abonnés actifs',
+        'emails_sent' => 'Emails envoyés',
+        'this_month' => 'Ce mois',
+        'open_rate' => 'Taux d\'ouverture',
+        'click_rate' => 'Taux de clic',
+        'growth_rate' => 'Croissance',
+      ),
+      
+      // Locations
+      'rentals' => 
+      array (
+        'title' => 'Locations',
+        'description' => 'Performance location',
+        'total_orders' => 'Commandes location',
+        'monthly_revenue' => 'Revenus location',
+        'total' => 'Total',
+        'active_orders' => '🟢 Locations actives',
+        'closed_orders' => '🟠 Clôturées (en attente inspection)',
+        'inspecting_orders' => '🔍 Inspection en cours',
+        'finished_orders' => '✅ Inspection terminée',
+        'pending_returns' => '🟣 Retours en attente',
+      ),
+      
+      // Performance
+      'performance' => 
+      array (
+        'title' => 'Performance du Site',
+        'description' => 'Graphiques de tendances et performances',
+        'detailed_view' => 'Vue détaillée',
+        'visitor_evolution' => '📈 Évolution Visiteurs (7j)',
+        'recent_orders' => '🛒 Commandes Récentes (7j)',
+        'newsletter_performance' => '💌 Newsletter Performance',
+        'total_site' => 'Total site',
+        'newsletter_subscribers' => 'Abonnés newsletter',
+      ),
+      
+      // Sections
+      'recent_users_title' => 'Utilisateurs récents',
+      'recent_articles_title' => 'Articles récents',
+      'see_all' => 'Voir tous',
+      'no_recent_users' => 'Aucun utilisateur récent.',
+      'published' => 'Publié',
+      'draft' => 'Brouillon',
+      'scheduled' => 'Programmé',
+      
+      // Jours de la semaine
+      'days' => 
+      array (
+        'mon' => 'Lun',
+        'tue' => 'Mar',
+        'wed' => 'Mer',
+        'thu' => 'Jeu',
+        'fri' => 'Ven',
+        'sat' => 'Sam',
+        'sun' => 'Dim',
+      ),
+      'recent' => 
+      array (
+        'users' => 'Utilisateurs récents',
+        'articles' => 'Articles récents',
+        'no_users' => 'Aucun utilisateur récent.',
+        'no_articles' => 'Aucun article récent.',
+        'view_all' => 'Voir tous',
+      ),
+      'status' => 
+      array (
+        'published' => 'Publié',
+        'draft' => 'Brouillon',
+        'scheduled' => 'Programmé',
+      ),
+      'quick_actions' => 'Actions rapides',
+      'actions' => 
+      array (
+        'manage_articles' => 'Gérer Articles',
+        'view_all_articles' => 'Voir tous les articles',
+        'manage_categories' => 'Gérer Catégories',
+        'view_all_categories' => 'Voir toutes les catégories',
+        'view_blog' => 'Voir le Blog',
+        'manage_users' => 'Gérer Utilisateurs',
+        'view_all_users' => 'Voir tous les utilisateurs',
+        'manage_comments' => 'Gérer Commentaires',
+        'pending_comments' => 'en attente',
+        'all_comments' => 'Tous les commentaires',
+        'blog_public_page' => 'Page publique du blog',
+        'reports' => 'Signalements',
+        'this_month' => 'Ce mois',
+      ),
+      'restocking' => 
+      array (
+        'suggestion_title' => 'Suggestion de Réapprovisionnement',
+        'bulk_suggestions_title' => 'Suggestions de Réapprovisionnement en Masse',
+      ),
+    ),
   ),
   'auth' => 
   array (
@@ -363,6 +602,7 @@ return array (
     'title' => 'Nos Locations',
     'subtitle' => 'Découvrez notre gamme complète d\'équipements agricoles à louer',
     'hero_description' => 'Louez des équipements de qualité professionnelle pour vos projets agricoles',
+    'available_rentals' => 'Locations Disponibles',
     
     // Filtres et recherche
     'filters' => 'Filtres',
@@ -496,6 +736,12 @@ return array (
     'machines' => 'Machines',
     'equipements' => 'Équipements',
   ),
+  'rental_categories_descriptions' => 
+  array (
+    'outils-agricoles' => 'Location d\'outils manuels et électriques pour l\'agriculture et le jardinage. Bêches, houes, sécateurs, tondeuses et bien plus.',
+    'machines' => 'Location de machines agricoles légères et équipements motorisés. Motoculteurs, débroussailleuses, tondeuses professionnelles.',
+    'equipements' => 'Équipements et accessoires agricoles. Serres, bâches, contenants, gants, tenues, systèmes d\'irrigation.',
+  ),
   'footer' => 
   array (
     'company_description' => 'Votre partenaire de confiance pour le matériel agricole en Belgique. Achat et location d\'équipements de qualité pour professionnels et particuliers.',
@@ -602,6 +848,7 @@ return array (
     'in_stock' => 'En stock',
     'out_of_stock' => 'Rupture de stock',
     'limited_stock' => 'Stock limité',
+    'view_all_products' => 'Voir tous les produits',
   ),
   'contact' => 
   array (
@@ -872,6 +1119,34 @@ return array (
     'product_unavailable' => 'Produit indisponible',
     'added_to_cart_success' => 'Produit ajouté au panier !',
     'add_to_cart_error' => 'Erreur lors de l\'ajout au panier',
+  ),
+  
+  'wishlist' => 
+  array (
+    'title' => 'Ma Wishlist',
+    'product_singular' => 'produit dans votre liste',
+    'products_plural' => 'produits dans votre liste',
+    'clear_list' => 'Vider la liste',
+    'add_all_to_cart' => 'Tout ajouter au panier',
+    'added_on' => 'Ajouté le',
+    'remove_from_wishlist' => 'Retirer de la liste',
+    'add_to_cart' => 'Ajouter au panier',
+    'buy_now' => 'Acheter maintenant',
+    'rent_now' => 'Louer maintenant',
+    'view_product' => 'Voir le produit',
+    'empty_title' => 'Votre wishlist est vide',
+    'empty_description' => 'Découvrez nos produits et ajoutez vos favoris en cliquant sur le cœur',
+    'browse_products' => 'Parcourir les produits',
+    'per_day' => 'par jour',
+    'deposit' => 'Caution',
+    'in_stock' => 'En stock',
+    'limited_stock' => 'Stock limité',
+    'low_stock' => 'Stock faible',
+    'out_of_stock' => 'Rupture',
+    'product_unavailable' => 'Produit indisponible',
+    'added_to_cart_success' => 'Produit ajouté au panier !',
+    'add_to_cart_error' => 'Erreur lors de l\'ajout au panier',
+    'quantity_label' => 'Quantité :',
   ),
   
   'buttons' => 
@@ -1362,6 +1637,89 @@ return array (
     'processing_error' => 'Erreur lors du traitement du paiement',
   ),
 
+  'orders' => array(
+    'my_orders' => 'Mes Commandes',
+    'description' => 'Suivez l\'état de vos commandes et gérez vos achats',
+    'filter_by_status' => 'Filtrer par statut',
+    'all_statuses' => 'Tous les statuts',
+    'sort_by' => 'Trier par',
+    'sort' => array(
+      'most_recent' => 'Plus récentes',
+      'oldest' => 'Plus anciennes',
+      'amount_desc' => 'Montant décroissant',
+      'amount_asc' => 'Montant croissant',
+    ),
+    'order_number' => 'Commande #:number',
+    'placed_on' => 'Passée le',
+    'view_details' => 'Voir les détails',
+    'download_invoice' => 'Télécharger la facture',
+    'cancel_order' => 'Annuler la commande',
+    'cancel_order_confirm' => 'Êtes-vous sûr de vouloir annuler cette commande ?',
+    'request_return' => 'Demander un retour',
+    'expired' => 'Expiré',
+    'other_items' => 'autres articles',
+    'paid' => 'Payée',
+    'payment_pending' => 'Paiement en attente',
+    'no_orders' => 'Aucune commande',
+    'no_orders_yet' => 'Vous n\'avez passé aucune commande pour le moment.',
+    'no_orders_with_status' => 'Aucune commande trouvée avec le statut sélectionné.',
+    'view_all_orders' => 'Voir toutes les commandes',
+    'discover_products' => 'Découvrir nos produits',
+    'timeline_processing' => 'En préparation',
+    'non_returnable_products' => 'Produits non retournables',
+    'non_returnable_message' => 'Cette commande contient uniquement des produits non retournables (alimentaires périssables).',
+    'understood' => 'Compris',
+    'return_period_expired' => 'Délai de retour expiré',
+    'return_period_expired_message' => 'Le délai de 14 jours pour retourner cette commande est expiré.',
+    'return_reason' => 'Motif du retour',
+    'return_reason_placeholder' => 'Décrivez la raison de votre demande de retour...',
+    // Page de détail d'une commande
+    'back_to_orders' => 'Retour à mes commandes',
+    'ordered_items' => 'Articles commandés',
+    'delivery_address' => 'Adresse de livraison', 
+    'billing_address' => 'Adresse de facturation',
+    'order_summary' => 'Résumé de la commande',
+    'shipping_cost' => 'Frais de livraison',
+    'free_shipping' => 'GRATUITE',
+    'payment_method' => 'Méthode',
+    'payment_status' => 'Statut',
+    'paid_on' => 'Payé le',
+    'actions' => 'Actions',
+    'reorder' => 'Renouveler la commande',
+    'tracking_number' => 'Numéro de suivi',
+    'refund_processed' => 'Remboursement traité',
+    'refund_processing' => 'Remboursement en cours',
+    // Méthodes de paiement
+    'payment_methods' => array(
+      'card' => '💳 Carte bancaire',
+      'paypal' => '💰 PayPal',
+      'bank_transfer' => '🏦 Virement bancaire',
+    ),
+    // Statuts de paiement
+    'payment_statuses' => array(
+      'paid' => '✅ Payé',
+      'pending' => '⏳ En attente',
+      'failed' => '❌ Échec',
+    ),
+    
+    // Actions et boutons
+    'reorder_confirm' => 'Voulez-vous vraiment ajouter tous les produits de cette commande à votre panier ?',
+    'download_invoice' => '📄 Télécharger la facture',
+    'return_order' => '🔄 Retourner la commande',
+    'reorder_button' => '🔄 Renouveler cette commande',
+    
+    // Modal de retour
+    'request_return' => 'Demander un retour',
+    'return_reason_label' => 'Raison du retour *',
+    'return_reason_placeholder' => 'Expliquez pourquoi vous souhaitez retourner cette commande...',
+    'cancel' => 'Annuler',
+    'request_return_btn' => 'Demander le retour',
+    
+    // Messages JavaScript
+    'update_error' => 'Erreur lors de la mise à jour du statut:',
+    'status_updated' => 'Statut mis à jour:',
+  ),
+
   'admin' => array(
     'logout' => 'Déconnexion',
     'categories' => array(
@@ -1395,6 +1753,57 @@ return array (
       'no_categories_title' => 'Aucune catégorie',
       'no_categories_description' => 'Commencez par créer votre première catégorie.',
       'add_first_category' => 'Ajouter une catégorie',
+      'view_articles' => 'Voir Articles',
+      'search_and_filters' => 'Recherche et Filtres',
+      'search_and_filters_description' => 'Trouvez rapidement les catégories que vous recherchez',
+      'search_category_placeholder' => 'Rechercher une catégorie',
+      'category_status' => 'Statut de la catégorie',
+      'actions_title' => 'Actions',
+      'categories_count' => 'Catégories',
+      'order_label' => 'Ordre:',
+      'articles_label' => 'Articles:',
+      'articles_total' => 'Articles Total',
+      'articles_count' => 'articles',
+      'showing_results' => 'Affichage de',
+      'to_text' => 'à',
+      'of_text' => 'de',
+      'results_text' => 'résultats',
+      'filter_button' => 'Filtrer',
+      'reset_button' => 'Réinitialiser',
+      'all_statuses' => 'Tous les statuts',
+      'active_categories' => 'Catégories actives',
+      'inactive_categories' => 'Catégories inactives',
+      'no_search_results' => 'Aucune catégorie ne correspond à vos critères de recherche.',
+      'create_first_blog_category' => 'Commencez par créer votre première catégorie de blog.',
+      'create_category_btn' => 'Créer une catégorie',
+      'create_new_category' => 'Créer une nouvelle catégorie',
+      'category_name_label' => 'Nom de la catégorie *',
+      'category_name_placeholder' => 'Ex: Jardinage, Agriculture bio...',
+      'description_label' => 'Description',
+      'description_placeholder' => 'Décrivez cette catégorie et son contenu...',
+      'color_label' => 'Couleur thématique',
+      'sort_order_label' => "Ordre d'affichage",
+      'sort_order_placeholder' => '0',
+      'is_active_label' => 'Statut de la catégorie',
+      'active_status' => 'Catégorie active',
+      'cancel_button' => 'Annuler',
+      'create_button' => 'Créer la catégorie',
+      'category_name_required' => 'Le nom de la catégorie est requis.',
+      'error_title' => 'Erreur',
+      'success_title' => 'Succès',
+      'category_created_success' => 'Catégorie créée avec succès !',
+      'network_error' => 'Erreur réseau',
+      'server_error' => 'Impossible de contacter le serveur. Vérifiez votre connexion.',
+      'active_visible_category' => 'Catégorie active et visible',
+      'creating_category' => 'Création en cours...',
+      'edit_category' => 'Modifier la catégorie',
+      'update_button' => 'Mettre à jour',
+      'updating_category' => 'Mise à jour en cours...',
+      'delete_category' => 'Supprimer la catégorie',
+      'delete_category_confirm' => 'Êtes-vous sûr de vouloir supprimer cette catégorie ?',
+      'delete_category_warning' => 'Cette action est irréversible.',
+      'deleting_category' => 'Suppression en cours...',
+      'form_error' => 'Erreur lors de la création de la catégorie. Vérifiez la console pour plus de détails.',
       'filter_all' => 'Toutes',
       'filter_active' => 'Actives',
       'filter_inactive' => 'Inactives',
@@ -1468,5 +1877,97 @@ return array (
   'common' => array(
     'close' => 'Fermer',
     'cancel' => 'Annuler',
+  ),
+  
+  // Gestion des utilisateurs
+  'users' => array(
+    'title' => 'Gestion des utilisateurs - Dashboard Admin',
+    'page_title' => 'Gestion des utilisateurs',
+    'manage_all_users' => 'Gérez tous les utilisateurs',
+    'advanced_interface' => 'Interface avancée de gestion des comptes utilisateurs avec recherche et filtres',
+    'total_users' => 'Utilisateurs totaux',
+    
+    // Messages
+    'success' => 'Succès !',
+    'error' => 'Erreur !',
+    
+    // Statistiques
+    'stats' => array(
+      'users' => 'Utilisateurs',
+      'administrators' => 'Administrateurs',
+      'deleted' => 'Supprimés',
+      'new_30_days' => 'Nouveaux (30j)',
+      'active_7_days' => 'Actifs (7j)',
+    ),
+    
+    // Recherche et filtres
+    'search' => array(
+      'title' => 'Recherche et filtres avancés',
+      'general_search' => 'Recherche générale',
+      'placeholder' => 'Nom, username, email...',
+      'filter_by_role' => 'Filtre par rôle',
+      'all_roles' => 'Tous les rôles',
+      'account_status' => 'Statut des comptes',
+      'active_only' => '✅ Comptes actifs uniquement',
+      'deleted_only' => '🗑️ Comptes supprimés uniquement',
+      'all_accounts' => '📋 Tous les comptes',
+      'sort_by' => 'Trier par',
+      'order' => 'Ordre',
+      'reset' => 'Réinitialiser',
+      'apply_filters' => 'Appliquer les filtres',
+    ),
+    
+    // Options de tri
+    'sort_options' => array(
+      'created_at' => '📅 Date d\'inscription',
+      'name' => '🔤 Nom',
+      'username' => '👤 Username',
+      'email' => '📧 Email',
+      'role' => '⚡ Rôle',
+      'updated_at' => '🔄 Dernière modification',
+      'deleted_at' => '🗑️ Date de suppression',
+    ),
+    
+    // Ordre de tri
+    'order_options' => array(
+      'desc' => '⬇️ Décroissant',
+      'asc' => '⬆️ Croissant',
+    ),
+    
+    // Tableau
+    'table' => array(
+      'user' => 'Utilisateur',
+      'email' => 'Email',
+      'role' => 'Rôle',
+      'status' => 'Statut',
+      'newsletter' => 'Newsletter',
+      'registration' => 'Inscription',
+      'actions' => 'Actions',
+    ),
+    
+    // Statuts
+    'status' => array(
+      'deleted' => '🗑️ Supprimé',
+      'active' => '✅ Actif',
+      'subscribed' => '📧 Abonné',
+      'not_subscribed' => '❌ Non abonné',
+    ),
+    
+    // Actions
+    'actions' => array(
+      'restore' => 'Restaurer',
+      'restore_confirm' => 'Êtes-vous sûr de vouloir restaurer cet utilisateur ?',
+      'view_details' => 'Voir les détails',
+      'edit_user' => 'Modifier l\'utilisateur',
+      'delete_user' => 'Supprimer l\'utilisateur',
+      'delete_confirm' => 'Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action peut être annulée en restaurant le compte.',
+    ),
+    
+    // Messages vides
+    'empty' => array(
+      'title' => 'Aucun utilisateur trouvé',
+      'filtered' => 'Aucun utilisateur ne correspond à vos critères de recherche.',
+      'no_users' => 'Les utilisateurs apparaîtront ici une fois qu\'ils s\'inscriront.',
+    ),
   ),
 );

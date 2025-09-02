@@ -1,6 +1,21 @@
 <?php
 
 return array (
+  // User roles
+  'user_roles' => array(
+    'administrator' => 'Beheerder',
+    'admin' => 'Admin',
+    'user' => 'Gebruiker',
+    'customer' => 'Klant',
+  ),
+  
+  // Datumformaten
+  'date_format' => array(
+    'datetime' => 'd-m-Y om H:i',
+    'date' => 'd-m-Y',
+    'time' => 'H:i',
+  ),
+  
   'nav' => 
   array (
     'home' => 'Home',
@@ -8,6 +23,7 @@ return array (
     'rentals' => 'Verhuur',
     'blog' => 'Blog',
     'contact' => 'Contact',
+    'newsletter' => 'Nieuwsbrief',
     'login' => 'Inloggen',
     'register' => 'Registreren',
     'cart' => 'Winkelwagen',
@@ -183,9 +199,35 @@ return array (
     'subtotal' => 'Subtotaal',
     'tax' => 'BTW',
     'payment' => 'Betaling',
+    'orders' => 'Aankoop Bestellingen',
+    'order_locations' => 'Verhuur Bestellingen',
+    'rental_returns' => 'Verhuur Retours',
+    'orders_section' => 'Bestellingen',
+    
+    // Admin navigation sections
+    'user_management_section' => 'Gebruikersbeheer',
+    'catalog_section' => 'Catalogus',
+    'stock_management_section' => 'Voorraadbeheer',
+    'communication_section' => 'Communicatie',
+    'tools_analytics_section' => 'Tools & Analytics',
+    
+    // Admin navigation items
+    'user_management' => 'Gebruikersbeheer',
+    'special_offers' => 'Speciale Aanbiedingen',
+    'stock_overview' => 'Overzicht',
+    'alerts_thresholds' => 'Waarschuwingen & Drempels',
+    'restocking' => 'Heraanvulling',
+    'reports_analysis' => 'Rapporten & Analyses',
+    'blog_articles' => 'Blog Artikelen',
+    'blog_categories' => 'Blog Categorieën',
+    'blog_comments' => 'Blog Reacties',
+    'reports' => 'Meldingen',
+    'contact_messages' => 'Contact Berichten',
+    'cookie_management' => 'Cookie Beheer',
   ),
   'forms' => 
   array (
+    'content' => 'Contentbeheer',
     'delivery_address' => 'Bezorgadres',
     'full_name' => 'Volledige naam',
     'phone' => 'Telefoon',
@@ -275,6 +317,120 @@ return array (
     'download_invoice' => 'Factuur downloaden',
     'close_rental' => 'Verhuur sluiten',
     'discover_products' => 'Ontdek onze producten',
+    
+    // Aanvullende ontbrekende teksten
+    'no_rental_orders' => 'Geen verhuurbestellingen',
+    'no_rental_orders_desc' => 'U heeft nog geen verhuurbestellingen geplaatst.',
+    'understand' => 'Begrepen',
+    'close_rental_modal_title' => '🔒 Verhuur sluiten',
+    'close_rental_confirmation' => 'Weet u zeker dat u deze verhuur wilt sluiten?',
+    'close_rental_checklist_title' => 'Deze actie bevestigt dat:',
+    'close_rental_checklist' => [
+        'equipment_returned' => '• U heeft alle apparatuur teruggebracht',
+        'equipment_good_condition' => '• Apparatuur is in goede staat', 
+        'accept_inspection' => '• U accepteert admin inspectie'
+    ],
+    'users' => [
+        'title' => 'Gebruikersbeheer - Admin Dashboard',
+        'page_title' => 'Gebruikersbeheer',
+        'manage_all_users' => 'Beheer alle gebruikers',
+        'advanced_interface' => 'Geavanceerde gebruikersaccountbeheerinterface met zoeken en filters',
+        'total_users' => 'Totaal Gebruikers',
+        
+        // Messages
+        'success' => 'Succes!',
+        'error' => 'Fout!',
+        
+        // Statistiques
+        'stats' => [
+            'users' => 'Gebruikers',
+            'administrators' => 'Beheerders',
+            'deleted' => 'Verwijderd',
+            'new_30_days' => 'Nieuw (30d)',
+            'active_7_days' => 'Actief (7d)',
+        ],
+        
+        // Recherche et filtres
+        'search' => [
+            'title' => 'Geavanceerd zoeken en filters',
+            'general_search' => 'Algemeen zoeken',
+            'placeholder' => 'Naam, gebruikersnaam, email...',
+            'filter_by_role' => 'Filter op rol',
+            'all_roles' => 'Alle rollen',
+            'account_status' => 'Accountstatus',
+            'active_only' => '✅ Alleen actieve accounts',
+            'deleted_only' => '🗑️ Alleen verwijderde accounts',
+            'all_accounts' => '📋 Alle accounts',
+            'sort_by' => 'Sorteren op',
+            'order' => 'Volgorde',
+            'reset' => 'Resetten',
+            'apply_filters' => 'Filters toepassen',
+        ],
+        
+        // Options de tri
+        'sort_options' => [
+            'created_at' => '📅 Registratiedatum',
+            'name' => '🔤 Naam',
+            'username' => '👤 Gebruikersnaam',
+            'email' => '📧 Email',
+            'role' => '⚡ Rol',
+            'updated_at' => '🔄 Laatste wijziging',
+            'deleted_at' => '🗑️ Verwijderingsdatum',
+        ],
+        
+        // Ordre de tri
+        'order_options' => [
+            'desc' => '⬇️ Aflopend',
+            'asc' => '⬆️ Oplopend',
+        ],
+        
+        // Tableau
+        'table' => [
+            'user' => 'Gebruiker',
+            'email' => 'Email',
+            'role' => 'Rol',
+            'status' => 'Status',
+            'newsletter' => 'Nieuwsbrief',
+            'registration' => 'Registratie',
+            'actions' => 'Acties',
+        ],
+        
+        // Statuts
+        'status' => [
+            'deleted' => '🗑️ Verwijderd',
+            'active' => '✅ Actief',
+            'subscribed' => '📧 Geabonneerd',
+            'not_subscribed' => '❌ Niet geabonneerd',
+        ],
+        
+        // Actions
+        'actions' => [
+            'restore' => 'Herstellen',
+            'restore_confirm' => 'Weet je zeker dat je deze gebruiker wilt herstellen?',
+            'view_details' => 'Details bekijken',
+            'edit_user' => 'Gebruiker bewerken',
+            'delete_user' => 'Gebruiker verwijderen',
+            'delete_confirm' => 'Weet je zeker dat je deze gebruiker wilt verwijderen? Deze actie kan ongedaan worden gemaakt door het account te herstellen.',
+        ],
+        
+        // Messages vides
+        'empty' => [
+            'title' => 'Geen gebruikers gevonden',
+            'filtered' => 'Geen gebruikers komen overeen met je zoekcriteria.',
+            'no_users' => 'Gebruikers verschijnen hier zodra ze zich registreren.',
+        ],
+    ],
+    'close_rental_warning_title' => 'Belangrijk om te weten',
+    'close_rental_warning' => 'Deze actie kan niet ongedaan worden gemaakt en zal inspectie door administratie activeren.',
+    'confirm_close' => 'Sluiting bevestigen',
+    'payment_failed' => '💔 Mislukt',
+    'payment_refunded' => '💙 Terugbetaald',
+    'rental_period_label' => 'Verhuurperiode',
+    'items_label' => 'Artikelen', 
+    'last_update_label' => 'Laatste update',
+    
+    // Periode formaten
+    'period_from_to' => 'Van :start tot :end',
   ),
   'rental_status' => 
   array (
@@ -284,6 +440,8 @@ return array (
     'completed' => 'Voltooid',
     'cancelled' => 'Geannuleerd',
     'closed' => 'Gesloten',
+    'inspecting' => 'Inspectie bezig',
+    'finished' => 'Inspectie voltooid',
   ),
   'payment_status' => 
   array (
@@ -294,11 +452,184 @@ return array (
   ),
   'pages' => 
   array (
+    'admin' => 'Administratiepaneel',
     'our_products' => 'Onze Producten',
     'blog' => 'Blog',
     'category' => 'Categorie',
     'contact' => 'Contact',
     'rentals' => 'Verhuur',
+    'statistics' => 'Statistieken',
+    'settings' => 'Instellingen',
+    'dashboard_title' => 'Dashboard',
+    'dashboard' => 
+    array (
+      // Hoofdstatistieken
+      'stats' => 
+      array (
+        'users' => 'Gebruikers',
+        'products' => 'Producten',
+        'categories' => 'Categorieën',
+        'orders' => 'Bestellingen',
+        'blog_posts' => 'Blog Artikelen',
+        'blog_categories' => 'Blog Categorieën',
+        'comments' => 'Reacties',
+        'reports' => 'Meldingen',
+        'pending_comments' => 'in behandeling',
+        'pending_reports' => 'te verwerken',
+      ),
+      
+      // Voorraadbeheer
+      'stock' => 
+      array (
+        'title' => 'Voorraadbeheer',
+        'description' => 'Automatische monitoring en intelligent voorraadbeheer',
+        'out_of_stock' => 'uitverkocht',
+        'critical_stock' => 'kritiek',
+        'low_stock' => 'lage voorraad',
+        'all_good' => 'Alles goed',
+        'refresh' => 'Vernieuwen',
+        'manage_products' => 'Producten Beheren',
+        'sound_on' => '🔊 Geluid AAN',
+        'sound_off' => '🔇 Geluid UIT',
+        'desktop_on' => '🔔 Desktop AAN',
+        'desktop_off' => '🔕 Desktop UIT',
+        'out_of_stock_title' => 'Uitverkocht',
+        'critical_stock_title' => 'Kritieke voorraad',
+        'low_stock_title' => 'Lage voorraad',
+        'normal_stock' => 'Normale voorraad',
+        'low_stock_monitoring' => '📋 Monitoring vereist',
+        'critical_products_title' => '🚨 Producten met Kritieke Voorraad',
+        'products_count' => 'producten',
+        'no_category' => 'Geen categorie',
+        'stock_label' => 'Voorraad',
+        'threshold_label' => 'Drempel',
+        'edit_action' => 'Bewerken',
+        'restock_suggestions' => '🔄 Herbevoorradingssuggesties',
+        'restock_description' => 'Klik om automatisch aanbevolen hoeveelheden te genereren',
+        'generate_action' => 'Genereren',
+        'no_critical_stock' => 'Geen producten met kritieke voorraad',
+        'recent_alerts_title' => '📢 Recente Voorraadwaarschuwingen',
+        'last_days' => 'Laatste 7 dagen',
+        'no_recent_alerts' => 'Geen recente waarschuwingen',
+        'urgent_priority' => 'Urgent',
+        'high_priority' => 'Hoog',
+        'normal_priority' => 'Normaal',
+        'critical_stock_value' => 'Kritieke voorraadwaarde',
+        'monitoring_required' => 'Producten die aandacht vereisen',
+        'total_stock_value' => 'Totale voorraadwaarde',
+      ),
+      
+      // Analytics
+      'analytics' => 
+      array (
+        'title' => 'Bezoekersverkeer',
+        'description' => 'Site analytics',
+        'unique_visitors' => 'Unieke bezoekers',
+        'page_views' => 'Paginaweergaven',
+        'bounce_rate' => 'Bounce rate',
+        'avg_session_duration' => 'Gemiddelde duur',
+        'visitors_total' => 'Totaal bezoekers',
+        'monthly_growth' => 'deze maand',
+      ),
+      
+      // Newsletter
+      'newsletter' => 
+      array (
+        'title' => 'Nieuwsbrief',
+        'description' => 'Email prestaties',
+        'active_subscribers' => 'Actieve abonnees',
+        'emails_sent' => 'Emails verzonden',
+        'this_month' => 'Deze maand',
+        'open_rate' => 'Openingspercentage',
+        'click_rate' => 'Klikpercentage',
+        'growth_rate' => 'Groei',
+      ),
+      
+      // Verhuur
+      'rentals' => 
+      array (
+        'title' => 'Verhuur',
+        'description' => 'Verhuurprestaties',
+        'total_orders' => 'Verhuurbestellingen',
+        'monthly_revenue' => 'Verhuurinkomsten',
+        'total' => 'Totaal',
+        'active_orders' => '🟢 Actieve verhuur',
+        'closed_orders' => '🟠 Gesloten (wachtend op inspectie)',
+        'inspecting_orders' => '🔍 Inspectie bezig',
+        'finished_orders' => '✅ Inspectie voltooid',
+        'pending_returns' => '🟣 Wachtende retourzendingen',
+      ),
+      
+      // Performance
+      'performance' => 
+      array (
+        'title' => 'Site Prestaties',
+        'description' => 'Trend- en prestatiegrafieken',
+        'detailed_view' => 'Gedetailleerde weergave',
+        'visitor_evolution' => '📈 Bezoekersontwikkeling (7d)',
+        'recent_orders' => '🛒 Recente Bestellingen (7d)',
+        'newsletter_performance' => '💌 Nieuwsbrief Prestaties',
+        'total_site' => 'Totaal site',
+        'newsletter_subscribers' => 'Nieuwsbrief abonnees',
+      ),
+      
+      // Secties
+      'recent_users_title' => 'Recente gebruikers',
+      'recent_articles_title' => 'Recente artikelen',
+      'see_all' => 'Alles bekijken',
+      'no_recent_users' => 'Geen recente gebruikers.',
+      'published' => 'Gepubliceerd',
+      'draft' => 'Concept',
+      'scheduled' => 'Gepland',
+      
+      // Dagen van de week
+      'days' => 
+      array (
+        'mon' => 'Ma',
+        'tue' => 'Di',
+        'wed' => 'Wo',
+        'thu' => 'Do',
+        'fri' => 'Vr',
+        'sat' => 'Za',
+        'sun' => 'Zo',
+      ),
+      'recent' => 
+      array (
+        'users' => 'Recente Gebruikers',
+        'articles' => 'Recente Artikelen',
+        'no_users' => 'Geen recente gebruikers.',
+        'no_articles' => 'Geen recente artikelen.',
+        'view_all' => 'Bekijk Alles',
+      ),
+      'status' => 
+      array (
+        'published' => 'Gepubliceerd',
+        'draft' => 'Concept',
+        'scheduled' => 'Gepland',
+      ),
+      'quick_actions' => 'Snelle Acties',
+      'actions' => 
+      array (
+        'manage_articles' => 'Artikelen Beheren',
+        'view_all_articles' => 'Alle artikelen bekijken',
+        'manage_categories' => 'Categorieën Beheren',
+        'view_all_categories' => 'Alle categorieën bekijken',
+        'view_blog' => 'Blog Bekijken',
+        'manage_users' => 'Gebruikers Beheren',
+        'view_all_users' => 'Alle gebruikers bekijken',
+        'manage_comments' => 'Reacties Beheren',
+        'pending_comments' => 'in afwachting',
+        'all_comments' => 'Alle reacties',
+        'blog_public_page' => 'Openbare blog pagina',
+        'reports' => 'Meldingen',
+        'this_month' => 'Deze maand',
+      ),
+      'restocking' => 
+      array (
+        'suggestion_title' => 'Aanvulsuggestie',
+        'bulk_suggestions_title' => 'Bulk Aanvulsuggesties',
+      ),
+    ),
   ),
   'products' => 
   array (
@@ -353,6 +684,7 @@ return array (
     'add_to_wishlist' => 'Toevoegen aan verlanglijst',
     'in_wishlist' => 'In verlanglijst',
     'view_product' => 'Product bekijken',
+    'view_all_products' => 'Alle producten bekijken',
   ),
   'auth' => 
   array (
@@ -482,6 +814,7 @@ return array (
     'title' => 'Onze Verhuur',
     'subtitle' => 'Ontdek ons complete assortiment landbouwmachines voor verhuur',
     'hero_description' => 'Huur professionele kwaliteitsapparatuur voor uw landbouwprojecten',
+    'available_rentals' => 'Beschikbare Verhuur',
     
     // Filters en zoeken
     'filters' => 'Filters',
@@ -614,6 +947,12 @@ return array (
     'outils-agricoles' => 'Landbouwgereedschap',
     'machines' => 'Machines',
     'equipements' => 'Uitrusting',
+  ),
+  'rental_categories_descriptions' => 
+  array (
+    'outils-agricoles' => 'Verhuur van handmatige en elektrische gereedschappen voor landbouw en tuinieren. Schoppen, schoffels, snoeischaren, maaiers en nog veel meer.',
+    'machines' => 'Verhuur van lichte landbouwmachines en gemotoriseerde apparatuur. Cultivators, bosmaaiers, professionele maaiers.',
+    'equipements' => 'Landbouwuitrusting en accessoires. Kassen, zeildoeken, containers, handschoenen, kleding, irrigatiesystemen.',
   ),
   'footer' => 
   array (
@@ -1221,6 +1560,7 @@ return array (
     'product_unavailable' => 'Product niet beschikbaar',
     'added_to_cart_success' => 'Product toegevoegd aan winkelwagen!',
     'add_to_cart_error' => 'Fout bij toevoegen aan winkelwagen',
+    'quantity_label' => 'Hoeveelheid:',
   ),
   
   'buttons' => 
@@ -1442,6 +1782,89 @@ return array (
     'processing_error' => 'Fout bij verwerken betaling',
   ),
 
+  'orders' => array(
+    'my_orders' => 'Mijn Bestellingen',
+    'description' => 'Volg de status van uw bestellingen en beheer uw aankopen',
+    'filter_by_status' => 'Filteren op status',
+    'all_statuses' => 'Alle statussen',
+    'sort_by' => 'Sorteren op',
+    'sort' => array(
+      'most_recent' => 'Meest recent',
+      'oldest' => 'Oudste',
+      'amount_desc' => 'Bedrag aflopend',
+      'amount_asc' => 'Bedrag oplopend',
+    ),
+    'order_number' => 'Bestelling #:number',
+    'placed_on' => 'Geplaatst op',
+    'view_details' => 'Details bekijken',
+    'download_invoice' => 'Factuur downloaden',
+    'cancel_order' => 'Bestelling annuleren',
+    'cancel_order_confirm' => 'Weet u zeker dat u deze bestelling wilt annuleren?',
+    'request_return' => 'Retour aanvragen',
+    'expired' => 'Verlopen',
+    'other_items' => 'andere artikelen',
+    'paid' => 'Betaald',
+    'payment_pending' => 'Betaling in behandeling',
+    'no_orders' => 'Geen bestellingen',
+    'no_orders_yet' => 'U heeft nog geen bestellingen geplaatst.',
+    'no_orders_with_status' => 'Geen bestellingen gevonden met de geselecteerde status.',
+    'view_all_orders' => 'Alle bestellingen bekijken',
+    'discover_products' => 'Ontdek onze producten',
+    'timeline_processing' => 'Verwerken',
+    'non_returnable_products' => 'Niet-retourneerbare producten',
+    'non_returnable_message' => 'Deze bestelling bevat alleen niet-retourneerbare producten (bederfelijke voedingsmiddelen).',
+    'understood' => 'Begrepen',
+    'return_period_expired' => 'Retourperiode verlopen',
+    'return_period_expired_message' => 'De 14-daagse periode om deze bestelling te retourneren is verlopen.',
+    'return_reason' => 'Reden voor retour',
+    'return_reason_placeholder' => 'Beschrijf de reden voor uw retourverzoek...',
+    // Bestelling detailpagina
+    'back_to_orders' => 'Terug naar mijn bestellingen',
+    'ordered_items' => 'Bestelde artikelen',
+    'delivery_address' => 'Bezorgadres',
+    'billing_address' => 'Factuuradres',
+    'order_summary' => 'Besteloverzicht',
+    'shipping_cost' => 'Verzendkosten',
+    'free_shipping' => 'GRATIS',
+    'payment_method' => 'Methode',
+    'payment_status' => 'Status',
+    'paid_on' => 'Betaald op',
+    'actions' => 'Acties',
+    'reorder' => 'Opnieuw bestellen',
+    'tracking_number' => 'Trackingnummer',
+    'refund_processed' => 'Terugbetaling verwerkt',
+    'refund_processing' => 'Terugbetaling wordt verwerkt',
+    // Betaalmethoden
+    'payment_methods' => array(
+      'card' => '💳 Creditcard',
+      'paypal' => '💰 PayPal',
+      'bank_transfer' => '🏦 Bankoverschrijving',
+    ),
+    // Betalingsstatussen
+    'payment_statuses' => array(
+      'paid' => '✅ Betaald',
+      'pending' => '⏳ In behandeling',
+      'failed' => '❌ Mislukt',
+    ),
+    
+    // Acties en knoppen
+    'reorder_confirm' => 'Wilt u echt alle producten van deze bestelling aan uw winkelwagen toevoegen?',
+    'download_invoice' => '📄 Factuur downloaden',
+    'return_order' => '🔄 Bestelling retourneren',
+    'reorder_button' => '🔄 Opnieuw bestellen',
+    
+    // Retour modal
+    'request_return' => 'Retour aanvragen',
+    'return_reason_label' => 'Reden voor retour *',
+    'return_reason_placeholder' => 'Leg uit waarom u deze bestelling wilt retourneren...',
+    'cancel' => 'Annuleren',
+    'request_return_btn' => 'Retour aanvragen',
+    
+    // JavaScript berichten
+    'update_error' => 'Fout bij het bijwerken van status:',
+    'status_updated' => 'Status bijgewerkt:',
+  ),
+
   'admin' => array(
     'logout' => 'Uitloggen',
     'categories' => array(
@@ -1475,6 +1898,57 @@ return array (
       'no_categories_title' => 'Geen categorieën',
       'no_categories_description' => 'Begin door uw eerste categorie aan te maken.',
       'add_first_category' => 'Een categorie toevoegen',
+      'view_articles' => 'Artikelen Bekijken',
+      'search_and_filters' => 'Zoeken en Filters',
+      'search_and_filters_description' => 'Vind snel de categorieën die u zoekt',
+      'search_category_placeholder' => 'Zoek naar een categorie',
+      'category_status' => 'Categorie status',
+      'actions_title' => 'Acties',
+      'categories_count' => 'Categorieën',
+      'order_label' => 'Volgorde:',
+      'articles_label' => 'Artikelen:',
+      'articles_total' => 'Totaal Artikelen',
+      'articles_count' => 'artikelen',
+      'showing_results' => 'Toont',
+      'to_text' => 'tot',
+      'of_text' => 'van',
+      'results_text' => 'resultaten',
+      'filter_button' => 'Filteren',
+      'reset_button' => 'Resetten',
+      'all_statuses' => 'Alle statussen',
+      'active_categories' => 'Actieve categorieën',
+      'inactive_categories' => 'Inactieve categorieën',
+      'no_search_results' => 'Geen categorieën komen overeen met uw zoekcriteria.',
+      'create_first_blog_category' => 'Begin met het maken van uw eerste blogcategorie.',
+      'create_category_btn' => 'Categorie maken',
+      'create_new_category' => 'Nieuwe categorie maken',
+      'category_name_label' => 'Categorienaam *',
+      'category_name_placeholder' => 'Bijv: Tuinieren, Biologische landbouw...',
+      'description_label' => 'Beschrijving',
+      'description_placeholder' => 'Beschrijf deze categorie en de inhoud...',
+      'color_label' => 'Thematische kleur',
+      'sort_order_label' => 'Weergavevolgorde',
+      'sort_order_placeholder' => '0',
+      'is_active_label' => 'Categorie status',
+      'active_status' => 'Actieve categorie',
+      'cancel_button' => 'Annuleren',
+      'create_button' => 'Categorie maken',
+      'category_name_required' => 'Categorienaam is vereist.',
+      'error_title' => 'Fout',
+      'success_title' => 'Succes',
+      'category_created_success' => 'Categorie succesvol aangemaakt!',
+      'network_error' => 'Netwerkfout',
+      'server_error' => 'Kan geen verbinding maken met de server. Controleer uw verbinding.',
+      'active_visible_category' => 'Actieve en zichtbare categorie',
+      'creating_category' => 'Bezig met maken...',
+      'edit_category' => 'Categorie bewerken',
+      'update_button' => 'Bijwerken',
+      'updating_category' => 'Bezig met bijwerken...',
+      'delete_category' => 'Categorie verwijderen',
+      'delete_category_confirm' => 'Weet u zeker dat u deze categorie wilt verwijderen?',
+      'delete_category_warning' => 'Deze actie kan niet ongedaan worden gemaakt.',
+      'deleting_category' => 'Bezig met verwijderen...',
+      'form_error' => 'Fout bij het maken van categorie. Controleer console voor meer details.',
       'filter_all' => 'Alle',
       'filter_active' => 'Actief',
       'filter_inactive' => 'Inactief',

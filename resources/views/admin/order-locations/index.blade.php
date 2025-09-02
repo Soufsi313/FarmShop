@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Gestion des Commandes de Location')
+@section('title', __('order_locations.title'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -13,15 +13,15 @@
                         <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        Gestion des Commandes de Location
+                        {{ __('order_locations.title') }}
                     </h1>
                     <p class="mt-2 text-orange-100">
-                        Interface complète de gestion des locations avec suivi et inspection
+                        {{ __('order_locations.subtitle') }}
                     </p>
                 </div>
                 <div class="text-right">
                     <div class="text-2xl font-bold">{{ $orders->total() }}</div>
-                    <div class="text-orange-100">Locations totales</div>
+                    <div class="text-orange-100">{{ __('order_locations.total_rentals') }}</div>
                 </div>
             </div>
         </div>
@@ -38,7 +38,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-orange-600">{{ $stats['pending_orders'] ?? 0 }}</div>
-                    <div class="text-sm text-orange-700">En attente</div>
+                    <div class="text-sm text-orange-700">{{ __('order_locations.pending_orders') }}</div>
                 </div>
             </div>
         </div>
@@ -52,7 +52,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-green-600">{{ $stats['active_rentals'] ?? 0 }}</div>
-                    <div class="text-sm text-green-700">Locations actives</div>
+                    <div class="text-sm text-green-700">{{ __('order_locations.active_rentals') }}</div>
                 </div>
             </div>
         </div>
@@ -66,7 +66,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-blue-600">{{ $stats['pending_returns'] ?? 0 }}</div>
-                    <div class="text-sm text-blue-700">Retours attendus</div>
+                    <div class="text-sm text-blue-700">{{ __('order_locations.pending_returns') }}</div>
                 </div>
             </div>
         </div>
@@ -80,7 +80,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-purple-600">{{ $stats['total_orders'] ?? 0 }}</div>
-                    <div class="text-sm text-purple-700">Total locations</div>
+                    <div class="text-sm text-purple-700">{{ __('order_locations.total_orders') }}</div>
                 </div>
             </div>
         </div>
@@ -97,7 +97,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-yellow-600">{{ number_format($stats['revenue_month'] ?? 0, 0) }}€</div>
-                    <div class="text-sm text-yellow-700">Revenus ce mois</div>
+                    <div class="text-sm text-yellow-700">{{ __('order_locations.revenue_month') }}</div>
                 </div>
             </div>
         </div>
@@ -111,7 +111,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-emerald-600">{{ number_format($stats['revenue_year'] ?? 0, 0) }}€</div>
-                    <div class="text-sm text-emerald-700">Revenus cette année</div>
+                    <div class="text-sm text-emerald-700">{{ __('order_locations.revenue_year') }}</div>
                 </div>
             </div>
         </div>
@@ -125,7 +125,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-amber-600">{{ number_format($stats['deposits_held'] ?? 0, 0) }}€</div>
-                    <div class="text-sm text-amber-700">Dépôts bloqués</div>
+                    <div class="text-sm text-amber-700">{{ __('order_locations.deposits_held') }}</div>
                 </div>
             </div>
         </div>
@@ -138,10 +138,10 @@
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
-                Recherche & Filtres
+                {{ __('order_locations.search_filters') }}
             </h3>
             <button @click="showFilters = !showFilters" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                <span x-text="showFilters ? 'Masquer les filtres' : 'Afficher les filtres'"></span>
+                <span x-text="showFilters ? '{{ __('order_locations.hide_filters') }}' : '{{ __('order_locations.show_filters') }}'"></span>
             </button>
         </div>
 
@@ -149,36 +149,36 @@
             <!-- Recherche rapide -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Recherche rapide</label>
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">{{ __('order_locations.quick_search') }}</label>
                     <input type="text" id="search" name="search" value="{{ request('search') }}" 
-                           placeholder="Numéro de commande, nom client, email..."
+                           placeholder="{{ __('order_locations.search_placeholder') }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                 </div>
                 
                 <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">{{ __('order_locations.status') }}</label>
                     <select id="status" name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                        <option value="">Tous les statuts</option>
-                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>En attente</option>
-                        <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmée</option>
-                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>En cours</option>
-                        <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Terminée</option>
-                        <option value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>Fermée</option>
-                        <option value="inspecting" {{ request('status') === 'inspecting' ? 'selected' : '' }}>Inspection</option>
-                        <option value="finished" {{ request('status') === 'finished' ? 'selected' : '' }}>Finalisée</option>
-                        <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Annulée</option>
+                        <option value="">{{ __('order_locations.all_statuses') }}</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>{{ __('order_locations.status_pending') }}</option>
+                        <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>{{ __('order_locations.status_confirmed') }}</option>
+                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>{{ __('order_locations.status_active') }}</option>
+                        <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>{{ __('order_locations.status_completed') }}</option>
+                        <option value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>{{ __('order_locations.status_closed') }}</option>
+                        <option value="inspecting" {{ request('status') === 'inspecting' ? 'selected' : '' }}>{{ __('order_locations.status_inspecting') }}</option>
+                        <option value="finished" {{ request('status') === 'finished' ? 'selected' : '' }}>{{ __('order_locations.status_finished') }}</option>
+                        <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>{{ __('order_locations.status_cancelled') }}</option>
                     </select>
                 </div>
 
                 <div>
-                    <label for="sort_by" class="block text-sm font-medium text-gray-700 mb-1">Trier par</label>
+                    <label for="sort_by" class="block text-sm font-medium text-gray-700 mb-1">{{ __('order_locations.sort_by') }}</label>
                     <select id="sort_by" name="sort_by" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                        <option value="recent" {{ request('sort_by') === 'recent' ? 'selected' : '' }}>Plus récentes</option>
-                        <option value="oldest" {{ request('sort_by') === 'oldest' ? 'selected' : '' }}>Plus anciennes</option>
-                        <option value="start_date" {{ request('sort_by') === 'start_date' ? 'selected' : '' }}>Date de début</option>
-                        <option value="end_date" {{ request('sort_by') === 'end_date' ? 'selected' : '' }}>Date de fin</option>
-                        <option value="total_desc" {{ request('sort_by') === 'total_desc' ? 'selected' : '' }}>Montant décroissant</option>
-                        <option value="total_asc" {{ request('sort_by') === 'total_asc' ? 'selected' : '' }}>Montant croissant</option>
+                        <option value="recent" {{ request('sort_by') === 'recent' ? 'selected' : '' }}>{{ __('order_locations.sort_recent') }}</option>
+                        <option value="oldest" {{ request('sort_by') === 'oldest' ? 'selected' : '' }}>{{ __('order_locations.sort_oldest') }}</option>
+                        <option value="start_date" {{ request('sort_by') === 'start_date' ? 'selected' : '' }}>{{ __('order_locations.sort_start_date') }}</option>
+                        <option value="end_date" {{ request('sort_by') === 'end_date' ? 'selected' : '' }}>{{ __('order_locations.sort_end_date') }}</option>
+                        <option value="total_desc" {{ request('sort_by') === 'total_desc' ? 'selected' : '' }}>{{ __('order_locations.sort_total_desc') }}</option>
+                        <option value="total_asc" {{ request('sort_by') === 'total_asc' ? 'selected' : '' }}>{{ __('order_locations.sort_total_asc') }}</option>
                     </select>
                 </div>
             </div>
@@ -186,25 +186,25 @@
             <!-- Filtres avancés -->
             <div x-show="showFilters" x-transition class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
                 <div>
-                    <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">Date création (de)</label>
+                    <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">{{ __('order_locations.date_from') }}</label>
                     <input type="date" id="date_from" name="date_from" value="{{ request('date_from') }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                 </div>
 
                 <div>
-                    <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1">Date création (à)</label>
+                    <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1">{{ __('order_locations.date_to') }}</label>
                     <input type="date" id="date_to" name="date_to" value="{{ request('date_to') }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                 </div>
 
                 <div>
-                    <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Début location (après)</label>
+                    <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">{{ __('order_locations.start_date_from') }}</label>
                     <input type="date" id="start_date" name="start_date" value="{{ request('start_date') }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                 </div>
 
                 <div>
-                    <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">Fin location (avant)</label>
+                    <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">{{ __('order_locations.start_date_to') }}</label>
                     <input type="date" id="end_date" name="end_date" value="{{ request('end_date') }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                 </div>
@@ -212,10 +212,10 @@
 
             <div class="flex items-center space-x-3">
                 <button type="submit" class="px-6 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors">
-                    🔍 Rechercher
+                    🔍 {{ __('order_locations.search_button') }}
                 </button>
                 <a href="{{ route('admin.order-locations.index') }}" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
-                    🔄 Réinitialiser
+                    🔄 {{ __('order_locations.reset_filters') }}
                 </a>
                 <a href="{{ route('admin.order-locations.export', request()->all()) }}" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors">
                     📊 Exporter CSV
@@ -230,12 +230,12 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commande</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Période</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('order_locations.order_number') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('order_locations.customer') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('order_locations.rental_period') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('order_locations.amount') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('order_locations.status') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('order_locations.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -243,20 +243,20 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900">{{ $order->order_number }}</div>
-                            <div class="text-sm text-gray-500">{{ $order->orderItemLocations->count() }} produit(s)</div>
+                            <div class="text-sm text-gray-500">{{ $order->orderItemLocations->count() }} {{ __('order_locations.product') }}(s)</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900">{{ $order->user->name }}</div>
                             <div class="text-sm text-gray-500">{{ $order->user->email }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <div><strong>Début:</strong> {{ $order->start_date->format('d/m/Y') }}</div>
-                            <div><strong>Fin:</strong> {{ $order->end_date->format('d/m/Y') }}</div>
-                            <div class="text-gray-500">{{ $order->rental_days }} jour(s)</div>
+                            <div><strong>{{ __('order_locations.from') }}:</strong> {{ $order->start_date->format('d/m/Y') }}</div>
+                            <div><strong>{{ __('order_locations.to') }}:</strong> {{ $order->end_date->format('d/m/Y') }}</div>
+                            <div class="text-gray-500">{{ $order->rental_days }} {{ __('order_locations.duration') }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             <div><strong>Total:</strong> {{ number_format($order->total_amount, 2) }}€</div>
-                            <div class="text-gray-500">Dépôt: {{ number_format($order->calculated_deposit_amount, 2) }}€</div>
+                            <div class="text-gray-500">{{ __('order_locations.deposit') }}: {{ number_format($order->calculated_deposit_amount, 2) }}€</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @php
@@ -271,14 +271,14 @@
                                     'cancelled' => 'bg-red-100 text-red-800'
                                 ];
                                 $statusLabels = [
-                                    'pending' => 'En attente',
-                                    'confirmed' => 'Confirmée',
-                                    'active' => 'Active',
-                                    'completed' => 'Terminée',
-                                    'closed' => 'Fermée',
-                                    'inspecting' => 'Inspection',
-                                    'finished' => 'Finalisée',
-                                    'cancelled' => 'Annulée'
+                                    'pending' => __('order_locations.status_pending'),
+                                    'confirmed' => __('order_locations.status_confirmed'),
+                                    'active' => __('order_locations.status_active'),
+                                    'completed' => __('order_locations.status_completed'),
+                                    'closed' => __('order_locations.status_closed'),
+                                    'inspecting' => __('order_locations.status_inspecting'),
+                                    'finished' => __('order_locations.status_finished'),
+                                    'cancelled' => __('order_locations.status_cancelled')
                                 ];
                             @endphp
                             <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $statusColors[$order->status] ?? 'bg-gray-100 text-gray-800' }}">
@@ -290,7 +290,7 @@
                                 <!-- Bouton Voir avec icône œil -->
                                 <a href="{{ route('admin.order-locations.show', $order) }}" 
                                    class="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition duration-200"
-                                   title="Voir les détails">
+                                   title="{{ __('order_locations.view_details') }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -301,7 +301,7 @@
                                 <!-- Bouton Confirmer avec icône check -->
                                 <button onclick="updateStatus({{ $order->id }}, 'confirmed')" 
                                         class="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition duration-200"
-                                        title="Confirmer la commande">
+                                        title="{{ __('order_locations.confirm_order') }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
@@ -312,7 +312,7 @@
                                 <!-- Bouton Clôturer pour les locations terminées (non inspectées) -->
                                 <button onclick="updateStatus({{ $order->id }}, 'closed')" 
                                         class="inline-flex items-center px-3 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition duration-200"
-                                        title="Clôturer la location">
+                                        title="{{ __('order_locations.close_rental') }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
@@ -320,20 +320,20 @@
                                 @elseif($order->status === 'completed' && $order->inspection_status === 'completed')
                                 <!-- Message pour les locations déjà inspectées -->
                                 <span class="inline-flex items-center px-3 py-2 bg-green-100 text-green-800 text-sm font-medium rounded-md"
-                                      title="Inspection terminée">
+                                      title="{{ __('order_locations.inspection_completed') }}">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
-                                    Inspection terminée
+                                    {{ __('order_locations.inspection_completed') }}
                                 </span>
                                 @elseif($order->status === 'finished')
                                 <!-- Message pour les locations complètement terminées -->
                                 <span class="inline-flex items-center px-3 py-2 bg-gray-100 text-gray-800 text-sm font-medium rounded-md"
-                                      title="Location terminée">
+                                      title="{{ __('order_locations.rental_finished') }}">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
-                                    Terminée
+                                    {{ __('order_locations.rental_finished') }}
                                 </span>
                                 @endif
                                 
@@ -341,7 +341,7 @@
                                 <!-- Bouton Retour avec icône -->
                                 <a href="{{ route('admin.rental-returns.show', $order) }}" 
                                    class="inline-flex items-center px-3 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700 transition duration-200"
-                                   title="Gérer le retour">
+                                   title="{{ __('order_locations.manage_return') }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                     </svg>
@@ -350,9 +350,9 @@
                                 
                                 @if(!in_array($order->status, ['finished', 'cancelled']))
                                 <!-- Bouton Annuler - Admin peut annuler même les locations actives -->
-                                <button onclick="if(confirm('Confirmer l\'annulation ? Cette action est irréversible.')) updateStatus({{ $order->id }}, 'cancelled')" 
+                                <button onclick="if(confirm('{{ __('order_locations.confirm_cancel') }}')) updateStatus({{ $order->id }}, 'cancelled')" 
                                         class="inline-flex items-center px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition duration-200"
-                                        title="Annuler la commande">
+                                        title="{{ __('order_locations.cancel_order') }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -367,8 +367,8 @@
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
-                            <p class="mt-4 text-lg font-medium">Aucune commande trouvée</p>
-                            <p class="mt-2">Aucune commande ne correspond aux critères de recherche.</p>
+                            <p class="mt-4 text-lg font-medium">{{ __('order_locations.no_orders_found') }}</p>
+                            <p class="mt-2">{{ __('order_locations.no_orders_match_criteria') }}</p>
                         </td>
                     </tr>
                     @endforelse
@@ -407,12 +407,12 @@ function updateStatus(orderId, status) {
         if (data.success) {
             location.reload();
         } else {
-            alert('Erreur lors de la mise à jour du statut: ' + (data.message || 'Erreur inconnue'));
+            alert('{{ __("order_locations.status_update_error") }}: ' + (data.message || '{{ __("order_locations.unknown_error") }}'));
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Erreur lors de la mise à jour du statut: ' + error.message);
+        alert('{{ __("order_locations.status_update_error") }}: ' + error.message);
     });
 }
 </script>

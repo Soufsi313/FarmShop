@@ -1287,8 +1287,12 @@ class DashboardController extends Controller
         try {
             \App\Models\Message::createSystemMessage(
                 Auth::id() ?: 1, // Utiliser l'ID de l'utilisateur connecté ou 1 par défaut
-                "✅ Réapprovisionnement effectué",
-                "Le produit \"{$product->name}\" a été réapprovisionné. Quantité ajoutée: {$request->quantity}. Nouveau stock: {$newQuantity}.",
+                "✅ " . __('stock.restock_system_messages.restock_completed_title'),
+                __('stock.restock_system_messages.restock_completed_message', [
+                    'product' => $product->name,
+                    'quantity' => $request->quantity,
+                    'new_stock' => $newQuantity
+                ]),
                 [
                     'product_id' => $product->id,
                     'quantity_added' => $request->quantity,
@@ -1338,8 +1342,12 @@ class DashboardController extends Controller
                 // Créer une alerte pour chaque produit réapprovisionné
                 \App\Models\Message::createSystemMessage(
                     1, // ID admin (à adapter)
-                    "🔄 Réapprovisionnement automatique",
-                    "Le produit \"{$product->name}\" a été réapprovisionné automatiquement. Quantité ajoutée: {$suggestion->quantity_to_order}. Nouveau stock: {$newQuantity}.",
+                    "🔄 " . __('stock.restock_system_messages.auto_restock_title'),
+                    __('stock.restock_system_messages.auto_restock_message', [
+                        'product' => $product->name,
+                        'quantity' => $suggestion->quantity_to_order,
+                        'new_stock' => $newQuantity
+                    ]),
                     [
                         'product_id' => $product->id,
                         'quantity_added' => $suggestion->quantity_to_order,
@@ -1436,8 +1444,12 @@ class DashboardController extends Controller
                 // Créer un message pour chaque produit
                 \App\Models\Message::createSystemMessage(
                     1, // ID admin
-                    "🔄 Réapprovisionnement en masse",
-                    "Le produit \"{$product->name}\" a été réapprovisionné. Quantité ajoutée: {$quantity}. Nouveau stock: {$newQuantity}.",
+                    "🔄 " . __('stock.restock_system_messages.bulk_restock_title'),
+                    __('stock.restock_system_messages.bulk_restock_message', [
+                        'product' => $product->name,
+                        'quantity' => $quantity,
+                        'new_stock' => $newQuantity
+                    ]),
                     [
                         'product_id' => $product->id,
                         'quantity_added' => $quantity,

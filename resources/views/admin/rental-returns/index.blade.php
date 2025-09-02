@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Gestion des Retours de Location')
+@section('title', __('rental_returns.management_title'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -13,15 +13,15 @@
                         <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
-                        Gestion des Retours de Location
+                        {{ __('rental_returns.management_title') }}
                     </h1>
                     <p class="mt-2 text-purple-100">
-                        Gérez les retours, inspections et remboursements de caution
+                        {{ __('rental_returns.management_subtitle') }}
                     </p>
                 </div>
                 <div class="text-right">
                     <div class="text-2xl font-bold">{{ $orderLocations->total() }}</div>
-                    <div class="text-purple-100">Retours totaux</div>
+                    <div class="text-purple-100">{{ __('rental_returns.total_returns') }}</div>
                 </div>
             </div>
         </div>
@@ -38,7 +38,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-yellow-600">{{ $stats['pending_inspection'] ?? 0 }}</div>
-                    <div class="text-sm text-yellow-700">En attente d'inspection</div>
+                    <div class="text-sm text-yellow-700">{{ __('rental_returns.pending_inspection') }}</div>
                 </div>
             </div>
         </div>
@@ -52,7 +52,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-blue-600">{{ $stats['in_inspection'] ?? 0 }}</div>
-                    <div class="text-sm text-blue-700">En cours d'inspection</div>
+                    <div class="text-sm text-blue-700">{{ __('rental_returns.in_inspection') }}</div>
                 </div>
             </div>
         </div>
@@ -66,7 +66,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-green-600">{{ $stats['completed_inspection'] ?? 0 }}</div>
-                    <div class="text-sm text-green-700">Inspections terminées</div>
+                    <div class="text-sm text-green-700">{{ __('rental_returns.completed_inspection') }}</div>
                 </div>
             </div>
         </div>
@@ -80,7 +80,7 @@
                 </div>
                 <div class="ml-4">
                     <div class="text-2xl font-bold text-red-600">{{ $stats['overdue_returns'] ?? 0 }}</div>
-                    <div class="text-sm text-red-700">Retours en retard</div>
+                    <div class="text-sm text-red-700">{{ __('rental_returns.overdue_returns') }}</div>
                 </div>
             </div>
         </div>
@@ -96,7 +96,7 @@
                         <input type="text" 
                                name="search" 
                                value="{{ request('search') }}"
-                               placeholder="Rechercher par numéro de commande, nom ou email du client..."
+                               placeholder="{{ __('rental_returns.search_placeholder') }}"
                                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,10 +110,10 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
-                        Rechercher
+                        {{ __('rental_returns.filter') }}
                     </button>
                     <a href="{{ route('admin.rental-returns.index') }}" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition duration-200">
-                        Réinitialiser
+                        {{ __('rental_returns.reset') }}
                     </a>
                 </div>
             </div>
@@ -132,17 +132,17 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Statut d'inspection</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('rental_returns.inspection_status_label') }}</label>
                     <select name="inspection_status" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-purple-500 focus:border-purple-500">
-                        <option value="">Tous</option>
-                        <option value="pending" {{ request('inspection_status') == 'pending' ? 'selected' : '' }}>En attente</option>
-                        <option value="in_progress" {{ request('inspection_status') == 'in_progress' ? 'selected' : '' }}>En cours</option>
-                        <option value="completed" {{ request('inspection_status') == 'completed' ? 'selected' : '' }}>Terminée</option>
+                        <option value="">{{ __('rental_returns.all') }}</option>
+                        <option value="pending" {{ request('inspection_status') == 'pending' ? 'selected' : '' }}>{{ __('rental_returns.pending') }}</option>
+                        <option value="in_progress" {{ request('inspection_status') == 'in_progress' ? 'selected' : '' }}>{{ __('rental_returns.in_progress') }}</option>
+                        <option value="completed" {{ request('inspection_status') == 'completed' ? 'selected' : '' }}>{{ __('rental_returns.completed') }}</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Date retour (de)</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('rental_returns.return_date_from') }}</label>
                     <input type="date" 
                            name="return_date_from" 
                            value="{{ request('return_date_from') }}"
@@ -150,7 +150,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Date retour (à)</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('rental_returns.return_date_to') }}</label>
                     <input type="date" 
                            name="return_date_to" 
                            value="{{ request('return_date_to') }}"
@@ -167,13 +167,16 @@
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
-                Exporter CSV
+                {{ __('rental_returns.export_csv') }}
             </button>
         </div>
         
         <div class="text-sm text-gray-600">
-            Affichage de {{ $orderLocations->firstItem() ?? 0 }} à {{ $orderLocations->lastItem() ?? 0 }} 
-            sur {{ $orderLocations->total() }} retours
+            {{ __('rental_returns.showing_results', [
+                'first' => $orderLocations->firstItem() ?? 0,
+                'last' => $orderLocations->lastItem() ?? 0,
+                'total' => $orderLocations->total()
+            ]) }}
         </div>
     </div>
 
@@ -183,13 +186,13 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commande</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inspection</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montants</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('rental_returns.order') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('rental_returns.client') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('rental_returns.dates') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('rental_returns.status') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('rental_returns.inspection') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('rental_returns.amounts') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('rental_returns.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -197,16 +200,16 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900">{{ $orderLocation->order_number }}</div>
-                            <div class="text-sm text-gray-500">{{ $orderLocation->orderItemLocations->count() }} produit(s)</div>
+                            <div class="text-sm text-gray-500">{{ __('rental_returns.products_count', ['count' => $orderLocation->orderItemLocations->count()]) }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900">{{ $orderLocation->user->name }}</div>
                             <div class="text-sm text-gray-500">{{ $orderLocation->user->email }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <div><strong>Fin:</strong> {{ $orderLocation->end_date->format('d/m/Y') }}</div>
+                            <div><strong>{{ __('rental_returns.end_date_label') }}:</strong> {{ $orderLocation->end_date->format('d/m/Y') }}</div>
                             @if($orderLocation->actual_return_date)
-                            <div class="text-green-600"><strong>Retour:</strong> {{ $orderLocation->actual_return_date->format('d/m/Y') }}</div>
+                            <div class="text-green-600"><strong>{{ __('rental_returns.return_date_label') }}:</strong> {{ $orderLocation->actual_return_date->format('d/m/Y') }}</div>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -218,10 +221,10 @@
                                     'finished' => 'bg-green-100 text-green-800'
                                 ];
                                 $statusLabels = [
-                                    'completed' => 'Terminé',
-                                    'closed' => 'Retourné',
-                                    'inspecting' => 'Inspection',
-                                    'finished' => 'Finalisé'
+                                    'completed' => __('rental_returns.status_completed'),
+                                    'closed' => __('rental_returns.status_closed'),
+                                    'inspecting' => __('rental_returns.status_inspecting'),
+                                    'finished' => __('rental_returns.status_finished')
                                 ];
                             @endphp
                             <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $statusColors[$orderLocation->status] ?? 'bg-gray-100 text-gray-800' }}">
@@ -237,9 +240,9 @@
                                         'completed' => 'bg-green-100 text-green-800'
                                     ];
                                     $inspectionLabels = [
-                                        'pending' => 'En attente',
-                                        'in_progress' => 'En cours',
-                                        'completed' => 'Terminée'
+                                        'pending' => __('rental_returns.pending'),
+                                        'in_progress' => __('rental_returns.in_progress'),
+                                        'completed' => __('rental_returns.completed')
                                     ];
                                 @endphp
                                 <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $inspectionColors[$orderLocation->inspection_status] ?? 'bg-gray-100 text-gray-800' }}">
@@ -250,19 +253,19 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <div><strong>Dépôt:</strong> {{ number_format($orderLocation->deposit_amount, 2) }}€</div>
+                            <div><strong>{{ __('rental_returns.deposit_label') }}:</strong> {{ number_format($orderLocation->deposit_amount, 2) }}€</div>
                             @if($orderLocation->penalty_amount > 0)
-                            <div class="text-red-600"><strong>Pénalités:</strong> {{ number_format($orderLocation->penalty_amount, 2) }}€</div>
+                            <div class="text-red-600"><strong>{{ __('rental_returns.penalties_label') }}:</strong> {{ number_format($orderLocation->penalty_amount, 2) }}€</div>
                             @endif
                             @if($orderLocation->deposit_refund !== null)
-                            <div class="text-green-600"><strong>Remboursement:</strong> {{ number_format($orderLocation->deposit_refund, 2) }}€</div>
+                            <div class="text-green-600"><strong>{{ __('rental_returns.refund_label') }}:</strong> {{ number_format($orderLocation->deposit_refund, 2) }}€</div>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div class="flex gap-3">
                                 <a href="{{ route('admin.rental-returns.show', $orderLocation) }}" 
                                    class="text-blue-600 hover:text-blue-800 transition-colors"
-                                   title="Voir les détails">
+                                   title="{{ __('rental_returns.view_details') }}">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -274,7 +277,7 @@
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="text-green-600 hover:text-green-800 transition-colors"
-                                            title="Confirmer le retour">
+                                            title="{{ __('rental_returns.confirm_return') }}">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/>
                                         </svg>
@@ -287,7 +290,7 @@
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="text-purple-600 hover:text-purple-800 transition-colors"
-                                            title="Démarrer l'inspection">
+                                            title="{{ __('rental_returns.start_inspection') }}">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -304,8 +307,8 @@
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
-                            <p class="mt-4 text-lg font-medium">Aucun retour trouvé</p>
-                            <p class="mt-2">Aucun retour ne correspond aux critères de recherche.</p>
+                            <p class="mt-4 text-lg font-medium">{{ __('rental_returns.no_returns_found') }}</p>
+                            <p class="mt-2">{{ __('rental_returns.no_returns_match_criteria') }}</p>
                         </td>
                     </tr>
                     @endforelse

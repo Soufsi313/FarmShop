@@ -1,24 +1,24 @@
 @extends('layouts.admin')
 
-@section('title', 'Rapports & Analyses - Gestion de Stock')
-@section('page-title', 'Rapports & Analyses')
+@section('title', __('stock.reports_title') . ' - ' . __('stock.title'))
+@section('page-title', __('stock.reports_title'))
 
 @section('content')
 <div class="space-y-6" x-data="stockReports">
     <!-- En-tête -->
     <div class="flex justify-between items-center">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">📊 Rapports & Analyses de Stock</h1>
-            <p class="text-gray-600">Analyses détaillées et prévisions de votre inventaire</p>
+            <h1 class="text-3xl font-bold text-gray-900">📊 {{ __('stock.reports_title') }}</h1>
+            <p class="text-gray-600">{{ __('stock.reports_subtitle') }}</p>
         </div>
         <div class="flex space-x-3">
             <a href="{{ route('admin.stock.index') }}" 
                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
-                ← Retour
+                ← {{ __('stock.back_button') }}
             </a>
             <button @click="exportReport()" 
                     class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
-                📁 Exporter Rapport
+                📁 {{ __('stock.export_report_button') }}
             </button>
         </div>
     </div>
@@ -27,7 +27,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Graphique en barres - Stock par catégorie -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">📈 Répartition du Stock par Catégorie</h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">📈 {{ __('stock.category_stock_chart_title') }}</h3>
             <div class="h-64">
                 <canvas id="categoryStockChart"></canvas>
             </div>
@@ -35,7 +35,7 @@
 
         <!-- Graphique en secteurs - Statut du stock -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">🥧 Répartition par Statut de Stock</h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">🥧 {{ __('stock.stock_status_chart_title') }}</h3>
             <div class="h-64">
                 <canvas id="stockStatusChart"></canvas>
             </div>
@@ -45,22 +45,22 @@
     <!-- Top des produits -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-lg font-semibold text-gray-900">🏆 Top 10 des Produits les Plus Populaires</h3>
+            <h3 class="text-lg font-semibold text-gray-900">🏆 {{ __('stock.top_products_title') }}</h3>
             <div class="flex space-x-2">
                 <button @click="sortBy = 'views'; updateTopProducts()" 
                         :class="sortBy === 'views' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
                         class="px-3 py-1 rounded text-sm transition-colors">
-                    Vues
+                    {{ __('stock.sort_by_views') }}
                 </button>
                 <button @click="sortBy = 'likes'; updateTopProducts()" 
                         :class="sortBy === 'likes' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
                         class="px-3 py-1 rounded text-sm transition-colors">
-                    Likes
+                    {{ __('stock.sort_by_likes') }}
                 </button>
                 <button @click="sortBy = 'stock_value'; updateTopProducts()" 
                         :class="sortBy === 'stock_value' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
                         class="px-3 py-1 rounded text-sm transition-colors">
-                    Valeur
+                    {{ __('stock.sort_by_value') }}
                 </button>
             </div>
         </div>
@@ -69,14 +69,14 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catégorie</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vues</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Likes</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valeur Stock</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('stock.product_header') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('stock.category_header') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('stock.stock_header') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('stock.price_header') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('stock.views_header') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('stock.likes_header') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('stock.stock_value_header') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('stock.status_header') }}</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -133,19 +133,19 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($product->quantity == 0)
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                        Rupture
+                                        {{ __('stock.status_outage') }}
                                     </span>
                                 @elseif($product->quantity <= $product->critical_threshold)
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                                        Critique
+                                        {{ __('stock.status_critical') }}
                                     </span>
                                 @elseif($product->low_stock_threshold && $product->quantity <= $product->low_stock_threshold)
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                        Bas
+                                        {{ __('stock.status_low') }}
                                     </span>
                                 @else
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Normal
+                                        {{ __('stock.status_normal') }}
                                     </span>
                                 @endif
                             </td>
@@ -158,7 +158,7 @@
 
     <!-- Prévisions de stock -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-6">🔮 Prévisions de Rupture de Stock</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-6">🔮 {{ __('stock.stock_forecasts_title') }}</h3>
         
         @if(count($stockForecasts) > 0)
             <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -169,27 +169,27 @@
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
                                 <h4 class="font-medium text-gray-900">{{ $forecast['product']->name }}</h4>
-                                <p class="text-sm text-gray-600">{{ $forecast['product']->category->name ?? 'Sans catégorie' }}</p>
+                                <p class="text-sm text-gray-600">{{ $forecast['product']->category->name ?? __('stock.no_category') }}</p>
                                 
                                 <div class="mt-3 space-y-2 text-sm">
                                     <div class="flex justify-between">
-                                        <span class="text-gray-500">Stock actuel:</span>
+                                        <span class="text-gray-500">{{ __('stock.current_stock') }}:</span>
                                         <span class="font-medium">{{ $forecast['product']->quantity }}</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-500">Ventes mensuelles:</span>
+                                        <span class="text-gray-500">{{ __('stock.monthly_sales') }}:</span>
                                         <span class="font-medium">{{ $forecast['monthly_sales'] }}</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-500">Jours restants:</span>
+                                        <span class="text-gray-500">{{ __('stock.days_remaining') }}:</span>
                                         <span class="font-medium 
                                               {{ $forecast['days_remaining'] <= 7 ? 'text-red-600' : 
                                                  ($forecast['days_remaining'] <= 14 ? 'text-orange-600' : 'text-yellow-600') }}">
-                                            {{ $forecast['days_remaining'] > 0 ? $forecast['days_remaining'] . ' jours' : 'Épuisé' }}
+                                            {{ $forecast['days_remaining'] > 0 ? $forecast['days_remaining'] . ' ' . __('stock.days_unit') : __('stock.exhausted') }}
                                         </span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-500">Rupture prévue:</span>
+                                        <span class="text-gray-500">{{ __('stock.estimated_outage_date') }}:</span>
                                         <span class="font-medium">{{ $forecast['estimated_outage_date'] }}</span>
                                     </div>
                                 </div>
@@ -202,21 +202,21 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
                                         </svg>
                                     </div>
-                                    <span class="text-xs font-medium text-red-600">URGENT</span>
+                                    <span class="text-xs font-medium text-red-600">{{ __('stock.urgent_priority') }}</span>
                                 @elseif($forecast['days_remaining'] <= 14)
                                     <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center mb-2">
                                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                     </div>
-                                    <span class="text-xs font-medium text-orange-600">BIENTÔT</span>
+                                    <span class="text-xs font-medium text-orange-600">{{ __('stock.soon_priority') }}</span>
                                 @else
                                     <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-2">
                                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"/>
                                         </svg>
                                     </div>
-                                    <span class="text-xs font-medium text-yellow-600">ATTENTION</span>
+                                    <span class="text-xs font-medium text-yellow-600">{{ __('stock.attention_priority') }}</span>
                                 @endif
                             </div>
                         </div>
@@ -224,7 +224,7 @@
                         <div class="mt-4 pt-3 border-t border-gray-200">
                             <a href="{{ route('admin.products.edit', $forecast['product']) }}" 
                                class="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors text-center block">
-                                Gérer ce produit
+                                {{ __('stock.manage_product_button') }}
                             </a>
                         </div>
                     </div>
@@ -235,15 +235,15 @@
                 <svg class="mx-auto h-12 w-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-green-600">Aucune rupture prévue !</h3>
-                <p class="mt-1 text-sm text-gray-500">Vos stocks sont bien gérés.</p>
+                <h3 class="mt-2 text-sm font-medium text-green-600">{{ __('stock.no_forecasts_title') }}</h3>
+                <p class="mt-1 text-sm text-gray-500">{{ __('stock.no_forecasts_message') }}</p>
             </div>
         @endif
     </div>
 
     <!-- Actions d'export -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">📁 Exports et Rapports</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">📁 {{ __('stock.exports_reports_title') }}</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <button @click="exportStockData()" 
                     class="flex items-center justify-center p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
@@ -253,8 +253,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                     </div>
-                    <span class="text-sm font-medium text-gray-900">Export Excel</span>
-                    <p class="text-xs text-gray-500 mt-1">Données complètes</p>
+                    <span class="text-sm font-medium text-gray-900">{{ __('stock.export_excel_title') }}</span>
+                    <p class="text-xs text-gray-500 mt-1">{{ __('stock.export_excel_desc') }}</p>
                 </div>
             </button>
 
@@ -266,8 +266,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                         </svg>
                     </div>
-                    <span class="text-sm font-medium text-gray-900">Rapport PDF</span>
-                    <p class="text-xs text-gray-500 mt-1">Synthèse hebdomadaire</p>
+                    <span class="text-sm font-medium text-gray-900">{{ __('stock.pdf_report_title') }}</span>
+                    <p class="text-xs text-gray-500 mt-1">{{ __('stock.pdf_report_desc') }}</p>
                 </div>
             </button>
 
@@ -279,8 +279,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
-                    <span class="text-sm font-medium text-gray-900">Planifier</span>
-                    <p class="text-xs text-gray-500 mt-1">Rapports automatiques</p>
+                    <span class="text-sm font-medium text-gray-900">{{ __('stock.schedule_title') }}</span>
+                    <p class="text-xs text-gray-500 mt-1">{{ __('stock.schedule_desc') }}</p>
                 </div>
             </button>
         </div>
@@ -305,19 +305,19 @@ document.addEventListener('alpine:init', () => {
                 data: {
                     labels: {!! json_encode($chartData['categories']) !!},
                     datasets: [{
-                        label: 'Stock Normal',
+                        label: @json(__('stock.stock_normal')),
                         data: {!! json_encode($chartData['stock_data']->pluck('normal')) !!},
                         backgroundColor: 'rgba(34, 197, 94, 0.8)'
                     }, {
-                        label: 'Stock Bas',
+                        label: @json(__('stock.stock_low')),
                         data: {!! json_encode($chartData['stock_data']->pluck('low')) !!},
                         backgroundColor: 'rgba(245, 158, 11, 0.8)'
                     }, {
-                        label: 'Stock Critique',
+                        label: @json(__('stock.stock_critical')),
                         data: {!! json_encode($chartData['stock_data']->pluck('critical')) !!},
                         backgroundColor: 'rgba(249, 115, 22, 0.8)'
                     }, {
-                        label: 'Rupture',
+                        label: @json(__('stock.stock_outage')),
                         data: {!! json_encode($chartData['stock_data']->pluck('out')) !!},
                         backgroundColor: 'rgba(239, 68, 68, 0.8)'
                     }]
@@ -342,7 +342,12 @@ document.addEventListener('alpine:init', () => {
             new Chart(statusCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Stock Normal', 'Stock Bas', 'Stock Critique', 'Rupture'],
+                    labels: [
+                        @json(__('stock.stock_normal')),
+                        @json(__('stock.stock_low')),
+                        @json(__('stock.stock_critical')),
+                        @json(__('stock.stock_outage'))
+                    ],
                     datasets: [{
                         data: [totalNormal, totalLow, totalCritical, totalOut],
                         backgroundColor: [
@@ -385,7 +390,7 @@ document.addEventListener('alpine:init', () => {
                 }
             } catch (error) {
                 console.error('Erreur:', error);
-                alert('Erreur lors de l\'export');
+                alert(@json(__('stock.export_error')));
             }
         },
         
@@ -409,12 +414,12 @@ document.addEventListener('alpine:init', () => {
                 }
             } catch (error) {
                 console.error('Erreur:', error);
-                alert('Erreur lors de la génération du rapport');
+                alert(@json(__('stock.report_error')));
             }
         },
         
         scheduleReport() {
-            alert('Fonctionnalité de planification en développement');
+            alert(@json(__('stock.schedule_development')));
         },
         
         exportReport() {

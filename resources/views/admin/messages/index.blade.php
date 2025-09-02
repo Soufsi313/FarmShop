@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Messages')
+@section('title', __('messages.page_title'))
 
 @section('content')
 <style>
@@ -14,7 +14,7 @@
 
 <div class="container mx-auto px-4 py-6">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Messages reçus</h1>
+        <h1 class="text-2xl font-bold text-gray-800">{{ __('messages.received_messages') }}</h1>
     </div>
 
     <!-- Compteurs de messages -->
@@ -28,7 +28,7 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Total</p>
+                    <p class="text-sm font-medium text-gray-600">{{ __('messages.statistics.total') }}</p>
                     <p class="text-2xl font-bold text-gray-900">{{ $statistics['total'] ?? 0 }}</p>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Non lus</p>
+                    <p class="text-sm font-medium text-gray-600">{{ __('messages.statistics.unread') }}</p>
                     <p class="text-2xl font-bold text-red-600">{{ $statistics['unread'] ?? 0 }}</p>
                 </div>
             </div>
@@ -58,7 +58,7 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Lus</p>
+                    <p class="text-sm font-medium text-gray-600">{{ __('messages.statistics.read') }}</p>
                     <p class="text-2xl font-bold text-green-600">{{ $statistics['read'] ?? 0 }}</p>
                 </div>
             </div>
@@ -73,7 +73,7 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Importants</p>
+                    <p class="text-sm font-medium text-gray-600">{{ __('messages.statistics.important') }}</p>
                     <p class="text-2xl font-bold text-yellow-600">{{ $statistics['important'] ?? 0 }}</p>
                 </div>
             </div>
@@ -84,77 +84,77 @@
     <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
         <form method="GET" action="{{ route('admin.messages.index') }}" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Filtre par auteur -->
+                <!-- {{ __('messages.filters.author') }} -->
                 <div>
-                    <label for="author" class="block text-sm font-medium text-gray-700 mb-1">Auteur</label>
+                    <label for="author" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.filters.author') }}</label>
                     <input type="text" id="author" name="author" value="{{ request('author') }}" 
-                           placeholder="Nom ou email..."
+                           placeholder="{{ __('messages.filters.author_placeholder') }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
-                <!-- Filtre par raison -->
+                <!-- {{ __('messages.filters.reason') }} -->
                 <div>
-                    <label for="reason" class="block text-sm font-medium text-gray-700 mb-1">Motif</label>
+                    <label for="reason" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.filters.reason') }}</label>
                     <select id="reason" name="reason" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Tous les motifs</option>
-                        <option value="question" {{ request('reason') == 'question' ? 'selected' : '' }}>Question</option>
-                        <option value="support" {{ request('reason') == 'support' ? 'selected' : '' }}>Support</option>
-                        <option value="commande" {{ request('reason') == 'commande' ? 'selected' : '' }}>Commande</option>
-                        <option value="autre" {{ request('reason') == 'autre' ? 'selected' : '' }}>Autre</option>
+                        <option value="">{{ __('messages.filters.all_reasons') }}</option>
+                        <option value="question" {{ request('reason') == 'question' ? 'selected' : '' }}>{{ __('messages.reasons.question') }}</option>
+                        <option value="support" {{ request('reason') == 'support' ? 'selected' : '' }}>{{ __('messages.reasons.support') }}</option>
+                        <option value="commande" {{ request('reason') == 'commande' ? 'selected' : '' }}>{{ __('messages.reasons.commande') }}</option>
+                        <option value="autre" {{ request('reason') == 'autre' ? 'selected' : '' }}>{{ __('messages.reasons.autre') }}</option>
                     </select>
                 </div>
 
-                <!-- Filtre par priorité -->
+                <!-- {{ __('messages.filters.priority') }} -->
                 <div>
-                    <label for="priority" class="block text-sm font-medium text-gray-700 mb-1">Priorité</label>
+                    <label for="priority" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.filters.priority') }}</label>
                     <select id="priority" name="priority" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Toutes priorités</option>
-                        <option value="urgent" {{ request('priority') == 'urgent' ? 'selected' : '' }}>Urgent</option>
-                        <option value="high" {{ request('priority') == 'high' ? 'selected' : '' }}>Haute</option>
-                        <option value="normal" {{ request('priority') == 'normal' ? 'selected' : '' }}>Normale</option>
-                        <option value="low" {{ request('priority') == 'low' ? 'selected' : '' }}>Basse</option>
+                        <option value="">{{ __('messages.filters.all_priorities') }}</option>
+                        <option value="urgent" {{ request('priority') == 'urgent' ? 'selected' : '' }}>{{ __('messages.priorities.urgent') }}</option>
+                        <option value="high" {{ request('priority') == 'high' ? 'selected' : '' }}>{{ __('messages.priorities.high') }}</option>
+                        <option value="normal" {{ request('priority') == 'normal' ? 'selected' : '' }}>{{ __('messages.priorities.normal') }}</option>
+                        <option value="low" {{ request('priority') == 'low' ? 'selected' : '' }}>{{ __('messages.priorities.low') }}</option>
                     </select>
                 </div>
 
-                <!-- Statut -->
+                <!-- {{ __('messages.filters.status') }} -->
                 <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.filters.status') }}</label>
                     <select id="status" name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Tous statuts</option>
-                        <option value="new" {{ request('status') == 'new' ? 'selected' : '' }}>Nouveau</option>
-                        <option value="read" {{ request('status') == 'read' ? 'selected' : '' }}>Lu</option>
-                        <option value="responded" {{ request('status') == 'responded' ? 'selected' : '' }}>Répondu</option>
-                        <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>Archivé</option>
+                        <option value="">{{ __('messages.filters.all_statuses') }}</option>
+                        <option value="new" {{ request('status') == 'new' ? 'selected' : '' }}>{{ __('messages.statuses.new') }}</option>
+                        <option value="read" {{ request('status') == 'read' ? 'selected' : '' }}>{{ __('messages.statuses.read') }}</option>
+                        <option value="responded" {{ request('status') == 'responded' ? 'selected' : '' }}>{{ __('messages.statuses.responded') }}</option>
+                        <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>{{ __('messages.statuses.archived') }}</option>
                     </select>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Date de début -->
+                <!-- {{ __('messages.filters.date_from') }} -->
                 <div>
-                    <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">Date de début</label>
+                    <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.filters.date_from') }}</label>
                     <input type="date" id="date_from" name="date_from" value="{{ request('date_from') }}" 
                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
-                <!-- Date de fin -->
+                <!-- {{ __('messages.filters.date_to') }} -->
                 <div>
-                    <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
+                    <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.filters.date_to') }}</label>
                     <input type="date" id="date_to" name="date_to" value="{{ request('date_to') }}" 
                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
-                <!-- Recherche -->
+                <!-- {{ __('messages.filters.search') }} -->
                 <div>
-                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Recherche</label>
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.filters.search') }}</label>
                     <input type="text" id="search" name="search" value="{{ request('search') }}" 
-                           placeholder="Rechercher dans le contenu..."
+                           placeholder="{{ __('messages.filters.search_placeholder') }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
-                <!-- Nombre par page -->
+                <!-- {{ __('messages.filters.per_page') }} -->
                 <div>
-                    <label for="per_page" class="block text-sm font-medium text-gray-700 mb-1">Par page</label>
+                    <label for="per_page" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.filters.per_page') }}</label>
                     <select id="per_page" name="per_page" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         <option value="10" {{ request('per_page') == '10' ? 'selected' : '' }}>10</option>
                         <option value="15" {{ request('per_page') == '15' || !request('per_page') ? 'selected' : '' }}>15</option>
@@ -168,11 +168,11 @@
             <div class="flex justify-end space-x-3">
                 <a href="{{ route('admin.messages.index') }}" 
                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
-                    Réinitialiser
+                    {{ __('messages.filters.reset_button') }}
                 </a>
                 <button type="submit" 
                         class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">
-                    Filtrer
+                    {{ __('messages.filters.filter_button') }}
                 </button>
             </div>
         </form>
@@ -181,14 +181,14 @@
     <!-- Liste compacte des messages -->
     <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
         @if($messages->count() > 0)
-            <!-- En-tête des colonnes (caché sur mobile) -->
+            <!-- {{ __('messages.table.headers') }} -->
             <div class="hidden md:block bg-gray-50 border-b border-gray-200">
                 <div class="grid grid-cols-12 gap-4 items-center p-4 text-xs font-medium text-gray-500 uppercase tracking-wide">
-                    <div class="col-span-3">Expéditeur</div>
-                    <div class="col-span-4">Message</div>
-                    <div class="col-span-2 text-center">Date / Motif</div>
-                    <div class="col-span-2 text-center">Statut</div>
-                    <div class="col-span-1 text-center">Actions</div>
+                    <div class="col-span-3">{{ __('messages.table.author') }}</div>
+                    <div class="col-span-4">{{ __('messages.table.subject') }}</div>
+                    <div class="col-span-2 text-center">{{ __('messages.table.date') }} / {{ __('messages.table.reason') }}</div>
+                    <div class="col-span-2 text-center">{{ __('messages.table.status') }}</div>
+                    <div class="col-span-1 text-center">{{ __('messages.table.actions') }}</div>
                 </div>
             </div>
 
@@ -209,7 +209,7 @@
                                                 {{ $message->sender->name ?: $message->sender->username }}
                                             </h4>
                                             <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full flex-shrink-0">
-                                                Inscrit
+                                                {{ __('messages.user_types.registered') }}
                                             </span>
                                         </div>
                                         <p class="text-xs text-gray-600 truncate">{{ $message->sender->email }}</p>
@@ -222,11 +222,11 @@
                                         <div class="flex items-center space-x-2">
                                             <h4 class="font-medium text-gray-900 text-sm truncate">{{ $message->metadata['sender_name'] }}</h4>
                                             <span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full flex-shrink-0">
-                                                Visiteur
+                                                {{ __('messages.user_types.visitor') }}
                                             </span>
                                             @if(isset($message->metadata['migrated_from_contacts']))
                                                 <span class="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full flex-shrink-0">
-                                                    Migré
+                                                    {{ __('messages.user_types.migrated') }}
                                                 </span>
                                             @endif
                                         </div>
@@ -239,9 +239,9 @@
                                         ?
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <h4 class="font-medium text-gray-900 text-sm">Utilisateur inconnu</h4>
+                                        <h4 class="font-medium text-gray-900 text-sm">{{ __('messages.user_types.unknown_user') }}</h4>
                                         <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
-                                            Anonyme
+                                            {{ __('messages.user_types.anonymous') }}
                                         </span>
                                     </div>
                                 @endif
@@ -272,13 +272,13 @@
                             <div class="col-span-2 flex flex-wrap justify-center gap-1">
                                 @if(!$message->read_at)
                                     <span class="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">
-                                        Nouveau
+                                        {{ __('messages.statuses.new') }}
                                     </span>
                                 @endif
                                 
                                 @if($message->is_important)
                                     <span class="px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
-                                        Important
+                                        {{ __('messages.status_labels.important') }}
                                     </span>
                                 @endif
 
@@ -295,7 +295,7 @@
                             <div class="col-span-1 flex flex-col space-y-1">
                                 <a href="{{ route('admin.messages.show', $message) }}" 
                                    class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors text-center">
-                                    Voir
+                                    {{ __('messages.actions.view') }}
                                 </a>
                                 
                                 @if($message->type === 'contact' && !($message->metadata['admin_responded'] ?? false))
@@ -403,8 +403,8 @@
         @else
             <div class="p-8 text-center text-gray-500">
                 <div class="text-4xl mb-4">📭</div>
-                <h3 class="text-lg font-medium mb-2">Aucun message trouvé</h3>
-                <p class="text-sm">Aucun message ne correspond aux critères de recherche.</p>
+                <h3 class="text-lg font-medium mb-2">{{ __('messages.empty_state.no_messages') }}</h3>
+                <p class="text-sm">{{ __('messages.empty_state.no_match_filters') }}</p>
             </div>
         @endif
     </div>
@@ -412,10 +412,10 @@
     <!-- Pagination -->
     <div class="mt-8">
         <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
-            <!-- Informations sur la pagination -->
+            <!-- {{ __('messages.pagination.info') }} -->
             <div class="text-sm text-gray-700">
-                Affichage de {{ $messages->firstItem() ?? 0 }} à {{ $messages->lastItem() ?? 0 }} 
-                sur {{ $messages->total() }} résultats
+                {{ __('messages.pagination.showing') }} {{ $messages->firstItem() ?? 0 }} {{ __('messages.pagination.to') }} {{ $messages->lastItem() ?? 0 }} 
+                {{ __('messages.pagination.of') }} {{ $messages->total() }} {{ __('messages.pagination.results') }}
             </div>
             
             <!-- Liens de pagination -->
@@ -426,11 +426,11 @@
     </div>
 </div>
 
-<!-- Modale de réponse -->
+<!-- {{ __('messages.response_modal.title') }} -->
 <div id="responseModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
     <div class="relative top-20 mx-auto p-5 border w-3/4 max-w-2xl shadow-lg rounded-md bg-white">
         <div class="mt-3">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Répondre au message</h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('messages.response_modal.title') }}</h3>
             
             <form id="responseForm">
                 @csrf
@@ -438,21 +438,21 @@
                 
                 <div class="mb-4">
                     <label for="response" class="block text-sm font-medium text-gray-700 mb-2">
-                        Votre réponse <span class="text-red-500">*</span>
+                        {{ __('messages.response_modal.your_response') }} <span class="text-red-500">*</span>
                     </label>
                     <textarea id="response" name="response" rows="6" required 
-                              placeholder="Rédigez votre réponse..."
+                              placeholder="{{ __('messages.response_modal.response_placeholder') }}"
                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
                 </div>
                 
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeResponseModal()" 
                             class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
-                        Annuler
+                        {{ __('messages.response_modal.cancel') }}
                     </button>
                     <button type="submit" 
                             class="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md">
-                        Envoyer la réponse
+                        {{ __('messages.response_modal.send_response') }}
                     </button>
                 </div>
             </form>
@@ -492,14 +492,14 @@ document.getElementById('responseForm').addEventListener('submit', async functio
         const data = await result.json();
         
         if (data.success) {
-            alert('Réponse envoyée avec succès !');
+            alert('{{ __('messages.javascript.response_sent_success') }}');
             closeResponseModal();
             location.reload();
         } else {
-            alert('Erreur: ' + data.message);
+            alert('{{ __('messages.javascript.error') }}: ' + data.message);
         }
     } catch (error) {
-        alert('Erreur lors de l\'envoi de la réponse');
+        alert('{{ __('messages.javascript.response_send_error') }}');
         console.error(error);
     }
 });

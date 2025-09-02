@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Gestion des Commentaires')
-@section('page-title', 'Gestion des Commentaires')
+@section('title', __('blog.comments.page_title'))
+@section('page-title', __('blog.comments.section_title'))
 
 @section('content')
 <div class="space-y-6">
@@ -14,22 +14,22 @@
                         <svg class="w-7 h-7 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                         </svg>
-                        Gestion des Commentaires
+                        {{ __('blog.comments.title') }}
                     </h1>
-                    <p class="mt-1 text-sm text-gray-600">Gérez tous les commentaires du blog et leur modération</p>
+                    <p class="mt-1 text-sm text-gray-600">{{ __('blog.comments.description') }}</p>
                 </div>
                 <div class="mt-4 sm:mt-0 flex space-x-3">
                     <button type="button" onclick="openFilterModal()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"/>
                         </svg>
-                        Filtres
+                        {{ __('blog.comments.filters_button') }}
                     </button>
                     <button type="button" onclick="refreshData()" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
-                        Actualiser
+                        {{ __('blog.comments.refresh_button') }}
                     </button>
                 </div>
             </div>
@@ -49,7 +49,7 @@
                         </div>
                     </div>
                     <div class="ml-4 flex-1">
-                        <div class="text-sm font-medium text-gray-500">Total Commentaires</div>
+                        <div class="text-sm font-medium text-gray-500">{{ __('blog.comments.total_comments') }}</div>
                         <div class="text-2xl font-bold text-gray-900" id="totalComments">{{ $stats['total_comments'] ?? 0 }}</div>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                         </div>
                     </div>
                     <div class="ml-4 flex-1">
-                        <div class="text-sm font-medium text-gray-500">En Attente</div>
+                        <div class="text-sm font-medium text-gray-500">{{ __('blog.comments.pending_comments') }}</div>
                         <div class="text-2xl font-bold text-gray-900" id="pendingComments">{{ $stats['pending_comments'] ?? 0 }}</div>
                     </div>
                 </div>
@@ -85,7 +85,7 @@
                         </div>
                     </div>
                     <div class="ml-4 flex-1">
-                        <div class="text-sm font-medium text-gray-500">Approuvés</div>
+                        <div class="text-sm font-medium text-gray-500">{{ __('blog.comments.approved_comments') }}</div>
                         <div class="text-2xl font-bold text-gray-900" id="approvedComments">{{ $stats['approved_comments'] ?? 0 }}</div>
                     </div>
                 </div>
@@ -103,7 +103,7 @@
                         </div>
                     </div>
                     <div class="ml-4 flex-1">
-                        <div class="text-sm font-medium text-gray-500">Signalements</div>
+                        <div class="text-sm font-medium text-gray-500">{{ __('blog.comments.reported_comments') }}</div>
                         <div class="text-2xl font-bold text-gray-900" id="reportedComments">{{ $stats['total_reports'] ?? 0 }}</div>
                     </div>
                 </div>
@@ -114,72 +114,77 @@
 
     <!-- Section de filtrage et recherche -->
     <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900">{{ __('blog.comments.advanced_search_title') }}</h2>
+            <p class="mt-1 text-sm text-gray-600">{{ __('blog.comments.advanced_search_description') }}</p>
+        </div>
         <div class="p-6">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <!-- Recherche -->
                 <div class="lg:col-span-2">
-                    <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-2">Rechercher</label>
+                    <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-2">{{ __('blog.comments.search_label') }}</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
-                        <input type="text" id="searchInput" name="search" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500" placeholder="Rechercher dans les commentaires...">
+                        <input type="text" id="searchInput" name="search" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500" placeholder="{{ __('blog.comments.search_placeholder') }}">
                     </div>
                 </div>
 
                 <!-- Filtre par statut -->
                 <div>
-                    <label for="statusFilter" class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
+                    <label for="statusFilter" class="block text-sm font-medium text-gray-700 mb-2">{{ __('blog.comments.status') }}</label>
                     <select id="statusFilter" name="status" class="block w-full px-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Tous les statuts</option>
-                        <option value="pending">En attente</option>
-                        <option value="approved">Approuvés</option>
-                        <option value="rejected">Rejetés</option>
-                        <option value="spam">Spam</option>
+                        <option value="">{{ __('blog.comments.all_statuses') }}</option>
+                        <option value="pending">{{ __('blog.comments.status_pending') }}</option>
+                        <option value="approved">{{ __('blog.comments.status_approved') }}</option>
+                        <option value="rejected">{{ __('blog.comments.status_rejected') }}</option>
+                        <option value="spam">{{ __('blog.comments.status_spam') }}</option>
                     </select>
                 </div>
 
                 <!-- Filtre signalements -->
                 <div>
-                    <label for="reportedFilter" class="block text-sm font-medium text-gray-700 mb-2">Signalements</label>
+                    <label for="reportedFilter" class="block text-sm font-medium text-gray-700 mb-2">{{ __('blog.comments.reports_label') }}</label>
                     <select id="reportedFilter" name="reported" class="block w-full px-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Tous</option>
-                        <option value="reported">Avec signalements</option>
-                        <option value="not_reported">Sans signalements</option>
+                        <option value="">{{ __('blog.comments.all_reports') }}</option>
+                        <option value="reported">{{ __('blog.comments.with_reports') }}</option>
+                        <option value="not_reported">{{ __('blog.comments.without_reports') }}</option>
                     </select>
                 </div>
             </div>
 
             <!-- Actions en lot -->
             <div class="mt-6 pt-6 border-t border-gray-200">
+                <h4 class="text-sm font-medium text-gray-900 mb-4">{{ __('blog.comments.quick_actions') }}</h4>
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex items-center space-x-4">
                         <div class="flex items-center">
                             <input type="checkbox" id="selectAll" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <label for="selectAll" class="ml-2 text-sm text-gray-900">Tout sélectionner</label>
+                            <label for="selectAll" class="ml-2 text-sm text-gray-900">{{ __('blog.comments.select_all') }}</label>
                         </div>
-                        <span id="selectedCount" class="text-sm text-gray-500">0 sélectionné(s)</span>
+                        <span id="selectedCount" class="text-sm text-gray-500">0 {{ __('blog.comments.selected_count') }}</span>
                     </div>
                     <div class="mt-4 sm:mt-0 flex space-x-2">
                         <button type="button" onclick="bulkAction('approve')" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50" id="bulkApprove" disabled>
                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
-                            Approuver
+                            {{ __('blog.comments.bulk_approve') }}
                         </button>
                         <button type="button" onclick="bulkAction('reject')" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50" id="bulkReject" disabled>
                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
-                            Rejeter
+                            {{ __('blog.comments.bulk_reject') }}
                         </button>
                         <button type="button" onclick="bulkAction('delete')" class="inline-flex items-center px-3 py-2 border border-red-300 shadow-sm text-sm leading-4 font-medium rounded-lg text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50" id="bulkDelete" disabled>
                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                             </svg>
-                            Supprimer
+                            {{ __('blog.comments.bulk_delete') }}
                         </button>
                     </div>
                 </div>
@@ -190,7 +195,7 @@
     <!-- Tableau des commentaires -->
     <div class="bg-white shadow-sm rounded-lg border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Liste des Commentaires</h3>
+            <h3 class="text-lg font-medium text-gray-900">{{ __('blog.comments.comments_list') }}</h3>
         </div>
         <div class="overflow-hidden">
             <div id="commentsContainer" class="min-h-[400px]">
@@ -201,7 +206,7 @@
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <p class="mt-2 text-sm text-gray-500">Chargement des commentaires...</p>
+                        <p class="mt-2 text-sm text-gray-500">{{ __('blog.comments.loading') }}</p>
                     </div>
                 </div>
             </div>
@@ -229,13 +234,13 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Auteur</th>
-                                    <th>Article</th>
-                                    <th>Contenu</th>
-                                    <th>Statut</th>
-                                    <th>Signalements</th>
-                                    <th>Date</th>
-                                    <th>Actions</th>
+                                    <th>{{ __('blog.comments.table_author') }}</th>
+                                    <th>{{ __('blog.comments.table_article') }}</th>
+                                    <th>{{ __('blog.comments.table_content') }}</th>
+                                    <th>{{ __('blog.comments.table_status') }}</th>
+                                    <th>{{ __('blog.comments.table_reports') }}</th>
+                                    <th>{{ __('blog.comments.table_date') }}</th>
+                                    <th>{{ __('blog.comments.table_actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="commentsTableBody">
@@ -295,19 +300,19 @@
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="action" id="approveAction" value="approve">
                             <label class="form-check-label" for="approveAction">
-                                <i class="fas fa-check text-success"></i> Approuver
+                                <i class="fas fa-check text-success"></i> {{ __('blog.comments.action_approve') }}
                             </label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="action" id="rejectAction" value="reject">
                             <label class="form-check-label" for="rejectAction">
-                                <i class="fas fa-times text-danger"></i> Rejeter
+                                <i class="fas fa-times text-danger"></i> {{ __('blog.comments.action_reject') }}
                             </label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="action" id="spamAction" value="spam">
                             <label class="form-check-label" for="spamAction">
-                                <i class="fas fa-ban text-warning"></i> Marquer comme spam
+                                <i class="fas fa-ban text-warning"></i> {{ __('blog.comments.action_spam') }}
                             </label>
                         </div>
                     </div>
@@ -443,7 +448,7 @@ $(document).ready(function() {
                                                         <svg class="w-4 h-4 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"/>
                                                         </svg>
-                                                        Marquer comme spam
+                                                        {{ __('blog.comments.action_spam') }}
                                                     </span>
                                                 </label>
                                             </div>
@@ -568,8 +573,8 @@ function loadComments(page = 1) {
         updateStats(data);
     })
     .catch(error => {
-        console.error('Erreur:', error);
-        showToast('Erreur lors du chargement des commentaires', 'error');
+        console.error('{{ __('blog.comments.js_error_loading') }}:', error);
+        showToast('{{ __('blog.comments.js_error_loading') }}', 'error');
     });
 }
 
@@ -582,8 +587,8 @@ function updateCommentsDisplay(comments) {
                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun commentaire</h3>
-                <p class="mt-1 text-sm text-gray-500">Aucun commentaire ne correspond à vos critères de recherche.</p>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('blog.comments.no_comments') }}</h3>
+                <p class="mt-1 text-sm text-gray-500">{{ __('blog.comments.no_comments_message') }}</p>
             </div>
         `;
         return;
@@ -601,7 +606,7 @@ function updateCommentsDisplay(comments) {
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Article</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commentaire</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Signalements</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('blog.comments.table_reports') }}</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                         <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
                     </tr>
@@ -630,7 +635,7 @@ function createCommentRow(comment) {
     const reportsBadge = getReportsBadge(comment.reports_count || 0);
     const authorInfo = comment.user ? 
         `${comment.user.name}<br><span class="text-xs text-gray-500">${comment.user.email}</span>` :
-        `${comment.guest_name || 'Anonyme'}<br><span class="text-xs text-gray-500">${comment.guest_email || 'N/A'}</span>`;
+        `${comment.guest_name || '{{ __('blog.comments.anonymous') }}'}<br><span class="text-xs text-gray-500">${comment.guest_email || '{{ __('blog.comments.not_available') }}'}</span>`;
     
     return `
         <tr class="hover:bg-gray-50">
@@ -692,8 +697,8 @@ function createCommentRow(comment) {
 function getStatusBadge(status) {
     const badges = {
         'pending': '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">En attente</span>',
-        'approved': '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Approuvé</span>',
-        'rejected': '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Rejeté</span>',
+        'approved': '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{{ __('blog.comments.status_approved_label') }}</span>',
+        'rejected': '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">{{ __('blog.comments.status_rejected_label') }}</span>',
         'spam': '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Spam</span>'
     };
     return badges[status] || '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Inconnu</span>';
@@ -749,7 +754,7 @@ function showCommentDetail(commentId) {
         document.getElementById('commentModal').classList.remove('hidden');
     })
     .catch(error => {
-        showToast('Erreur lors du chargement du détail', 'error');
+        showToast('{{ __('blog.comments.js_error_loading_detail') }}', 'error');
     });
 }
 
@@ -833,7 +838,7 @@ function moderateComment(event) {
     const reason = document.getElementById('reason').value;
     
     if (!action) {
-        showToast('Veuillez sélectionner une action', 'error');
+        showToast('{{ __('blog.comments.js_select_action') }}', 'error');
         return;
     }
     
@@ -853,19 +858,19 @@ function moderateComment(event) {
     .then(data => {
         if (data.success) {
             closeModerateModal();
-            showToast(data.message || 'Action effectuée avec succès', 'success');
+            showToast(data.message || '{{ __('blog.comments.js_action_success') }}', 'success');
             loadComments();
         } else {
-            showToast(data.message || 'Erreur lors de la modération', 'error');
+            showToast(data.message || '{{ __('blog.comments.js_moderation_error') }}', 'error');
         }
     })
     .catch(error => {
-        showToast('Erreur lors de la modération', 'error');
+        showToast('{{ __('blog.comments.js_moderation_error') }}', 'error');
     });
 }
 
 function deleteComment(commentId) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) {
+    if (confirm('{{ __('blog.comments.js_confirm_delete') }}')) {
         fetch(`/api/admin/blog/comments/${commentId}`, {
             method: 'DELETE',
             headers: {
@@ -876,14 +881,14 @@ function deleteComment(commentId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showToast('Commentaire supprimé avec succès', 'success');
+                showToast('{{ __('blog.comments.js_delete_success') }}', 'success');
                 loadComments();
             } else {
-                showToast(data.message || 'Erreur lors de la suppression', 'error');
+                showToast(data.message || '{{ __('blog.comments.js_delete_error') }}', 'error');
             }
         })
         .catch(error => {
-            showToast('Erreur lors de la suppression', 'error');
+            showToast('{{ __('blog.comments.js_delete_error') }}', 'error');
         });
     }
 }
@@ -893,7 +898,7 @@ function bulkAction(action) {
     const commentIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.commentId);
     
     if (commentIds.length === 0) {
-        showToast('Veuillez sélectionner au moins un commentaire', 'error');
+        showToast('{{ __('blog.comments.js_select_comments') }}', 'error');
         return;
     }
     
@@ -919,17 +924,17 @@ function bulkAction(action) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showToast(data.message || 'Action effectuée avec succès', 'success');
+                showToast(data.message || '{{ __('blog.comments.js_bulk_action_success') }}', 'success');
                 loadComments();
                 document.getElementById('selectAll').checked = false;
                 updateSelectedCount();
                 updateBulkButtons();
             } else {
-                showToast(data.message || 'Erreur lors de l\'action groupée', 'error');
+                showToast(data.message || '{{ __('blog.comments.js_bulk_action_error') }}', 'error');
             }
         })
         .catch(error => {
-            showToast('Erreur lors de l\'action groupée', 'error');
+            showToast('{{ __('blog.comments.js_bulk_action_error') }}', 'error');
         });
     }
 }
@@ -940,12 +945,12 @@ function showReports(commentId) {
 
 function refreshData() {
     loadComments();
-    showToast('Données actualisées', 'success');
+    showToast('{{ __('blog.comments.js_data_refreshed') }}', 'success');
 }
 
 function openFilterModal() {
     // Implémenter une modal de filtres avancés si nécessaire
-    showToast('Fonctionnalité en développement', 'info');
+    showToast('{{ __('blog.comments.js_feature_development') }}', 'info');
 }
 
 function showToast(message, type = 'info') {

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Gestion des Cookies - FarmShop Admin')
-@section('page-title', 'Gestion des Cookies')
+@section('title', __('cookies.page_title'))
+@section('page-title', __('cookies.page_subtitle'))
 
 @section('content')
 <div class="space-y-6" x-data="cookieManagement">
@@ -20,7 +20,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Total consentements</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('cookies.stats.total_consents') }}</dt>
                             <dd class="text-lg font-medium text-gray-900" x-text="stats.total_consents">-</dd>
                         </dl>
                     </div>
@@ -41,7 +41,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Acceptés</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('cookies.stats.accepted_consents') }}</dt>
                             <dd class="text-lg font-medium text-gray-900" x-text="stats.accepted_consents">-</dd>
                         </dl>
                     </div>
@@ -62,7 +62,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Rejetés</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('cookies.stats.rejected_consents') }}</dt>
                             <dd class="text-lg font-medium text-gray-900" x-text="stats.rejected_consents">-</dd>
                         </dl>
                     </div>
@@ -83,7 +83,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">En attente</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('cookies.stats.pending_consents') }}</dt>
                             <dd class="text-lg font-medium text-gray-900" x-text="stats.pending_consents">-</dd>
                         </dl>
                     </div>
@@ -96,10 +96,10 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Graphique par type de cookie -->
         <div class="bg-white shadow rounded-lg p-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Préférences par type de cookie</h3>
+            <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('cookies.charts.preferences_by_type') }}</h3>
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-600">🔧 Cookies essentiels</span>
+                    <span class="text-sm text-gray-600">🔧 {{ __('cookies.cookie_types.necessary') }}</span>
                     <div class="flex items-center">
                         <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
                             <div class="bg-green-600 h-2 rounded-full" x-bind:style="`width: 100%`"></div>
@@ -108,7 +108,7 @@
                     </div>
                 </div>
                 <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-600">📊 Cookies analytiques</span>
+                    <span class="text-sm text-gray-600">📊 {{ __('cookies.cookie_types.analytics') }}</span>
                     <div class="flex items-center">
                         <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
                             <div class="bg-blue-600 h-2 rounded-full" x-bind:style="`width: ${getPercentage(stats.analytics_count)}%`"></div>
@@ -117,7 +117,7 @@
                     </div>
                 </div>
                 <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-600">🎯 Cookies marketing</span>
+                    <span class="text-sm text-gray-600">🎯 {{ __('cookies.cookie_types.marketing') }}</span>
                     <div class="flex items-center">
                         <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
                             <div class="bg-purple-600 h-2 rounded-full" x-bind:style="`width: ${getPercentage(stats.marketing_count)}%`"></div>
@@ -126,7 +126,7 @@
                     </div>
                 </div>
                 <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-600">⚙️ Cookies préférences</span>
+                    <span class="text-sm text-gray-600">⚙️ {{ __('cookies.cookie_types.preferences') }}</span>
                     <div class="flex items-center">
                         <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
                             <div class="bg-orange-600 h-2 rounded-full" x-bind:style="`width: ${getPercentage(stats.preferences_count)}%`"></div>
@@ -135,7 +135,7 @@
                     </div>
                 </div>
                 <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-600">📱 Cookies sociaux</span>
+                    <span class="text-sm text-gray-600">📱 {{ __('cookies.cookie_types.social_media') }}</span>
                     <div class="flex items-center">
                         <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
                             <div class="bg-pink-600 h-2 rounded-full" x-bind:style="`width: ${getPercentage(stats.social_media_count)}%`"></div>
@@ -148,7 +148,7 @@
 
         <!-- Évolution dans le temps -->
         <div class="bg-white shadow rounded-lg p-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Consentements par jour (7 derniers jours)</h3>
+            <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('cookies.charts.daily_consents') }} ({{ __('cookies.charts.last_7_days') }})</h3>
             <div class="space-y-3">
                 <template x-for="day in stats.daily_consents" :key="day.date">
                     <div class="flex items-center justify-between">
@@ -173,21 +173,21 @@
     <div class="bg-white shadow rounded-lg">
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
-                <h3 class="text-lg font-medium text-gray-900">Consentements récents</h3>
+                <h3 class="text-lg font-medium text-gray-900">{{ __('cookies.sections.recent_consents') }}</h3>
                 <div class="flex space-x-3">
                     <button @click="refreshData()" 
                             class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
-                        Actualiser
+                        {{ __('cookies.actions.refresh') }}
                     </button>
                     <button @click="exportData()" 
                             class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        Exporter
+                        {{ __('cookies.export.export_data') }}
                     </button>
                 </div>
             </div>
@@ -197,12 +197,12 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilisateur</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Préférences</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('cookies.table.user') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('cookies.table.status') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('cookies.table.preferences') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('cookies.table.date') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('cookies.table.ip') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('cookies.table.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -218,15 +218,15 @@
                                     </div>
                                     <div class="ml-4">
                                         <div class="text-sm font-medium text-gray-900">
-                                            <span x-text="cookie.user ? cookie.user.email : 'Visiteur anonyme'"></span>
+                                            <span x-text="cookie.user ? cookie.user.email : '{{ __('cookies.user_status.anonymous_visitor') }}'"></span>
                                             <span x-show="cookie.user" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 ml-2">
-                                                Connecté
+                                                {{ __('cookies.user_status.connected') }}
                                             </span>
                                         </div>
                                         <div class="text-sm text-gray-500">
-                                            <span x-show="cookie.user && !cookie.session_id" class="italic">Utilisateur connecté</span>
+                                            <span x-show="cookie.user && !cookie.session_id" class="italic">{{ __('cookies.user_status.logged_in_user') }}</span>
                                             <span x-show="cookie.session_id" x-text="cookie.session_id.substring(0, 10) + '...'"></span>
-                                            <span x-show="!cookie.user && !cookie.session_id">Session inconnue</span>
+                                            <span x-show="!cookie.user && !cookie.session_id">{{ __('cookies.user_status.unknown_session') }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -234,7 +234,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span :class="cookie.status === 'accepted' ? 'bg-green-100 text-green-800' : cookie.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'" 
                                       class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
-                                    <span x-text="cookie.status === 'accepted' ? 'Accepté' : cookie.status === 'rejected' ? 'Rejeté' : 'En attente'"></span>
+                                    <span x-text="cookie.status === 'accepted' ? '{{ __('cookies.labels.accepted') }}' : cookie.status === 'rejected' ? '{{ __('cookies.labels.rejected') }}' : '{{ __('cookies.labels.pending') }}'"></span>
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -253,7 +253,7 @@
                                     <!-- Bouton Voir -->
                                     <button @click="viewDetails(cookie)" 
                                             class="text-blue-600 hover:text-blue-900 transition-colors"
-                                            title="Voir les détails">
+                                            title="{{ __('cookies.actions.view') }}">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -263,7 +263,7 @@
                                     <!-- Bouton Supprimer -->
                                     <button @click="deleteConsent(cookie.id)" 
                                             class="text-red-600 hover:text-red-900 transition-colors"
-                                            title="Supprimer le consentement">
+                                            title="{{ __('cookies.actions.delete_consent') }}">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                         </svg>
@@ -281,30 +281,30 @@
             <div class="flex-1 flex justify-between sm:hidden">
                 <button @click="previousPage()" :disabled="currentPage <= 1" 
                         class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    Précédent
+                    {{ __('cookies.pagination.previous') }}
                 </button>
                 <button @click="nextPage()" :disabled="currentPage >= totalPages" 
                         class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    Suivant
+                    {{ __('cookies.pagination.next') }}
                 </button>
             </div>
             <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
                     <p class="text-sm text-gray-700">
-                        Affichage <span x-text="(currentPage - 1) * perPage + 1"></span> à 
-                        <span x-text="Math.min(currentPage * perPage, totalItems)"></span> sur 
-                        <span x-text="totalItems"></span> résultats
+                        {{ __('cookies.pagination.showing') }} <span x-text="(currentPage - 1) * perPage + 1"></span> {{ __('cookies.pagination.to') }} 
+                        <span x-text="Math.min(currentPage * perPage, totalItems)"></span> {{ __('cookies.pagination.of') }} 
+                        <span x-text="totalItems"></span> {{ __('cookies.pagination.results') }}
                     </p>
                 </div>
                 <div>
                     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                         <button @click="previousPage()" :disabled="currentPage <= 1" 
                                 class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            Précédent
+                            {{ __('cookies.pagination.previous') }}
                         </button>
                         <button @click="nextPage()" :disabled="currentPage >= totalPages" 
                                 class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            Suivant
+                            {{ __('cookies.pagination.next') }}
                         </button>
                     </nav>
                 </div>
@@ -337,105 +337,105 @@
                         </div>
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                                Détails du consentement
+                                {{ __('cookies.modal.consent_details') }}
                             </h3>
                             
                             <template x-if="selectedCookie">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <!-- Informations utilisateur -->
                                     <div class="space-y-3">
-                                        <h4 class="font-semibold text-gray-700 border-b pb-2">👤 Informations utilisateur</h4>
+                                        <h4 class="font-semibold text-gray-700 border-b pb-2">👤 {{ __('cookies.modal.user_information') }}</h4>
                                         <div>
-                                            <span class="text-sm font-medium text-gray-500">Utilisateur:</span>
-                                            <p class="text-sm text-gray-900" x-text="selectedCookie.user ? selectedCookie.user.email : 'Visiteur anonyme'"></p>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.user') }}:</span>
+                                            <p class="text-sm text-gray-900" x-text="selectedCookie.user ? selectedCookie.user.email : '{{ __('cookies.user_status.anonymous_visitor') }}'"></p>
                                         </div>
                                         <div>
-                                            <span class="text-sm font-medium text-gray-500">Session ID:</span>
-                                            <p class="text-sm text-gray-900 font-mono" x-text="selectedCookie.session_id || 'Utilisateur connecté'"></p>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.session_id') }}:</span>
+                                            <p class="text-sm text-gray-900 font-mono" x-text="selectedCookie.session_id || '{{ __('cookies.details.connected_user') }}'"></p>
                                         </div>
                                         <div>
-                                            <span class="text-sm font-medium text-gray-500">Adresse IP:</span>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.ip_address') }}:</span>
                                             <p class="text-sm text-gray-900" x-text="selectedCookie.ip_address"></p>
                                         </div>
                                         <div>
-                                            <span class="text-sm font-medium text-gray-500">User Agent:</span>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.user_agent') }}:</span>
                                             <p class="text-sm text-gray-900 break-all" x-text="selectedCookie.user_agent"></p>
                                         </div>
                                     </div>
 
                                     <!-- Statut et préférences -->
                                     <div class="space-y-3">
-                                        <h4 class="font-semibold text-gray-700 border-b pb-2">⚙️ Consentement</h4>
+                                        <h4 class="font-semibold text-gray-700 border-b pb-2">⚙️ {{ __('cookies.modal.consent_status') }}</h4>
                                         <div>
-                                            <span class="text-sm font-medium text-gray-500">Statut:</span>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.status') }}:</span>
                                             <span :class="selectedCookie.status === 'accepted' ? 'bg-green-100 text-green-800' : selectedCookie.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'" 
                                                   class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ml-2">
-                                                <span x-text="selectedCookie.status === 'accepted' ? 'Accepté' : selectedCookie.status === 'rejected' ? 'Rejeté' : selectedCookie.status === 'partial' ? 'Partiel' : 'En attente'"></span>
+                                                <span x-text="selectedCookie.status === 'accepted' ? '{{ __('cookies.labels.accepted') }}' : selectedCookie.status === 'rejected' ? '{{ __('cookies.labels.rejected') }}' : selectedCookie.status === 'partial' ? '{{ __('cookies.status.partial') }}' : '{{ __('cookies.labels.pending') }}'"></span>
                                             </span>
                                         </div>
                                         <div>
-                                            <span class="text-sm font-medium text-gray-500">Types acceptés:</span>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.accepted_types') }}:</span>
                                             <p class="text-sm text-gray-900" x-text="formatCookieTypes(selectedCookie)"></p>
                                         </div>
                                         <div>
-                                            <span class="text-sm font-medium text-gray-500">Version:</span>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.version') }}:</span>
                                             <p class="text-sm text-gray-900" x-text="selectedCookie.consent_version"></p>
                                         </div>
                                         <div x-show="selectedCookie.page_url">
-                                            <span class="text-sm font-medium text-gray-500">Page de consentement:</span>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.consent_page') }}:</span>
                                             <p class="text-sm text-gray-900 break-all" x-text="selectedCookie.page_url"></p>
                                         </div>
                                     </div>
 
                                     <!-- Dates -->
                                     <div class="space-y-3">
-                                        <h4 class="font-semibold text-gray-700 border-b pb-2">📅 Historique</h4>
+                                        <h4 class="font-semibold text-gray-700 border-b pb-2">📅 {{ __('cookies.modal.history') }}</h4>
                                         <div>
-                                            <span class="text-sm font-medium text-gray-500">Créé le:</span>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.created_at') }}:</span>
                                             <p class="text-sm text-gray-900" x-text="new Date(selectedCookie.created_at).toLocaleString('fr-FR')"></p>
                                         </div>
                                         <div>
-                                            <span class="text-sm font-medium text-gray-500">Dernière mise à jour:</span>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.updated_at') }}:</span>
                                             <p class="text-sm text-gray-900" x-text="new Date(selectedCookie.updated_at).toLocaleString('fr-FR')"></p>
                                         </div>
                                         <div x-show="selectedCookie.accepted_at">
-                                            <span class="text-sm font-medium text-gray-500">Accepté le:</span>
-                                            <p class="text-sm text-gray-900" x-text="selectedCookie.accepted_at ? new Date(selectedCookie.accepted_at).toLocaleString('fr-FR') : 'N/A'"></p>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.accepted_at') }}:</span>
+                                            <p class="text-sm text-gray-900" x-text="selectedCookie.accepted_at ? new Date(selectedCookie.accepted_at).toLocaleString('fr-FR') : '{{ __('cookies.details.na') }}'"></p>
                                         </div>
                                         <div x-show="selectedCookie.rejected_at">
-                                            <span class="text-sm font-medium text-gray-500">Rejeté le:</span>
-                                            <p class="text-sm text-gray-900" x-text="selectedCookie.rejected_at ? new Date(selectedCookie.rejected_at).toLocaleString('fr-FR') : 'N/A'"></p>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.rejected_at') }}:</span>
+                                            <p class="text-sm text-gray-900" x-text="selectedCookie.rejected_at ? new Date(selectedCookie.rejected_at).toLocaleString('fr-FR') : '{{ __('cookies.details.na') }}'"></p>
                                         </div>
                                     </div>
 
                                     <!-- Détails techniques -->
                                     <div class="space-y-3">
-                                        <h4 class="font-semibold text-gray-700 border-b pb-2">🔧 Détails techniques</h4>
+                                        <h4 class="font-semibold text-gray-700 border-b pb-2">🔧 {{ __('cookies.details.technical_details') }}</h4>
                                         <div x-show="selectedCookie.browser_info">
-                                            <span class="text-sm font-medium text-gray-500">Navigateur:</span>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.browser') }}:</span>
                                             <div class="text-sm text-gray-900 mt-1">
                                                 <div x-show="selectedCookie.browser_info?.platform">
-                                                    <span class="font-medium">Plateforme:</span> <span x-text="selectedCookie.browser_info?.platform"></span>
+                                                    <span class="font-medium">{{ __('cookies.details.platform') }}:</span> <span x-text="selectedCookie.browser_info?.platform"></span>
                                                 </div>
                                                 <div x-show="selectedCookie.browser_info?.screen_resolution">
-                                                    <span class="font-medium">Résolution:</span> <span x-text="selectedCookie.browser_info?.screen_resolution"></span>
+                                                    <span class="font-medium">{{ __('cookies.details.resolution') }}:</span> <span x-text="selectedCookie.browser_info?.screen_resolution"></span>
                                                 </div>
                                                 <div x-show="selectedCookie.browser_info?.mobile !== undefined">
-                                                    <span class="font-medium">Mobile:</span> <span x-text="selectedCookie.browser_info?.mobile ? 'Oui' : 'Non'"></span>
+                                                    <span class="font-medium">{{ __('cookies.details.mobile') }}:</span> <span x-text="selectedCookie.browser_info?.mobile ? '{{ __('cookies.details.yes') }}' : '{{ __('cookies.details.no') }}'"></span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div x-show="selectedCookie.preferences_details">
-                                            <span class="text-sm font-medium text-gray-500">Préférences détaillées:</span>
+                                            <span class="text-sm font-medium text-gray-500">{{ __('cookies.details.detailed_preferences') }}:</span>
                                             <div class="text-sm text-gray-900 mt-1">
                                                 <div x-show="selectedCookie.preferences_details?.language">
-                                                    <span class="font-medium">Langue:</span> <span x-text="selectedCookie.preferences_details?.language"></span>
+                                                    <span class="font-medium">{{ __('cookies.details.language') }}:</span> <span x-text="selectedCookie.preferences_details?.language"></span>
                                                 </div>
                                                 <div x-show="selectedCookie.preferences_details?.theme">
-                                                    <span class="font-medium">Thème:</span> <span x-text="selectedCookie.preferences_details?.theme"></span>
+                                                    <span class="font-medium">{{ __('cookies.details.theme') }}:</span> <span x-text="selectedCookie.preferences_details?.theme"></span>
                                                 </div>
                                                 <div x-show="selectedCookie.preferences_details?.notifications !== undefined">
-                                                    <span class="font-medium">Notifications:</span> <span x-text="selectedCookie.preferences_details?.notifications ? 'Activées' : 'Désactivées'"></span>
+                                                    <span class="font-medium">{{ __('cookies.details.notifications') }}:</span> <span x-text="selectedCookie.preferences_details?.notifications ? '{{ __('cookies.details.enabled') }}' : '{{ __('cookies.details.disabled') }}'"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -449,7 +449,7 @@
                     <button @click="closeModal()" 
                             type="button" 
                             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Fermer
+                        {{ __('cookies.modal.close') }}
                     </button>
                 </div>
             </div>

@@ -20,7 +20,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Utilisateurs</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('app.pages.dashboard.stats.users') }}</dt>
                             <dd class="text-lg font-medium text-gray-900">{{ $stats['users'] }}</dd>
                         </dl>
                     </div>
@@ -41,7 +41,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Produits</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('app.pages.dashboard.stats.products') }}</dt>
                             <dd class="text-lg font-medium text-gray-900">{{ $stats['products'] }}</dd>
                         </dl>
                     </div>
@@ -62,7 +62,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Catégories</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('app.pages.dashboard.stats.categories') }}</dt>
                             <dd class="text-lg font-medium text-gray-900">{{ $stats['categories'] }}</dd>
                         </dl>
                     </div>
@@ -83,7 +83,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Commandes</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('app.pages.dashboard.stats.orders') }}</dt>
                             <dd class="text-lg font-medium text-gray-900">{{ $stats['orders'] }}</dd>
                         </dl>
                     </div>
@@ -104,7 +104,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Commandes</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('app.pages.dashboard.stats.orders') }}</dt>
                             <dd class="text-lg font-medium text-gray-900">{{ $stats['orders'] }}</dd>
                         </dl>
                     </div>
@@ -125,7 +125,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Articles Blog</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('app.pages.dashboard.stats.blog_posts') }}</dt>
                             <dd class="text-lg font-medium text-gray-900">{{ $stats['blog_posts'] }}</dd>
                         </dl>
                     </div>
@@ -146,7 +146,7 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Catégories Blog</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('app.pages.dashboard.stats.blog_categories') }}</dt>
                             <dd class="text-lg font-medium text-gray-900">{{ $stats['blog_categories'] }}</dd>
                         </dl>
                     </div>
@@ -167,10 +167,10 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Commentaires</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('app.pages.dashboard.stats.comments') }}</dt>
                             <dd class="text-lg font-medium text-gray-900">{{ $stats['blog_comments'] }}</dd>
                             @if($stats['pending_comments'] > 0)
-                                <dd class="text-xs text-orange-600">{{ $stats['pending_comments'] }} en attente</dd>
+                                <dd class="text-xs text-orange-600">{{ $stats['pending_comments'] }} {{ __('app.pages.dashboard.stats.pending_comments') }}</dd>
                             @endif
                         </dl>
                     </div>
@@ -191,10 +191,10 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Signalements</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ __('app.pages.dashboard.stats.reports') }}</dt>
                             <dd class="text-lg font-medium text-gray-900">{{ $stats['comment_reports'] }}</dd>
                             @if($stats['pending_reports'] > 0)
-                                <dd class="text-xs text-red-600">{{ $stats['pending_reports'] }} à traiter</dd>
+                                <dd class="text-xs text-red-600">{{ $stats['pending_reports'] }} {{ __('app.pages.dashboard.stats.pending_reports') }}</dd>
                             @endif
                         </dl>
                     </div>
@@ -225,31 +225,31 @@
                 <div class="flex items-center">
                     <div class="flex flex-col">
                         <div class="flex items-center">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">📦 Gestion de Stock</h3>
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">📦 {{ __('app.pages.dashboard.stock.title') }}</h3>
                             <!-- Indicateurs d'état inline -->
                             @if(($stats['stock']['out_of_stock'] ?? 0) > 0)
                                 <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse">
                                     <span class="w-2 h-2 bg-red-400 rounded-full mr-1"></span>
-                                    {{ $stats['stock']['out_of_stock'] }} rupture(s)
+                                    {{ $stats['stock']['out_of_stock'] }} {{ __('app.pages.dashboard.stock.out_of_stock') }}
                                 </span>
                             @elseif(($stats['stock']['critical_stock'] ?? 0) > 0)
                                 <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 animate-pulse">
                                     <span class="w-2 h-2 bg-orange-400 rounded-full mr-1"></span>
-                                    {{ $stats['stock']['critical_stock'] }} critique(s)
+                                    {{ $stats['stock']['critical_stock'] }} {{ __('app.pages.dashboard.stock.critical_stock') }}
                                 </span>
                             @elseif(($stats['stock']['low_stock'] ?? 0) > 0)
                                 <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                     <span class="w-2 h-2 bg-yellow-400 rounded-full mr-1"></span>
-                                    {{ $stats['stock']['low_stock'] }} stock bas
+                                    {{ $stats['stock']['low_stock'] }} {{ __('app.pages.dashboard.stock.low_stock') }}
                                 </span>
                             @else
                                 <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                     <span class="w-2 h-2 bg-green-400 rounded-full mr-1"></span>
-                                    Tout va bien
+                                    {{ __('app.pages.dashboard.stock.all_good') }}
                                 </span>
                             @endif
                         </div>
-                        <p class="text-sm text-gray-500 mt-1">Surveillance automatique et gestion intelligente des stocks</p>
+                        <p class="text-sm text-gray-500 mt-1">{{ __('app.pages.dashboard.stock.description') }}</p>
                     </div>
                 </div>
                 <div class="flex flex-col space-y-2">
@@ -259,11 +259,11 @@
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                             </svg>
-                            Actualiser
+                            {{ __('app.pages.dashboard.stock.refresh') }}
                         </button>
                         <a href="{{ route('admin.products.index') }}" 
                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
-                            Gérer Produits
+                            {{ __('app.pages.dashboard.stock.manage_products') }}
                         </a>
                     </div>
                     
@@ -275,7 +275,7 @@
                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728m-9.9-2.828a5 5 0 007.072 0m2.828-9.9a9 9 0 000 12.728M6.343 6.343L4.93 4.93m12.728 12.728L16.24 16.24"/>
                             </svg>
-                            <span x-text="notifications.sound ? '🔊 Son ON' : '🔇 Son OFF'"></span>
+                            <span x-text="notifications.sound ? '{{ __('app.pages.dashboard.stock.sound_on') }}' : '{{ __('app.pages.dashboard.stock.sound_off') }}'"></span>
                         </button>
                         
                         <button @click="toggleDesktopNotifications()" 
@@ -284,7 +284,7 @@
                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 4.828A4 4 0 015.858 4H9a4 4 0 014 4v1a1.97 1.97 0 00.971 1.691l2.026 1.18a2 2 0 011.003 1.73V17h-5"/>
                             </svg>
-                            <span x-text="notifications.desktop ? '🔔 Desktop ON' : '🔕 Desktop OFF'"></span>
+                            <span x-text="notifications.desktop ? '{{ __('app.pages.dashboard.stock.desktop_on') }}' : '{{ __('app.pages.dashboard.stock.desktop_off') }}'"></span>
                         </button>
                     </div>
                 </div>
@@ -304,7 +304,7 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-2xl font-bold text-red-900">{{ $stats['stock']['out_of_stock'] }}</p>
-                            <p class="text-sm text-red-700">Rupture de stock</p>
+                            <p class="text-sm text-red-700">{{ __('app.pages.dashboard.stock.out_of_stock_title') }}</p>
                             @if(($stats['stock']['out_of_stock'] ?? 0) > 0)
                                 <p class="text-xs text-red-600 font-medium mt-1 animate-pulse-fast">⚠️ Action requise</p>
                             @endif
@@ -324,7 +324,7 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-2xl font-bold text-orange-900">{{ $stats['stock']['critical_stock'] }}</p>
-                            <p class="text-sm text-orange-700">Stock critique</p>
+                            <p class="text-sm text-orange-700">{{ __('app.pages.dashboard.stock.critical_stock_title') }}</p>
                             @if(($stats['stock']['critical_stock'] ?? 0) > 0)
                                 <p class="text-xs text-orange-600 font-medium mt-1 animate-pulse">⚡ Réapprovisionnement recommandé</p>
                             @endif
@@ -344,9 +344,9 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-2xl font-bold text-yellow-900">{{ $stats['stock']['low_stock'] }}</p>
-                            <p class="text-sm text-yellow-700">Stock bas</p>
+                            <p class="text-sm text-yellow-700">{{ __('app.pages.dashboard.stock.low_stock_title') }}</p>
                             @if(($stats['stock']['low_stock'] ?? 0) > 0)
-                                <p class="text-xs text-yellow-600 font-medium mt-1">📋 Surveillance nécessaire</p>
+                                <p class="text-xs text-yellow-600 font-medium mt-1">{{ __('app.pages.dashboard.stock.low_stock_monitoring') }}</p>
                             @endif
                         </div>
                     </div>
@@ -364,7 +364,7 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-2xl font-bold text-green-900">{{ $stats['stock']['normal_stock'] }}</p>
-                            <p class="text-sm text-green-700">Stock normal</p>
+                            <p class="text-sm text-green-700">{{ __('app.pages.dashboard.stock.normal_stock') }}</p>
                         </div>
                     </div>
                 </div>
@@ -375,19 +375,19 @@
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div class="text-center">
                         <p class="text-lg font-bold text-blue-900">{{ number_format($stats['stock']['total_stock_value'], 2) }}€</p>
-                        <p class="text-sm text-blue-700">Valeur totale du stock</p>
+                        <p class="text-sm text-blue-700">{{ __('app.pages.dashboard.stock.total_stock_value') }}</p>
                     </div>
                 </div>
                 <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                     <div class="text-center">
                         <p class="text-lg font-bold text-red-900">{{ number_format($stats['stock']['critical_stock_value'], 2) }}€</p>
-                        <p class="text-sm text-red-700">Valeur stock critique</p>
+                        <p class="text-sm text-red-700">{{ __('app.pages.dashboard.stock.critical_stock_value') }}</p>
                     </div>
                 </div>
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <div class="text-center">
                         <p class="text-lg font-bold text-gray-900">{{ $stats['stock']['needs_attention'] }}</p>
-                        <p class="text-sm text-gray-700">Produits nécessitant attention</p>
+                        <p class="text-sm text-gray-700">{{ __('app.pages.dashboard.stock.monitoring_required') }}</p>
                     </div>
                 </div>
             </div>
@@ -397,9 +397,9 @@
                 <!-- Produits en Stock Critique -->
                 <div class="border border-gray-200 rounded-lg p-4">
                     <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-md font-medium text-gray-900">🚨 Produits en Stock Critique</h4>
+                        <h4 class="text-md font-medium text-gray-900">{{ __('app.pages.dashboard.stock.critical_products_title') }}</h4>
                         <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
-                            {{ $stats['stock']['critical_products']->count() }} produits
+                            {{ $stats['stock']['critical_products']->count() }} {{ __('app.pages.dashboard.stock.products_count') }}
                         </span>
                     </div>
                     
@@ -409,13 +409,13 @@
                                 <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
                                     <div class="flex-1">
                                         <p class="text-sm font-medium text-gray-900">{{ $product->name }}</p>
-                                        <p class="text-xs text-gray-500">{{ $product->category->name ?? 'Sans catégorie' }}</p>
+                                        <p class="text-xs text-gray-500">{{ $product->category->name ?? __('app.pages.dashboard.stock.no_category') }}</p>
                                         <div class="flex items-center space-x-2 mt-1">
                                             <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
-                                                Stock: {{ $product->quantity }}
+                                                {{ __('app.pages.dashboard.stock.stock_label') }}: {{ $product->quantity }}
                                             </span>
                                             <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
-                                                Seuil: {{ $product->critical_threshold }}
+                                                {{ __('app.pages.dashboard.stock.threshold_label') }}: {{ $product->critical_threshold }}
                                             </span>
                                         </div>
                                     </div>
@@ -423,7 +423,7 @@
                                         <p class="text-sm font-bold text-red-900">{{ number_format($product->price * $product->quantity, 2) }}€</p>
                                         <a href="{{ route('admin.products.edit', $product) }}" 
                                            class="text-xs text-blue-600 hover:text-blue-800">
-                                            Modifier
+                                            {{ __('app.pages.dashboard.stock.edit_action') }}
                                         </a>
                                     </div>
                                 </div>
@@ -434,12 +434,12 @@
                         <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm font-medium text-yellow-900">🔄 Suggestions de Réapprovisionnement</p>
-                                    <p class="text-xs text-yellow-700">Cliquez pour générer automatiquement les quantités recommandées</p>
+                                    <p class="text-sm font-medium text-yellow-900">{{ __('app.pages.dashboard.stock.restock_suggestions') }}</p>
+                                    <p class="text-xs text-yellow-700">{{ __('app.pages.dashboard.stock.restock_description') }}</p>
                                 </div>
                                 <button onclick="generateRestockSuggestions()" 
                                         class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded text-xs transition-colors">
-                                    Générer
+                                    {{ __('app.pages.dashboard.stock.generate_action') }}
                                 </button>
                             </div>
                         </div>
@@ -448,7 +448,7 @@
                             <svg class="mx-auto h-12 w-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            <p class="mt-2 text-sm text-gray-500">Aucun produit en stock critique</p>
+                            <p class="mt-2 text-sm text-gray-500">{{ __('app.pages.dashboard.stock.no_critical_stock') }}</p>
                         </div>
                     @endif
                 </div>
@@ -456,9 +456,9 @@
                 <!-- Alertes Récentes -->
                 <div class="border border-gray-200 rounded-lg p-4">
                     <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-md font-medium text-gray-900">📢 Alertes Stock Récentes</h4>
+                        <h4 class="text-md font-medium text-gray-900">{{ __('app.pages.dashboard.stock.recent_alerts_title') }}</h4>
                         <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
-                            7 derniers jours
+                            {{ __('app.pages.dashboard.stock.last_days') }}
                         </span>
                     </div>
                     
@@ -474,13 +474,13 @@
                                         </div>
                                         @switch($alert->priority)
                                             @case('urgent')
-                                                <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Urgent</span>
+                                                <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">{{ __('app.pages.dashboard.stock.urgent_priority') }}</span>
                                                 @break
                                             @case('high')
-                                                <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">Élevé</span>
+                                                <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">{{ __('app.pages.dashboard.stock.high_priority') }}</span>
                                                 @break
                                             @default
-                                                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">Normal</span>
+                                                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">{{ __('app.pages.dashboard.stock.normal_priority') }}</span>
                                         @endswitch
                                     </div>
                                 </div>
@@ -491,7 +491,7 @@
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h6v-6H4v6z"/>
                             </svg>
-                            <p class="mt-2 text-sm text-gray-500">Aucune alerte récente</p>
+                            <p class="mt-2 text-sm text-gray-500">{{ __('app.pages.dashboard.stock.no_recent_alerts') }}</p>
                         </div>
                     @endif
                 </div>
@@ -509,9 +509,9 @@
                         <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4"/>
                         </svg>
-                        Fréquentation
+                        {{ __('app.pages.dashboard.analytics.title') }}
                     </h3>
-                    <p class="text-sm text-gray-600">Analytics du site</p>
+                    <p class="text-sm text-gray-600">{{ __('app.pages.dashboard.analytics.description') }}</p>
                 </div>
                 <a href="{{ route('admin.statistics') }}" class="text-blue-600 hover:text-blue-800">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -524,26 +524,26 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-white rounded-lg p-3 border border-blue-100">
                         <div class="text-2xl font-bold text-blue-600">{{ number_format($stats['analytics']['unique_visitors'] ?? 1247) }}</div>
-                        <div class="text-xs text-gray-600">Visiteurs uniques</div>
-                        <div class="text-xs text-green-600">+12.5% ce mois</div>
+                        <div class="text-xs text-gray-600">{{ __('app.pages.dashboard.analytics.unique_visitors') }}</div>
+                        <div class="text-xs text-green-600">+12.5% {{ __('app.pages.dashboard.analytics.monthly_growth') }}</div>
                     </div>
                     <div class="bg-white rounded-lg p-3 border border-blue-100">
                         <div class="text-2xl font-bold text-indigo-600">{{ number_format($stats['analytics']['page_views'] ?? 3842) }}</div>
-                        <div class="text-xs text-gray-600">Pages vues</div>
-                        <div class="text-xs text-green-600">+8.3% ce mois</div>
+                        <div class="text-xs text-gray-600">{{ __('app.pages.dashboard.analytics.page_views') }}</div>
+                        <div class="text-xs text-green-600">+8.3% {{ __('app.pages.dashboard.analytics.monthly_growth') }}</div>
                     </div>
                 </div>
                 
                 <div class="bg-white rounded-lg p-3 border border-blue-100">
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600">Taux de rebond</span>
+                        <span class="text-sm text-gray-600">{{ __('app.pages.dashboard.analytics.bounce_rate') }}</span>
                         <span class="text-sm font-medium text-orange-600">{{ $stats['analytics']['bounce_rate'] ?? '42.3%' }}</span>
                     </div>
                 </div>
                 
                 <div class="bg-white rounded-lg p-3 border border-blue-100">
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600">Durée moyenne</span>
+                        <span class="text-sm text-gray-600">{{ __('app.pages.dashboard.analytics.avg_session_duration') }}</span>
                         <span class="text-sm font-medium text-blue-600">{{ $stats['analytics']['avg_session_duration'] ?? '2m 34s' }}</span>
                     </div>
                 </div>
@@ -558,9 +558,9 @@
                         <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 7.89a1 1 0 001.42 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
-                        Newsletter
+                        {{ __('app.pages.dashboard.newsletter.title') }}
                     </h3>
-                    <p class="text-sm text-gray-600">Performance email</p>
+                    <p class="text-sm text-gray-600">{{ __('app.pages.dashboard.newsletter.description') }}</p>
                 </div>
                 <a href="{{ route('admin.newsletters.index') }}" class="text-purple-600 hover:text-purple-800">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -573,28 +573,28 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-white rounded-lg p-3 border border-purple-100">
                         <div class="text-2xl font-bold text-purple-600">{{ number_format($stats['newsletter']['subscribers'] ?? 0) }}</div>
-                        <div class="text-xs text-gray-600">Abonnés actifs</div>
+                        <div class="text-xs text-gray-600">{{ __('app.pages.dashboard.newsletter.active_subscribers') }}</div>
                         <div class="text-xs {{ ($stats['newsletter']['growth_rate'] ?? 0) > 0 ? 'text-green-600' : 'text-red-600' }}">
-                            {{ ($stats['newsletter']['growth_rate'] ?? 0) > 0 ? '+' : '' }}{{ $stats['newsletter']['growth_rate'] ?? '+5.2' }}% ce mois
+                            {{ ($stats['newsletter']['growth_rate'] ?? 0) > 0 ? '+' : '' }}{{ $stats['newsletter']['growth_rate'] ?? '+5.2' }}% {{ __('app.pages.dashboard.newsletter.this_month') }}
                         </div>
                     </div>
                     <div class="bg-white rounded-lg p-3 border border-purple-100">
                         <div class="text-2xl font-bold text-pink-600">{{ $stats['newsletter']['sent_count'] ?? 0 }}</div>
-                        <div class="text-xs text-gray-600">Emails envoyés</div>
-                        <div class="text-xs text-blue-600">Ce mois</div>
+                        <div class="text-xs text-gray-600">{{ __('app.pages.dashboard.newsletter.emails_sent') }}</div>
+                        <div class="text-xs text-blue-600">{{ __('app.pages.dashboard.newsletter.this_month') }}</div>
                     </div>
                 </div>
                 
                 <div class="bg-white rounded-lg p-3 border border-purple-100">
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600">Taux d'ouverture</span>
+                        <span class="text-sm text-gray-600">{{ __('app.pages.dashboard.newsletter.open_rate') }}</span>
                         <span class="text-sm font-medium text-green-600">{{ $stats['newsletter']['open_rate'] ?? '0.0' }}%</span>
                     </div>
                 </div>
                 
                 <div class="bg-white rounded-lg p-3 border border-purple-100">
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600">Taux de clic</span>
+                        <span class="text-sm text-gray-600">{{ __('app.pages.dashboard.newsletter.click_rate') }}</span>
                         <span class="text-sm font-medium text-blue-600">{{ $stats['newsletter']['click_rate'] ?? '0.0' }}%</span>
                     </div>
                 </div>
@@ -609,9 +609,9 @@
                         <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
                         </svg>
-                        Locations
+                        {{ __('app.pages.dashboard.rentals.title') }}
                     </h3>
-                    <p class="text-sm text-gray-600">Performance location</p>
+                    <p class="text-sm text-gray-600">{{ __('app.pages.dashboard.rentals.description') }}</p>
                 </div>
                 <a href="{{ route('admin.rental-returns.index') }}" class="text-green-600 hover:text-green-800">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -624,13 +624,13 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-white rounded-lg p-3 border border-green-100">
                         <div class="text-2xl font-bold text-green-600">{{ number_format($stats['rentals']['total_orders'] ?? 0) }}</div>
-                        <div class="text-xs text-gray-600">Commandes location</div>
-                        <div class="text-xs text-blue-600">Total</div>
+                        <div class="text-xs text-gray-600">{{ __('app.pages.dashboard.rentals.total_orders') }}</div>
+                        <div class="text-xs text-blue-600">{{ __('app.pages.dashboard.rentals.total') }}</div>
                     </div>
                     <div class="bg-white rounded-lg p-3 border border-green-100">
                         <div class="text-2xl font-bold text-emerald-600">{{ number_format($stats['rentals']['monthly_revenue'] ?? 0, 2) }}€</div>
-                        <div class="text-xs text-gray-600">Revenus location</div>
-                        <div class="text-xs text-green-600">Ce mois</div>
+                        <div class="text-xs text-gray-600">{{ __('app.pages.dashboard.rentals.monthly_revenue') }}</div>
+                        <div class="text-xs text-green-600">{{ __('app.pages.dashboard.newsletter.this_month') }}</div>
                     </div>
                 </div>
                 
@@ -638,35 +638,35 @@
                 <div class="space-y-2">
                     <div class="bg-white rounded-lg p-2 border border-green-100">
                         <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">🟢 Locations actives</span>
+                            <span class="text-sm text-gray-600">{{ __('app.pages.dashboard.rentals.active_orders') }}</span>
                             <span class="text-sm font-medium text-green-600">{{ $stats['rentals']['active_orders'] ?? 0 }}</span>
                         </div>
                     </div>
                     
                     <div class="bg-white rounded-lg p-2 border border-green-100">
                         <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">🟠 Clôturées (en attente inspection)</span>
+                            <span class="text-sm text-gray-600">{{ __('app.pages.dashboard.rentals.closed_orders') }}</span>
                             <span class="text-sm font-medium text-orange-600">{{ $stats['rentals']['closed_orders'] ?? 0 }}</span>
                         </div>
                     </div>
                     
                     <div class="bg-white rounded-lg p-2 border border-green-100">
                         <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">🔍 Inspection en cours</span>
+                            <span class="text-sm text-gray-600">{{ __('app.pages.dashboard.rentals.inspecting_orders') }}</span>
                             <span class="text-sm font-medium text-indigo-600">{{ $stats['rentals']['inspecting_orders'] ?? 0 }}</span>
                         </div>
                     </div>
                     
                     <div class="bg-white rounded-lg p-2 border border-green-100">
                         <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">✅ Inspection terminée</span>
+                            <span class="text-sm text-gray-600">{{ __('app.pages.dashboard.rentals.finished_orders') }}</span>
                             <span class="text-sm font-medium text-emerald-600">{{ $stats['rentals']['finished_orders'] ?? 0 }}</span>
                         </div>
                     </div>
                     
                     <div class="bg-white rounded-lg p-2 border border-green-100">
                         <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">🟣 Retours en attente</span>
+                            <span class="text-sm text-gray-600">{{ __('app.pages.dashboard.rentals.pending_returns') }}</span>
                             <span class="text-sm font-medium text-purple-600">{{ $stats['rentals']['pending_returns'] ?? 0 }}</span>
                         </div>
                     </div>
@@ -680,8 +680,8 @@
         <div class="px-4 py-5 sm:p-6">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">📊 Performance du Site</h3>
-                    <p class="text-sm text-gray-500">Graphiques de tendances et performances</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">📊 {{ __('app.pages.dashboard.performance.title') }}</h3>
+                    <p class="text-sm text-gray-500">{{ __('app.pages.dashboard.performance.description') }}</p>
                 </div>
                 <div class="flex space-x-2">
                     <button onclick="refreshCharts()" 
@@ -689,11 +689,11 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
-                        Actualiser
+                        {{ __('app.pages.dashboard.stock.refresh') }}
                     </button>
                     <a href="{{ route('admin.statistics') }}" 
                        class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
-                        Vue détaillée
+                        {{ __('app.pages.dashboard.performance.detailed_view') }}
                     </a>
                 </div>
             </div>
@@ -702,7 +702,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Graphique visiteurs -->
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
-                    <h4 class="text-sm font-medium text-gray-700 mb-3">📈 Évolution Visiteurs (7j)</h4>
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">{{ __('app.pages.dashboard.performance.visitor_evolution') }}</h4>
                     <div class="flex items-end space-x-1 h-20">
                         @php
                             $visitorData = [45, 52, 48, 61, 55, 67, 73]; // Données de démonstration
@@ -715,19 +715,19 @@
                         @endforeach
                     </div>
                     <div class="flex justify-between text-xs text-gray-500 mt-2">
-                        <span>Lun</span>
-                        <span>Mar</span>
-                        <span>Mer</span>
-                        <span>Jeu</span>
-                        <span>Ven</span>
-                        <span>Sam</span>
-                        <span>Dim</span>
+                        <span>{{ __('app.pages.dashboard.days.mon') }}</span>
+                        <span>{{ __('app.pages.dashboard.days.tue') }}</span>
+                        <span>{{ __('app.pages.dashboard.days.wed') }}</span>
+                        <span>{{ __('app.pages.dashboard.days.thu') }}</span>
+                        <span>{{ __('app.pages.dashboard.days.fri') }}</span>
+                        <span>{{ __('app.pages.dashboard.days.sat') }}</span>
+                        <span>{{ __('app.pages.dashboard.days.sun') }}</span>
                     </div>
                 </div>
 
                 <!-- Graphique commandes -->
                 <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-100">
-                    <h4 class="text-sm font-medium text-gray-700 mb-3">🛒 Commandes Récentes (7j)</h4>
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">{{ __('app.pages.dashboard.performance.recent_orders') }}</h4>
                     <div class="flex items-end space-x-1 h-20">
                         @php
                             $orderData = [12, 18, 15, 22, 19, 25, 21]; // Données de démonstration
@@ -740,22 +740,22 @@
                         @endforeach
                     </div>
                     <div class="flex justify-between text-xs text-gray-500 mt-2">
-                        <span>Lun</span>
-                        <span>Mar</span>
-                        <span>Mer</span>
-                        <span>Jeu</span>
-                        <span>Ven</span>
-                        <span>Sam</span>
-                        <span>Dim</span>
+                        <span>{{ __('app.pages.dashboard.days.mon') }}</span>
+                        <span>{{ __('app.pages.dashboard.days.tue') }}</span>
+                        <span>{{ __('app.pages.dashboard.days.wed') }}</span>
+                        <span>{{ __('app.pages.dashboard.days.thu') }}</span>
+                        <span>{{ __('app.pages.dashboard.days.fri') }}</span>
+                        <span>{{ __('app.pages.dashboard.days.sat') }}</span>
+                        <span>{{ __('app.pages.dashboard.days.sun') }}</span>
                     </div>
                 </div>
 
                 <!-- Graphique newsletter -->
                 <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-100">
-                    <h4 class="text-sm font-medium text-gray-700 mb-3">💌 Newsletter Performance</h4>
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">{{ __('app.pages.dashboard.performance.newsletter_performance') }}</h4>
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
-                            <span class="text-xs text-gray-600">Taux d'ouverture</span>
+                            <span class="text-xs text-gray-600">{{ __('app.pages.dashboard.newsletter.open_rate') }}</span>
                             <div class="flex items-center">
                                 <div class="w-20 bg-gray-200 rounded-full h-2 mr-2">
                                     <div class="bg-purple-500 h-2 rounded-full" style="width: {{ $stats['newsletter']['open_rate'] ?? 65 }}%;"></div>
@@ -764,7 +764,7 @@
                             </div>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-xs text-gray-600">Taux de clic</span>
+                            <span class="text-xs text-gray-600">{{ __('app.pages.dashboard.newsletter.click_rate') }}</span>
                             <div class="flex items-center">
                                 <div class="w-20 bg-gray-200 rounded-full h-2 mr-2">
                                     <div class="bg-pink-500 h-2 rounded-full" style="width: {{ $stats['newsletter']['click_rate'] ?? 23 }}%;"></div>
@@ -773,7 +773,7 @@
                             </div>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-xs text-gray-600">Croissance</span>
+                            <span class="text-xs text-gray-600">{{ __('app.pages.dashboard.newsletter.growth_rate') }}</span>
                             <span class="text-xs font-medium text-green-600">{{ $stats['newsletter']['growth_rate'] ?? '+5.2' }}%</span>
                         </div>
                     </div>
@@ -784,25 +784,25 @@
             <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="text-center p-4 bg-gray-50 rounded-lg">
                     <div class="text-2xl font-bold text-blue-600">{{ number_format($stats['analytics']['visitors'] ?? 1247) }}</div>
-                    <div class="text-sm text-gray-600">Visiteurs totaux</div>
-                    <div class="text-xs text-green-600 mt-1">+12.5% ce mois</div>
+                    <div class="text-sm text-gray-600">{{ __('app.pages.dashboard.analytics.visitors_total') }}</div>
+                    <div class="text-xs text-green-600 mt-1">+12.5% {{ __('app.pages.dashboard.analytics.monthly_growth') }}</div>
                 </div>
                 <div class="text-center p-4 bg-gray-50 rounded-lg">
                     <div class="text-2xl font-bold text-green-600">{{ $stats['orders'] ?? 0 }}</div>
-                    <div class="text-sm text-gray-600">Commandes</div>
-                    <div class="text-xs text-blue-600 mt-1">Total site</div>
+                    <div class="text-sm text-gray-600">{{ __('app.pages.dashboard.stats.orders') }}</div>
+                    <div class="text-xs text-blue-600 mt-1">{{ __('app.pages.dashboard.performance.total_site') }}</div>
                 </div>
                 <div class="text-center p-4 bg-gray-50 rounded-lg">
                     <div class="text-2xl font-bold text-purple-600">{{ number_format($stats['newsletter']['subscribers'] ?? 0) }}</div>
-                    <div class="text-sm text-gray-600">Abonnés newsletter</div>
+                    <div class="text-sm text-gray-600">{{ __('app.pages.dashboard.performance.newsletter_subscribers') }}</div>
                     <div class="text-xs {{ ($stats['newsletter']['growth_rate'] ?? 0) > 0 ? 'text-green-600' : 'text-red-600' }} mt-1">
-                        {{ ($stats['newsletter']['growth_rate'] ?? 0) > 0 ? '+' : '' }}{{ $stats['newsletter']['growth_rate'] ?? '+5.2' }}% ce mois
+                        {{ ($stats['newsletter']['growth_rate'] ?? 0) > 0 ? '+' : '' }}{{ $stats['newsletter']['growth_rate'] ?? '+5.2' }}% {{ __('app.pages.dashboard.analytics.monthly_growth') }}
                     </div>
                 </div>
                 <div class="text-center p-4 bg-gray-50 rounded-lg">
                     <div class="text-2xl font-bold text-emerald-600">{{ number_format($stats['rentals']['monthly_revenue'] ?? 0, 2) }}€</div>
-                    <div class="text-sm text-gray-600">Revenus location</div>
-                    <div class="text-xs text-emerald-600 mt-1">Ce mois</div>
+                    <div class="text-sm text-gray-600">{{ __('app.pages.dashboard.rentals.monthly_revenue') }}</div>
+                    <div class="text-xs text-emerald-600 mt-1">{{ __('app.pages.dashboard.actions.this_month') }}</div>
                 </div>
             </div>
         </div>
@@ -813,9 +813,9 @@
         <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Utilisateurs récents</h3>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('app.pages.dashboard.recent.users') }}</h3>
                     <a href="{{ route('admin.users.index') }}" class="text-sm text-green-600 hover:text-green-500">
-                        Voir tous
+                        {{ __('app.pages.dashboard.recent.view_all') }}
                     </a>
                 </div>
                 
@@ -843,7 +843,7 @@
                         @endforeach
                     </div>
                 @else
-                    <p class="text-gray-500 text-sm">Aucun utilisateur récent.</p>
+                    <p class="text-gray-500 text-sm">{{ __('app.pages.dashboard.recent.no_users') }}</p>
                 @endif
             </div>
         </div>
@@ -852,9 +852,9 @@
         <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Articles récents</h3>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('app.pages.dashboard.recent.articles') }}</h3>
                     <a href="{{ route('admin.blog.index') }}" class="text-sm text-green-600 hover:text-green-500">
-                        Voir tous
+                        {{ __('app.pages.dashboard.recent.view_all') }}
                     </a>
                 </div>
                 
@@ -886,17 +886,17 @@
                                     @switch($post->status)
                                         @case('published')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                Publié
+                                                {{ __('app.pages.dashboard.status.published') }}
                                             </span>
                                             @break
                                         @case('draft')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                Brouillon
+                                                {{ __('app.pages.dashboard.status.draft') }}
                                             </span>
                                             @break
                                         @case('scheduled')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                Programmé
+                                                {{ __('app.pages.dashboard.status.scheduled') }}
                                             </span>
                                             @break
                                     @endswitch
@@ -905,7 +905,7 @@
                         @endforeach
                     </div>
                 @else
-                    <p class="text-gray-500 text-sm">Aucun article récent.</p>
+                    <p class="text-gray-500 text-sm">{{ __('app.pages.dashboard.recent.no_articles') }}</p>
                 @endif
             </div>
         </div>
@@ -914,7 +914,7 @@
     <!-- Actions rapides -->
     <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Actions rapides</h3>
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">{{ __('app.pages.dashboard.quick_actions') }}</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 <a href="{{ route('admin.blog.index') }}" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     <div class="flex-shrink-0">
@@ -925,8 +925,8 @@
                         </div>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm font-medium text-gray-900">Gérer Articles</p>
-                        <p class="text-xs text-gray-500">Voir tous les articles</p>
+                        <p class="text-sm font-medium text-gray-900">{{ __('app.pages.dashboard.actions.manage_articles') }}</p>
+                        <p class="text-xs text-gray-500">{{ __('app.pages.dashboard.actions.view_all_articles') }}</p>
                     </div>
                 </a>
 
@@ -939,8 +939,8 @@
                         </div>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm font-medium text-gray-900">Gérer Catégories</p>
-                        <p class="text-xs text-gray-500">Voir toutes les catégories</p>
+                        <p class="text-sm font-medium text-gray-900">{{ __('app.pages.dashboard.actions.manage_categories') }}</p>
+                        <p class="text-xs text-gray-500">{{ __('app.pages.dashboard.actions.view_all_categories') }}</p>
                     </div>
                 </a>
 
@@ -954,8 +954,8 @@
                         </div>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm font-medium text-gray-900">Voir le Blog</p>
-                        <p class="text-xs text-gray-500">Page publique du blog</p>
+                        <p class="text-sm font-medium text-gray-900">{{ __('app.pages.dashboard.actions.view_blog') }}</p>
+                        <p class="text-xs text-gray-500">{{ __('app.pages.dashboard.actions.blog_public_page') }}</p>
                     </div>
                 </a>
 
@@ -968,8 +968,8 @@
                         </div>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm font-medium text-gray-900">Gérer Utilisateurs</p>
-                        <p class="text-xs text-gray-500">Voir tous les utilisateurs</p>
+                        <p class="text-sm font-medium text-gray-900">{{ __('app.pages.dashboard.actions.manage_users') }}</p>
+                        <p class="text-xs text-gray-500">{{ __('app.pages.dashboard.actions.view_all_users') }}</p>
                     </div>
                 </a>
 
@@ -982,12 +982,12 @@
                         </div>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm font-medium text-gray-900">Gérer Commentaires</p>
+                        <p class="text-sm font-medium text-gray-900">{{ __('app.pages.dashboard.actions.manage_comments') }}</p>
                         <p class="text-xs text-gray-500">
                             @if($stats['pending_comments'] > 0)
-                                {{ $stats['pending_comments'] }} en attente
+                                {{ $stats['pending_comments'] }} {{ __('app.pages.dashboard.actions.pending_comments') }}
                             @else
-                                Tous les commentaires
+                                {{ __('app.pages.dashboard.actions.all_comments') }}
                             @endif
                         </p>
                     </div>
@@ -1002,7 +1002,7 @@
                         </div>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm font-medium text-gray-900">Signalements</p>
+                        <p class="text-sm font-medium text-gray-900">{{ __('app.pages.dashboard.actions.reports') }}</p>
                         <p class="text-xs text-gray-500">
                             @if($stats['pending_reports'] > 0)
                                 {{ $stats['pending_reports'] }} à traiter
@@ -1553,7 +1553,7 @@ document.addEventListener('alpine:init', () => {
             const modal = `
                 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                     <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                        <h3 class="text-lg font-medium mb-4">Suggestion de Réapprovisionnement</h3>
+                        <h3 class="text-lg font-medium mb-4">{{ __('app.pages.dashboard.restocking.suggestion_title') }}</h3>
                         <div class="space-y-3">
                             <p><span class="font-medium">Produit:</span> ${suggestion.product_name}</p>
                             <p><span class="font-medium">Stock actuel:</span> ${suggestion.current_stock}</p>
@@ -1593,7 +1593,7 @@ document.addEventListener('alpine:init', () => {
             const modal = `
                 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                     <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-                        <h3 class="text-lg font-medium mb-4">Suggestions de Réapprovisionnement en Masse</h3>
+                        <h3 class="text-lg font-medium mb-4">{{ __('app.pages.dashboard.restocking.bulk_suggestions_title') }}</h3>
                         <div class="space-y-2 mb-6">
                             ${suggestionsHtml}
                         </div>

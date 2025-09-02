@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
-@section('title', 'Location #' . $orderLocation->order_number . ' - Dashboard Admin')
-@section('page-title', 'Détail de la location #' . $orderLocation->order_number)
+@section('title', __('order_locations.order_detail_title', ['number' => $orderLocation->order_number]) . ' - Dashboard Admin')
+@section('page-title', __('order_locations.order_detail_title', ['number' => $orderLocation->order_number]))
 
 @section('content')
 <div class="space-y-6">
     <!-- Retour -->
     <div>
         <a href="{{ route('admin.order-locations.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-            ← Retour à la liste des locations
+            ← {{ __('order_locations.back_to_orders') }}
         </a>
     </div>
 
@@ -16,33 +16,33 @@
     <div class="bg-white rounded-lg shadow p-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Informations de location</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('order_locations.rental_information') }}</h3>
                 <dl class="space-y-2">
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Numéro de location</dt>
+                        <dt class="text-sm font-medium text-gray-500">{{ __('order_locations.order_number_label') }}</dt>
                         <dd class="text-sm text-gray-900">#{{ $orderLocation->order_number }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Date de commande</dt>
+                        <dt class="text-sm font-medium text-gray-500">{{ __('order_locations.order_date') }}</dt>
                         <dd class="text-sm text-gray-900">{{ $orderLocation->created_at->format('d/m/Y à H:i') }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Période de location</dt>
+                        <dt class="text-sm font-medium text-gray-500">{{ __('order_locations.rental_period') }}</dt>
                         <dd class="text-sm text-gray-900">
-                            Du {{ \Carbon\Carbon::parse($orderLocation->start_date)->format('d/m/Y') }} 
-                            au {{ \Carbon\Carbon::parse($orderLocation->end_date)->format('d/m/Y') }}
+                            {{ __('order_locations.from') }} {{ \Carbon\Carbon::parse($orderLocation->start_date)->format('d/m/Y') }} 
+                            {{ __('order_locations.to') }} {{ \Carbon\Carbon::parse($orderLocation->end_date)->format('d/m/Y') }}
                             <span class="text-gray-500">
-                                ({{ \Carbon\Carbon::parse($orderLocation->start_date)->diffInDays($orderLocation->end_date) }} jours)
+                                ({{ \Carbon\Carbon::parse($orderLocation->start_date)->diffInDays($orderLocation->end_date) }} {{ __('order_locations.duration') }})
                             </span>
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Montant total</dt>
+                        <dt class="text-sm font-medium text-gray-500">{{ __('order_locations.total_amount') }}</dt>
                         <dd class="text-lg font-semibold text-gray-900">{{ number_format($orderLocation->total_amount, 2) }}€</dd>
                     </div>
                     @if($orderLocation->caution_amount)
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Caution</dt>
+                        <dt class="text-sm font-medium text-gray-500">{{ __('order_locations.deposit_amount') }}</dt>
                         <dd class="text-sm text-gray-900">{{ number_format($orderLocation->caution_amount, 2) }}€</dd>
                     </div>
                     @endif
@@ -50,25 +50,25 @@
             </div>
 
             <div>
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Informations client</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('order_locations.customer_information') }}</h3>
                 <dl class="space-y-2">
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Nom</dt>
+                        <dt class="text-sm font-medium text-gray-500">{{ __('order_locations.customer_name') }}</dt>
                         <dd class="text-sm text-gray-900">{{ $orderLocation->user->name }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Email</dt>
+                        <dt class="text-sm font-medium text-gray-500">{{ __('order_locations.customer_email') }}</dt>
                         <dd class="text-sm text-gray-900">{{ $orderLocation->user->email }}</dd>
                     </div>
                     @if($orderLocation->user->phone)
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Téléphone</dt>
+                        <dt class="text-sm font-medium text-gray-500">{{ __('order_locations.customer_phone') }}</dt>
                         <dd class="text-sm text-gray-900">{{ $orderLocation->user->phone }}</dd>
                     </div>
                     @endif
                     @if($orderLocation->delivery_address)
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Adresse de livraison</dt>
+                        <dt class="text-sm font-medium text-gray-500">{{ __('order_locations.delivery_address') }}</dt>
                         <dd class="text-sm text-gray-900 whitespace-pre-line">
                             @if(is_array($orderLocation->delivery_address))
                                 {{ implode("\n", $orderLocation->delivery_address) }}

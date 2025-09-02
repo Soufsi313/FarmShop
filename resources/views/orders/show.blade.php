@@ -34,8 +34,8 @@
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">
                         {{ __('app.orders.order_number', ['number' => $order->order_number]) }}
                     </h1>
-                    <p class="text-gray-600">
-                        {{ __('app.orders.placed_on') }} {{ $order->created_at->format('d/m/Y à H:i') }}
+                                        <p class="text-sm text-gray-600">
+                        {{ __('app.orders.placed_on') }} {{ $order->created_at->format(__('app.date_format.datetime')) }}
                     </p>
                 </div>
                 
@@ -86,7 +86,7 @@
             <div class="mt-4">
                 <a href="{{ route('orders.index') }}" 
                    class="text-green-600 hover:text-green-800 text-sm font-medium">
-                    ← Retour à mes commandes
+                    ← {{ __('app.orders.back_to_orders') }}
                 </a>
             </div>
         </div>
@@ -98,7 +98,7 @@
                 
                 <!-- Articles commandés -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Articles commandés</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.orders.ordered_items') }}</h2>
                     <div class="space-y-4">
                         @foreach($order->items as $item)
                         <div class="flex items-start space-x-4 pb-4 {{ !$loop->last ? 'border-b border-gray-200' : '' }}">
@@ -153,7 +153,7 @@
 
                 <!-- Informations de livraison -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __("app.forms.delivery_address") }}<//h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.orders.delivery_address') }}</h2>
                     <div class="text-sm">
                         <p class="font-medium">{{ $order->shipping_address['name'] }}</p>
                         <p>{{ $order->shipping_address['address'] }}</p>
@@ -166,7 +166,7 @@
                     
                     @if($order->tracking_number)
                     <div class="mt-4 p-3 bg-blue-50 rounded-lg">
-                        <p class="text-sm font-medium text-blue-900">Numéro de suivi</p>
+                        <p class="text-sm font-medium text-blue-900">{{ __('app.orders.tracking_number') }}</p>
                         <p class="text-sm text-blue-800">{{ $order->tracking_number }}</p>
                     </div>
                     @endif
@@ -174,7 +174,7 @@
 
                 <!-- Informations de facturation -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Adresse de facturation</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.orders.billing_address') }}</h2>
                     <div class="text-sm">
                         <p class="font-medium">{{ $order->billing_address['name'] }}</p>
                         <p>{{ $order->billing_address['address'] }}</p>
@@ -190,7 +190,7 @@
                 
                 <!-- Résumé financier -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Résumé de la commande</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.orders.order_summary') }}</h2>
                     
                     <div class="space-y-3">
                         <div class="flex justify-between text-sm">
@@ -206,9 +206,9 @@
                         @endif
                         
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Frais de livraison</span>
+                            <span class="text-gray-600">{{ __('app.orders.shipping_cost') }}</span>
                             <span class="{{ $order->shipping_cost == 0 ? 'text-green-600' : '' }}">
-                                {{ $order->shipping_cost == 0 ? 'GRATUITE' : number_format($order->shipping_cost, 2) . ' €' }}
+                                {{ $order->shipping_cost == 0 ? __('app.orders.free_shipping') : number_format($order->shipping_cost, 2) . ' €' }}
                             </span>
                         </div>
                         
@@ -230,21 +230,21 @@
 
                 <!-- Statut du paiement -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __("app.ecommerce.payment") }}<//h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __("app.ecommerce.payment") }}</h2>
                     
                     <div class="space-y-3">
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Méthode</span>
+                            <span class="text-gray-600">{{ __('app.orders.payment_method') }}</span>
                             <span class="capitalize">
                                 @switch($order->payment_method)
                                     @case('card')
-                                        💳 Carte bancaire
+                                        {{ __('app.orders.payment_methods.card') }}
                                         @break
                                     @case('paypal')
-                                        💰 PayPal
+                                        {{ __('app.orders.payment_methods.paypal') }}
                                         @break
                                     @case('bank_transfer')
-                                        🏦 Virement bancaire
+                                        {{ __('app.orders.payment_methods.bank_transfer') }}
                                         @break
                                     @default
                                         {{ $order->payment_method }}
@@ -253,20 +253,20 @@
                         </div>
                         
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Statut</span>
+                            <span class="text-gray-600">{{ __('app.orders.payment_status') }}</span>
                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                                 {{ $order->payment_status == 'paid' ? 'bg-green-100 text-green-800' : '' }}
                                 {{ $order->payment_status == 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
                                 {{ $order->payment_status == 'failed' ? 'bg-red-100 text-red-800' : '' }}">
                                 @switch($order->payment_status)
                                     @case('paid')
-                                        ✅ Payé
+                                        {{ __('app.orders.payment_statuses.paid') }}
                                         @break
                                     @case('pending')
-                                        ⏳ En attente
+                                        {{ __('app.orders.payment_statuses.pending') }}
                                         @break
                                     @case('failed')
-                                        ❌ Échec
+                                        {{ __('app.orders.payment_statuses.failed') }}
                                         @break
                                     @default
                                         {{ ucfirst($order->payment_status) }}
@@ -276,7 +276,7 @@
                         
                         @if($order->paid_at)
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Payé le</span>
+                            <span class="text-gray-600">{{ __('app.orders.paid_on') }}</span>
                             <span>{{ $order->paid_at->format('d/m/Y') }}</span>
                         </div>
                         @endif
@@ -285,16 +285,16 @@
 
                 <!-- Actions -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Actions</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.orders.actions') }}</h2>
                     
                     <div class="space-y-3">
                         @if($order->can_be_cancelled && in_array($order->status, ['pending', 'confirmed']))
                         <form method="POST" action="{{ route('orders.cancel', $order) }}" 
-                              onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')">
+                              onsubmit="return confirm('{{ __('app.orders.cancel_order_confirm') }}')">
                             @csrf
                             <button type="submit" 
                                     class="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-red-700 transition-colors">
-                                Annuler la commande
+                                {{ __('app.orders.cancel_order') }}
                             </button>
                         </form>
                         @endif
@@ -303,7 +303,7 @@
                         @if($order->payment_status == 'paid' && $order->invoice_number)
                         <a href="{{ route('orders.invoice', $order) }}" 
                            class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-center block">
-                            📄 Télécharger la facture
+                            {{ __('app.orders.download_invoice') }}
                         </a>
                         @endif
                         
@@ -311,16 +311,16 @@
                         <a x-show="canBeReturnedNow" 
                            href="{{ route('orders.return.confirm', $order) }}" 
                            class="w-full bg-orange-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-orange-700 transition-colors text-center block">
-                            🔄 Retourner la commande
+                            {{ __('app.orders.return_order') }}
                         </a>
                         
                         <!-- Renouveler la commande -->
                         <form action="{{ route('orders.reorder', $order) }}" method="POST" 
-                              onsubmit="return confirm('Voulez-vous vraiment ajouter tous les produits de cette commande à votre panier ?')">
+                              onsubmit="return confirm('{{ __('app.orders.reorder_confirm') }}')">
                             @csrf
                             <button type="submit" 
                                     class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors text-center block">
-                                🔄 Renouveler cette commande
+                                {{ __('app.orders.reorder_button') }}
                             </button>
                         </form>
                     </div>
@@ -336,27 +336,27 @@
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 text-center mb-4">
-                Demander un retour
+                {{ __('app.orders.request_return') }}
             </h3>
             <form id="returnForm" method="POST" action="">
                 @csrf
                 <div class="mb-4">
                     <label for="return_reason" class="block text-sm font-medium text-gray-700 mb-2">
-                        Raison du retour *
+                        {{ __('app.orders.return_reason_label') }}
                     </label>
                     <textarea name="reason" id="return_reason" rows="4" 
                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                              placeholder="Expliquez pourquoi vous souhaitez retourner cette commande..."
+                              placeholder="{{ __('app.orders.return_reason_placeholder') }}"
                               required></textarea>
                 </div>
                 <div class="flex gap-3">
                     <button type="button" onclick="closeReturnModal()" 
                             class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
-                        Annuler
+                        {{ __('app.orders.cancel') }}
                     </button>
                     <button type="submit" 
                             class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700">
-                        Demander le retour
+                        {{ __('app.orders.request_return_btn') }}
                     </button>
                 </div>
             </form>
@@ -467,11 +467,11 @@ function pollOrderUpdate() {
                     // Mettre à jour l'affichage du statut dynamiquement (sans recharger la page)
                     updateStatusDisplay(data.order.status);
                     
-                    console.log('Statut mis à jour:', data.order.status);
+                    console.log('{{ __('app.orders.status_updated') }}', data.order.status);
                 }
             })
             .catch(error => {
-                console.log('Erreur lors de la mise à jour du statut:', error);
+                console.log('{{ __('app.orders.update_error') }}', error);
             });
     }
 }

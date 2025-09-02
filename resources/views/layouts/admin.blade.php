@@ -79,7 +79,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                                 </svg>
                             </div>
-                            <span>{{ __("app.pages.dashboard") }}</span>
+                            <span>{{ __("app.pages.dashboard_title") }}</span>
                         </a>
                     </div>
 
@@ -87,7 +87,7 @@
                     <div class="mt-8">
                         <div class="flex items-center px-4 mb-4">
                             <div class="w-8 h-0.5 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"></div>
-                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Utilisateurs</h3>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __('app.ecommerce.user_management_section') }}</h3>
                         </div>
                         <div class="space-y-2">
                             <a href="{{ route('admin.users.index') }}" 
@@ -97,7 +97,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
                                     </svg>
                                 </div>
-                                <span>Gestion Utilisateurs</span>
+                                <span>{{ __('app.ecommerce.user_management') }}</span>
                             </a>
                         </div>
                     </div>
@@ -106,7 +106,7 @@
                     <div class="mt-8">
                         <div class="flex items-center px-4 mb-4">
                             <div class="w-8 h-0.5 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full"></div>
-                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Catalogue</h3>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __('app.ecommerce.catalog_section') }}</h3>
                         </div>
                         <div class="space-y-2">
                             <a href="{{ route('admin.products.index') }}" 
@@ -136,7 +136,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
                                     </svg>
                                 </div>
-                                <span>Offres Spéciales</span>
+                                <span>{{ __('app.ecommerce.special_offers') }}</span>
                             </a>
 
                             <a href="{{ route('admin.rental-categories.index') }}" 
@@ -155,7 +155,7 @@
                     <div class="mt-8">
                         <div class="flex items-center px-4 mb-4">
                             <div class="w-8 h-0.5 bg-gradient-to-r from-red-400 to-red-600 rounded-full"></div>
-                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Gestion de Stock</h3>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __('app.ecommerce.stock_management_section') }}</h3>
                         </div>
                         <div class="space-y-2">
                             <a href="{{ route('admin.stock.index') }}" 
@@ -165,7 +165,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                                     </svg>
                                 </div>
-                                <span>Vue d'ensemble</span>
+                                <span>{{ __('app.ecommerce.stock_overview') }}</span>
                                 @if(isset($stockStats) && ($stockStats['out_of_stock'] > 0 || $stockStats['critical_stock'] > 0))
                                     <span class="ml-auto px-2 py-1 text-xs bg-red-500/20 text-red-400 rounded-full">
                                         {{ $stockStats['out_of_stock'] + $stockStats['critical_stock'] }}
@@ -180,7 +180,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
                                     </svg>
                                 </div>
-                                <span>Alertes & Seuils</span>
+                                <span>{{ __('app.ecommerce.alerts_thresholds') }}</span>
                             </a>
 
                             <a href="{{ route('admin.stock.restock') }}" 
@@ -190,7 +190,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                                     </svg>
                                 </div>
-                                <span>Réapprovisionnement</span>
+                                <span>{{ __('app.ecommerce.restocking') }}</span>
                             </a>
 
                             <a href="{{ route('admin.stock.reports') }}" 
@@ -200,7 +200,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                                     </svg>
                                 </div>
-                                <span>Rapports & Analyses</span>
+                                <span>{{ __('app.ecommerce.reports_analysis') }}</span>
                             </a>
                         </div>
                     </div>
@@ -209,7 +209,7 @@
                     <div class="mt-8">
                         <div class="flex items-center px-4 mb-4">
                             <div class="w-8 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"></div>
-                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __("app.ecommerce.orders") }}</h3>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __('app.ecommerce.orders_section') }}</h3>
                         </div>
                         <div class="space-y-2">
                             <a href="{{ route('admin.orders.index') }}" 
@@ -219,7 +219,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                                     </svg>
                                 </div>
-                                <span>Commandes Achat</span>
+                                <span>{{ __('app.ecommerce.orders') }}</span>
                             </a>
 
                             <a href="{{ route('admin.order-locations.index') }}" 
@@ -229,7 +229,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                 </div>
-                                <span>Commandes Location</span>
+                                <span>{{ __('app.ecommerce.order_locations') }}</span>
                             </a>
 
                             <a href="{{ route('admin.rental-returns.index') }}" 
@@ -239,7 +239,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                     </svg>
                                 </div>
-                                <span>Retours</span>
+                                <span>{{ __('app.ecommerce.rental_returns') }}</span>
                             </a>
                         </div>
                     </div>
@@ -258,7 +258,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H14"/>
                                     </svg>
                                 </div>
-                                <span>Articles Blog</span>
+                                <span>{{ __('app.ecommerce.blog_articles') }}</span>
                             </a>
 
                             <a href="{{ route('admin.blog-categories.index') }}" 
@@ -268,7 +268,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                     </svg>
                                 </div>
-                                <span>Catégories Blog</span>
+                                <span>{{ __('app.ecommerce.blog_categories') }}</span>
                             </a>
 
                             <a href="{{ route('admin.blog-comments.index') }}" 
@@ -278,7 +278,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                                     </svg>
                                 </div>
-                                <span>Commentaires Blog</span>
+                                <span>{{ __('app.ecommerce.blog_comments') }}</span>
                             </a>
 
                             <a href="{{ route('admin.blog-comment-reports.index') }}" 
@@ -288,7 +288,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
                                     </svg>
                                 </div>
-                                <span>Signalements</span>
+                                <span>{{ __('app.ecommerce.reports') }}</span>
                             </a>
 
                             <a href="{{ route('admin.newsletters.index') }}" 
@@ -307,7 +307,7 @@
                     <div class="mt-8">
                         <div class="flex items-center px-4 mb-4">
                             <div class="w-8 h-0.5 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full"></div>
-                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Communication</h3>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __('app.ecommerce.communication_section') }}</h3>
                         </div>
                         <div class="space-y-2">
                             <a href="{{ route('admin.messages.index') }}" 
@@ -317,7 +317,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                     </svg>
                                 </div>
-                                <span>Messages Contact</span>
+                                <span>{{ __('app.ecommerce.contact_messages') }}</span>
                             </a>
                         </div>
                     </div>
@@ -326,7 +326,7 @@
                     <div class="mt-8">
                         <div class="flex items-center px-4 mb-4">
                             <div class="w-8 h-0.5 bg-gradient-to-r from-rose-400 to-rose-600 rounded-full"></div>
-                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Outils & Analytics</h3>
+                            <h3 class="ml-3 text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __('app.ecommerce.tools_analytics_section') }}</h3>
                         </div>
                         <div class="space-y-2">
                             <a href="{{ route('admin.statistics') }}" 
@@ -347,7 +347,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                 </div>
-                                <span>Gestion Cookies</span>
+                                <span>{{ __('app.ecommerce.cookie_management') }}</span>
                             </a>
 
                             <a href="{{ route('admin.settings.index') }}" 
@@ -372,7 +372,7 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-white truncate">{{ Auth::user()->name }}</p>
-                            <p class="text-xs text-slate-400 truncate">Administrateur</p>
+                            <p class="text-xs text-slate-400 truncate">{{ __('app.user_roles.administrator') }}</p>
                         </div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

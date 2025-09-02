@@ -1,6 +1,21 @@
 <?php
 
 return array (
+  // User roles
+  'user_roles' => array(
+    'administrator' => 'Administrator',
+    'admin' => 'Admin',
+    'user' => 'User',
+    'customer' => 'Customer',
+  ),
+  
+  // Date formats
+  'date_format' => array(
+    'datetime' => 'm/d/Y at H:i',
+    'date' => 'm/d/Y',
+    'time' => 'H:i',
+  ),
+  
   'nav' => 
   array (
     'home' => 'Home',
@@ -8,6 +23,7 @@ return array (
     'rentals' => 'Rental',
     'blog' => 'Blog',
     'contact' => 'Contact',
+    'newsletter' => 'Newsletter',
     'login' => 'Login',
     'register' => 'Register',
     'cart' => 'Cart',
@@ -119,9 +135,35 @@ return array (
     'subtotal' => 'Subtotal',
     'tax' => 'Tax',
     'payment' => 'Payment',
+    'orders' => 'Purchase Orders',
+    'order_locations' => 'Rental Orders',
+    'rental_returns' => 'Rental Returns',
+    'orders_section' => 'Orders',
+    
+    // Admin navigation sections
+    'user_management_section' => 'User Management',
+    'catalog_section' => 'Catalog',
+    'stock_management_section' => 'Stock Management',
+    'communication_section' => 'Communication',
+    'tools_analytics_section' => 'Tools & Analytics',
+    
+    // Admin navigation items
+    'user_management' => 'User Management',
+    'special_offers' => 'Special Offers',
+    'stock_overview' => 'Overview',
+    'alerts_thresholds' => 'Alerts & Thresholds',
+    'restocking' => 'Restocking',
+    'reports_analysis' => 'Reports & Analysis',
+    'blog_articles' => 'Blog Articles',
+    'blog_categories' => 'Blog Categories',
+    'blog_comments' => 'Blog Comments',
+    'reports' => 'Reports',
+    'contact_messages' => 'Contact Messages',
+    'cookie_management' => 'Cookie Management',
   ),
   'forms' => 
   array (
+    'content' => 'Content Management',
     'delivery_address' => 'Delivery address',
     'full_name' => 'Full name',
     'phone' => 'Phone',
@@ -206,6 +248,122 @@ return array (
     'pickup_address' => 'Pickup address',
     'return_address' => 'Return address',
     'additional_notes' => 'Additional notes',
+    
+    // Additional missing texts
+    'no_rental_orders' => 'No rental orders',
+    'no_rental_orders_desc' => 'You haven\'t made any rental orders yet.',
+    'understand' => 'Understand',
+    'close_rental' => 'Close rental',
+    'close_rental_modal_title' => '🔒 Close rental',
+    'close_rental_confirmation' => 'Are you sure you want to close this rental?',
+    'close_rental_checklist_title' => 'This action confirms that:',
+    'close_rental_checklist' => [
+        'equipment_returned' => '• You have returned all equipment',
+        'equipment_good_condition' => '• Equipment is in good condition', 
+        'accept_inspection' => '• You accept admin inspection'
+    ],
+    'users' => [
+        'title' => 'User Management - Admin Dashboard',
+        'page_title' => 'User Management',
+        'manage_all_users' => 'Manage all users',
+        'advanced_interface' => 'Advanced user account management interface with search and filters',
+        'total_users' => 'Total Users',
+        
+        // Messages
+        'success' => 'Success!',
+        'error' => 'Error!',
+        
+        // Statistiques
+        'stats' => [
+            'users' => 'Users',
+            'administrators' => 'Administrators',
+            'deleted' => 'Deleted',
+            'new_30_days' => 'New (30d)',
+            'active_7_days' => 'Active (7d)',
+        ],
+        
+        // Recherche et filtres
+        'search' => [
+            'title' => 'Advanced search and filters',
+            'general_search' => 'General search',
+            'placeholder' => 'Name, username, email...',
+            'filter_by_role' => 'Filter by role',
+            'all_roles' => 'All roles',
+            'account_status' => 'Account status',
+            'active_only' => '✅ Active accounts only',
+            'deleted_only' => '🗑️ Deleted accounts only',
+            'all_accounts' => '📋 All accounts',
+            'sort_by' => 'Sort by',
+            'order' => 'Order',
+            'reset' => 'Reset',
+            'apply_filters' => 'Apply filters',
+        ],
+        
+        // Options de tri
+        'sort_options' => [
+            'created_at' => '📅 Registration date',
+            'name' => '🔤 Name',
+            'username' => '👤 Username',
+            'email' => '📧 Email',
+            'role' => '⚡ Role',
+            'updated_at' => '🔄 Last modification',
+            'deleted_at' => '🗑️ Deletion date',
+        ],
+        
+        // Ordre de tri
+        'order_options' => [
+            'desc' => '⬇️ Descending',
+            'asc' => '⬆️ Ascending',
+        ],
+        
+        // Tableau
+        'table' => [
+            'user' => 'User',
+            'email' => 'Email',
+            'role' => 'Role',
+            'status' => 'Status',
+            'newsletter' => 'Newsletter',
+            'registration' => 'Registration',
+            'actions' => 'Actions',
+        ],
+        
+        // Statuts
+        'status' => [
+            'deleted' => '🗑️ Deleted',
+            'active' => '✅ Active',
+            'subscribed' => '📧 Subscribed',
+            'not_subscribed' => '❌ Not subscribed',
+        ],
+        
+        // Actions
+        'actions' => [
+            'restore' => 'Restore',
+            'restore_confirm' => 'Are you sure you want to restore this user?',
+            'view_details' => 'View details',
+            'edit_user' => 'Edit user',
+            'delete_user' => 'Delete user',
+            'delete_confirm' => 'Are you sure you want to delete this user? This action can be undone by restoring the account.',
+        ],
+        
+        // Messages vides
+        'empty' => [
+            'title' => 'No users found',
+            'filtered' => 'No users match your search criteria.',
+            'no_users' => 'Users will appear here once they register.',
+        ],
+    ],
+    'close_rental_warning_title' => 'Important to know',
+    'close_rental_warning' => 'This action cannot be undone and will trigger inspection by administration.',
+    'confirm_close' => 'Confirm closure',
+    'payment_failed' => '💔 Failed',
+    'payment_refunded' => '💙 Refunded',
+    'rental_period_label' => 'Rental period',
+    'items_label' => 'Items', 
+    'last_update_label' => 'Last update',
+    'discover_products' => 'Discover our products',
+    
+    // Period formats
+    'period_from_to' => 'From :start to :end',
   ),
   'rental_status' => 
   array (
@@ -215,6 +373,8 @@ return array (
     'completed' => 'Completed',
     'cancelled' => 'Cancelled',
     'closed' => 'Closed',
+    'inspecting' => 'Inspection in progress',
+    'finished' => 'Inspection completed',
   ),
   'payment_status' => 
   array (
@@ -225,11 +385,184 @@ return array (
   ),
   'pages' => 
   array (
+    'admin' => 'Administration Panel',
     'our_products' => 'Our Products',
     'blog' => 'Blog',
     'category' => 'Category',
     'contact' => 'Contact',
     'rentals' => 'Rentals',
+    'statistics' => 'Statistics',
+    'settings' => 'Settings',
+    'dashboard_title' => 'Dashboard',
+    'dashboard' => 
+    array (
+      // Main statistics
+      'stats' => 
+      array (
+        'users' => 'Users',
+        'products' => 'Products',
+        'categories' => 'Categories',
+        'orders' => 'Orders',
+        'blog_posts' => 'Blog Posts',
+        'blog_categories' => 'Blog Categories',
+        'comments' => 'Comments',
+        'reports' => 'Reports',
+        'pending_comments' => 'pending',
+        'pending_reports' => 'to process',
+      ),
+      
+      // Stock management
+      'stock' => 
+      array (
+        'title' => 'Stock Management',
+        'description' => 'Automatic monitoring and intelligent stock management',
+        'out_of_stock' => 'out of stock',
+        'critical_stock' => 'critical',
+        'low_stock' => 'low stock',
+        'all_good' => 'All good',
+        'refresh' => 'Refresh',
+        'manage_products' => 'Manage Products',
+        'sound_on' => '🔊 Sound ON',
+        'sound_off' => '🔇 Sound OFF',
+        'desktop_on' => '🔔 Desktop ON',
+        'desktop_off' => '🔕 Desktop OFF',
+        'out_of_stock_title' => 'Out of stock',
+        'critical_stock_title' => 'Critical stock',
+        'low_stock_title' => 'Low stock',
+        'normal_stock' => 'Normal stock',
+        'low_stock_monitoring' => '📋 Monitoring required',
+        'critical_products_title' => '🚨 Products in Critical Stock',
+        'products_count' => 'products',
+        'no_category' => 'No category',
+        'stock_label' => 'Stock',
+        'threshold_label' => 'Threshold',
+        'edit_action' => 'Edit',
+        'restock_suggestions' => '🔄 Restocking Suggestions',
+        'restock_description' => 'Click to automatically generate recommended quantities',
+        'generate_action' => 'Generate',
+        'no_critical_stock' => 'No products in critical stock',
+        'recent_alerts_title' => '📢 Recent Stock Alerts',
+        'last_days' => 'Last 7 days',
+        'no_recent_alerts' => 'No recent alerts',
+        'urgent_priority' => 'Urgent',
+        'high_priority' => 'High',
+        'normal_priority' => 'Normal',
+        'critical_stock_value' => 'Critical stock value',
+        'monitoring_required' => 'Products requiring attention',
+        'total_stock_value' => 'Total stock value',
+      ),
+      
+      // Analytics
+      'analytics' => 
+      array (
+        'title' => 'Traffic',
+        'description' => 'Site analytics',
+        'unique_visitors' => 'Unique visitors',
+        'page_views' => 'Page views',
+        'bounce_rate' => 'Bounce rate',
+        'avg_session_duration' => 'Average duration',
+        'visitors_total' => 'Total visitors',
+        'monthly_growth' => 'this month',
+      ),
+      
+      // Newsletter
+      'newsletter' => 
+      array (
+        'title' => 'Newsletter',
+        'description' => 'Email performance',
+        'active_subscribers' => 'Active subscribers',
+        'emails_sent' => 'Emails sent',
+        'this_month' => 'This month',
+        'open_rate' => 'Open rate',
+        'click_rate' => 'Click rate',
+        'growth_rate' => 'Growth',
+      ),
+      
+      // Rentals
+      'rentals' => 
+      array (
+        'title' => 'Rentals',
+        'description' => 'Rental performance',
+        'total_orders' => 'Rental orders',
+        'monthly_revenue' => 'Rental revenue',
+        'total' => 'Total',
+        'active_orders' => '🟢 Active rentals',
+        'closed_orders' => '🟠 Closed (awaiting inspection)',
+        'inspecting_orders' => '🔍 Inspection in progress',
+        'finished_orders' => '✅ Inspection completed',
+        'pending_returns' => '🟣 Pending returns',
+      ),
+      
+      // Performance
+      'performance' => 
+      array (
+        'title' => 'Site Performance',
+        'description' => 'Trend and performance charts',
+        'detailed_view' => 'Detailed view',
+        'visitor_evolution' => '📈 Visitor Evolution (7d)',
+        'recent_orders' => '🛒 Recent Orders (7d)',
+        'newsletter_performance' => '💌 Newsletter Performance',
+        'total_site' => 'Total site',
+        'newsletter_subscribers' => 'Newsletter subscribers',
+      ),
+      
+      // Sections
+      'recent_users_title' => 'Recent users',
+      'recent_articles_title' => 'Recent articles',
+      'see_all' => 'See all',
+      'no_recent_users' => 'No recent users.',
+      'published' => 'Published',
+      'draft' => 'Draft',
+      'scheduled' => 'Scheduled',
+      
+      // Days of the week
+      'days' => 
+      array (
+        'mon' => 'Mon',
+        'tue' => 'Tue',
+        'wed' => 'Wed',
+        'thu' => 'Thu',
+        'fri' => 'Fri',
+        'sat' => 'Sat',
+        'sun' => 'Sun',
+      ),
+      'recent' => 
+      array (
+        'users' => 'Recent Users',
+        'articles' => 'Recent Articles',
+        'no_users' => 'No recent users.',
+        'no_articles' => 'No recent articles.',
+        'view_all' => 'View All',
+      ),
+      'status' => 
+      array (
+        'published' => 'Published',
+        'draft' => 'Draft',
+        'scheduled' => 'Scheduled',
+      ),
+      'quick_actions' => 'Quick Actions',
+      'actions' => 
+      array (
+        'manage_articles' => 'Manage Articles',
+        'view_all_articles' => 'View all articles',
+        'manage_categories' => 'Manage Categories',
+        'view_all_categories' => 'View all categories',
+        'view_blog' => 'View Blog',
+        'manage_users' => 'Manage Users',
+        'view_all_users' => 'View all users',
+        'manage_comments' => 'Manage Comments',
+        'pending_comments' => 'pending',
+        'all_comments' => 'All comments',
+        'blog_public_page' => 'Public blog page',
+        'reports' => 'Reports',
+        'this_month' => 'This month',
+      ),
+      'restocking' => 
+      array (
+        'suggestion_title' => 'Restocking Suggestion',
+        'bulk_suggestions_title' => 'Bulk Restocking Suggestions',
+      ),
+    ),
   ),
   'products' => 
   array (
@@ -395,6 +728,7 @@ return array (
     'title' => 'Our Rentals',
     'subtitle' => 'Discover our complete range of agricultural equipment for rent',
     'hero_description' => 'Rent professional quality equipment for your agricultural projects',
+    'available_rentals' => 'Available Rentals',
     
     // Filters and search
     'filters' => 'Filters',
@@ -528,6 +862,12 @@ return array (
     'machines' => 'Machines',
     'equipements' => 'Equipment',
   ),
+  'rental_categories_descriptions' => 
+  array (
+    'outils-agricoles' => 'Rental of manual and electric tools for agriculture and gardening. Spades, hoes, pruning shears, mowers and much more.',
+    'machines' => 'Rental of light agricultural machines and motorized equipment. Cultivators, brush cutters, professional mowers.',
+    'equipements' => 'Agricultural equipment and accessories. Greenhouses, tarpaulins, containers, gloves, clothing, irrigation systems.',
+  ),
   'footer' => 
   array (
     'company_description' => 'Your trusted partner for agricultural equipment in Belgium. Purchase and rental of quality equipment for professionals and individuals.',
@@ -634,6 +974,7 @@ return array (
     'in_stock' => 'In stock',
     'out_of_stock' => 'Out of stock',
     'limited_stock' => 'Limited stock',
+    'view_all_products' => 'View all products',
   ),
   'contact' => 
   array (
@@ -901,6 +1242,7 @@ return array (
     'product_unavailable' => 'Product unavailable',
     'added_to_cart_success' => 'Product added to cart!',
     'add_to_cart_error' => 'Error adding to cart',
+    'quantity_label' => 'Quantity:',
   ),
   
   'buttons' => 
@@ -1389,6 +1731,89 @@ return array (
     'processing_error' => 'Error processing payment',
   ),
 
+  'orders' => array(
+    'my_orders' => 'My Orders',
+    'description' => 'Track the status of your orders and manage your purchases',
+    'filter_by_status' => 'Filter by status',
+    'all_statuses' => 'All statuses',
+    'sort_by' => 'Sort by',
+    'sort' => array(
+      'most_recent' => 'Most recent',
+      'oldest' => 'Oldest',
+      'amount_desc' => 'Amount descending',
+      'amount_asc' => 'Amount ascending',
+    ),
+    'order_number' => 'Order #:number',
+    'placed_on' => 'Placed on',
+    'view_details' => 'View details',
+    'download_invoice' => 'Download invoice',
+    'cancel_order' => 'Cancel order',
+    'cancel_order_confirm' => 'Are you sure you want to cancel this order?',
+    'request_return' => 'Request return',
+    'expired' => 'Expired',
+    'other_items' => 'other items',
+    'paid' => 'Paid',
+    'payment_pending' => 'Payment pending',
+    'no_orders' => 'No orders',
+    'no_orders_yet' => 'You haven\'t placed any orders yet.',
+    'no_orders_with_status' => 'No orders found with the selected status.',
+    'view_all_orders' => 'View all orders',
+    'discover_products' => 'Discover our products',
+    'timeline_processing' => 'Processing',
+    'non_returnable_products' => 'Non-returnable products',
+    'non_returnable_message' => 'This order contains only non-returnable products (perishable food items).',
+    'understood' => 'Understood',
+    'return_period_expired' => 'Return period expired',
+    'return_period_expired_message' => 'The 14-day period to return this order has expired.',
+    'return_reason' => 'Return reason',
+    'return_reason_placeholder' => 'Describe the reason for your return request...',
+    // Order detail page
+    'back_to_orders' => 'Back to my orders',
+    'ordered_items' => 'Ordered items',
+    'delivery_address' => 'Delivery address',
+    'billing_address' => 'Billing address',
+    'order_summary' => 'Order summary',
+    'shipping_cost' => 'Shipping cost',
+    'free_shipping' => 'FREE',
+    'payment_method' => 'Method',
+    'payment_status' => 'Status',
+    'paid_on' => 'Paid on',
+    'actions' => 'Actions',
+    'reorder' => 'Reorder',
+    'tracking_number' => 'Tracking number',
+    'refund_processed' => 'Refund processed',
+    'refund_processing' => 'Refund processing',
+    // Payment methods
+    'payment_methods' => array(
+      'card' => '💳 Credit card',
+      'paypal' => '💰 PayPal',
+      'bank_transfer' => '🏦 Bank transfer',
+    ),
+    // Payment statuses
+    'payment_statuses' => array(
+      'paid' => '✅ Paid',
+      'pending' => '⏳ Pending',
+      'failed' => '❌ Failed',
+    ),
+    
+    // Actions and buttons
+    'reorder_confirm' => 'Do you really want to add all products from this order to your cart?',
+    'download_invoice' => '📄 Download invoice',
+    'return_order' => '🔄 Return order',
+    'reorder_button' => '🔄 Reorder',
+    
+    // Return modal
+    'request_return' => 'Request a return',
+    'return_reason_label' => 'Reason for return *',
+    'return_reason_placeholder' => 'Explain why you want to return this order...',
+    'cancel' => 'Cancel',
+    'request_return_btn' => 'Request return',
+    
+    // JavaScript messages
+    'update_error' => 'Error updating status:',
+    'status_updated' => 'Status updated:',
+  ),
+
   'admin' => array(
     'logout' => 'Logout',
     'categories' => array(
@@ -1422,6 +1847,57 @@ return array (
       'no_categories_title' => 'No categories',
       'no_categories_description' => 'Start by creating your first category.',
       'add_first_category' => 'Add a category',
+      'view_articles' => 'View Articles',
+      'search_and_filters' => 'Search and Filters',
+      'search_and_filters_description' => 'Quickly find the categories you are looking for',
+      'search_category_placeholder' => 'Search for a category',
+      'category_status' => 'Category status',
+      'actions_title' => 'Actions',
+      'categories_count' => 'Categories',
+      'order_label' => 'Order:',
+      'articles_label' => 'Articles:',
+      'articles_total' => 'Total Articles',
+      'articles_count' => 'articles',
+      'showing_results' => 'Showing',
+      'to_text' => 'to',
+      'of_text' => 'of',
+      'results_text' => 'results',
+      'filter_button' => 'Filter',
+      'reset_button' => 'Reset',
+      'all_statuses' => 'All statuses',
+      'active_categories' => 'Active categories',
+      'inactive_categories' => 'Inactive categories',
+      'no_search_results' => 'No categories match your search criteria.',
+      'create_first_blog_category' => 'Start by creating your first blog category.',
+      'create_category_btn' => 'Create category',
+      'create_new_category' => 'Create new category',
+      'category_name_label' => 'Category name *',
+      'category_name_placeholder' => 'Ex: Gardening, Organic farming...',
+      'description_label' => 'Description',
+      'description_placeholder' => 'Describe this category and its content...',
+      'color_label' => 'Thematic color',
+      'sort_order_label' => 'Display order',
+      'sort_order_placeholder' => '0',
+      'is_active_label' => 'Category status',
+      'active_status' => 'Active category',
+      'cancel_button' => 'Cancel',
+      'create_button' => 'Create category',
+      'category_name_required' => 'Category name is required.',
+      'error_title' => 'Error',
+      'success_title' => 'Success',
+      'category_created_success' => 'Category created successfully!',
+      'network_error' => 'Network error',
+      'server_error' => 'Unable to contact the server. Check your connection.',
+      'active_visible_category' => 'Active and visible category',
+      'creating_category' => 'Creating...',
+      'edit_category' => 'Edit category',
+      'update_button' => 'Update',
+      'updating_category' => 'Updating...',
+      'delete_category' => 'Delete category',
+      'delete_category_confirm' => 'Are you sure you want to delete this category?',
+      'delete_category_warning' => 'This action is irreversible.',
+      'deleting_category' => 'Deleting...',
+      'form_error' => 'Error creating category. Check console for more details.',
       'filter_all' => 'All',
       'filter_active' => 'Active',
       'filter_inactive' => 'Inactive',

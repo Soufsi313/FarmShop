@@ -85,7 +85,7 @@
                                 {{ __('app.orders.order_number', ['number' => $order->order_number]) }}
                             </h3>
                             <p class="text-sm text-gray-600">
-                                {{ __('app.orders.placed_on') }} {{ $order->created_at->format('d/m/Y à H:i') }}
+                                {{ __('app.orders.placed_on') }} {{ $order->created_at->format(__('app.date_format.datetime')) }}
                             </p>
                         </div>
                         
