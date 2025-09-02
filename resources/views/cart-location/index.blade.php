@@ -282,6 +282,7 @@
                         <input type="date" 
                                x-model="editForm.start_date"
                                :min="minDate"
+                               x-ref="startDateInput"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                     </div>
                     
@@ -290,6 +291,7 @@
                         <input type="date" 
                                x-model="editForm.end_date"
                                :min="editForm.start_date"
+                               x-ref="endDateInput"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                     </div>
                 </div>
@@ -329,8 +331,12 @@ document.addEventListener('alpine:init', () => {
             start_date: '',
             end_date: ''
         },
-        // MODIFICATION TEMPORAIRE POUR TESTS : Autoriser les locations le jour même
-        minDate: new Date().toISOString().split('T')[0],
+        // Date minimum fixée à demain (pas aujourd'hui)
+        minDate: (() => {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            return tomorrow.toISOString().split('T')[0];
+        })(),
 
         // Initialize
         async init() {
@@ -433,6 +439,16 @@ document.addEventListener('alpine:init', () => {
             this.editForm.start_date = item.start_date;
             this.editForm.end_date = item.end_date;
             this.showDateModal = true;
+            
+            // Initialiser la désactivation des dimanches après l'ouverture du modal
+            this.$nextTick(() => {
+                if (this.$refs.startDateInput) {
+                    this.disableSundays(this.$refs.startDateInput);
+                }
+                if (this.$refs.endDateInput) {
+                    this.disableSundays(this.$refs.endDateInput);
+                }
+            });
         },
 
         // Save date changes
@@ -610,7 +626,53 @@ document.addEventListener('alpine:init', () => {
                     }
                 }, 300);
             }, 5000); // Plus de temps pour lire les messages d'erreur
-        }
+        },
+
+        // Fonction pour ajuster les dates de dimanche au lundi suivant
+        adjustDateForBusinessDays(date) {
+            const adjusted = new Date(date);
+            if (adjusted.getDay() === 0) { // Dimanche
+                adjusted.setDate(adjusted.getDate() + 1); // Décaler au lundi
+            }
+            return adjusted;
+        },
+
+        // Fonction pour désactiver la sélection des dimanches dans les inputs date
+        disableSundays(dateInput) {
+            if (!dateInput) return;
+            
+            // Supprimer les anciens listeners pour éviter les doublons
+            if (dateInput._sundayListener) {
+                dateInput.removeEventListener('input', dateInput._sundayListener);
+            }
+            
+            // Créer et attacher le nouveau listener
+            dateInput._sundayListener = (e) => {
+                const selectedDate = new Date(e.target.value);
+                if (selectedDate.getDay() === 0) { // Dimanche
+                    const adjustedDate = this.adjustDateForBusinessDays(selectedDate);
+                    const adjustedDateStr = adjustedDate.toISOString().split('T')[0];
+                    
+                    // Mettre à jour l'input
+                    e.target.value = adjustedDateStr;
+                    
+                    // Mettre à jour le modèle Alpine.js
+                    if (e.target === this.$refs.startDateInput) {
+                        this.editForm.start_date = adjustedDateStr;
+                    } else if (e.target === this.$refs.endDateInput) {
+                        this.editForm.end_date = adjustedDateStr;
+                    }
+                    
+                    // Déclencher l'événement change pour s'assurer que Alpine.js est notifié
+                    e.target.dispatchEvent(new Event('change'));
+                    
+                    this.showNotification('🚫 Dimanche sélectionné : Notre boutique est fermée ce jour-là. Date décalée au lundi suivant.', 'warning');
+                }
+            };
+            
+            dateInput.addEventListener('input', dateInput._sundayListener);
+        },
+
     }));
 });
 </script>

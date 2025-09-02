@@ -133,48 +133,76 @@ class CartItemLocationController extends Controller
         if ($cartItemLocation->cartLocation->user_id !== $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Élément non trouvé'
+                'message' => '❌ Élément non trouvé'
             ], 404);
         }
-
-        $validated = $request->validate([
-            'start_date' => [
-                'required',
-                'date',
-                new RentalDateValidation($cartItemLocation->product, null, null, 'start')
-            ],
-            'end_date' => [
-                'required', 
-                'date',
-                // MODIFICATION TEMPORAIRE POUR TESTS : Permettre les locations d'un jour
-                'after_or_equal:start_date',
-                new RentalDateValidation($cartItemLocation->product, 
-                    $request->start_date ? Carbon::parse($request->start_date) : null, 
-                    null, 
-                    'end')
-            ]
-        ], [
-            'end_date.after_or_equal' => 'La date de fin doit être postérieure ou égale à la date de début',
-            'start_date.required' => 'La date de début est obligatoire',
-            'end_date.required' => 'La date de fin est obligatoire',
-        ]);
 
         try {
             DB::beginTransaction();
 
+            $tomorrow = now()->addDay()->format('Y-m-d');  // Changé de 'today' à 'tomorrow'
+            
+            // Validation de base
+            $validator = \Validator::make($request->all(), [
+                "start_date" => [
+                    "required",
+                    "date", 
+                    "after_or_equal:{$tomorrow}",  // Changé pour exiger au minimum demain
+                ],
+                'end_date' => [
+                    'required',
+                    'date',
+                    'after_or_equal:start_date'
+                ]
+            ], [
+                'start_date.after_or_equal' => '📅 La date de début doit être au minimum demain (' . now()->addDay()->format('d/m/Y') . ')',  // Message mis à jour
+                'end_date.after_or_equal' => '📅 La date de fin doit être égale ou postérieure à la date de début',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreur de validation : ' . implode(', ', $validator->errors()->all()),
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $validated = $validator->validated();
             $startDate = Carbon::parse($validated['start_date']);
             $endDate = Carbon::parse($validated['end_date']);
 
-            // Validation supplémentaire avec les contraintes du produit
-            $validation = $cartItemLocation->product->validateRentalPeriod($startDate, $endDate);
-            
-            if (!$validation['valid']) {
-                throw ValidationException::withMessages([
-                    'rental_period' => $validation['errors']
-                ]);
+            // Vérification stricte des dimanches - ne pas les accepter du tout
+            if ($startDate->dayOfWeek === 0) { // Dimanche
+                return response()->json([
+                    'success' => false,
+                    'message' => '🚫 Notre boutique est fermée le dimanche. Veuillez sélectionner une date entre lundi et samedi.',
+                    'error_type' => 'sunday_restriction'
+                ], 400);
             }
 
-            // Vérifier la disponibilité pour les nouvelles dates
+            if ($endDate->dayOfWeek === 0) { // Dimanche
+                return response()->json([
+                    'success' => false,
+                    'message' => '🚫 Notre boutique est fermée le dimanche. Veuillez sélectionner une date de fin entre lundi et samedi.',
+                    'error_type' => 'sunday_restriction'
+                ], 400);
+            }
+
+            // Validation spécialisée avec les règles métier
+            $startDateValidator = new \App\Rules\RentalDateValidation($cartItemLocation->product, null, null, 'start');
+            $endDateValidator = new \App\Rules\RentalDateValidation($cartItemLocation->product, $startDate, $endDate, 'end');
+            
+            // Valider la date de début
+            $startDateValidator->validate('start_date', $startDate->format('Y-m-d'), function($message) {
+                throw new \Exception($message);
+            });
+
+            // Valider la date de fin
+            $endDateValidator->validate('end_date', $endDate->format('Y-m-d'), function($message) {
+                throw new \Exception($message);
+            });
+
+            // Vérifier la disponibilité
             $cartItemLocation->cartLocation->checkProductAvailability(
                 $cartItemLocation->product,
                 $cartItemLocation->quantity,
@@ -183,20 +211,31 @@ class CartItemLocationController extends Controller
                 $cartItemLocation->id
             );
 
-            // Mettre à jour les dates
+            // Mettre à jour les dates (pas d'ajustement automatique, les dates sont déjà validées)
             $cartItemLocation->updateDates($startDate, $endDate);
             
             // Recalculer le total du panier
             $cartItemLocation->cartLocation->recalculateTotal();
 
+            // Calculer les jours ouvrés pour information
+            $businessDays = $cartItemLocation->product->calculateRentalDuration($startDate, $endDate);
+            $totalDays = $startDate->diffInDays($endDate) + 1;
+
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Dates de location mises à jour avec succès',
+                'message' => '✅ Dates de location mises à jour avec succès',
                 'data' => [
                     'cart_item' => $cartItemLocation->fresh()->toDisplayArray(),
-                    'cart_summary' => $cartItemLocation->cartLocation->fresh()->getSummary()
+                    'cart_summary' => $cartItemLocation->cartLocation->fresh()->getSummary(),
+                    'date_info' => [
+                        'start_date' => $startDate->format('Y-m-d'),
+                        'end_date' => $endDate->format('Y-m-d'),
+                        'business_days' => $businessDays,
+                        'total_calendar_days' => $totalDays,
+                        'note' => 'Location du ' . $startDate->format('d/m/Y') . ' au ' . $endDate->format('d/m/Y') . ' (' . $businessDays . ' jours ouvrés)'
+                    ]
                 ]
             ]);
 
@@ -205,8 +244,9 @@ class CartItemLocationController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la mise à jour: ' . $e->getMessage()
-            ], 500);
+                'message' => $e->getMessage(),
+                'error_type' => 'validation_error'
+            ], 400);
         }
     }
 

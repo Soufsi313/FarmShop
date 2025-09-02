@@ -132,8 +132,8 @@ class OrderLocationController extends Controller
     {
         $request->validate([
             'cart_location_id' => 'required|exists:cart_locations,id',
-            'start_date' => 'required|date|after:today',
-            'end_date' => 'required|date|after:start_date',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => 'required|date|after_or_equal:start_date',
             'pickup_address' => 'required|string|max:255',
             'return_address' => 'required|string|max:255',
             'notes' => 'nullable|string|max:1000'

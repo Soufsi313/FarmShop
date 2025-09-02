@@ -168,21 +168,44 @@ class RentalController extends Controller
         $endDate = \Carbon\Carbon::parse($validated['end_date']);
         $quantity = $validated['quantity'];
 
-        // Calculer le nombre de jours
-        $days = $startDate->diffInDays($endDate) + 1;
+        // Ajuster automatiquement les dates si elles tombent un dimanche
+        $adjustedStartDate = $product->adjustDateForBusinessDays($startDate);
+        $adjustedEndDate = $product->adjustDateForBusinessDays($endDate);
+
+        // Calculer le nombre de jours en excluant les dimanches
+        $days = $product->calculateRentalDuration($adjustedStartDate, $adjustedEndDate);
 
         // Vérifier les contraintes
         if ($days < $product->min_rental_days) {
+            $totalCalendarDays = $startDate->diffInDays($adjustedEndDate) + 1;
+            $sundaysExcluded = $totalCalendarDays - $days;
+            $message = "⏱️ Durée de location insuffisante : {$days} jour(s) ouvrés";
+            if ($sundaysExcluded > 0) {
+                $message .= " (sur {$totalCalendarDays} jours calendaires, {$sundaysExcluded} dimanche(s) exclus)";
+            }
+            $message .= ". Minimum requis : {$product->min_rental_days} jour(s) ouvrés (boutique fermée le dimanche)";
+            
             return response()->json([
                 'success' => false,
-                'message' => "Durée minimale de location : {$product->min_rental_days} jour(s)"
+                'message' => $message,
+                'details' => [
+                    'business_days_calculated' => $days,
+                    'total_calendar_days' => $totalCalendarDays,
+                    'sundays_excluded' => $sundaysExcluded,
+                    'minimum_required' => $product->min_rental_days
+                ]
             ], 400);
         }
 
-        if ($days > $product->max_rental_days) {
+        // Vérifier max_rental_days seulement si défini (pas de limite si NULL)
+        if ($product->max_rental_days !== null && $days > $product->max_rental_days) {
             return response()->json([
                 'success' => false,
-                'message' => "Durée maximale de location : {$product->max_rental_days} jour(s)"
+                'message' => "⏱️ Durée de location trop longue : {$days} jour(s) ouvrés. Maximum autorisé : {$product->max_rental_days} jour(s) ouvrés (boutique fermée le dimanche)",
+                'details' => [
+                    'business_days_calculated' => $days,
+                    'maximum_allowed' => $product->max_rental_days
+                ]
             ], 400);
         }
 
@@ -195,13 +218,22 @@ class RentalController extends Controller
         $tax = $subtotal * ($product->getTaxRate() / 100); // TVA basée sur le produit
         $total = $subtotal + $tax;
 
+        // Préparer la réponse avec les dates ajustées si nécessaire
+        $dateAdjustmentMessage = '';
+        if (!$adjustedStartDate->eq($startDate) || !$adjustedEndDate->eq($endDate)) {
+            $dateAdjustmentMessage = 'Dates ajustées automatiquement (boutique fermée le dimanche)';
+        }
+
         return response()->json([
             'success' => true,
             'data' => [
                 'rental_period' => [
-                    'start_date' => $startDate->format('Y-m-d'),
-                    'end_date' => $endDate->format('Y-m-d'),
-                    'days' => $days
+                    'original_start_date' => $startDate->format('Y-m-d'),
+                    'original_end_date' => $endDate->format('Y-m-d'),
+                    'adjusted_start_date' => $adjustedStartDate->format('Y-m-d'),
+                    'adjusted_end_date' => $adjustedEndDate->format('Y-m-d'),
+                    'days' => $days,
+                    'business_days_only' => true
                 ],
                 'quantity' => $quantity,
                 'pricing' => [
@@ -217,6 +249,10 @@ class RentalController extends Controller
                     'total_days' => $days,
                     'quantity' => $quantity,
                     'unit_deposit' => $depositAmount
+                ],
+                'messages' => [
+                    'date_adjustment' => $dateAdjustmentMessage,
+                    'note' => 'Les dimanches ne sont pas comptabilisés dans la location (boutique fermée)'
                 ]
             ]
         ]);

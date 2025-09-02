@@ -4,24 +4,67 @@
 
 @push('styles')
 <style>
+    /* Prévenir l'hyper-zoom et garantir un affichage responsive */
+    html {
+        touch-action: manipulation; /* Empêche le double-tap zoom sur mobile */
+    }
+    
+    /* Prévenir les problèmes de clignotement Alpine.js */
+    [x-cloak] {
+        display: none !important;
+    }
+    
     .product-image {
         transition: transform 0.3s ease;
+        max-width: 100%;
+        height: auto;
     }
+    
     .product-image:hover {
         transform: scale(1.05);
     }
+    
     .rental-calculator {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
+    
     .constraint-badge {
         @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800;
+    }
+    
+    /* Assurer un bon responsive */
+    .container {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+    
+    /* Empêcher les débordements horizontaux */
+    body {
+        overflow-x: hidden;
+    }
+    
+    /* Assurer que les grilles ne causent pas de problèmes */
+    .grid {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    /* Stabiliser la mise en page */
+    * {
+        box-sizing: border-box;
+    }
+    
+    /* Prévenir les sauts de mise en page */
+    img {
+        max-width: 100%;
+        height: auto;
     }
 </style>
 @endpush
 
 @section('content')
-<div class="min-h-screen bg-gray-50" x-data="rentalDetailPage">
-    <!-- Breadcrumb -->
+<div class="min-h-screen bg-gray-50" x-data="rentalDetailPage" x-cloak>
+    <!-- Breadcrumbs -->
     <div class="bg-white border-b">
         <div class="container mx-auto px-4 py-3">
             <nav class="flex items-center space-x-2 text-sm text-gray-600">
@@ -122,7 +165,8 @@
                     @auth
                         <div class="flex items-center space-x-3 mb-4">
                             <button id="like_btn_{{ $product->slug }}" 
-                                    onclick="toggleLike('{{ $product->slug }}')"
+                                    onclick="event.preventDefault(); event.stopPropagation(); toggleLike('{{ $product->slug }}')"
+                                    type="button"
                                     class="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
                                 <svg class="w-5 h-5 {{ $product->isLikedByUser() ? 'text-red-500' : 'text-gray-400' }}" 
                                      fill="{{ $product->isLikedByUser() ? 'currentColor' : 'none' }}" 
@@ -191,16 +235,14 @@
                         <h3 class="font-semibold text-gray-900">📋 {{ __('app.rentals.rental_conditions') }}</h3>
                         
                         <div class="space-y-2">
-                            @if($product->min_rental_days || $product->max_rental_days)
+                            @if($product->min_rental_days)
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm text-gray-600">{{ __('app.rentals.rental_duration') }} :</span>
                                     <span class="constraint-badge">
-                                        @if($product->min_rental_days && $product->max_rental_days)
+                                        @if($product->max_rental_days)
                                             {{ $product->min_rental_days }} - {{ $product->max_rental_days }} {{ __('app.rentals.days') }}
-                                        @elseif($product->min_rental_days)
-                                            {{ __('app.rentals.minimum_days') }} {{ $product->min_rental_days }} {{ __('app.rentals.days') }}
-                                        @elseif($product->max_rental_days)
-                                            {{ __('app.rentals.maximum_days') }} {{ $product->max_rental_days }} {{ __('app.rentals.days') }}
+                                        @else
+                                            {{ __('app.rentals.minimum_days') }} {{ $product->min_rental_days }} {{ __('app.rentals.day') }} ({{ __('app.rentals.no_maximum_limit') }})
                                         @endif
                                     </span>
                                 </div>
@@ -518,7 +560,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('rentalDetailPage', () => ({
         // Contraintes du produit
         minRentalDays: {{ $product->min_rental_days ?? 1 }},
-        maxRentalDays: {{ $product->max_rental_days ?? 365 }},
+        maxRentalDays: {{ $product->max_rental_days ?? 'null' }}, // null = pas de limite
         
         // État
         quantity: 1,
@@ -544,26 +586,43 @@ document.addEventListener('alpine:init', () => {
         
         // Initialisation
         init() {
-            // Définir dates par défaut
+            // Définir dates par défaut en évitant les dimanches
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
-            this.startDate = tomorrow.toISOString().split('T')[0];
+            this.startDate = this.adjustDateForBusinessDays(tomorrow).toISOString().split('T')[0];
             
             const weekLater = new Date();
             weekLater.setDate(weekLater.getDate() + 8);
-            this.endDate = weekLater.toISOString().split('T')[0];
+            this.endDate = this.adjustDateForBusinessDays(weekLater).toISOString().split('T')[0];
+            
+            // Ajouter les event listeners pour bloquer les dimanches
+            this.setupDateRestrictions();
             
             // Calculer le coût initial
             this.calculateCost();
             
             // Watchers pour recalculer automatiquement quand les dates changent
-            this.$watch('startDate', () => {
+            this.$watch('startDate', (newDate) => {
+                // Ajuster automatiquement si c'est un dimanche
+                const adjustedDate = this.adjustDateForBusinessDays(new Date(newDate));
+                const adjustedDateStr = adjustedDate.toISOString().split('T')[0];
+                if (adjustedDateStr !== newDate) {
+                    this.startDate = adjustedDateStr;
+                    this.showNotification('🚫 Date ajustée automatiquement : notre boutique est fermée le dimanche', 'warning');
+                }
                 if (this.startDate && this.endDate) {
                     this.calculateCost();
                 }
             });
             
-            this.$watch('endDate', () => {
+            this.$watch('endDate', (newDate) => {
+                // Ajuster automatiquement si c'est un dimanche
+                const adjustedDate = this.adjustDateForBusinessDays(new Date(newDate));
+                const adjustedDateStr = adjustedDate.toISOString().split('T')[0];
+                if (adjustedDateStr !== newDate) {
+                    this.endDate = adjustedDateStr;
+                    this.showNotification('🚫 Date ajustée automatiquement : notre boutique est fermée le dimanche', 'warning');
+                }
                 if (this.startDate && this.endDate) {
                     this.calculateCost();
                 }
@@ -574,6 +633,39 @@ document.addEventListener('alpine:init', () => {
                     this.calculateCost();
                 }
             });
+        },
+
+        // Ajuster une date si elle tombe un dimanche (décaler au lundi)
+        adjustDateForBusinessDays(date) {
+            const adjustedDate = new Date(date);
+            while (adjustedDate.getDay() === 0) { // 0 = dimanche
+                adjustedDate.setDate(adjustedDate.getDate() + 1);
+            }
+            return adjustedDate;
+        },
+
+        // Configurer les restrictions sur les sélecteurs de date
+        setupDateRestrictions() {
+            // Fonction pour désactiver les dimanches
+            const disableSundays = (dateInput) => {
+                dateInput.addEventListener('input', (e) => {
+                    const selectedDate = new Date(e.target.value);
+                    if (selectedDate.getDay() === 0) { // Dimanche
+                        const adjustedDate = this.adjustDateForBusinessDays(selectedDate);
+                        e.target.value = adjustedDate.toISOString().split('T')[0];
+                        this.showNotification('🚫 Dimanche sélectionné : Notre boutique est fermée ce jour-là. Date décalée au lundi suivant.', 'warning');
+                    }
+                });
+            };
+
+            // Appliquer aux champs de date après un court délai pour s'assurer qu'ils existent
+            setTimeout(() => {
+                const startDateInput = this.$el.querySelector('input[x-model="startDate"]');
+                const endDateInput = this.$el.querySelector('input[x-model="endDate"]');
+                
+                if (startDateInput) disableSundays(startDateInput);
+                if (endDateInput) disableSundays(endDateInput);
+            }, 100);
         },
         
         // Gestion des quantités
@@ -648,7 +740,8 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
             
-            if (days > this.maxRentalDays) {
+            // Vérifier max_rental_days seulement si défini (pas de limite si null)
+            if (this.maxRentalDays !== null && days > this.maxRentalDays) {
                 this.calculation.show = false;
                 this.calculation.loading = false;
                 this.calculationError = `Durée maximale de location : ${this.maxRentalDays} jour(s)`;

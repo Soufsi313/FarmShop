@@ -333,7 +333,7 @@ class Product extends Model
     {
         return [
             'min_rental_days' => $this->min_rental_days ?? 1,
-            'max_rental_days' => $this->max_rental_days ?? 30,
+            'max_rental_days' => $this->max_rental_days, // NULL = pas de limite
             'available_days' => $this->available_days ?? [1, 2, 3, 4, 5, 6, 7],
             'daily_price' => $this->rental_price_per_day,
             'deposit_amount' => $this->deposit_amount,
@@ -353,8 +353,9 @@ class Product extends Model
             $errors[] = "Durée minimale de location : " . ($this->min_rental_days ?? 1) . " jour(s)";
         }
 
-        if ($days > ($this->max_rental_days ?? 30)) {
-            $errors[] = "Durée maximale de location : " . ($this->max_rental_days ?? 30) . " jour(s)";
+        // Vérification max_rental_days seulement si défini (pas de limite si NULL)
+        if ($this->max_rental_days !== null && $days > $this->max_rental_days) {
+            $errors[] = "Durée maximale de location : " . $this->max_rental_days . " jour(s)";
         }
 
         // Vérifier que la date de début n'est pas dans le passé
@@ -934,12 +935,64 @@ class Product extends Model
 
     /**
      * Vérifie si le produit est disponible pour un jour donné
+     * Exclut les dimanches car la boutique est fermée
      */
     public function isDayAvailable($date)
     {
-        // Pour l'instant, on considère que tous les jours sont disponibles
-        // Cette méthode peut être étendue pour vérifier les réservations existantes
-        return true;
+        // Si c'est un objet Carbon, extraire le jour de la semaine
+        if ($date instanceof \Carbon\Carbon) {
+            $dayOfWeek = $date->dayOfWeek === 0 ? 7 : $date->dayOfWeek;
+        } else {
+            // Si c'est un entier représentant le jour de la semaine
+            $dayOfWeek = $date;
+        }
+        
+        // Exclure le dimanche (jour 7 dans notre système)
+        // Jours disponibles : Lundi (1) à Samedi (6)
+        return in_array($dayOfWeek, [1, 2, 3, 4, 5, 6]);
+    }
+
+    /**
+     * Calcule la durée de location en excluant les dimanches
+     * @param \Carbon\Carbon $startDate
+     * @param \Carbon\Carbon $endDate
+     * @return int Nombre de jours de location (excluant les dimanches)
+     */
+    public function calculateRentalDuration($startDate, $endDate)
+    {
+        $start = \Carbon\Carbon::parse($startDate);
+        $end = \Carbon\Carbon::parse($endDate);
+        
+        $rentalDays = 0;
+        $current = $start->copy();
+        
+        while ($current->lte($end)) {
+            // Compter seulement les jours où on est ouvert (pas dimanche)
+            if ($this->isDayAvailable($current)) {
+                $rentalDays++;
+            }
+            $current->addDay();
+        }
+        
+        return $rentalDays;
+    }
+
+    /**
+     * Ajuste automatiquement une date si elle tombe un dimanche
+     * Décale au lundi suivant
+     * @param \Carbon\Carbon $date
+     * @return \Carbon\Carbon
+     */
+    public function adjustDateForBusinessDays($date)
+    {
+        $adjustedDate = \Carbon\Carbon::parse($date);
+        
+        // Si c'est un dimanche, décaler au lundi
+        while (!$this->isDayAvailable($adjustedDate)) {
+            $adjustedDate->addDay();
+        }
+        
+        return $adjustedDate;
     }
 
     /**

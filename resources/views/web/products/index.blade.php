@@ -601,109 +601,37 @@ async function buyNow(productId) {
 }
 
 async function toggleLike(productSlug) {
-    console.log('🎯 === DÉBUT toggleLike INDEX ===');
-    console.log('🔍 productSlug:', productSlug);
+    console.log('🎯 toggleLike appelé pour:', productSlug);
     
     try {
-        // Vérifier la présence du CSRF token
         const csrfToken = document.querySelector('meta[name="csrf-token"]');
         if (!csrfToken) {
-            throw new Error('❌ CSRF token meta tag non trouvé');
+            throw new Error('CSRF token non trouvé');
         }
-        console.log('✅ CSRF token trouvé');
         
-        // Utiliser XMLHttpRequest au lieu de fetch
-        const xhr = new XMLHttpRequest();
-    // Encoder le slug pour éviter problèmes d'URL et forcer l'envoi des cookies
-    const encodedSlug = encodeURIComponent(productSlug);
-    const url = `/web/likes/products/${encodedSlug}/toggle`;
-        
-        console.log('🌐 URL de la requête:', url);
-        
-        // Préparer la promesse
-        const request = new Promise((resolve, reject) => {
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    console.log('📊 Status:', xhr.status);
-                    console.log('📊 Response text:', xhr.responseText);
-
-                    // Diagnostic additionnel
-                    console.log('🔐 CSRF token (client):', csrfToken.getAttribute('content'));
-                    console.log('🍪 document.cookie:', document.cookie);
-                    console.log('🔗 URL envoyé:', url);
-
-                    // Si status 0, tenter un fallback avec fetch pour récupérer une erreur plus explicite
-                    if (xhr.status === 0) {
-                        console.warn('⚠️ XHR returned status 0 — attempting fetch fallback to gather more info');
-                        (async () => {
-                            try {
-                                const fd = new FormData();
-                                fd.append('_token', csrfToken.getAttribute('content'));
-                                const resp = await fetch(url, {
-                                    method: 'POST',
-                                    credentials: 'same-origin',
-                                    body: fd,
-                                    headers: {
-                                        'X-Requested-With': 'XMLHttpRequest',
-                                        'Accept': 'application/json'
-                                    }
-                                });
-                                console.log('🔁 Fallback fetch status:', resp.status, 'ok:', resp.ok);
-                                const text = await resp.text();
-                                console.log('🔁 Fallback fetch response text:', text);
-                            } catch (fetchErr) {
-                                console.error('🔁 Fallback fetch error:', fetchErr);
-                            }
-                        })();
-                    }
-                    
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        try {
-                            const data = JSON.parse(xhr.responseText);
-                            resolve(data);
-                        } catch (parseError) {
-                            console.error('❌ Erreur de parsing JSON:', parseError);
-                            reject(new Error('Réponse non valide du serveur'));
-                        }
-                    } else {
-                        reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
-                    }
-                }
-            };
-            
-            xhr.onerror = function() {
-                console.error('❌ XMLHttpRequest onerror triggered');
-                reject(new Error('Erreur réseau lors de la requête'));
-            };
+        const response = await fetch(`/web/likes/products/${productSlug}/toggle`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
         });
-        
-    // Configurer la requête
-    xhr.open('POST', url, true);
-    // S'assurer que les cookies/sessions sont envoyés
-    xhr.withCredentials = true;
-        xhr.setRequestHeader('Accept', 'application/json');
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken.getAttribute('content'));
-        xhr.timeout = 10000;
-        
-        // Préparer les données
-        const formData = new FormData();
-        formData.append('_token', csrfToken.getAttribute('content'));
-        
-        console.log('🚀 Envoi de la requête XMLHttpRequest POST...');
-        xhr.send(formData);
-        
-        // Attendre la réponse
-        const data = await request;
-        
-        console.log('✅ Réponse reçue avec succès:', data);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('✅ Réponse reçue:', data);
         
         if (data.success) {
             const btn = document.getElementById(`like_btn_${productSlug}`);
             const icon = btn.querySelector('svg');
             const likesCountElement = document.getElementById(`likes_count_${productSlug}`);
             
-            // Compatibilité avec les deux formats de réponse
             const isLiked = data.data.is_liked || data.data.liked;
             const likesCount = data.data.likes_count || 0;
             
@@ -726,8 +654,6 @@ async function toggleLike(productSlug) {
             if (likesCountElement) {
                 likesCountElement.textContent = likesCount;
                 console.log('🔢 Compteur mis à jour:', likesCount);
-            } else {
-                console.error('❌ Élément compteur non trouvé:', `likes_count_${productSlug}`);
             }
             
             showNotification(data.message, 'success');

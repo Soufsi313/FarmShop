@@ -211,16 +211,18 @@
 
                         <!-- Durée maximum de location -->
                         <div x-show="formData.type === 'rental' || formData.type === 'both'">
-                            <label for="max_rental_days" class="block text-sm font-medium text-gray-700 mb-1">Durée maximum (jours)</label>
+                            <label for="max_rental_days" class="block text-sm font-medium text-gray-700 mb-1">Durée maximum (jours) - <span class="text-sm text-gray-500">Laissez vide pour aucune limite</span></label>
                             <input type="number" 
                                    id="max_rental_days" 
                                    name="max_rental_days" 
                                    value="{{ old('max_rental_days') }}"
                                    min="1"
+                                   placeholder="Optionnel - aucune limite si vide"
                                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 @error('max_rental_days') border-red-500 @enderror">
                             @error('max_rental_days')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
+                            <p class="mt-1 text-xs text-gray-500">Si vide, il n'y aura pas de limite de durée maximum pour la location</p>
                         </div>
                     </div>
                 </div>

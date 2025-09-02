@@ -213,7 +213,7 @@ class ProductLikeController extends Controller
     /**
      * Toggle like sur un produit (utilisateurs connectés seulement)
      */
-    public function toggle(Product $product): JsonResponse
+    public function toggle($productIdentifier): JsonResponse
     {
         // Utiliser explicitement le guard web
         $user = Auth::guard('web')->user();
@@ -225,6 +225,20 @@ class ProductLikeController extends Controller
             ], 401);
         }
 
+        // Chercher le produit par ID ou par slug
+        if (is_numeric($productIdentifier)) {
+            $product = Product::find($productIdentifier);
+        } else {
+            $product = Product::where('slug', $productIdentifier)->first();
+        }
+
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produit non trouvé'
+            ], 404);
+        }
+
         // Vérifier que le produit est actif
         if (!$product->is_active) {
             return response()->json([
@@ -233,43 +247,60 @@ class ProductLikeController extends Controller
             ], 400);
         }
 
-        // Chercher le like existant
-        $existingLike = ProductLike::where('user_id', $user->id)
-            ->where('product_id', $product->id)
-            ->first();
-
-        if ($existingLike) {
-            // Retirer le like
-            $existingLike->delete();
-            $message = 'Like retiré avec succès';
-            $liked = false;
-        } else {
-            // Ajouter le like
-            ProductLike::create([
-                'user_id' => $user->id,
-                'product_id' => $product->id
-            ]);
-            $message = 'Produit liké avec succès';
-            $liked = true;
-        }
-
-        // Mettre à jour le compteur de likes dans la table products
-        $likesCount = $product->likes()->count();
-        $product->update(['likes_count' => $likesCount]);
+        // Utiliser une transaction pour garantir la cohérence
+        DB::beginTransaction();
         
-        // Recharger le produit pour avoir les données à jour
-        $product->refresh();
+        try {
+            // Chercher le like existant
+            $existingLike = ProductLike::where('user_id', $user->id)
+                ->where('product_id', $product->id)
+                ->first();
 
-        return response()->json([
-            'success' => true,
-            'message' => $message,
-            'data' => [
-                'is_liked' => $liked,
-                'liked' => $liked, // Alias pour compatibilité
-                'likes_count' => $likesCount,
-                'product' => $product->load('category')
-            ]
-        ]);
+            if ($existingLike) {
+                // Retirer le like
+                $existingLike->delete();
+                $message = 'Like retiré avec succès';
+                $liked = false;
+            } else {
+                // Ajouter le like
+                ProductLike::create([
+                    'user_id' => $user->id,
+                    'product_id' => $product->id
+                ]);
+                $message = 'Produit liké avec succès';
+                $liked = true;
+            }
+
+            // Mettre à jour le compteur de likes dans la table products de façon cohérente
+            $likesCount = ProductLike::where('product_id', $product->id)->count();
+            
+            // Mise à jour directe avec une requête SQL pour éviter les problèmes de cache
+            DB::table('products')
+                ->where('id', $product->id)
+                ->update(['likes_count' => $likesCount, 'updated_at' => now()]);
+            
+            DB::commit();
+            
+            // Recharger le produit depuis la base pour avoir les données à jour
+            $product = Product::find($product->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'data' => [
+                    'is_liked' => $liked,
+                    'liked' => $liked, // Alias pour compatibilité
+                    'likes_count' => $likesCount,
+                    'product' => $product->load('category')
+                ]
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour du like: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

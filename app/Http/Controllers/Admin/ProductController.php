@@ -102,7 +102,7 @@ class ProductController extends Controller
             'rental_price_per_day' => 'nullable|numeric|min:0',
             'deposit_amount' => 'nullable|numeric|min:0',
             'min_rental_days' => 'nullable|integer|min:1',
-            'max_rental_days' => 'nullable|integer|min:1',
+            'max_rental_days' => 'nullable|integer|min:1', // NULL autorisé = pas de limite
             'type' => 'required|in:sale,rental,both',
             'quantity' => 'required|integer|min:0',
             'rental_stock' => 'nullable|integer|min:0',
@@ -197,7 +197,7 @@ class ProductController extends Controller
             'rental_price_per_day' => 'nullable|numeric|min:0',
             'deposit_amount' => 'nullable|numeric|min:0',
             'min_rental_days' => 'nullable|integer|min:1',
-            'max_rental_days' => 'nullable|integer|min:1',
+            'max_rental_days' => 'nullable|integer|min:1', // NULL autorisé = pas de limite
             'type' => 'required|in:sale,rental,both',
             'quantity' => 'required|integer|min:0',
             'rental_stock' => 'nullable|integer|min:0',

@@ -266,12 +266,31 @@ document.addEventListener('alpine:init', () => {
                 return 0;
             }
             
+            // Calculer les jours en excluant les dimanches
             const start = new Date(this.rentalDates.start_date);
             const end = new Date(this.rentalDates.end_date);
-            const diffTime = Math.abs(end - start);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 car inclusif
             
-            return diffDays > 0 ? diffDays : 0;
+            let rentalDays = 0;
+            const current = new Date(start);
+            
+            while (current <= end) {
+                // Ne compter que les jours ouvrés (pas dimanche)
+                if (current.getDay() !== 0) { // 0 = dimanche
+                    rentalDays++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            
+            return rentalDays;
+        },
+
+        // Ajuster une date si elle tombe un dimanche (décaler au lundi)
+        adjustDateForBusinessDays(date) {
+            const adjustedDate = new Date(date);
+            while (adjustedDate.getDay() === 0) { // 0 = dimanche
+                adjustedDate.setDate(adjustedDate.getDate() + 1);
+            }
+            return adjustedDate;
         },
         
         toggleSameAddress() {
@@ -290,9 +309,18 @@ document.addEventListener('alpine:init', () => {
                 this.toggleSameAddress();
             });
             
-            // Initialiser les valeurs avec les vraies dates du panier
-            this.rentalDates.start_date = '{{ $cartLocation->default_start_date ? $cartLocation->default_start_date->format("Y-m-d") : now()->addDay()->format("Y-m-d") }}';
-            this.rentalDates.end_date = '{{ $cartLocation->default_end_date ? $cartLocation->default_end_date->format("Y-m-d") : now()->addDays(8)->format("Y-m-d") }}';
+            // Ajuster les dates initiales si elles tombent un dimanche
+            let startDate = new Date('{{ $cartLocation->default_start_date ? $cartLocation->default_start_date->format("Y-m-d") : now()->addDay()->format("Y-m-d") }}');
+            let endDate = new Date('{{ $cartLocation->default_end_date ? $cartLocation->default_end_date->format("Y-m-d") : now()->addDays(8)->format("Y-m-d") }}');
+            
+            startDate = this.adjustDateForBusinessDays(startDate);
+            endDate = this.adjustDateForBusinessDays(endDate);
+            
+            this.rentalDates.start_date = startDate.toISOString().split('T')[0];
+            this.rentalDates.end_date = endDate.toISOString().split('T')[0];
+            
+            // Configurer les restrictions sur les dates
+            this.setupDateRestrictions();
             
             // Synchroniser automatiquement lors de la frappe dans pickup_address
             setTimeout(() => {
@@ -310,7 +338,24 @@ document.addEventListener('alpine:init', () => {
                     this.toggleSameAddress();
                 }
             }, 100);
+
+            // Watchers pour ajuster automatiquement les dates
+            this.$watch('rentalDates.start_date', (newDate) => {
+                const adjustedDate = this.adjustDateForBusinessDays(new Date(newDate));
+                const adjustedDateStr = adjustedDate.toISOString().split('T')[0];
+                if (adjustedDateStr !== newDate) {
+                    this.rentalDates.start_date = adjustedDateStr;
+                }
+            });
             
+            this.$watch('rentalDates.end_date', (newDate) => {
+                const adjustedDate = this.adjustDateForBusinessDays(new Date(newDate));
+                const adjustedDateStr = adjustedDate.toISOString().split('T')[0];
+                if (adjustedDateStr !== newDate) {
+                    this.rentalDates.end_date = adjustedDateStr;
+                }
+            });
+
             // Debug: Ajouter un event listener sur le formulaire
             const form = document.querySelector('form');
             if (form) {
@@ -328,6 +373,28 @@ document.addEventListener('alpine:init', () => {
                     console.log('Same as pickup:', this.sameAsPickup);
                 });
             }
+        },
+
+        // Configurer les restrictions sur les sélecteurs de date
+        setupDateRestrictions() {
+            setTimeout(() => {
+                const startDateInput = document.querySelector('input[name="start_date"]');
+                const endDateInput = document.querySelector('input[name="end_date"]');
+                
+                const disableSundays = (dateInput) => {
+                    dateInput.addEventListener('input', (e) => {
+                        const selectedDate = new Date(e.target.value);
+                        if (selectedDate.getDay() === 0) { // Dimanche
+                            const adjustedDate = this.adjustDateForBusinessDays(selectedDate);
+                            e.target.value = adjustedDate.toISOString().split('T')[0];
+                            alert('🚫 Dimanche sélectionné : Notre boutique est fermée ce jour-là. La date a été automatiquement décalée au lundi suivant.');
+                        }
+                    });
+                };
+                
+                if (startDateInput) disableSundays(startDateInput);
+                if (endDateInput) disableSundays(endDateInput);
+            }, 100);
         }
     }));
 });

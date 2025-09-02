@@ -225,7 +225,10 @@ class CartLocationController extends Controller
     {
         $product = Product::where('slug', $productSlug)->first();
         if (!$product) {
-            return response()->json(['success' => false, 'message' => 'Produit non trouvé'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => '❌ Produit non trouvé'
+            ], 404);
         }
 
         $user = Auth::user();
@@ -234,18 +237,26 @@ class CartLocationController extends Controller
         if (!$cartLocation) {
             return response()->json([
                 'success' => false,
-                'message' => 'Panier de location non trouvé'
+                'message' => '🛒 Panier de location non trouvé'
             ], 404);
         }
 
-        $today = now()->format('Y-m-d');
+        $tomorrow = now()->addDay()->format('Y-m-d');  // Changé pour demain
         $validated = $request->validate([
-            // MODIFICATION TEMPORAIRE POUR TESTS : Permettre les locations le jour même
-            "start_date" => "required|date|after_or_equal:{$today}",
-            'end_date' => 'required|date|after_or_equal:start_date'
+            "start_date" => [
+                "required",
+                "date", 
+                "after_or_equal:{$tomorrow}",  // Changé pour exiger au minimum demain
+                new \App\Rules\RentalDateValidation($product, null, null, 'start')
+            ],
+            'end_date' => [
+                'required',
+                'date',
+                'after_or_equal:start_date'  // Changé de 'after' à 'after_or_equal' pour permettre les locations d'un jour
+            ]
         ], [
-            'start_date.after_or_equal' => 'La date de début doit être aujourd\'hui ou plus tard',
-            'end_date.after_or_equal' => 'La date de fin doit être postérieure ou égale à la date de début',
+            'start_date.after_or_equal' => '📅 La date de début doit être au minimum demain (' . now()->addDay()->format('d/m/Y') . ')',  // Message mis à jour
+            'end_date.after_or_equal' => '📅 La date de fin doit être égale ou postérieure à la date de début',  // Message mis à jour
         ]);
 
         try {
@@ -254,16 +265,57 @@ class CartLocationController extends Controller
             $startDate = Carbon::parse($validated['start_date']);
             $endDate = Carbon::parse($validated['end_date']);
 
-            $cartItem = $cartLocation->updateProductDates($product, $startDate, $endDate);
+            // Validation supplémentaire pour la date de fin avec la date de début
+            $endDateValidator = new \App\Rules\RentalDateValidation($product, $startDate, $endDate, 'end');
+            $endDateValidator->validate('end_date', $validated['end_date'], function($message) {
+                throw new \Exception($message);
+            });
+
+            // Ajuster automatiquement les dates si elles tombent un dimanche
+            $adjustedStartDate = $product->adjustDateForBusinessDays($startDate);
+            $adjustedEndDate = $product->adjustDateForBusinessDays($endDate);
+
+            $cartItem = $cartLocation->updateProductDates($product, $adjustedStartDate, $adjustedEndDate);
+
+            // Préparer le message de succès avec détails sur les ajustements
+            $message = '✅ Dates de location mises à jour avec succès';
+            $adjustmentInfo = [];
+            
+            if (!$adjustedStartDate->eq($startDate)) {
+                $adjustmentInfo[] = "Date de début ajustée du {$startDate->format('d/m/Y')} au {$adjustedStartDate->format('d/m/Y')} (boutique fermée le dimanche)";
+            }
+            
+            if (!$adjustedEndDate->eq($endDate)) {
+                $adjustmentInfo[] = "Date de fin ajustée du {$endDate->format('d/m/Y')} au {$adjustedEndDate->format('d/m/Y')} (boutique fermée le dimanche)";
+            }
+
+            if (!empty($adjustmentInfo)) {
+                $message .= ' - ' . implode(', ', $adjustmentInfo);
+            }
+
+            // Calculer les jours ouvrés pour information
+            $businessDays = $product->calculateRentalDuration($adjustedStartDate, $adjustedEndDate);
+            $totalDays = $adjustedStartDate->diffInDays($adjustedEndDate) + 1;
+            $sundaysExcluded = $totalDays - $businessDays;
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Dates de location mises à jour avec succès',
+                'message' => $message,
                 'data' => [
                     'cart_item' => $cartItem->toDisplayArray(),
-                    'cart_summary' => $cartLocation->fresh()->getSummary()
+                    'cart_summary' => $cartLocation->fresh()->getSummary(),
+                    'date_adjustments' => [
+                        'original_start_date' => $startDate->format('Y-m-d'),
+                        'original_end_date' => $endDate->format('Y-m-d'),
+                        'adjusted_start_date' => $adjustedStartDate->format('Y-m-d'),
+                        'adjusted_end_date' => $adjustedEndDate->format('Y-m-d'),
+                        'business_days' => $businessDays,
+                        'total_calendar_days' => $totalDays,
+                        'sundays_excluded' => $sundaysExcluded,
+                        'note' => 'Les dimanches ne sont pas comptabilisés (boutique fermée)'
+                    ]
                 ]
             ]);
 
@@ -272,7 +324,8 @@ class CartLocationController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
+                'error_type' => 'validation_error'
             ], 400);
         }
     }

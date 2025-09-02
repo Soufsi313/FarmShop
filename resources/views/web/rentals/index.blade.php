@@ -243,8 +243,12 @@
 
                                     <!-- Contraintes -->
                                     <div class="text-xs text-gray-500 mb-3 space-y-1">
-                                        @if($product->min_rental_days && $product->max_rental_days)
-                                            <p>📅 {{ $product->min_rental_days }}-{{ $product->max_rental_days }} {{ __('app.rentals.days') }}</p>
+                                        @if($product->min_rental_days)
+                                            @if($product->max_rental_days)
+                                                <p>📅 {{ $product->min_rental_days }}-{{ $product->max_rental_days }} {{ __('app.rentals.days') }}</p>
+                                            @else
+                                                <p>📅 {{ __('app.rentals.minimum_days') }} {{ $product->min_rental_days }} {{ __('app.rentals.day') }}</p>
+                                            @endif
                                         @endif
                                     </div>
 
@@ -304,7 +308,16 @@
                                             </button>
 
                                             <button class="rent-now-btn px-3 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors text-sm font-medium"
-                                                    x-on:click="rentNow({{ json_encode($product) }})">
+                                                    x-on:click="rentNow({
+                                                        id: {{ $product->id }},
+                                                        name: {{ json_encode($product->name) }},
+                                                        slug: {{ json_encode($product->slug) }},
+                                                        rental_price_per_day: {{ $product->rental_price_per_day }},
+                                                        deposit_amount: {{ $product->deposit_amount }},
+                                                        min_rental_days: {{ $product->min_rental_days }},
+                                                        max_rental_days: {{ $product->max_rental_days ?? 'null' }},
+                                                        rental_stock: {{ $product->rental_stock }}
+                                                    })">>
                                                 🏠 {{ __('app.rentals.rent_now') }}
                                             </button>
                                         @else
@@ -376,13 +389,13 @@
                         {{ __('app.rentals.deposit') }}: <span x-text="selectedProduct.deposit_amount" class="font-semibold text-amber-600"></span>€
                     </p>
                     <p class="text-sm text-gray-600">
-                        {{ __('app.rentals.duration') }}: <span x-text="selectedProduct.min_rental_days + '-' + selectedProduct.max_rental_days"></span> {{ __('app.rentals.days') }}
+                        {{ __('app.rentals.duration') }}: <span x-text="getDurationText(selectedProduct)"></span>
                     </p>
                 </div>
 
                 <!-- Quantité -->
                 <div>
-                    <label for="modal-quantity" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.ecommerce.quantity") }}<//label>
+                    <label for="modal-quantity" class="block text-sm font-medium text-gray-700 mb-1">{{ __("app.rentals.quantity_label") }}</label>
                     <input type="number" 
                            x-model="rentalForm.quantity" 
                            min="1" 
@@ -530,27 +543,77 @@ document.addEventListener('alpine:init', () => {
         // Initialisation
         init() {
             this.updateCartLocationCount();
-            // Définir dates par défaut
+            // Définir dates par défaut en évitant les dimanches
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
-            this.rentalForm.startDate = tomorrow.toISOString().split('T')[0];
+            this.rentalForm.startDate = this.adjustDateForBusinessDays(tomorrow).toISOString().split('T')[0];
             
             const weekLater = new Date();
             weekLater.setDate(weekLater.getDate() + 8);
-            this.rentalForm.endDate = weekLater.toISOString().split('T')[0];
+            this.rentalForm.endDate = this.adjustDateForBusinessDays(weekLater).toISOString().split('T')[0];
+            
+            // Ajouter les event listeners pour bloquer les dimanches
+            this.setupDateRestrictions();
             
             // Sauvegarder automatiquement les dates par défaut quand elles changent
             this.$watch('rentalForm.startDate', (newStartDate) => {
+                // Ajuster automatiquement si c'est un dimanche
+                const adjustedDate = this.adjustDateForBusinessDays(new Date(newStartDate));
+                const adjustedDateStr = adjustedDate.toISOString().split('T')[0];
+                if (adjustedDateStr !== newStartDate) {
+                    this.rentalForm.startDate = adjustedDateStr;
+                    this.showNotification('🚫 Date ajustée automatiquement : notre boutique est fermée le dimanche', 'warning');
+                }
                 if (newStartDate && this.rentalForm.endDate) {
                     this.saveDefaultDates();
                 }
             });
             
             this.$watch('rentalForm.endDate', (newEndDate) => {
+                // Ajuster automatiquement si c'est un dimanche
+                const adjustedDate = this.adjustDateForBusinessDays(new Date(newEndDate));
+                const adjustedDateStr = adjustedDate.toISOString().split('T')[0];
+                if (adjustedDateStr !== newEndDate) {
+                    this.rentalForm.endDate = adjustedDateStr;
+                    this.showNotification('🚫 Date ajustée automatiquement : notre boutique est fermée le dimanche', 'warning');
+                }
                 if (newEndDate && this.rentalForm.startDate) {
                     this.saveDefaultDates();
                 }
             });
+        },
+
+        // Ajuster une date si elle tombe un dimanche (décaler au lundi)
+        adjustDateForBusinessDays(date) {
+            const adjustedDate = new Date(date);
+            while (adjustedDate.getDay() === 0) { // 0 = dimanche
+                adjustedDate.setDate(adjustedDate.getDate() + 1);
+            }
+            return adjustedDate;
+        },
+
+        // Configurer les restrictions sur les sélecteurs de date
+        setupDateRestrictions() {
+            // Fonction pour désactiver les dimanches
+            const disableSundays = (dateInput) => {
+                dateInput.addEventListener('input', (e) => {
+                    const selectedDate = new Date(e.target.value);
+                    if (selectedDate.getDay() === 0) { // Dimanche
+                        const adjustedDate = this.adjustDateForBusinessDays(selectedDate);
+                        e.target.value = adjustedDate.toISOString().split('T')[0];
+                        this.showNotification('🚫 Dimanche sélectionné : Notre boutique est fermée ce jour-là. Date décalée au lundi suivant.', 'warning');
+                    }
+                });
+            };
+
+            // Appliquer aux champs de date après un court délai pour s'assurer qu'ils existent
+            setTimeout(() => {
+                const startDateInput = document.querySelector('input[x-model="rentalForm.startDate"]');
+                const endDateInput = document.querySelector('input[x-model="rentalForm.endDate"]');
+                
+                if (startDateInput) disableSundays(startDateInput);
+                if (endDateInput) disableSundays(endDateInput);
+            }, 100);
         },
         
         // Gestion des quantités
@@ -606,8 +669,24 @@ document.addEventListener('alpine:init', () => {
         rentNow(product) {
             this.selectedProduct = product;
             this.rentalForm.quantity = this.quantities[product.id];
+            this.rentalError = ''; // Réinitialiser les erreurs
+            this.calculation.show = false; // Masquer les calculs précédents
             this.showRentalModal = true;
-            this.calculateCost();
+            // Ne pas calculer automatiquement - attendre que l'utilisateur choisisse des dates
+        },
+
+        // Obtenir le texte de durée pour l'affichage
+        getDurationText(product) {
+            if (!product || !product.min_rental_days) return '';
+            
+            const minDays = product.min_rental_days;
+            const maxDays = product.max_rental_days;
+            
+            if (maxDays) {
+                return `${minDays}-${maxDays} {{ __('app.rentals.days') }}`;
+            } else {
+                return `${minDays}+ {{ __('app.rentals.days') }}`;
+            }
         },
         
         // Calculer le coût
@@ -816,8 +895,9 @@ function toggleLike(productSlug) {
             const text = button.querySelector('span:last-child');
             const likesCountElement = document.getElementById(`likes_count_${productSlug}`);
             
-            const isLiked = data.is_liked || data.liked;
-            const likesCount = data.data ? data.data.likes_count || 0 : 0;
+            // Utiliser la bonne structure de réponse
+            const isLiked = data.data.is_liked || data.data.liked;
+            const likesCount = data.data.likes_count || 0;
             
             if (isLiked) {
                 button.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors bg-red-100 text-red-600';

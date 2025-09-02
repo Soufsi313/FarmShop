@@ -2,7 +2,7 @@
 <html lang="{{ app()->getLocale() }}" class="h-full">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title', 'FarmShop - Matériel Agricole Belge de Qualité')</title>

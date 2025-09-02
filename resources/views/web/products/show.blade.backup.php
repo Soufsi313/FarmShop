@@ -766,6 +766,168 @@ async function toggleLike(productSlug) {
         showNotification('Erreur lors de l\'action', 'error');
     }
 }
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfToken) {
+            throw new Error('❌ CSRF token meta tag non trouvé');
+        }
+        console.log('✅ CSRF token trouvé');
+        
+        // Utiliser XMLHttpRequest au lieu de fetch
+        const xhr = new XMLHttpRequest();
+    // Encoder le slug pour éviter problèmes d'URL et forcer l'envoi des cookies
+    const encodedSlug = encodeURIComponent(productSlug);
+    const url = `/web/likes/products/${encodedSlug}/toggle`; // Route réelle fonctionnelle
+        
+        console.log('🌐 URL de la requête:', url);
+        
+        // Préparer la promesse
+        const request = new Promise((resolve, reject) => {
+            xhr.onreadystatechange = function() {
+                console.log('📡 XMLHttpRequest readyState:', xhr.readyState);
+                
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    console.log('📊 Status:', xhr.status);
+                    console.log('📊 Response text:', xhr.responseText);
+
+                    // Diagnostic additionnel
+                    console.log('🔐 CSRF token (client):', csrfToken.getAttribute('content'));
+                    console.log('🍪 document.cookie:', document.cookie);
+                    console.log('🔗 URL envoyé:', url);
+
+                    if (xhr.status === 0) {
+                        console.warn('⚠️ XHR returned status 0 — attempting fetch fallback to gather more info');
+                        (async () => {
+                            try {
+                                const fd = new FormData();
+                                fd.append('_token', csrfToken.getAttribute('content'));
+                                const resp = await fetch(url, {
+                                    method: 'POST',
+                                    credentials: 'same-origin',
+                                    body: fd,
+                                    headers: {
+                                        'X-Requested-With': 'XMLHttpRequest',
+                                        'Accept': 'application/json'
+                                    }
+                                });
+                                console.log('🔁 Fallback fetch status:', resp.status, 'ok:', resp.ok);
+                                const text = await resp.text();
+                                console.log('🔁 Fallback fetch response text:', text);
+                            } catch (fetchErr) {
+                                console.error('🔁 Fallback fetch error:', fetchErr);
+                            }
+                        })();
+                    }
+                    
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        try {
+                            const data = JSON.parse(xhr.responseText);
+                            resolve(data);
+                        } catch (parseError) {
+                            console.error('❌ Erreur de parsing JSON:', parseError);
+                            reject(new Error('Réponse non valide du serveur'));
+                        }
+                    } else {
+                        reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
+                    }
+                }
+            };
+            
+            xhr.onerror = function() {
+                console.error('� XMLHttpRequest onerror triggered');
+                console.error('📊 Status:', xhr.status);
+                console.error('📊 StatusText:', xhr.statusText);
+                reject(new Error('Erreur réseau lors de la requête'));
+            };
+            
+            xhr.ontimeout = function() {
+                console.error('⏰ XMLHttpRequest timeout');
+                reject(new Error('Timeout de la requête'));
+            };
+        });
+        
+    // Configurer la requête
+    xhr.open('POST', url, true);
+    // S'assurer que les cookies/sessions sont envoyés
+    xhr.withCredentials = true;
+        xhr.setRequestHeader('Accept', 'application/json');
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken.getAttribute('content'));
+        xhr.timeout = 10000; // 10 secondes
+        
+        // Préparer les données
+        const formData = new FormData();
+        formData.append('_token', csrfToken.getAttribute('content'));
+        
+        console.log('🚀 Envoi de la requête XMLHttpRequest POST...');
+        xhr.send(formData);
+        
+        // Attendre la réponse
+        const data = await request;
+        
+        console.log('✅ Réponse reçue avec succès:', data);
+        
+        if (data.success) {
+            const btn = document.getElementById(`like_btn_${productSlug}`);
+            const icon = btn.querySelector('svg');
+            const text = btn.querySelector('span');
+            const likesCountElement = document.getElementById(`likes_count_${productSlug}`);
+            const likesTextElement = document.getElementById(`likes_text_${productSlug}`);
+            
+            // Compatibilité avec les deux formats de réponse
+            const isLiked = data.data.is_liked || data.data.liked;
+            const likesCount = data.data.likes_count || 0;
+            
+            console.log('Updating UI with likes count:', likesCount);
+            
+            // Mettre à jour le bouton
+            if (isLiked) {
+                icon.classList.remove('text-gray-400');
+                icon.classList.add('text-red-500');
+                icon.setAttribute('fill', 'currentColor');
+                text.textContent = 'J\'aime';
+                btn.classList.add('text-red-500', 'border-red-300');
+                btn.classList.remove('text-gray-700');
+            } else {
+                icon.classList.remove('text-red-500');
+                icon.classList.add('text-gray-400');
+                icon.setAttribute('fill', 'none');
+                text.textContent = 'Aimer';
+                btn.classList.remove('text-red-500', 'border-red-300');
+                btn.classList.add('text-gray-700');
+            }
+            
+            // Mettre à jour le compteur et le texte
+            if (likesCountElement) {
+                likesCountElement.textContent = likesCount;
+            }
+            
+            if (likesTextElement) {
+                if (likesCount === 1) {
+                    likesTextElement.textContent = '{{ __('app.products.person_likes') }}';
+                } else {
+                    likesTextElement.textContent = '{{ __('app.products.people_like') }}';
+                }
+            }
+            
+            showNotification(data.message, 'success');
+        } else {
+            showNotification(data.message || 'Erreur lors de l\'action', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur détaillée:', error);
+        
+        // Afficher une erreur plus spécifique
+        if (error.message.includes('404')) {
+            showNotification('Produit non trouvé', 'error');
+        } else if (error.message.includes('401')) {
+            showNotification('Vous devez être connecté pour effectuer cette action', 'error');
+        } else if (error.message.includes('500')) {
+            showNotification('Erreur serveur. Veuillez réessayer plus tard.', 'error');
+        } else {
+            showNotification('Erreur lors de l\'action. Vérifiez votre connexion.', 'error');
+        }
+    }
+}
 
 async function toggleWishlist(productSlug) {
     try {
