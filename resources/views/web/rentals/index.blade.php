@@ -509,6 +509,14 @@
 
 @push('scripts')
 <script>
+// Variables de traduction JavaScript
+const translations = {
+    addToFavorites: {!! json_encode(__("app.rentals.add_to_favorites")) !!},
+    favorites: {!! json_encode(__("app.rentals.favorites")) !!},
+    added: 'Ajouté',
+    add: 'Ajouter'
+};
+
 document.addEventListener('alpine:init', () => {
     Alpine.data('rentalPage', () => ({
         // État
@@ -937,17 +945,31 @@ function toggleWishlist(productSlug) {
     .then(data => {
         if (data.success) {
             const button = document.getElementById(`wishlist_btn_${productSlug}`);
+            
+            if (!button) {
+                console.error('Button not found for slug:', productSlug);
+                return;
+            }
+            
             const icon = button.querySelector('span:first-child');
             const text = button.querySelector('span:last-child');
             
-            if (data.in_wishlist || data.is_wishlisted) {
+            if (!icon || !text) {
+                console.error('Icon or text element not found');
+                return;
+            }
+            
+            // Vérifier l'état de la wishlist
+            const isInWishlist = data.data?.in_wishlist || data.data?.is_wishlisted;
+            
+            if (isInWishlist) {
                 button.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors bg-yellow-100 text-yellow-600';
                 icon.textContent = '⭐';
-                text.textContent = 'En favoris';
+                text.textContent = translations.favorites;
             } else {
                 button.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors bg-gray-100 text-gray-600 hover:bg-yellow-50 hover:text-yellow-500';
                 icon.textContent = '☆';
-                text.textContent = __("app.buttons.favorites");
+                text.textContent = translations.addToFavorites;
             }
         } else {
             alert(data.message || 'Erreur lors de la mise à jour');
