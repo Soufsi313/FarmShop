@@ -49,34 +49,34 @@ Votre location **#{{ $orderLocation->order_number }}** a été finalisée avec s
 {{ $orderLocation->inspection_notes }}
 @endif
 
-## 💰 Caution et remboursement
+## 💰 Caution et traitement
 
 <table style="width: 100%; margin: 20px 0; background-color: #f0fff4; border: 2px solid #38a169;">
     <tr>
         <td style="padding: 15px; text-align: center;">
             @if(isset($damageFeesTotal) && $damageFeesTotal > 0)
-                <h3 style="margin: 0; color: #2d3748;">Remboursement de caution</h3>
+                <h3 style="margin: 0; color: #2d3748;">Caution capturée</h3>
                 <p style="margin: 10px 0; color: #4a5568;">
-                    Caution versée : <strong>{{ number_format($depositAmount, 2) }}€</strong><br>
+                    Caution pré-autorisée : <strong>{{ number_format($depositAmount, 2) }}€</strong><br>
                     Frais de dommages : <strong style="color: #e53e3e;">{{ number_format($damageFeesTotal, 2) }}€</strong>
                 </p>
-                <p style="margin: 15px 0; font-size: 24px; color: #38a169; font-weight: bold;">
-                    💰 Montant à rembourser : {{ number_format($refundAmount, 2) }}€
+                <p style="margin: 15px 0; font-size: 24px; color: #e53e3e; font-weight: bold;">
+                    � Montant prélevé : {{ number_format($damageFeesTotal, 2) }}€
                 </p>
                 <p style="margin: 10px 0; color: #718096; font-size: 14px;">
                     ⚠️ Des frais ont été appliqués suite à l'inspection
                 </p>
             @else
-                <h3 style="margin: 0; color: #2d3748;">Remboursement intégral !</h3>
+                <h3 style="margin: 0; color: #2d3748;">Caution libérée !</h3>
                 <p style="margin: 15px 0; font-size: 24px; color: #38a169; font-weight: bold;">
                     🎉 {{ number_format($depositAmount ?? $orderLocation->deposit_amount, 2) }}€
                 </p>
                 <p style="margin: 10px 0; color: #718096; font-size: 14px;">
-                    ✅ Aucun dommage constaté - Caution intégralement remboursée
+                    ✅ Aucun dommage constaté - Caution intégralement libérée
                 </p>
             @endif
             <p style="margin: 15px 0; color: #4a5568; font-size: 14px;">
-                🏦 Le remboursement sera effectué sous 3-5 jours ouvrés<br>sur votre moyen de paiement original
+                🏦 Le traitement sera effectué sous 3-5 jours ouvrés<br>sur votre moyen de paiement original
             </p>
         </td>
     </tr>

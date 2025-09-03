@@ -4,6 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Facture de Location {{ $orderLocation->invoice_number }}</title>
+    
+    @php
+        // Logique pour les deux types de facture
+        $isInitialInvoice = ($invoiceType ?? 'initial') === 'initial';
+        $isFinalInvoice = ($invoiceType ?? 'initial') === 'final';
+        
+        // Montants selon le type de facture
+        if ($isInitialInvoice) {
+            // Facture initiale : montants de base sans pénalités
+            $displayLateFees = false;
+            $displayDamageCost = false;
+            $displayInspectionNotes = false;
+            $displayDepositRefund = false;
+            $invoiceTitle = __('invoices.initial_invoice_title') ?: 'FACTURE INITIALE';
+            $invoiceNote = 'Cette facture sera mise à jour après inspection du matériel retourné.';
+        } else {
+            // Facture finale : tous les montants incluant pénalités
+            $displayLateFees = $orderLocation->late_fees > 0;
+            $displayDamageCost = $orderLocation->damage_cost > 0;
+            $displayInspectionNotes = !empty($orderLocation->inspection_notes);
+            $displayDepositRefund = $orderLocation->deposit_refund !== null;
+            $invoiceTitle = __('invoices.final_invoice_title') ?: 'FACTURE DÉFINITIVE';
+            $invoiceNote = 'Facture définitive après inspection du matériel retourné.';
+        }
+    @endphp
+    
     <style>
         body {
             font-family: 'DejaVu Sans', sans-serif;
@@ -177,21 +203,24 @@
     <div class="header">
         <div class="company-info">
             <div class="company-name">{{ $company['name'] }}</div>
-            <div>E-commerce de produits agricoles</div>
+            <div>{{ __('invoices.company_title') }}</div>
             <div>{{ $company['address'] }}</div>
             <div>{{ $company['postal_code'] }} {{ $company['city'] }}, {{ $company['country'] }}</div>
-            <div>Tél: {{ $company['phone'] }}</div>
-            <div>Email: {{ $company['email'] }}</div>
-            <div>N° TVA: {{ $company['vat_number'] }}</div>
+            <div>{{ __('invoices.phone_label') }}: {{ $company['phone'] }}</div>
+            <div>{{ __('invoices.email_label') }}: {{ $company['email'] }}</div>
+            <div>{{ __('invoices.vat_number') }}: {{ $company['vat_number'] }}</div>
         </div>
         
         <div class="invoice-info">
-            <div class="invoice-title">FACTURE DE LOCATION</div>
+            <div class="invoice-title">{{ $invoiceTitle }}</div>
             <div class="invoice-details">
-                <div><strong>N° Facture:</strong> {{ $orderLocation->invoice_number }}</div>
+                <div><strong>{{ __('invoices.invoice_number') }}:</strong> {{ $orderLocation->invoice_number }}</div>
                 <div><strong>N° Location:</strong> {{ $orderLocation->order_number }}</div>
-                <div><strong>Date facture:</strong> {{ $orderLocation->created_at->format('d/m/Y') }}</div>
-                <div><strong>Date échéance:</strong> {{ $orderLocation->created_at->addDays(30)->format('d/m/Y') }}</div>
+                <div><strong>{{ __('invoices.invoice_date') }}:</strong> {{ $orderLocation->created_at->format('d/m/Y') }}</div>
+                @if($isFinalInvoice && $orderLocation->inspection_completed_at)
+                <div><strong>Date inspection:</strong> {{ $orderLocation->inspection_completed_at->format('d/m/Y') }}</div>
+                @endif
+                <div><strong>{{ __('invoices.due_date') }}:</strong> {{ $orderLocation->created_at->addDays(30)->format('d/m/Y') }}</div>
                 <div class="status-badge status-{{ $orderLocation->payment_status }}">
                     @switch($orderLocation->payment_status)
                         @case('paid')
@@ -258,45 +287,48 @@
     
     <!-- Informations client -->
     <div class="rental-summary">
-        <h3 style="margin-top: 0; color: #28a745;">Informations client</h3>
+        <h3 style="margin-top: 0; color: #28a745;">{{ __('invoices.client_info') }}</h3>
         <div class="summary-row">
             <span><strong>Client:</strong></span>
             <span>{{ $user->name }}</span>
         </div>
         <div class="summary-row">
-            <span><strong>Email:</strong></span>
+            <span><strong>{{ __('invoices.email') }}:</strong></span>
             <span>{{ $user->email }}</span>
         </div>
         <div class="summary-row">
-            <span><strong>Téléphone:</strong></span>
-            <span>{{ $user->phone ?? 'Non renseigné' }}</span>
+            <span><strong>{{ __('invoices.phone') }}:</strong></span>
+            <span>{{ $user->phone ?? __('invoices.not_provided') }}</span>
         </div>
     </div>
     
     <!-- Informations de location -->
     <div class="rental-summary">
-        <h3 style="margin-top: 0; color: #28a745;">Détails de la location</h3>
+        <h3 style="margin-top: 0; color: #28a745;">{{ __('invoices.rental_details') }}</h3>
         <div class="summary-row">
-            <span><strong>Statut:</strong></span>
+            <span><strong>{{ __('invoices.status') }}:</strong></span>
             <span>
                 @switch($orderLocation->status)
+                    @case('pending')
+                        {{ __('invoices.status_pending') }}
+                        @break
                     @case('confirmed')
-                        Confirmée
+                        {{ __('invoices.status_confirmed') }}
                         @break
                     @case('active')
-                        En cours
+                        {{ __('invoices.status_active') }}
                         @break
-                    @case('returned')
-                        Retournée
+                    @case('completed')
+                        {{ __('invoices.status_completed') }}
                         @break
                     @case('inspecting')
-                        En inspection
+                        {{ __('invoices.status_inspecting') }}
                         @break
                     @case('finished')
-                        Terminée
+                        {{ __('invoices.status_finished') }}
                         @break
                     @case('cancelled')
-                        Annulée
+                        {{ __('invoices.status_cancelled') }}
                         @break
                     @default
                         {{ ucfirst($orderLocation->status) }}
@@ -304,17 +336,23 @@
             </span>
         </div>
         <div class="summary-row">
-            <span><strong>Mode de paiement:</strong></span>
+            <span><strong>{{ __('invoices.payment_method') }}:</strong></span>
             <span>
                 @switch($orderLocation->payment_method)
                     @case('stripe')
-                        Carte bancaire
+                        {{ __('invoices.payment_card') }}
+                        @break
+                    @case('card')
+                        {{ __('invoices.payment_card') }}
                         @break
                     @case('paypal')
                         PayPal
                         @break
                     @case('bank_transfer')
-                        Virement bancaire
+                        {{ __('invoices.payment_transfer') }}
+                        @break
+                    @case('cash')
+                        {{ __('invoices.payment_cash') }}
                         @break
                     @default
                         {{ ucfirst($orderLocation->payment_method) }}
@@ -351,12 +389,12 @@
     <table class="items-table">
         <thead>
             <tr>
-                <th style="width: 40%;">{{ __("app.ecommerce.product") }}</th>
-                <th style="width: 10%;" class="text-center">Qté</th>
-                <th style="width: 15%;" class="text-right">Prix/jour</th>
-                <th style="width: 10%;" class="text-center">Jours</th>
-                <th style="width: 15%;" class="text-right">Caution</th>
-                <th style="width: 10%;" class="text-right">{{ __("app.ecommerce.total") }}</th>
+                <th style="width: 40%;">{{ __("invoices.product") }}</th>
+                <th style="width: 10%;" class="text-center">{{ __("invoices.quantity") }}</th>
+                <th style="width: 15%;" class="text-right">{{ __("invoices.daily_rate") }}</th>
+                <th style="width: 10%;" class="text-center">{{ __("invoices.days") }}</th>
+                <th style="width: 15%;" class="text-right">{{ __("invoices.deposit") }}</th>
+                <th style="width: 10%;" class="text-right">{{ __("invoices.total") }}</th>
             </tr>
         </thead>
         <tbody>
@@ -381,38 +419,38 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="5" class="text-right"><strong>Sous-total location HT:</strong></td>
+                <td colspan="5" class="text-right"><strong>{{ __('invoices.subtotal_ht') }}:</strong></td>
                 <td class="text-right"><strong>{{ number_format($orderLocation->subtotal, 2, ',', ' ') }} €</strong></td>
             </tr>
             <tr>
-                <td colspan="5" class="text-right"><strong>Caution totale:</strong></td>
+                <td colspan="5" class="text-right"><strong>{{ __('invoices.total_deposit') }}:</strong></td>
                 <td class="text-right"><strong>{{ number_format($orderLocation->deposit_amount, 2, ',', ' ') }} €</strong></td>
             </tr>
-            @if($orderLocation->tax_amount > 0)
+            @if($orderLocation->tax_amount > 0 || $orderLocation->tax_rate > 0)
             <tr>
-                <td colspan="5" class="text-right"><strong>TVA ({{ number_format($orderLocation->tax_rate, 0) }}%):</strong></td>
+                <td colspan="5" class="text-right"><strong>{{ __('invoices.vat') }} ({{ number_format($orderLocation->tax_rate ?? 21, 0) }}%):</strong></td>
                 <td class="text-right"><strong>{{ number_format($orderLocation->tax_amount, 2, ',', ' ') }} €</strong></td>
             </tr>
             @endif
-            @if($orderLocation->late_fees > 0)
+            @if($displayLateFees)
             <tr>
-                <td colspan="5" class="text-right"><strong>Pénalités de retard ({{ $orderLocation->late_days }} jours):</strong></td>
+                <td colspan="5" class="text-right"><strong>{{ __('invoices.late_penalties') }} ({{ $orderLocation->late_days }} {{ $orderLocation->late_days > 1 ? __('invoices.days_plural') : __('invoices.day') }}):</strong></td>
                 <td class="text-right"><strong>{{ number_format($orderLocation->late_fees, 2, ',', ' ') }} €</strong></td>
             </tr>
             @endif
-            @if($orderLocation->damage_cost > 0)
+            @if($displayDamageCost)
             <tr>
-                <td colspan="5" class="text-right"><strong>Frais de dommages:</strong></td>
+                <td colspan="5" class="text-right"><strong>{{ __('invoices.damage_fees') }}:</strong></td>
                 <td class="text-right"><strong>{{ number_format($orderLocation->damage_cost, 2, ',', ' ') }} €</strong></td>
             </tr>
             @endif
             <tr class="total-row">
-                <td colspan="5" class="text-right"><strong>TOTAL TTC:</strong></td>
+                <td colspan="5" class="text-right"><strong>{{ __('invoices.total_ttc') }}:</strong></td>
                 <td class="text-right"><strong>{{ number_format($orderLocation->total_amount, 2, ',', ' ') }} €</strong></td>
             </tr>
-            @if($orderLocation->deposit_refund !== null)
+            @if($displayDepositRefund)
             <tr>
-                <td colspan="5" class="text-right"><strong>Remboursement de caution:</strong></td>
+                <td colspan="5" class="text-right"><strong>{{ __('invoices.deposit_released') }}:</strong></td>
                 <td class="text-right"><strong>{{ number_format($orderLocation->deposit_refund, 2, ',', ' ') }} €</strong></td>
             </tr>
             @endif
@@ -420,29 +458,48 @@
     </table>
     
     <!-- Informations de paiement -->
-    @if($orderLocation->payment_status === 'paid')
+    @if(in_array($orderLocation->payment_status, ['paid', 'deposit_paid']))
     <div class="payment-info">
         <h3 style="margin-top: 0; color: #28a745;">Paiement effectué</h3>
         <p>Le paiement de cette facture de location a été effectué le {{ $orderLocation->updated_at->format('d/m/Y à H:i') }} 
-        par {{ $orderLocation->payment_method === 'stripe' ? 'carte bancaire' : ucfirst($orderLocation->payment_method) }}.</p>
-        @if($orderLocation->deposit_amount > 0)
-        <p><strong>Note :</strong> La caution de {{ number_format($orderLocation->deposit_amount, 2, ',', ' ') }} € sera remboursée après inspection du matériel retourné et déduction des éventuelles pénalités.</p>
+        par {{ $orderLocation->payment_method === 'stripe' ? __('invoices.payment_card') : ucfirst($orderLocation->payment_method) }}.</p>
+        
+        @if($isInitialInvoice)
+            <p><strong>Note :</strong> {{ $invoiceNote }}</p>
+            @if($orderLocation->deposit_amount > 0)
+            <p><strong>Caution :</strong> La caution de {{ number_format($orderLocation->deposit_amount, 2, ',', ' ') }} € est pré-autorisée et sera libérée après inspection du matériel retourné, déduction faite des éventuelles pénalités.</p>
+            @endif
+        @else
+            <p><strong>Note :</strong> {{ $invoiceNote }}</p>
+            @if($orderLocation->deposit_refund !== null && $orderLocation->deposit_amount > 0)
+                <p><strong>Caution :</strong> 
+                    @if($orderLocation->deposit_refund == $orderLocation->deposit_amount)
+                        La caution de {{ number_format($orderLocation->deposit_amount, 2, ',', ' ') }} € a été intégralement libérée.
+                    @elseif($orderLocation->deposit_refund > 0)
+                        {{ number_format($orderLocation->deposit_refund, 2, ',', ' ') }} € de la caution ont été libérés. 
+                        {{ number_format($orderLocation->deposit_amount - $orderLocation->deposit_refund, 2, ',', ' ') }} € ont été retenus pour les frais.
+                    @else
+                        La caution de {{ number_format($orderLocation->deposit_amount, 2, ',', ' ') }} € a été intégralement retenue pour les frais.
+                    @endif
+                </p>
+            @elseif($orderLocation->deposit_amount > 0)
+                <p><strong>Caution :</strong> La caution de {{ number_format($orderLocation->deposit_amount, 2, ',', ' ') }} € est en cours de traitement.</p>
+            @endif
         @endif
     </div>
     @else
     <div class="payment-info">
-        <h3 style="margin-top: 0; color: #856404;">Paiement en attente</h3>
-        <p>Cette facture de location est en attente de paiement. Merci de procéder au règlement dans les meilleurs délais.</p>
+        <h3 style="margin-top: 0; color: #856404;">{{ __('invoices.payment_pending') }}</h3>
+        <p>{{ __('invoices.payment_pending_message') }}</p>
     </div>
     @endif
     
-    <!-- Conditions spécifiques à la location -->
-    @if($orderLocation->inspection_notes)
+    @if($displayInspectionNotes)
     <div class="payment-info">
-        <h3 style="margin-top: 0; color: #28a745;">Notes d'inspection</h3>
+        <h3 style="margin-top: 0; color: #28a745;">{{ __('invoices.inspection_notes') }}</h3>
         <p>{{ $orderLocation->inspection_notes }}</p>
         @if($orderLocation->inspection_completed_at)
-        <p><small>Inspection réalisée le {{ $orderLocation->inspection_completed_at->format('d/m/Y à H:i') }}</small></p>
+        <p><small>{{ __('invoices.inspection_performed') }} {{ $orderLocation->inspection_completed_at->format('d/m/Y') }} {{ __('invoices.at') }} {{ $orderLocation->inspection_completed_at->format('H:i') }}</small></p>
         @endif
     </div>
     @endif
@@ -450,18 +507,16 @@
     <!-- Pied de page -->
     <div class="footer">
         <div style="text-align: center;">
-            <p><strong>Conditions de location:</strong></p>
+            <p><strong>{{ __('invoices.rental_conditions') }}:</strong></p>
             <p>
-                Le matériel loué doit être retourné dans l'état où il a été livré. Tout dommage ou perte sera facturé au prix de remplacement.
-                En cas de retard de restitution, des pénalités de {{ number_format($orderLocation->late_fee_per_day ?? 10, 0) }} €/jour seront appliquées.
-                La caution sera remboursée dans un délai de 7 jours ouvrés après inspection du matériel et déduction des éventuelles pénalités.
+                {{ __('invoices.conditions_text', ['penalty_rate' => number_format($orderLocation->late_fee_per_day ?? 10, 0)]) }}
             </p>
         </div>
         
         <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
-            <p><strong>{{ $company['name'] }} - E-commerce de produits agricoles</strong></p>
-            <p>{{ $company['address'] }}, {{ $company['postal_code'] }} {{ $company['city'] }}, {{ $company['country'] }} | Tél: {{ $company['phone'] }} | Email: {{ $company['email'] }}</p>
-            <p>N° TVA: {{ $company['vat_number'] }}</p>
+            <p><strong>{{ $company['name'] }} - {{ __('invoices.company_title') }}</strong></p>
+            <p>{{ $company['address'] }}, {{ $company['postal_code'] }} {{ $company['city'] }}, {{ $company['country'] }} | {{ __('invoices.phone_label') }}: {{ $company['phone'] }} | {{ __('invoices.email_label') }}: {{ $company['email'] }}</p>
+            <p>{{ __('invoices.vat_number') }}: {{ $company['vat_number'] }}</p>
         </div>
         
         <div style="text-align: center; margin-top: 10px; color: #999; font-size: 10px;">

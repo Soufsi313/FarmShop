@@ -273,6 +273,31 @@ return array (
     
     // Formats de période
     'period_from_to' => 'Du :start au :end',
+    
+    // Inspection
+    'view_inspection' => 'Voir l\'inspection',
+    'inspection_details' => 'Détails de l\'inspection',
+    'inspection_date' => 'Date d\'inspection',
+    'not_inspected_yet' => 'Pas encore inspectée',
+    'inspection_results' => 'Résultats de l\'inspection',
+    'damage_detected' => 'Dégâts détectés',
+    'damage_detected_description' => 'Des dégâts ont été constatés lors de l\'inspection.',
+    'no_damage_detected' => 'Aucun dégât détecté',
+    'equipment_returned_good_condition' => 'Le matériel a été retourné en bon état.',
+    'damage_description' => 'Description des dégâts',
+    'damage_photos' => 'Photos des dégâts',
+    'damage_photo' => 'Photo des dégâts',
+    'damage_cost_breakdown' => 'Détail des coûts de dégâts',
+    'damage_repair_cost' => 'Coût de réparation des dégâts',
+    'late_fees' => 'Frais de retard',
+    'total_penalties' => 'Total des pénalités',
+    'inspection_notes' => 'Notes d\'inspection',
+    'deposit_status' => 'Statut de la caution',
+    'deposit_amount' => 'Montant de la caution',
+    'penalty_deductions' => 'Déductions pour pénalités',
+    'deposit_refund_amount' => 'Montant de caution libérée',
+    'deposit_partially_refunded_explanation' => 'Une partie de la caution a été retenue pour couvrir les frais de dégâts et/ou de retard.',
+    'view_order_details' => 'Voir les détails de la commande',
   ),
   'rental_status' => 
   array (

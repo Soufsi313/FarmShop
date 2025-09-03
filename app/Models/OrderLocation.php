@@ -51,6 +51,10 @@ class OrderLocation extends Model
         'penalty_amount',
         'total_penalties',
         'deposit_refund',
+        'has_damages',
+        'damage_notes',
+        'damage_photos',
+        'auto_calculate_damages',
         'inspection_notes',
         'inspection_completed_at',
         'inspected_by',
@@ -87,6 +91,9 @@ class OrderLocation extends Model
         'damage_cost' => 'decimal:2',
         'total_penalties' => 'decimal:2',
         'deposit_refund' => 'decimal:2',
+        'has_damages' => 'boolean',
+        'damage_photos' => 'array',
+        'auto_calculate_damages' => 'boolean',
         'actual_return_date' => 'datetime',
         'inspection_completed_at' => 'datetime',
         'confirmed_at' => 'datetime',
@@ -201,11 +208,11 @@ class OrderLocation extends Model
     {
         return match($this->payment_status) {
             'pending' => 'En attente',
-            'deposit_paid' => 'Caution payée',
+            'deposit_paid' => 'Caution pré-autorisée',
             'paid' => 'Payé',
             'failed' => 'Échec',
-            'refunded' => 'Remboursé',
-            'partial_refund' => 'Remboursement partiel',
+            'refunded' => 'Caution libérée',
+            'partial_refund' => 'Caution partiellement capturée',
             default => 'Inconnu'
         };
     }
@@ -303,6 +310,35 @@ class OrderLocation extends Model
     }
 
     /**
+     * Calculer automatiquement le montant des dommages
+     * Dommages = caution complète + frais de retard
+     */
+    public function calculateDamageAmount()
+    {
+        if (!$this->has_damages || !$this->auto_calculate_damages) {
+            return 0;
+        }
+        
+        return $this->deposit_amount + $this->late_fees;
+    }
+
+    /**
+     * Vérifier si la caution sera capturée (dommages détectés)
+     */
+    public function getDepositWillBeCapturedAttribute()
+    {
+        return $this->has_damages && $this->auto_calculate_damages;
+    }
+
+    /**
+     * Obtenir le montant de la caution qui sera libéré
+     */
+    public function getDepositReleaseAmountAttribute()
+    {
+        return $this->has_damages ? 0 : $this->deposit_amount;
+    }
+
+    /**
      * Mettre à jour le statut
      */
     public function updateStatus($newStatus, $notes = null)
@@ -379,21 +415,36 @@ class OrderLocation extends Model
     {
         $validated = validator($inspectionData, [
             'product_condition' => 'required|in:excellent,good,poor',
-            'damage_cost' => 'required|numeric|min:0',
+            'has_damages' => 'boolean',
+            'damage_notes' => 'nullable|string|max:2000',
+            'damage_photos' => 'nullable|array',
             'inspection_notes' => 'required|string|max:2000'
         ])->validate();
         
-        // Calculer le total des pénalités
-        $totalPenalties = $this->late_fees + $validated['damage_cost'];
+        // Calculer automatiquement les coûts de dommages
+        $damageCost = 0;
+        $hasDamages = $validated['has_damages'] ?? false;
         
-        // Calculer le remboursement de caution
-        $depositRefund = max(0, $this->deposit_amount - $totalPenalties);
+        if ($hasDamages && $this->auto_calculate_damages) {
+            // Dommages = caution complète + frais de retard
+            $damageCost = $this->deposit_amount + $this->late_fees;
+        }
+        
+        // Calculer le total des pénalités
+        $totalPenalties = $this->late_fees + $damageCost;
+        
+        // Important: Avec le système de pré-autorisation, il n'y a pas de "remboursement"
+        // La caution est soit libérée (si pas de dommages) soit capturée (si dommages)
+        $depositRefund = $hasDamages ? 0 : $this->deposit_amount;
         
         $this->update([
             'status' => 'finished',
             'inspection_status' => 'completed',
             'product_condition' => $validated['product_condition'],
-            'damage_cost' => $validated['damage_cost'],
+            'has_damages' => $hasDamages,
+            'damage_notes' => $validated['damage_notes'],
+            'damage_photos' => $validated['damage_photos'] ?? [],
+            'damage_cost' => $damageCost,
             'total_penalties' => $totalPenalties,
             'deposit_refund' => $depositRefund,
             'inspection_notes' => $validated['inspection_notes'],
@@ -602,7 +653,7 @@ class OrderLocation extends Model
         }
     }
 
-        /**
+    /**
      * Générer et sauvegarder la facture PDF
      */
     public function generateInvoicePdf()
@@ -611,10 +662,14 @@ class OrderLocation extends Model
             $this->generateInvoiceNumber();
         }
 
+        // Déterminer le type de facture selon l'état de l'inspection
+        $invoiceType = $this->inspection_completed_at ? 'final' : 'initial';
+        
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.rental-invoice', [
             'orderLocation' => $this,
             'items' => $this->items()->with('product')->get(),
             'user' => $this->user,
+            'invoiceType' => $invoiceType, // Nouveau paramètre
             'company' => [
                 'name' => config('app.name', 'FarmShop'),
                 'address' => 'Rue de la Ferme, 123',
@@ -655,36 +710,34 @@ class OrderLocation extends Model
 
         $prefix = 'FL-' . date('Y') . '-';
         
-        for ($attempt = 0; $attempt < 10; $attempt++) {
-            DB::transaction(function () use ($prefix, &$invoiceNumber) {
-                $lastInvoice = static::where('invoice_number', 'like', $prefix . '%')
-                    ->orderBy('invoice_number', 'desc')
-                    ->lockForUpdate()
-                    ->first();
+        return DB::transaction(function () use ($prefix) {
+            // Trouver le dernier numéro utilisé (inclus les supprimés pour éviter les conflits)
+            $lastInvoice = static::withTrashed()
+                ->where('invoice_number', 'like', $prefix . '%')
+                ->orderBy('invoice_number', 'desc')
+                ->first();
 
-                if ($lastInvoice) {
-                    $lastNumber = intval(substr($lastInvoice->invoice_number, -4));
-                    $newNumber = $lastNumber + 1;
-                } else {
-                    $newNumber = 1;
-                }
-
-                $invoiceNumber = $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-            });
-            
-            // Vérifier que ce numéro n'existe pas déjà
-            if (!static::where('invoice_number', $invoiceNumber)->exists()) {
-                $this->update(['invoice_number' => $invoiceNumber]);
-                return $invoiceNumber;
+            if ($lastInvoice) {
+                $lastNumber = intval(substr($lastInvoice->invoice_number, -4));
+                $newNumber = $lastNumber + 1;
+            } else {
+                $newNumber = 1;
             }
+
+            // Vérifier que le numéro n'existe pas déjà (sécurité)
+            do {
+                $invoiceNumber = $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+                $exists = static::withTrashed()->where('invoice_number', $invoiceNumber)->exists();
+                if ($exists) {
+                    $newNumber++;
+                }
+            } while ($exists);
             
-            usleep(100000); // 100ms
-        }
-        
-        // Fallback avec timestamp
-        $invoiceNumber = $prefix . time();
-        $this->update(['invoice_number' => $invoiceNumber]);
-        return $invoiceNumber;
+            // Mettre à jour directement dans la transaction
+            $this->update(['invoice_number' => $invoiceNumber]);
+            
+            return $invoiceNumber;
+        });
     }
 
     /**
@@ -692,7 +745,7 @@ class OrderLocation extends Model
      */
     public function canGenerateInvoice()
     {
-        return in_array($this->payment_status, ['paid', 'partially_paid']) && 
+        return in_array($this->payment_status, ['paid', 'partially_paid', 'deposit_paid']) && 
                in_array($this->status, ['confirmed', 'active', 'completed', 'returned', 'inspecting', 'finished']);
     }
 

@@ -132,53 +132,68 @@ class RentalReturnsController extends Controller
             'items' => 'required|array',
             'items.*.condition_at_return' => 'required|in:excellent,good,poor',
             'items.*.item_inspection_notes' => 'nullable|string|max:1000',
-            'items.*.item_damage_cost' => 'nullable|numeric|min:0|max:999999.99',
+            'items.*.has_damages' => 'required|boolean',
+            'damage_photos.*' => 'nullable|image|mimes:jpeg,jpg,png|max:5120', // 5MB max
             'late_fees' => 'nullable|numeric|min:0|max:999999.99',
             'general_notes' => 'nullable|string|max:2000'
         ]);
 
         DB::beginTransaction();
         try {
-            $totalDamageCosts = 0;
+            $hasGlobalDamages = false;
+            $damagePhotoPaths = [];
+
+            // Gérer l'upload des photos de dommages si elles existent
+            if ($request->hasFile('damage_photos')) {
+                $uploadPath = 'rental-inspections/' . $orderLocation->id;
+                
+                foreach ($request->file('damage_photos') as $index => $photo) {
+                    $filename = 'damage_' . time() . '_' . $index . '.' . $photo->getClientOriginalExtension();
+                    $path = $photo->storeAs($uploadPath, $filename, 'public');
+                    $damagePhotoPaths[] = $path;
+                }
+            }
 
             // Mettre à jour chaque item avec les résultats de l'inspection
             foreach ($request->items as $itemId => $itemData) {
                 $orderItem = $orderLocation->orderItemLocations()->findOrFail($itemId);
                 
-                $damageCost = floatval($itemData['item_damage_cost'] ?? 0);
-                $totalDamageCosts += $damageCost;
+                $hasDamages = (bool) ($itemData['has_damages'] ?? false);
+                if ($hasDamages) {
+                    $hasGlobalDamages = true;
+                }
 
                 $orderItem->update([
                     'condition_at_return' => $itemData['condition_at_return'],
                     'item_inspection_notes' => $itemData['item_inspection_notes'] ?? null,
-                    'item_damage_cost' => $damageCost
+                    'has_damages' => $hasDamages
                 ]);
             }
 
             // Récupérer les frais saisis dans le formulaire
             $lateFees = floatval($request->late_fees ?? 0);
             
-            // Le total des dégâts = somme des dégâts par produit seulement
-            
-            // Calculer le total des pénalités (frais de retard + dégâts)
-            $totalPenalties = $lateFees + $totalDamageCosts;
-            
-            // Calculer le remboursement de caution (caution - TOUTES les pénalités)
-            $depositRefund = max(0, $orderLocation->deposit_amount - $totalPenalties);
-
-            // Finaliser la location
-            $orderLocation->update([
-                'status' => 'finished',
-                'inspection_status' => 'completed',
-                'inspection_finished_at' => now(),
-                'late_fees' => $lateFees, // Frais de retard saisis par l'admin
-                'damage_cost' => $totalDamageCosts, // Frais de dégâts seulement
-                'penalty_amount' => $totalPenalties, // Total des pénalités (retard + dégâts)
-                'deposit_refund' => $depositRefund,
+            // Préparer les données pour l'inspection
+            $inspectionData = [
+                'product_condition' => 'good', // Valeur par défaut, peut être ajustée selon les items
+                'has_damages' => $hasGlobalDamages,
+                'damage_notes' => $request->general_notes,
+                'damage_photos' => $damagePhotoPaths,
                 'inspection_notes' => $request->general_notes
-            ]);
+            ];
+
+            // Mettre à jour les frais de retard avant l'inspection finale
+            $orderLocation->update(['late_fees' => $lateFees]);
+
+            // Utiliser la méthode du modèle pour terminer l'inspection
+            $orderLocation->completeInspection($inspectionData);
 
             DB::commit();
+
+            // Récupérer les valeurs calculées après l'inspection
+            $orderLocation->refresh();
+            $totalPenalties = $orderLocation->total_penalties;
+            $depositRefund = $orderLocation->deposit_refund;
 
             // 🤖 Envoyer message Mr Clank et email d'inspection
             $this->sendMrClankMessage($orderLocation, $totalPenalties, $depositRefund);
@@ -197,7 +212,11 @@ class RentalReturnsController extends Controller
                 ]);
             }
 
-            return redirect()->back()->with('success', 'Inspection terminée avec succès. Email d\'inspection envoyé. Pénalités totales: ' . number_format($totalPenalties, 2) . '€ - Remboursement: ' . number_format($depositRefund, 2) . '€');
+            $statusMessage = $hasGlobalDamages 
+                ? 'Inspection terminée avec dommages détectés. Caution capturée: ' . number_format($orderLocation->damage_cost, 2) . '€'
+                : 'Inspection terminée sans dommage. Caution libérée: ' . number_format($depositRefund, 2) . '€';
+
+            return redirect()->back()->with('success', $statusMessage);
 
         } catch (\Exception $e) {
             DB::rollBack();

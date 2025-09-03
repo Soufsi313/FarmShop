@@ -43,15 +43,15 @@ Vous devez fermer votre commande avant le {{ $closeDeadline }}
 Cette étape est OBLIGATOIRE pour :
 • Confirmer le retour de tous les équipements
 • Déclencher le processus d'inspection
-• Permettre le remboursement de votre dépôt
+• Permettre la libération de votre caution
 
 ⚠️ Si vous ne fermez pas votre commande dans les délais, 
 des frais supplémentaires de retard seront appliqués.
 
 👉 FERMER MA COMMANDE : {{ config('app.frontend_url') }}/rental-orders/{{ $orderLocation->id }}
 
-🔄 PROCESSUS DE REMBOURSEMENT
-=============================
+🔄 PROCESSUS DE TRAITEMENT DE CAUTION
+=====================================
 1. FERMETURE DE COMMANDE
    Vous confirmez la fin de location et le retour du matériel
 

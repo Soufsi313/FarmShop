@@ -130,7 +130,7 @@ return [
     'late_fees_label' => 'Late Fees',
     'damage_fees_label' => 'Damage Fees',
     'total_penalties_label' => 'Total Penalties',
-    'refund_label' => 'Refund',
+    'refund_label' => 'Release',
     
     // Dates and time
     'from' => 'from',
@@ -167,7 +167,7 @@ return [
     
     // Index page
     'management_title' => 'Rental Returns Management',
-    'management_subtitle' => 'Manage returns, inspections and deposit refunds',
+    'management_subtitle' => 'Manage returns, inspections and deposit releases',
     'total_returns' => 'Total returns',
     
     // Statistics
@@ -208,7 +208,7 @@ return [
     'return_date_label' => 'Return',
     'deposit_label' => 'Deposit',
     'penalties_label' => 'Penalties',
-    'refund_label' => 'Refund',
+    'refund_label' => 'Release',
     
     // Button actions
     'view_details' => 'View details',
@@ -219,4 +219,16 @@ return [
     'no_returns_found' => 'No returns found',
     'no_returns_match_criteria' => 'No returns match the search criteria.',
     'products_count' => ':count product(s)',
+    
+    // New damage system
+    'damage_status' => 'Damage Status',
+    'no_damage' => 'No Damage',
+    'has_damage' => 'Damage Detected',
+    'damage_auto_calculation_note' => 'If damage is detected, the amount will be calculated automatically (full deposit + late fees)',
+    'damage_photos' => 'Damage Photos',
+    'add_damage_photos' => 'Add Photos',
+    'upload_damage_photos' => 'Upload damage photos (optional)',
+    'damage_photos_note' => 'You can upload multiple photos to document the damage',
+    'remove_photo' => 'Remove this photo',
+    'click_to_enlarge' => 'Click to enlarge',
 ];

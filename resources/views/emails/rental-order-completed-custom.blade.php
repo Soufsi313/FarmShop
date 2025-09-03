@@ -391,14 +391,14 @@
                 <ul style="margin: 10px 0 10px 20px;">
                     <li>Confirmer le retour de tous les équipements</li>
                     <li>Déclencher le processus d'inspection</li>
-                    <li>Permettre le remboursement de votre dépôt</li>
+                    <li>Permettre la libération de votre caution</li>
                 </ul>
                 <p><strong>Si vous ne fermez pas votre commande dans les délais, des frais supplémentaires de retard seront appliqués.</strong></p>
             </div>
             
             <!-- Process Steps -->
             <div class="process-steps">
-                <h3>🔄 Processus de remboursement</h3>
+                <h3>🔄 Processus de traitement de caution</h3>
                 <div class="step">
                     <div class="step-number">1</div>
                     <div class="step-content">
@@ -416,8 +416,8 @@
                 <div class="step">
                     <div class="step-number">3</div>
                     <div class="step-content">
-                        <div class="step-title">Remboursement du dépôt</div>
-                        <div class="step-description">Votre dépôt vous est remboursé (déduction faite des éventuels dommages ou frais)</div>
+                        <div class="step-title">Traitement de la caution</div>
+                        <div class="step-description">Votre caution est libérée ou partiellement capturée selon l'état du matériel</div>
                     </div>
                 </div>
             </div>

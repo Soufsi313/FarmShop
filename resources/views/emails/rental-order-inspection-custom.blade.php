@@ -209,14 +209,14 @@
             </div>
             @endif
             
-            <h3>🏦 Remboursement</h3>
+            <h3>🏦 Libération de caution</h3>
             @if($depositRefund > 0)
             <div style="background-color: #dcfce7; border: 2px solid #10b981; border-radius: 8px; padding: 20px; text-align: center;">
-                <p style="margin: 0; color: #166534; font-size: 18px;"><strong>Un remboursement de {{ number_format($depositRefund, 2) }}€ sera effectué sur votre moyen de paiement original sous 3-5 jours ouvrés.</strong></p>
+                <p style="margin: 0; color: #166534; font-size: 18px;"><strong>Une libération de {{ number_format($depositRefund, 2) }}€ sera effectuée sur votre moyen de paiement original sous 3-5 jours ouvrés.</strong></p>
             </div>
             @else
             <div style="background-color: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 20px; text-align: center;">
-                <p style="margin: 0; color: #991b1b; font-size: 16px;"><strong>Aucun remboursement n'est dû car le montant des pénalités correspond au dépôt de garantie.</strong></p>
+                <p style="margin: 0; color: #991b1b; font-size: 16px;"><strong>Aucune libération n'est due car le montant des pénalités correspond au dépôt de garantie.</strong></p>
             </div>
             @endif
             

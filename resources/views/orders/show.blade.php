@@ -413,8 +413,8 @@ function getStatusText(status) {
         'shipped': '🚚 Expédiée',
         'delivered': '📍 Livrée',
         'cancelled': '❌ Annulée',
-        'return_requested': '🔄 Retour demandé',
-        'returned': '↩️ Retournée'
+        'return_requested': '<span class="inline-flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Retour demandé</span>',
+        'returned': '<span class="inline-flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>Retournée</span>'
     };
     return statusTexts[status] || status;
 }

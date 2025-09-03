@@ -205,7 +205,7 @@ return [
     'return_date_label' => 'Retour',
     'deposit_label' => 'Borg',
     'penalties_label' => 'Boetes',
-    'refund_label' => 'Terugbetaling',
+    'refund_label' => 'Vrijgave',
     
     // Knop acties
     'view_details' => 'Details bekijken',
@@ -216,4 +216,16 @@ return [
     'no_returns_found' => 'Geen retours gevonden',
     'no_returns_match_criteria' => 'Geen retours voldoen aan de zoekcriteria.',
     'products_count' => ':count product(en)',
+    
+    // Nieuw schadesysteem
+    'damage_status' => 'Schade Status',
+    'no_damage' => 'Geen Schade',
+    'has_damage' => 'Schade Gedetecteerd',
+    'damage_auto_calculation_note' => 'Bij schade wordt het bedrag automatisch berekend (volledige borg + vertragingskosten)',
+    'damage_photos' => 'Schade Foto\'s',
+    'add_damage_photos' => 'Foto\'s Toevoegen',
+    'upload_damage_photos' => 'Upload schadafoto\'s (optioneel)',
+    'damage_photos_note' => 'U kunt meerdere foto\'s uploaden om de schade te documenteren',
+    'remove_photo' => 'Deze foto verwijderen',
+    'click_to_enlarge' => 'Klik om te vergroten',
 ];

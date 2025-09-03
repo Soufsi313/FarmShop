@@ -464,6 +464,7 @@ Route::middleware('auth')->group(function () {
     // Routes pour les commandes de location utilisateur
     Route::get('/rental-orders', [\App\Http\Controllers\OrderLocationController::class, 'index'])->name('rental-orders.index');
     Route::get('/rental-orders/{orderLocation}', [\App\Http\Controllers\OrderLocationController::class, 'show'])->name('rental-orders.show');
+    Route::get('/rental-orders/{orderLocation}/inspection', [\App\Http\Controllers\OrderLocationController::class, 'inspection'])->name('rental-orders.inspection');
     Route::post('/rental-orders/{orderLocation}/cancel', [\App\Http\Controllers\OrderLocationController::class, 'cancel'])->name('rental-orders.cancel');
     Route::get('/rental-orders/{orderLocation}/invoice', [\App\Http\Controllers\OrderLocationController::class, 'downloadInvoice'])->name('rental-orders.invoice');
 });

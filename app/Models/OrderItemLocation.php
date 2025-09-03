@@ -127,7 +127,7 @@ class OrderItemLocation extends Model
     }
 
     /**
-     * Calculer le remboursement de caution pour cet article
+     * Calculer la libération de caution pour cet article
      */
     public function calculateItemDepositRefund()
     {
@@ -191,7 +191,7 @@ class OrderItemLocation extends Model
             'item_late_fees' => $lateFees
         ]);
 
-        // Calculer le remboursement de caution
+        // Calculer la libération de caution
         $depositRefund = $this->calculateItemDepositRefund();
         $this->update([
             'item_deposit_refund' => $depositRefund

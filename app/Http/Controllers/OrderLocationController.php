@@ -727,4 +727,26 @@ class OrderLocationController extends Controller
 
         return view('rental-orders.payment-cancel', compact('orderLocation'));
     }
+
+    /**
+     * Afficher les détails d'inspection d'une location
+     */
+    public function inspection(OrderLocation $orderLocation)
+    {
+        // Vérifier les permissions
+        if (!Auth::user()->isAdmin() && $orderLocation->user_id !== Auth::id()) {
+            abort(403, 'Commande non autorisée');
+        }
+
+        // Vérifier que la location a été inspectée
+        if ($orderLocation->inspection_status !== 'completed') {
+            return redirect()->route('rental-orders.show', $orderLocation)
+                ->with('error', 'Cette location n\'a pas encore été inspectée.');
+        }
+
+        // Charger les relations nécessaires
+        $orderLocation->load(['user', 'items.product']);
+
+        return view('rental-orders.inspection', compact('orderLocation'));
+    }
 }

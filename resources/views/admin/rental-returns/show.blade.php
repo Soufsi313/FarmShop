@@ -8,8 +8,9 @@
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <div>
-                <a href="{{ route('admin.rental-returns.index') }}" class="text-purple-600 hover:text-purple-700 flex items-center mb-4">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <!-- Bouton Retour - Amélioré: Plus grand et plus visible -->
+                <a href="{{ route('admin.rental-returns.index') }}" class="inline-flex items-center text-purple-600 hover:text-purple-700 bg-purple-50 hover:bg-purple-100 px-4 py-2 rounded-lg transition-all duration-200 mb-4">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
                     {{ __('rental_returns.back_to_returns') }}
@@ -23,8 +24,9 @@
                 <form action="{{ route('admin.rental-returns.mark-returned', $orderLocation) }}" method="POST" class="inline">
                     @csrf
                     @method('PATCH')
-                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200 flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Bouton Confirmer retour - Amélioré: Plus grand et plus visible -->
+                    <button type="submit" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/>
                         </svg>
                         {{ __('rental_returns.confirm_return') }}
@@ -36,9 +38,11 @@
                 <form action="{{ route('admin.rental-returns.start-inspection', $orderLocation) }}" method="POST" class="inline">
                     @csrf
                     @method('PATCH')
-                    <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition duration-200 flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Bouton Commencer inspection - Amélioré: Plus grand et plus visible -->
+                    <button type="submit" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                         </svg>
                         {{ __('rental_returns.start_inspection') }}
                     </button>
@@ -105,11 +109,11 @@
                 <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('rental_returns.rental_products') }}</h2>
                 
                 <!-- Frais et Pénalités -->
-                @if(($orderLocation->status === 'finished' && ($orderLocation->late_fees > 0 || $orderLocation->damage_cost > 0)) || ($orderLocation->status === 'inspecting' && ($orderLocation->late_days > 0 || $orderLocation->damage_cost > 0)))
+                @if($orderLocation->status !== 'finished' && (($orderLocation->status === 'inspecting' && ($orderLocation->late_days > 0 || $orderLocation->damage_cost > 0))))
                 <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <h3 class="text-lg font-semibold text-yellow-800 mb-3">⚠️ {{ __('rental_returns.fees_and_penalties') }}</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        @if(($orderLocation->status === 'finished' && $orderLocation->late_fees > 0) || ($orderLocation->status === 'inspecting' && $orderLocation->late_days > 0))
+                        @if($orderLocation->status === 'inspecting' && $orderLocation->late_days > 0)
                         <div class="bg-orange-50 p-3 rounded border border-orange-200">
                             <div class="text-sm font-medium text-orange-800">{{ __('rental_returns.late_fees') }}</div>
                             <div class="text-xl font-bold text-orange-900">{{ abs($orderLocation->late_days) }} {{ __('rental_returns.days') }}</div>
@@ -136,7 +140,7 @@
                             <div class="text-xl font-bold text-gray-900">{{ __('rental_returns.calculated') }}</div>
                             <div class="text-lg font-semibold text-gray-700" id="summary_total_penalties_display">
                                 @if($orderLocation->status === 'finished')
-                                    {{ number_format($orderLocation->penalty_amount ?? 0, 2) }}€
+                                    {{ number_format((($orderLocation->late_fees ?? 0) * ($orderLocation->late_days > 0 ? 1 : 0)) + ($orderLocation->damage_cost ?? 0), 2) }}€
                                 @else
                                     {{ number_format(($orderLocation->late_fees ?? (abs($orderLocation->late_days) * 10)) + ($orderLocation->damage_cost ?? 0), 2) }}€
                                 @endif
@@ -152,22 +156,28 @@
                     <h3 class="text-lg font-semibold text-green-800 mb-4">✅ {{ __('rental_returns.inspection_finished') }}</h3>
                     
                     <!-- Résumé financier final -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="grid grid-cols-1 gap-4 mb-6" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                        @if($orderLocation->late_fees > 0 && $orderLocation->late_days > 0)
                         <div class="bg-white p-4 rounded border">
                             <div class="text-sm font-medium text-gray-600">{{ __('rental_returns.late_fees_label') }}</div>
                             <div class="text-xl font-bold text-orange-600">{{ number_format($orderLocation->late_fees ?? 0, 2) }}€</div>
                         </div>
+                        @endif
+                        @if($orderLocation->damage_cost > 0)
                         <div class="bg-white p-4 rounded border">
                             <div class="text-sm font-medium text-gray-600">{{ __('rental_returns.damage_fees_label') }}</div>
                             <div class="text-xl font-bold text-red-600">{{ number_format($orderLocation->damage_cost ?? 0, 2) }}€</div>
                         </div>
+                        @endif
+                        @if((($orderLocation->late_fees ?? 0) > 0 && $orderLocation->late_days > 0) || ($orderLocation->damage_cost ?? 0) > 0)
                         <div class="bg-white p-4 rounded border">
                             <div class="text-sm font-medium text-gray-600">{{ __('rental_returns.total_penalties_label') }}</div>
-                            <div class="text-xl font-bold text-gray-800">{{ number_format($orderLocation->penalty_amount ?? 0, 2) }}€</div>
+                            <div class="text-xl font-bold text-gray-800">{{ number_format((($orderLocation->late_fees ?? 0) * ($orderLocation->late_days > 0 ? 1 : 0)) + ($orderLocation->damage_cost ?? 0), 2) }}€</div>
                         </div>
+                        @endif
                         <div class="bg-white p-4 rounded border">
                             <div class="text-sm font-medium text-gray-600">{{ __('rental_returns.refund_label') }}</div>
-                            <div class="text-xl font-bold text-green-600">{{ number_format($orderLocation->deposit_refund ?? 0, 2) }}€</div>
+                            <div class="text-xl font-bold text-green-600">{{ number_format(max(0, ($orderLocation->deposit_amount ?? 0) - ((($orderLocation->late_fees ?? 0) * ($orderLocation->late_days > 0 ? 1 : 0)) + ($orderLocation->damage_cost ?? 0))), 2) }}€</div>
                         </div>
                     </div>
                     
@@ -221,12 +231,34 @@
                         <p class="text-gray-700">{{ $orderLocation->inspection_notes }}</p>
                     </div>
                     @endif
+                    
+                    @if($orderLocation->damage_photos && count($orderLocation->damage_photos) > 0)
+                    <div class="mt-4 bg-white border rounded-lg p-4">
+                        <h5 class="font-medium text-gray-900 mb-3">{{ __('rental_returns.damage_photos') }}:</h5>
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            @foreach($orderLocation->damage_photos as $index => $photoPath)
+                            <div class="relative group">
+                                <img src="{{ asset('storage/' . $photoPath) }}" 
+                                     alt="Photo dommage {{ $index + 1 }}" 
+                                     class="w-full h-24 object-cover rounded-lg border-2 border-gray-200 cursor-pointer hover:border-blue-300 transition-colors"
+                                     onclick="openImageModal('{{ asset('storage/' . $photoPath) }}', 'Photo dommage {{ $index + 1 }}')"">
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">{{ __('rental_returns.click_to_enlarge') }}</p>
+                    </div>
+                    @endif
                 </div>
                 @endif
                 
                 @if($orderLocation->status === 'inspecting')
                 <!-- Formulaire d'inspection -->
-                <form action="{{ route('admin.rental-returns.finish-inspection', $orderLocation) }}" method="POST" id="inspectionForm">
+                <form action="{{ route('admin.rental-returns.finish-inspection', $orderLocation) }}" method="POST" id="inspectionForm" enctype="multipart/form-data">
                     @csrf
                     @method('PATCH')
                     
@@ -261,17 +293,28 @@
                                         </div>
                                         
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('rental_returns.damage_cost') }}</label>
-                                            <input type="number" 
-                                                   name="items[{{ $item->id }}][item_damage_cost]" 
-                                                   value="{{ $item->item_damage_cost ?? 0 }}"
-                                                   step="0.01" 
-                                                   min="0" 
-                                                   max="999999.99"
-                                                   class="w-full border border-gray-300 rounded px-3 py-2 item-damage-cost"
-                                                   placeholder="0.00"
-                                                   oninput="updatePenaltiesDisplay()"
-                                                   onchange="updatePenaltiesDisplay()">>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('rental_returns.damage_status') }}</label>
+                                            <div class="flex items-center space-x-4">
+                                                <label class="flex items-center">
+                                                    <input type="radio" 
+                                                           name="items[{{ $item->id }}][has_damages]" 
+                                                           value="0"
+                                                           {{ (!isset($item->has_damages) || !$item->has_damages) ? 'checked' : '' }}
+                                                           class="mr-2 text-green-600 focus:ring-green-500">
+                                                    <span class="text-green-700">{{ __('rental_returns.no_damage') }}</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="radio" 
+                                                           name="items[{{ $item->id }}][has_damages]" 
+                                                           value="1"
+                                                           {{ (isset($item->has_damages) && $item->has_damages) ? 'checked' : '' }}
+                                                           class="mr-2 text-red-600 focus:ring-red-500">
+                                                    <span class="text-red-700">{{ __('rental_returns.has_damage') }}</span>
+                                                </label>
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1">
+                                                {{ __('rental_returns.damage_auto_calculation_note') }}
+                                            </div>
                                         </div>
                                         
                                         <div class="md:col-span-1">
@@ -324,6 +367,30 @@
                                       placeholder="{{ __('rental_returns.general_inspection_notes') }}...">{{ $orderLocation->inspection_notes }}</textarea>
                         </div>
                         
+                        <!-- Section Photos de dommages -->
+                        <div class="border-t pt-4" id="damage-photos-section" style="display: none;">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ __('rental_returns.damage_photos') }}
+                                <span class="text-sm text-gray-500 font-normal">({{ __('rental_returns.upload_damage_photos') }})</span>
+                            </label>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-center w-full">
+                                    <label for="damage-photos-input" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                            </svg>
+                                            <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">{{ __('rental_returns.add_damage_photos') }}</span></p>
+                                            <p class="text-xs text-gray-500">PNG, JPG, JPEG (MAX. 5MB chacune)</p>
+                                        </div>
+                                        <input id="damage-photos-input" type="file" name="damage_photos[]" multiple accept="image/*" class="hidden" onchange="previewDamagePhotos(event)">
+                                    </label>
+                                </div>
+                                <div id="damage-photos-preview" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+                                <p class="text-xs text-gray-500">{{ __('rental_returns.damage_photos_note') }}</p>
+                            </div>
+                        </div>
+                        
                         <div class="flex justify-end gap-4">
                             <button type="button" onclick="history.back()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition duration-200">
                                 {{ __('rental_returns.cancel') }}
@@ -355,17 +422,20 @@
                         <span class="font-medium">{{ number_format($orderLocation->deposit_amount, 2) }}€</span>
                     </div>
                     
-                    @if($orderLocation->penalty_amount > 0)
+                    @php
+                        $calculatedPenalties = (($orderLocation->late_fees ?? 0) * ($orderLocation->late_days > 0 ? 1 : 0)) + ($orderLocation->damage_cost ?? 0);
+                    @endphp
+                    @if($calculatedPenalties > 0)
                     <div class="flex justify-between text-red-600">
                         <span>Pénalités/Dégâts:</span>
-                        <span class="font-medium">-{{ number_format($orderLocation->penalty_amount, 2) }}€</span>
+                        <span class="font-medium">-{{ number_format($calculatedPenalties, 2) }}€</span>
                     </div>
                     @endif
                     
                     @if($orderLocation->deposit_refund !== null)
                     <div class="border-t pt-3">
                         <div class="flex justify-between text-green-600">
-                            <span class="font-medium">Remboursement caution:</span>
+                            <span class="font-medium">Caution libérée:</span>
                             <span class="font-bold">{{ number_format($orderLocation->deposit_refund, 2) }}€</span>
                         </div>
                     </div>
@@ -449,6 +519,19 @@
     </div>
 </div>
 
+<!-- Modale pour agrandir les images -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+    <div class="relative max-w-4xl max-h-screen p-4">
+        <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 z-10">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        <img id="modalImage" src="" alt="" class="max-w-full max-h-full object-contain rounded-lg">
+        <p id="modalCaption" class="text-white text-center mt-2"></p>
+    </div>
+</div>
+
 <script>
 function updatePenaltiesDisplay() {
     // Récupérer les frais de retard
@@ -481,10 +564,128 @@ function updatePenaltiesDisplay() {
     }
 }
 
+// Gestion des photos de dommages
+function toggleDamagePhotosSection() {
+    const damageRadios = document.querySelectorAll('input[type="radio"][name*="[has_damages]"]');
+    const photosSection = document.getElementById('damage-photos-section');
+    
+    let hasDamages = false;
+    damageRadios.forEach(radio => {
+        if (radio.checked && radio.value === '1') {
+            hasDamages = true;
+        }
+    });
+    
+    if (photosSection) {
+        photosSection.style.display = hasDamages ? 'block' : 'none';
+    }
+}
+
+function previewDamagePhotos(event) {
+    const files = event.target.files;
+    const previewContainer = document.getElementById('damage-photos-preview');
+    
+    // Vider la prévisualisation existante
+    previewContainer.innerHTML = '';
+    
+    if (files.length === 0) return;
+    
+    Array.from(files).forEach((file, index) => {
+        if (!file.type.startsWith('image/')) return;
+        
+        // Vérifier la taille du fichier (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+            alert(`Le fichier ${file.name} est trop volumineux (max 5MB)`);
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const photoContainer = document.createElement('div');
+            photoContainer.className = 'relative group';
+            photoContainer.innerHTML = `
+                <img src="${e.target.result}" alt="Photo dommage ${index + 1}" 
+                     class="w-full h-24 object-cover rounded-lg border-2 border-gray-200">
+                <button type="button" 
+                        onclick="removeDamagePhoto(this, ${index})"
+                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            `;
+            previewContainer.appendChild(photoContainer);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function removeDamagePhoto(button, index) {
+    const photoContainer = button.parentElement;
+    photoContainer.remove();
+    
+    // Mettre à jour l'input file pour retirer ce fichier
+    const fileInput = document.getElementById('damage-photos-input');
+    const dt = new DataTransfer();
+    const files = Array.from(fileInput.files);
+    
+    files.forEach((file, i) => {
+        if (i !== index) {
+            dt.items.add(file);
+        }
+    });
+    
+    fileInput.files = dt.files;
+}
+
+// Gestion de la modale d'image
+function openImageModal(imageSrc, caption) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalCaption = document.getElementById('modalCaption');
+    
+    modalImage.src = imageSrc;
+    modalCaption.textContent = caption;
+    modal.classList.remove('hidden');
+    
+    // Fermer avec Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeImageModal();
+        }
+    });
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.add('hidden');
+}
+
+// Fermer la modale en cliquant en dehors de l'image
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeImageModal();
+            }
+        });
+    }
+});
+
 // Initialiser l'affichage au chargement de la page SEULEMENT en mode inspection
 document.addEventListener('DOMContentLoaded', function() {
     @if($orderLocation->status === 'inspecting')
     updatePenaltiesDisplay();
+    
+    // Ajouter des écouteurs d'événements pour les boutons radio de dommages
+    const damageRadios = document.querySelectorAll('input[type="radio"][name*="[has_damages]"]');
+    damageRadios.forEach(radio => {
+        radio.addEventListener('change', toggleDamagePhotosSection);
+    });
+    
+    // Initialiser l'affichage des photos
+    toggleDamagePhotosSection();
     @endif
 });
 </script>

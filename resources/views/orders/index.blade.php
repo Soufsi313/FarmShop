@@ -192,29 +192,41 @@
                                         <!-- Retour direct (produits entièrement retournables) -->
                                         <a x-show="returnButtonAction === 'direct'" 
                                            href="{{ route('orders.return.confirm', $order) }}" 
-                                           class="bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                            🔄 {{ __('app.orders.request_return') }}
+                                           class="bg-orange-100 hover:bg-orange-200 text-orange-800 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105 hover:shadow-md flex items-center gap-2">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                            </svg>
+                                            {{ __('app.orders.request_return') }}
                                         </a>
                                         
                                         <!-- Retour mixte (produits partiellement retournables) -->
                                         <a x-show="returnButtonAction === 'mixed'" 
                                            href="{{ route('orders.return.confirm', $order) }}" 
-                                           class="bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                            🔄 {{ __('app.orders.request_return') }}
+                                           class="bg-orange-100 hover:bg-orange-200 text-orange-800 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105 hover:shadow-md flex items-center gap-2">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                            </svg>
+                                            {{ __('app.orders.request_return') }}
                                         </a>
                                         
                                         <!-- Produits non retournables -->
                                         <button x-show="returnButtonAction === 'non_returnable'" 
                                                 @click="showNonReturnableModal = true"
-                                                class="bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                            🔄 {{ __('app.orders.request_return') }}
+                                                class="bg-orange-100 hover:bg-orange-200 text-orange-800 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105 hover:shadow-md flex items-center gap-2">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                            </svg>
+                                            {{ __('app.orders.request_return') }}
                                         </button>
                                         
                                         <!-- Délai expiré -->
                                         <button x-show="returnButtonAction === 'expired'" 
                                                 @click="showExpiredModal = true"
-                                                class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-not-allowed opacity-60">
-                                            🔄 {{ __('app.orders.request_return') }} ({{ __('app.orders.expired') }})
+                                                class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 cursor-not-allowed opacity-60 flex items-center gap-2">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            {{ __('app.orders.request_return') }} ({{ __('app.orders.expired') }})
                                         </button>
                                     </div>
                                 </template>
@@ -348,7 +360,10 @@
                         {{ __('app.common.cancel') }}
                     </button>
                     <button type="submit" 
-                            class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700">
+                            class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-all duration-200 hover:scale-105 hover:shadow-md flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
                         {{ __('app.orders.request_return') }}
                     </button>
                 </div>

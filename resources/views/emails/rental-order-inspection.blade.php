@@ -383,30 +383,7 @@
                 @endif
             </div>
             
-            @if($orderLocation->late_fees && $orderLocation->late_fees > 0)
-            <!-- Late Fees Alert -->
-            <div class="alert-box" style="background-color: #fff3cd; border-color: #fd7e14; color: #856404;">
-                <h4>⏰ Frais de retard appliqués</h4>
-                <p><strong>Jours de retard :</strong> {{ abs($orderLocation->late_days) }} jour{{ abs($orderLocation->late_days) > 1 ? 's' : '' }}</p>
-                <p><strong>Montant des frais de retard :</strong> {{ number_format($orderLocation->late_fees, 2) }}€</p>
-                <p style="font-size: 14px; margin-top: 10px;">
-                    Le matériel a été retourné {{ abs($orderLocation->late_days) }} jour{{ abs($orderLocation->late_days) > 1 ? 's' : '' }} après la date prévue.
-                    Conformément à nos conditions générales, des frais de retard sont appliqués.
-                </p>
-            </div>
-            @endif
-            
-            @if($orderLocation->damage_cost && $orderLocation->damage_cost > 0)
-            <!-- Damage Costs Alert -->
-            <div class="alert-box danger">
-                <h4>🔧 Frais de dégâts appliqués</h4>
-                <p><strong>Montant des frais de dégâts :</strong> {{ number_format($orderLocation->damage_cost, 2) }}€</p>
-                <p style="font-size: 14px; margin-top: 10px;">
-                    Des dommages ont été constatés lors de l'inspection du matériel retourné.
-                    Les frais correspondants sont détaillés ci-dessous.
-                </p>
-            </div>
-            @endif
+
             
             <!-- Financial Summary -->
             <div class="financial-summary">
@@ -421,7 +398,7 @@
                     <span><strong>{{ number_format($orderLocation->deposit_amount, 2) }}€</strong></span>
                 </div>
                 @endif
-                @if($orderLocation->late_fees && $orderLocation->late_fees > 0)
+                @if($orderLocation->late_fees && $orderLocation->late_fees > 0 && $orderLocation->late_days > 0)
                 <div class="financial-row" style="color: #fd7e14;">
                     <span>Frais de retard ({{ abs($orderLocation->late_days) }} jour{{ abs($orderLocation->late_days) > 1 ? 's' : '' }}) :</span>
                     <span><strong>{{ number_format($orderLocation->late_fees, 2) }}€</strong></span>
@@ -433,14 +410,14 @@
                     <span><strong>{{ number_format($orderLocation->damage_cost, 2) }}€</strong></span>
                 </div>
                 @endif
-                @if(($orderLocation->late_fees ?? 0) > 0 || ($orderLocation->damage_cost ?? 0) > 0)
+                @if((($orderLocation->late_fees ?? 0) > 0 && $orderLocation->late_days > 0) || ($orderLocation->damage_cost ?? 0) > 0)
                 <div class="financial-row total" style="color: #dc3545;">
                     <span>Total des pénalités :</span>
-                    <span><strong>{{ number_format(($orderLocation->late_fees ?? 0) + ($orderLocation->damage_cost ?? 0), 2) }}€</strong></span>
+                    <span><strong>{{ number_format((($orderLocation->late_fees ?? 0) * ($orderLocation->late_days > 0 ? 1 : 0)) + ($orderLocation->damage_cost ?? 0), 2) }}€</strong></span>
                 </div>
                 @endif
                 <div class="financial-row total">
-                    <span>Remboursement de caution :</span>
+                    <span>Libération de caution :</span>
                     <span><strong>{{ number_format($orderLocation->deposit_refund ?? 0, 2) }}€</strong></span>
                 </div>
             </div>

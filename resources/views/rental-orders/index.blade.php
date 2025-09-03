@@ -87,9 +87,14 @@
                                         @elseif($order->status === 'active') 🟢 {{ __('app.rental_status.active') }}
                                         @elseif($order->status === 'completed') 🟣 {{ __('app.rental_status.completed') }}
                                         @elseif($order->status === 'closed') 🟠 {{ __('app.rental_status.closed') }}
-                                        @elseif($order->status === 'inspecting') � {{ __('app.rental_status.inspecting') }}
-                                        @elseif($order->status === 'finished') ✅ {{ __('app.rental_status.finished') }}
-                                        @elseif($order->status === 'cancelled') � {{ __('app.rental_status.cancelled') }}
+                                        @elseif($order->status === 'inspecting') 🔍 {{ __('app.rental_status.inspecting') }}
+                                        @elseif($order->status === 'finished')
+                                            @if($order->inspection_completed_at)
+                                                ✅ Inspection terminée
+                                            @else
+                                                🔔 Location terminée - À inspecter
+                                            @endif
+                                        @elseif($order->status === 'cancelled') ❌ {{ __('app.rental_status.cancelled') }}
                                         @else 🔘 {{ $order->status_label }}
                                         @endif
                                     </span>
@@ -180,6 +185,16 @@
                                 </svg>
                                 {{ __("app.content.view_details") }}
                             </a>
+                            
+                            @if($order->inspection_status === 'completed')
+                                <a href="{{ route('rental-orders.inspection', $order) }}" 
+                                   class="bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    {{ __('app.rental_orders.view_inspection') }}
+                                </a>
+                            @endif
                             
                             @if($order->canGenerateInvoice())
                                 <a href="{{ route('rental-orders.invoice', $order) }}" 

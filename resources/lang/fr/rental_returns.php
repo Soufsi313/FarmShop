@@ -98,7 +98,7 @@ return [
     // Messages de confirmation
     'confirm_mark_returned' => 'Confirmer que tous les articles ont été retournés ?',
     'confirm_complete_inspection' => 'Finaliser l\'inspection ? Cette action est irréversible.',
-    'confirm_process_refund' => 'Traiter le remboursement de la caution ?',
+    'confirm_process_refund' => 'Traiter la libération de la caution ?',
     
     // Articles et inspection
     'rental_products' => 'Produits de la Location',
@@ -130,7 +130,7 @@ return [
     'late_fees_label' => 'Frais de Retard',
     'damage_fees_label' => 'Frais de Dégâts',
     'total_penalties_label' => 'Total Pénalités',
-    'refund_label' => 'Remboursement',
+    'refund_label' => 'Libération',
     
     // Dates et temps
     'from' => 'du',
@@ -153,7 +153,7 @@ return [
     'financial_summary' => 'Résumé Financier',
     'rental_subtotal' => 'Sous-total location',
     'deposit_caution' => 'Dépôt de caution',
-    'deposit_refund' => 'Remboursement caution',
+    'deposit_refund' => 'Caution libérée',
     'timeline' => 'Timeline',
     'rental_created' => 'Location créée',
     
@@ -167,7 +167,7 @@ return [
     
     // Page d'index
     'management_title' => 'Gestion des Retours de Location',
-    'management_subtitle' => 'Gérez les retours, inspections et remboursements de caution',
+    'management_subtitle' => 'Gérez les retours, inspections et libérations de caution',
     'total_returns' => 'Retours totaux',
     
     // Statistiques
@@ -208,7 +208,7 @@ return [
     'return_date_label' => 'Retour',
     'deposit_label' => 'Dépôt',
     'penalties_label' => 'Pénalités',
-    'refund_label' => 'Remboursement',
+    'refund_label' => 'Libération',
     
     // Actions des boutons
     'view_details' => 'Voir les détails',
@@ -219,4 +219,16 @@ return [
     'no_returns_found' => 'Aucun retour trouvé',
     'no_returns_match_criteria' => 'Aucun retour ne correspond aux critères de recherche.',
     'products_count' => ':count produit(s)',
+    
+    // Nouveau système de dommages
+    'damage_status' => 'État des dommages',
+    'no_damage' => 'Aucun dommage',
+    'has_damage' => 'Dommages détectés',
+    'damage_auto_calculation_note' => 'Si des dommages sont détectés, le montant sera calculé automatiquement (caution complète + frais de retard)',
+    'damage_photos' => 'Photos des dommages',
+    'add_damage_photos' => 'Ajouter des photos',
+    'upload_damage_photos' => 'Charger des photos des dommages (optionnel)',
+    'damage_photos_note' => 'Vous pouvez charger plusieurs photos pour documenter les dommages',
+    'remove_photo' => 'Supprimer cette photo',
+    'click_to_enlarge' => 'Cliquez pour agrandir',
 ];
