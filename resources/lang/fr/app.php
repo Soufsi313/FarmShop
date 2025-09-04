@@ -938,6 +938,23 @@ return array (
     'response_time_text' => 'Nous nous engageons à vous répondre dans les <strong>24 à 48 heures</strong> suivant la réception de votre message.',
     'urgent_note' => 'Pour les demandes urgentes, n\'hésitez pas à nous appeler directement.',
     
+    // Section Google Maps
+    'find_us_title' => 'Trouvez-nous',
+    'location_description' => 'Nous sommes situés au cœur de Bruxelles, facilement accessibles en transport en commun.',
+    'farmshop_brussels' => 'FarmShop Bruxelles',
+    'brussels_location' => '1000 Bruxelles, Belgique',
+    'distance_city_center' => 'Distance du centre-ville',
+    'walking_distance' => '~2 min à pied',
+    'farmshop_name' => 'FarmShop',
+    'city_center_brussels' => 'Centre-ville de Bruxelles',
+    'approximate_position' => 'Position approximative',
+    'metro_transport' => 'Métro',
+    'central_station' => 'Gare Centrale - 5 min',
+    'bus_transport' => 'Bus',
+    'bus_lines' => 'Lignes 29, 38, 71',
+    'parking_info' => 'Parking',
+    'parking_distance' => 'À 2 min à pied',
+    
     // Messages JavaScript
     'error_title' => 'Erreur',
     'connection_error_title' => 'Erreur de connexion',

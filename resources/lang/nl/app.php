@@ -1072,6 +1072,23 @@ return array (
     'response_time_text' => 'Wij verbinden ons ertoe om u binnen <strong>24 tot 48 uur</strong> na ontvangst van uw bericht te antwoorden.',
     'urgent_note' => 'Voor urgente verzoeken kunt u ons gerust rechtstreeks bellen.',
     
+    // Google Maps sectie
+    'find_us_title' => 'Vind Ons',
+    'location_description' => 'We bevinden ons in het hart van Brussel, gemakkelijk bereikbaar met het openbaar vervoer.',
+    'farmshop_brussels' => 'FarmShop Brussel',
+    'brussels_location' => '1000 Brussel, België',
+    'distance_city_center' => 'Afstand tot stadscentrum',
+    'walking_distance' => '~2 min lopen',
+    'farmshop_name' => 'FarmShop',
+    'city_center_brussels' => 'Stadscentrum Brussel',
+    'approximate_position' => 'Benaderende positie',
+    'metro_transport' => 'Metro',
+    'central_station' => 'Centraal Station - 5 min',
+    'bus_transport' => 'Bus',
+    'bus_lines' => 'Lijnen 29, 38, 71',
+    'parking_info' => 'Parking',
+    'parking_distance' => '2 min lopen',
+    
     // JavaScript berichten
     'error_title' => 'Fout',
     'connection_error_title' => 'Verbindingsfout',

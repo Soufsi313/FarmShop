@@ -182,8 +182,141 @@
                 </div>
             </div>
         </div>
+
+        <!-- Section Google Maps -->
+        <div class="mt-16">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-green-800 mb-4">
+                    🗺️ {{ __('app.contact.find_us_title') }}
+                </h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    {{ __('app.contact.location_description') }}
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <!-- Enhanced Map Container -->
+                <div class="relative">
+                    <!-- Map Header -->
+                    <div class="bg-gradient-to-r from-green-600 to-orange-500 p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                                    <span class="text-2xl">📍</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold">{{ __('app.contact.farmshop_brussels') }}</h3>
+                                    <p class="text-white/90">{{ __('app.contact.brussels_location') }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-white/80">{{ __('app.contact.distance_city_center') }}</p>
+                                <p class="text-lg font-bold">{{ __('app.contact.walking_distance') }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Google Maps Container -->
+                    <div class="relative h-96 lg:h-[500px] bg-gray-100">
+                        <iframe 
+                            id="googleMap"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2519.2775186965783!2d4.351710315735!3d50.84656007952755!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c3c47fb2381c1d%3A0xa82a3d1b0e3a9c4!2s1000%20Bruxelles%2C%20Belgique!5e0!3m2!1sfr!2sbe!4v1694175600000!5m2!1sfr!2sbe"
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            class="w-full h-full">
+                        </iframe>
+
+                        <!-- Map Overlay with Info -->
+                        <div class="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-4 max-w-xs">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="text-white text-lg">🏪</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">{{ __('app.contact.farmshop_name') }}</h4>
+                                    <p class="text-sm text-gray-600">{{ __('app.contact.city_center_brussels') }}</p>
+                                    <p class="text-xs text-green-600 font-medium mt-1">📍 {{ __('app.contact.approximate_position') }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions Overlay -->
+                        <div class="absolute bottom-4 right-4 flex space-x-2">
+                            <button onclick="openInGoogleMaps()" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                            <button onclick="getDirections()" class="bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Map Info Footer -->
+                    <div class="bg-gray-50 px-6 py-4">
+                        <div class="grid md:grid-cols-3 gap-4 text-center">
+                            <div class="flex items-center justify-center space-x-2">
+                                <span class="text-blue-600 text-lg">🚇</span>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">{{ __('app.contact.metro_transport') }}</p>
+                                    <p class="text-xs text-gray-600">{{ __('app.contact.central_station') }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-center space-x-2">
+                                <span class="text-green-600 text-lg">🚌</span>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">{{ __('app.contact.bus_transport') }}</p>
+                                    <p class="text-xs text-gray-600">{{ __('app.contact.bus_lines') }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-center space-x-2">
+                                <span class="text-orange-600 text-lg">🚗</span>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">{{ __('app.contact.parking_info') }}</p>
+                                    <p class="text-xs text-gray-600">{{ __('app.contact.parking_distance') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Map JavaScript Functions -->
+<script>
+function openInGoogleMaps() {
+    const url = 'https://www.google.com/maps/search/1000+Bruxelles,+Belgique/@50.8465600,4.3517103,17z';
+    window.open(url, '_blank');
+}
+
+function getDirections() {
+    const url = 'https://www.google.com/maps/dir//1000+Bruxelles,+Belgique/@50.8465600,4.3517103,17z';
+    window.open(url, '_blank');
+}
+
+// Map loading animation
+document.addEventListener('DOMContentLoaded', function() {
+    const mapFrame = document.getElementById('googleMap');
+    
+    mapFrame.addEventListener('load', function() {
+        // Add a subtle fade-in effect when map loads
+        this.style.opacity = '0';
+        this.style.transition = 'opacity 0.5s ease-in-out';
+        setTimeout(() => {
+            this.style.opacity = '1';
+        }, 100);
+    });
+});
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

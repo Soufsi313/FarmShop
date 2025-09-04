@@ -1039,6 +1039,23 @@ return array (
     'response_time_text' => 'We are committed to responding to you within <strong>24 to 48 hours</strong> of receiving your message.',
     'urgent_note' => 'For urgent requests, please feel free to call us directly.',
     
+    // Google Maps section
+    'find_us_title' => 'Find Us',
+    'location_description' => 'We are located in the heart of Brussels, easily accessible by public transport.',
+    'farmshop_brussels' => 'FarmShop Brussels',
+    'brussels_location' => '1000 Brussels, Belgium',
+    'distance_city_center' => 'Distance from city center',
+    'walking_distance' => '~2 min walk',
+    'farmshop_name' => 'FarmShop',
+    'city_center_brussels' => 'Brussels city center',
+    'approximate_position' => 'Approximate position',
+    'metro_transport' => 'Metro',
+    'central_station' => 'Central Station - 5 min',
+    'bus_transport' => 'Bus',
+    'bus_lines' => 'Lines 29, 38, 71',
+    'parking_info' => 'Parking',
+    'parking_distance' => '2 min walk',
+    
     // JavaScript messages
     'error_title' => 'Error',
     'connection_error_title' => 'Connection error',

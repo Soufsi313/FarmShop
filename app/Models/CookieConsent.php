@@ -11,7 +11,7 @@ class CookieConsent extends Model
 {
     use HasFactory;
 
-    protected $table = 'cookies'; // Correction: utiliser la table créée par la migration
+    protected $table = 'cookies'; 
 
     protected $fillable = [
         'user_id',
