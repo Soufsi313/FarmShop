@@ -45,7 +45,13 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             
-            return redirect()->intended('/')->with('success', 'Connexion réussie ! Bienvenue sur FarmShop.');
+            // Marquer qu'un changement d'authentification a eu lieu APRÈS la régénération
+            session(['auth_status_changed' => true]);
+            
+            // Redirection vers la page demandée ou la page d'accueil
+            $redirectTo = $request->input('redirect_to', '/');
+            
+            return redirect()->intended($redirectTo)->with('success', 'Connexion réussie ! Bienvenue sur FarmShop.');
         }
 
         // Échec de la connexion
@@ -59,6 +65,9 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
+        // Marquer qu'un changement d'authentification a eu lieu pour la synchronisation des cookies
+        $request->session()->put('auth_status_changed', true);
+        
         Auth::logout();
         
         $request->session()->invalidate();

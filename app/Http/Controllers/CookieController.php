@@ -436,6 +436,12 @@ class CookieController extends Controller
             
             // Si on trouve un cookie utilisateur, le retourner
             if ($cookie) {
+                \Log::info('Cookie utilisateur existant trouvé', [
+                    'cookie_id' => $cookie->id,
+                    'user_id' => $userId,
+                    'status' => $cookie->status,
+                    'created_at' => $cookie->created_at
+                ]);
                 return $cookie;
             }
             
@@ -461,7 +467,8 @@ class CookieController extends Controller
                     'guest_cookie_id' => $guestCookie->id,
                     'user_id' => $userId,
                     'status' => $guestCookie->status,
-                    'session_id' => $sessionId
+                    'original_session_id' => $sessionId,
+                    'migration_date' => now()
                 ]);
                 
                 return $guestCookie;
@@ -476,6 +483,12 @@ class CookieController extends Controller
             
             // Si on trouve un cookie visiteur, le retourner
             if ($cookie) {
+                \Log::info('Cookie visiteur existant trouvé', [
+                    'cookie_id' => $cookie->id,
+                    'session_id' => $sessionId,
+                    'status' => $cookie->status,
+                    'ip_address' => $ipAddress
+                ]);
                 return $cookie;
             }
         }
@@ -498,9 +511,10 @@ class CookieController extends Controller
             'cookie_id' => $cookie->id,
             'user_id' => Auth::id(),
             'session_id' => Auth::guest() ? $sessionId : 'null (user connected)',
-            'status' => 'pending'
+            'status' => 'pending',
+            'ip_address' => $ipAddress
         ]);
-
+        
         return $cookie;
     }
 
@@ -748,6 +762,39 @@ class CookieController extends Controller
             'data' => [
                 'migrated_count' => $migratedCount,
                 'user_id' => $userId
+            ]
+        ]);
+    }
+
+    /**
+     * Synchroniser l'état d'authentification et les cookies
+     * Utilisé quand un utilisateur se connecte/déconnecte pour synchroniser localStorage et serveur
+     */
+    public function syncAuthenticationStatus(Request $request): JsonResponse
+    {
+        $sessionId = Session::getId();
+        $ipAddress = $request->ip();
+        
+        \Log::info('Synchronisation état authentification', [
+            'user_id' => Auth::id(),
+            'session_id' => $sessionId,
+            'ip_address' => $ipAddress,
+            'is_authenticated' => Auth::check()
+        ]);
+        
+        // Obtenir ou créer le cookie approprié (migration automatique si nécessaire)
+        $cookie = $this->findOrCreateCookie($request);
+        
+        // Retourner l'état actuel synchronisé
+        return response()->json([
+            'success' => true,
+            'message' => 'État synchronisé avec succès',
+            'data' => [
+                'cookie_id' => $cookie->id,
+                'consent_required' => $cookie->status === 'pending',
+                'preferences' => $cookie->getPreferencesSummary(),
+                'user_authenticated' => Auth::check(),
+                'migration_occurred' => $cookie->migrated_at !== null
             ]
         ]);
     }

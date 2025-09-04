@@ -79,6 +79,7 @@ Route::middleware(['web'])->group(function () {
     Route::post('/cookies/reject-all', [CookieController::class, 'rejectAll'])->name('api.cookies.reject-all');
     Route::get('/cookies/consent/{cookieType}', [CookieController::class, 'checkConsent'])->name('api.cookies.check-consent');
     Route::post('/cookies/migrate-guest', [CookieController::class, 'migrateGuestCookies'])->name('api.cookies.migrate-guest');
+    Route::post('/cookies/sync-auth-status', [CookieController::class, 'syncAuthenticationStatus'])->name('api.cookies.sync-auth-status');
 });
 
 // Routes publiques pour les likes (consultation seulement)

@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="user-authenticated" content="{{ auth()->check() ? 'true' : 'false' }}">
 
     <title>@yield('title', 'FarmShop - Matériel Agricole Belge de Qualité')</title>
     <meta name="description" content="@yield('description', 'FarmShop propose du matériel agricole de qualité en Belgique. Achat et location d\'équipements pour professionnels et particuliers.')">
@@ -110,25 +111,40 @@
                 async show() {
                     console.log('🍪 === DÉMARRAGE VÉRIFICATION CONSENTEMENT ===');
                     
-                    // Vérifier d'abord le consentement local
-                    if (this.hasLocalConsent()) {
-                        console.log('🍪 ❌ Consentement déjà donné localement - ARRÊT');
-                        return;
-                    }
-                    
-                    console.log('🍪 ✅ Pas de consentement local - CONTINUER');
-
                     const banner = document.getElementById('cookie-banner');
                     console.log('🍪 Élément banner trouvé:', banner ? '✅ OUI' : '❌ NON');
                     
                     if (banner) {
                         try {
                             console.log('🍪 📡 Appel API /api/cookies/preferences...');
-                            // Vérifier l'état du consentement via l'API
+                            // Toujours vérifier d'abord l'état du consentement via l'API
                             const response = await this.checkConsentStatus();
                             console.log('🍪 📨 Réponse API complète:', response);
                             console.log('🍪 📊 Data:', response.data);
                             
+                            // Vérifier si le serveur et le localStorage sont synchronisés
+                            const hasLocalConsent = this.hasLocalConsent();
+                            const serverConsentRequired = response.data && response.data.consent_required;
+                            
+                            console.log('🍪 📊 État localStorage:', hasLocalConsent ? 'CONSENT DONNÉ' : 'PAS DE CONSENT');
+                            console.log('🍪 📊 État serveur:', serverConsentRequired ? 'CONSENT REQUIS' : 'CONSENT PAS REQUIS');
+                            
+                            // Si localStorage dit "consent donné" mais serveur dit "consent requis" 
+                            // = désynchronisation (ex: utilisateur connecté après visite anonyme)
+                            if (hasLocalConsent && serverConsentRequired) {
+                                console.log('🍪 ⚠️ DÉSYNCHRONISATION DÉTECTÉE - Nettoyage localStorage');
+                                this.clearLocalConsent();
+                            }
+                            
+                            // Si localStorage dit "pas de consent" mais serveur dit "pas requis"
+                            // = serveur a un consent valide, synchroniser localStorage
+                            if (!hasLocalConsent && !serverConsentRequired) {
+                                console.log('🍪 � SYNCHRONISATION - Serveur a consent, mise à jour localStorage');
+                                this.setLocalConsent();
+                            }
+                            
+                            
+                            // Décision finale d'affichage basée sur l'état serveur
                             if (response.data && response.data.consent_required) {
                                 console.log('🍪 ✅ consent_required = TRUE -> AFFICHAGE DU BANDEAU');
                                 banner.classList.remove('hidden');
@@ -136,13 +152,16 @@
                             } else {
                                 console.log('🍪 ❌ consent_required = FALSE -> PAS D\'AFFICHAGE');
                                 console.log('🍪 🔍 Détails consent_required:', response.data?.consent_required);
-                                this.setLocalConsent(); // Marquer comme accepté côté serveur
+                                // S'assurer que localStorage est synchronisé
+                                this.setLocalConsent();
                             }
                         } catch (error) {
                             console.error('🍪 💥 ERREUR lors de la vérification:', error);
-                            // Afficher le banner par défaut en cas d'erreur
-                            console.log('🍪 🚨 Affichage du bandeau par défaut suite à l\'erreur');
-                            banner.classList.remove('hidden');
+                            // En cas d'erreur serveur, vérifier le localStorage
+                            if (!this.hasLocalConsent()) {
+                                console.log('🍪 🚨 Affichage du bandeau par défaut suite à l\'erreur');
+                                banner.classList.remove('hidden');
+                            }
                         }
                     } else {
                         console.error('🍪 💥 ERREUR: Élément #cookie-banner non trouvé dans le DOM !');
@@ -210,7 +229,7 @@
                 clearLocalConsent() {
                     localStorage.removeItem('cookie_consent_given');
                     localStorage.removeItem('cookie_consent_date');
-                    console.log('🍪 Consentement local effacé');
+                    console.log('🍪 🧹 localStorage nettoyé');
                 },
 
                 async checkConsentStatus() {
@@ -286,6 +305,47 @@
                         window.FarmShop.notification.show(message, type);
                     } else {
                         console.log(`${type.toUpperCase()}: ${message}`);
+                    }
+                },
+
+                // Synchroniser l'état d'authentification avec le serveur
+                async syncAuthStatus() {
+                    try {
+                        console.log('🍪 🔄 Synchronisation état authentification...');
+                        const response = await fetch('/api/cookies/sync-auth-status', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('🍪 ✅ Synchronisation réussie:', data);
+                            
+                            // Si migration détectée ou statut changé, nettoyer localStorage et revérifier
+                            if (data.data.migration_occurred || data.data.consent_required) {
+                                console.log('🍪 🧹 Migration détectée - nettoyage localStorage');
+                                this.clearLocalConsent();
+                                
+                                // Revérifier l'affichage du bandeau
+                                setTimeout(() => {
+                                    this.show();
+                                }, 100);
+                            } else {
+                                // Synchroniser localStorage avec état serveur
+                                this.setLocalConsent();
+                            }
+                            
+                            return data;
+                        } else {
+                            throw new Error('Erreur lors de la synchronisation');
+                        }
+                    } catch (error) {
+                        console.error('🍪 💥 Erreur lors de la synchronisation:', error);
+                        return null;
                     }
                 }
             },
@@ -1198,19 +1258,37 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🍪 DOM chargé - Initialisation du système de cookies...');
             
-            // Nettoyer le localStorage des cookies pour forcer une nouvelle vérification
-            @auth
-            console.log('🍪 Utilisateur connecté - nettoyage du localStorage pour synchronisation');
-            localStorage.removeItem('cookie_consent_given');
-            localStorage.removeItem('cookie_consent_date');
-            @endauth
-            
             console.log('🔍 FarmShop object:', window.FarmShop);
             console.log('🔍 cookieConsent object:', window.FarmShop?.cookieConsent);
             console.log('🔍 show function:', typeof window.FarmShop?.cookieConsent?.show);
+            
+            // Vérifier si on vient d'une connexion/déconnexion ou changement d'état auth
+            const urlParams = new URLSearchParams(window.location.search);
+            const authChanged = urlParams.get('auth_changed') || 
+                              sessionStorage.getItem('auth_status_changed') ||
+                              localStorage.getItem('auth_status_changed') ||
+                              @if(session('auth_status_changed')) 'true' @else 'false' @endif === 'true';
+            
             // Vérifier le consentement des cookies
             if (window.FarmShop && window.FarmShop.cookieConsent && typeof window.FarmShop.cookieConsent.show === 'function') {
-                FarmShop.cookieConsent.show();
+                
+                if (authChanged) {
+                    console.log('🍪 � Changement d\'authentification détecté');
+                    // Nettoyer les indicateurs
+                    sessionStorage.removeItem('auth_status_changed');
+                    localStorage.removeItem('auth_status_changed');
+                    
+                    // Synchroniser immédiatement
+                    FarmShop.cookieConsent.syncAuthStatus().then(() => {
+                        // Puis afficher le bandeau si nécessaire
+                        setTimeout(() => {
+                            FarmShop.cookieConsent.show();
+                        }, 200);
+                    });
+                } else {
+                    // Affichage normal
+                    FarmShop.cookieConsent.show();
+                }
             } else {
                 console.error('❌ FarmShop.cookieConsent.show n\'est pas une fonction');
             }
@@ -1340,6 +1418,35 @@
                 console.error('Erreur lors du chargement du compteur wishlist:', error);
             }
         }
+    </script>
+
+    <!-- PATCH COOKIE : Fix pour le bandeau qui disparaît après connexion -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🍪 PATCH COOKIE - Initialisation');
+            
+            // Attendre que le script principal soit chargé
+            setTimeout(function() {
+                // Vérifier si l'utilisateur est connecté
+                const isAuth = document.querySelector('meta[name="user-authenticated"]')?.content === 'true';
+                
+                if (isAuth) {
+                    console.log('🍪 PATCH - Utilisateur connecté détecté');
+                    console.log('🍪 PATCH - Forçage de la vérification API');
+                    
+                    // Forcer l'appel à l'API pour les utilisateurs connectés
+                    if (window.FarmShop && window.FarmShop.cookieConsent && typeof window.FarmShop.cookieConsent.show === 'function') {
+                        // Appeler directement show() qui va faire l'appel API
+                        window.FarmShop.cookieConsent.show();
+                        console.log('🍪 PATCH - show() exécuté');
+                    } else {
+                        console.error('🍪 PATCH - FarmShop.cookieConsent non disponible');
+                    }
+                } else {
+                    console.log('🍪 PATCH - Utilisateur invité, pas d\'intervention');
+                }
+            }, 1000); // Attendre 1 seconde pour être sûr que tout est chargé
+        });
     </script>
 </body>
 </html>

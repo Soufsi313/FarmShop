@@ -64,6 +64,9 @@ class RegisterController extends Controller
         // Envoyer l'email de vérification (synchrone pour éviter les problèmes de queue)
         $user->sendEmailVerificationNotification();
 
+        // Marquer qu'un changement d'authentification pourrait avoir lieu pour la synchronisation des cookies
+        session()->put('auth_status_changed', true);
+
         return redirect('/login')->with('success', 'Votre compte a été créé avec succès ! Veuillez vérifier votre email pour activer votre compte.');
     }
 }
