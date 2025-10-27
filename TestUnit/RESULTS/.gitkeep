@@ -1,0 +1,17 @@
+# 📊 Résultats des Tests Database
+
+Ce fichier sera automatiquement créé après l'exécution des tests.
+
+Les résultats seront sauvegardés dans le dossier `TestUnit/RESULTS/` avec un horodatage.
+
+## Format des résultats
+
+```
+database_test_YYYY-MM-DD_HH-MM-SS.log
+```
+
+## Exemple
+
+```
+database_test_2025-01-11_14-30-45.log
+```
