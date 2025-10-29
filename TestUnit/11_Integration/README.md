@@ -92,6 +92,35 @@ Teste la validation des montants de paiement invalides.
 - Stripe maximum: 999999.99 EUR
 - Precision: 2 decimales
 
+### 4. test_rental_past_date.php
+Teste la tentative de location d'un produit avec une date de debut dans le passe.
+
+**Scenarios testes:**
+- Recherche ou creation d'un produit de location (type: rental ou both)
+- Test avec date d'hier (28/10 alors qu'on est le 29/10)
+- Test avec differentes dates passees (il y a 2 jours, 1 semaine, 1 mois)
+- Validation des dates valides (aujourd'hui, demain, semaine prochaine)
+- Test regles validation Laravel (after_or_equal:today)
+- Test date de fin avant date de debut
+- Test contraintes de duree (min/max rental days)
+- Verification types de produits (sale, rental, both)
+- Test ajout au panier de location avec date passee
+- Messages d'erreur utilisateur
+
+**Validations:**
+- Date de debut doit etre >= aujourd'hui
+- Date de fin doit etre >= date de debut
+- Duree doit respecter min/max rental days
+- Produits de location correctement catalogues
+- Validation front-end et back-end
+- Messages d'erreur clairs
+
+**Messages d'erreur attendus:**
+- "La date de debut doit etre aujourd'hui ou dans le futur."
+- "La date de debut de location ne peut pas etre dans le passe."
+- "La date de fin doit etre posterieure ou egale a la date de debut."
+- "La periode de location est invalide."
+
 ## Execution
 
 ### Test individuel
@@ -99,6 +128,7 @@ Teste la validation des montants de paiement invalides.
 php TestUnit/11_Integration/test_empty_cart_checkout.php
 php TestUnit/11_Integration/test_out_of_stock_product.php
 php TestUnit/11_Integration/test_invalid_payment_amount.php
+php TestUnit/11_Integration/test_rental_past_date.php
 ```
 
 ### Tous les tests
@@ -128,6 +158,14 @@ php TestUnit/11_Integration/run_all_tests.php
 - Calculs corrects (TVA, conversion)
 - Limites systeme respectees
 
+### Location Date Passee
+- Date de debut dans le passe refusee
+- Validation today/future uniquement
+- Date de fin >= date de debut
+- Duree respecte contraintes (min/max jours)
+- Distinction produits sale/rental/both
+- Validation front-end et back-end
+
 ## Cas d'Utilisation Reels
 
 ### Scenario 1: Utilisateur oublie d'ajouter des produits
@@ -156,6 +194,14 @@ php TestUnit/11_Integration/run_all_tests.php
 3. Backend recalcule le montant reel
 4. Comparaison: montant panier != montant paiement
 5. Paiement refuse
+
+### Scenario 5: Location avec date passee
+1. Utilisateur selectionne un produit de location
+2. Utilisateur choisit date de debut: hier (28/10)
+3. Systeme valide la date
+4. Systeme affiche: "La date de debut doit etre aujourd'hui ou dans le futur"
+5. Ajout au panier bloque
+6. Utilisateur corrige la date (aujourd'hui ou futur)
 
 ## Donnees de Test
 
@@ -240,16 +286,19 @@ php TestUnit/11_Integration/run_all_tests.php
 - Temps de reponse: < 200ms
 - Taux de conversion sauvee: Mesure
 
-## Extensions Futures
+### Extensions Futures
 
 ### Tests Additionnels
-- Location avec dates invalides
+- ~~Location avec dates invalides~~ ✓ Implemente (test_rental_past_date.php)
 - Produit inexistant
 - Session expiree
 - Concurrence (meme produit, 2 utilisateurs)
 - Limite de panier (nombre max items)
 - Codes promo invalides
 - Adresse livraison incomplete
+- Location: periode trop courte/longue
+- Location: chevauchement dates existantes
+- Location: produit non-location (type: sale)
 
 ### Ameliorations
 - Tests de charge

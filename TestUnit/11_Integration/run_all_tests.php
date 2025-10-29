@@ -31,6 +31,11 @@ $tests = [
         'name' => 'Paiement Montant Invalide',
         'file' => __DIR__ . '/test_invalid_payment_amount.php',
         'description' => 'Verification validation montants de paiement'
+    ],
+    [
+        'name' => 'Location Date Passee',
+        'file' => __DIR__ . '/test_rental_past_date.php',
+        'description' => 'Verification blocage location avec date de debut dans le passe'
     ]
 ];
 
