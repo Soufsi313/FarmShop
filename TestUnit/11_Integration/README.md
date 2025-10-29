@@ -121,6 +121,69 @@ Teste la tentative de location d'un produit avec une date de debut dans le passe
 - "La date de fin doit etre posterieure ou egale a la date de debut."
 - "La periode de location est invalide."
 
+### 5. test_product_return_restrictions.php
+Teste les restrictions de retour de produits (non retournables, delai 14 jours, commandes mixtes).
+
+**Scenarios testes:**
+- Verification produits retournables vs non retournables (is_returnable)
+- Tentative retour produit alimentaire (tomates, fruits, legumes)
+- Tentative retour semences/graines
+- Retour commande mixte (produits retournables + non retournables)
+- Calcul remboursement partiel (uniquement items retournables)
+- Test delai 14 jours: commande recente (5 jours) - VALIDE
+- Test delai 14 jours: commande a la limite (14 jours) - VALIDE
+- Test delai 14 jours: commande ancienne (15 jours) - REFUSE
+- Test delai 14 jours: commande tres ancienne (30 jours) - REFUSE
+- Validation complete demande retour (delai + produits)
+- Regles validation Laravel
+- Messages utilisateur (retour partiel, delai depasse)
+- Calcul remboursement partiel
+- Identification categories non retournables
+- Verification statut commande (delivered/completed eligibles)
+
+**Validations:**
+- Produits non retournables bloques (alimentaire, frais, semences)
+- Delai maximum 14 jours strictement respecte
+- Commandes mixtes: retour PARTIEL uniquement items retournables
+- Remboursement calcule correctement (TVA incluse)
+- Messages clairs pour utilisateur
+- Statuts eligibles: delivered, completed uniquement
+
+**Categories non retournables:**
+- Fruits et Legumes
+- Semences et Graines
+- Plants et Boutures
+- Produits Frais
+- Alimentation Animaux (frais)
+
+**Messages d'erreur attendus:**
+- "Ce produit ne peut pas etre retourne car il s'agit d'un produit alimentaire/frais."
+- "Seuls les produits non alimentaires de votre commande seront retournes et rembourses."
+- "Le delai de retour de 14 jours est depasse pour cette commande."
+- "Aucun produit de cette commande ne peut etre retourne."
+- Test avec differentes dates passees (il y a 2 jours, 1 semaine, 1 mois)
+- Validation des dates valides (aujourd'hui, demain, semaine prochaine)
+- Test regles validation Laravel (after_or_equal:today)
+- Test date de fin avant date de debut
+- Test contraintes de duree (min/max rental days)
+- Verification types de produits (sale, rental, both)
+- Test ajout au panier de location avec date passee
+- Messages d'erreur utilisateur
+
+**Validations:**
+- Date de debut doit etre >= aujourd'hui
+- Date de fin doit etre >= date de debut
+- Duree doit respecter min/max rental days
+- Produits de location correctement catalogues
+- Validation front-end et back-end
+- Messages d'erreur clairs
+
+**Messages d'erreur attendus:**
+- "La date de debut doit etre aujourd'hui ou dans le futur."
+- "La date de debut de location ne peut pas etre dans le passe."
+- "La date de fin doit etre posterieure ou egale a la date de debut."
+- "La periode de location est invalide."
+
 ## Execution
 
 ### Test individuel
@@ -129,6 +192,7 @@ php TestUnit/11_Integration/test_empty_cart_checkout.php
 php TestUnit/11_Integration/test_out_of_stock_product.php
 php TestUnit/11_Integration/test_invalid_payment_amount.php
 php TestUnit/11_Integration/test_rental_past_date.php
+php TestUnit/11_Integration/test_product_return_restrictions.php
 ```
 
 ### Tous les tests
@@ -166,6 +230,14 @@ php TestUnit/11_Integration/run_all_tests.php
 - Distinction produits sale/rental/both
 - Validation front-end et back-end
 
+### Retour Produits
+- Produits non retournables bloques (alimentaire, frais, semences)
+- Delai 14 jours strictement respecte
+- Commandes mixtes: retour partiel autorise
+- Remboursement partiel calcule correctement
+- Messages clairs (retour partiel, delai depasse)
+- Statuts eligibles: delivered, completed
+
 ## Cas d'Utilisation Reels
 
 ### Scenario 1: Utilisateur oublie d'ajouter des produits
@@ -202,6 +274,30 @@ php TestUnit/11_Integration/run_all_tests.php
 4. Systeme affiche: "La date de debut doit etre aujourd'hui ou dans le futur"
 5. Ajout au panier bloque
 6. Utilisateur corrige la date (aujourd'hui ou futur)
+
+### Scenario 6: Retour produit alimentaire
+1. Utilisateur commande des tomates bio (produit frais)
+2. Commande livree
+3. Utilisateur tente de retourner les tomates
+4. Systeme detecte: is_returnable = false
+5. Systeme affiche: "Ce produit ne peut pas etre retourne (produit alimentaire/frais)"
+6. Retour bloque
+
+### Scenario 7: Retour commande mixte
+1. Utilisateur commande: 1 beche (retournable) + 2kg tomates (non retournable)
+2. Commande livree (total: 48.50 EUR + 7.00 EUR = 55.50 EUR)
+3. Utilisateur demande retour complet
+4. Systeme analyse: 1 item retournable, 1 item non retournable
+5. Systeme propose: "Retour partiel - Seuls les produits non alimentaires seront retournes"
+6. Remboursement partiel: 48.50 EUR (beche uniquement)
+7. Montant conserve: 7.00 EUR (tomates)
+
+### Scenario 8: Retour apres delai
+1. Utilisateur a commande il y a 15 jours
+2. Utilisateur tente de retourner
+3. Systeme calcule: 15 jours ecoules
+4. Systeme affiche: "Le delai de retour de 14 jours est depasse"
+5. Retour refuse
 
 ## Donnees de Test
 

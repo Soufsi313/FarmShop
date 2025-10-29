@@ -36,6 +36,11 @@ $tests = [
         'name' => 'Location Date Passee',
         'file' => __DIR__ . '/test_rental_past_date.php',
         'description' => 'Verification blocage location avec date de debut dans le passe'
+    ],
+    [
+        'name' => 'Restrictions Retour Produits',
+        'file' => __DIR__ . '/test_product_return_restrictions.php',
+        'description' => 'Verification restrictions retour: produits non retournables, delai 14 jours, commandes mixtes'
     ]
 ];
 
