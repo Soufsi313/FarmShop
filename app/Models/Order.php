@@ -92,6 +92,31 @@ class Order extends Model
         'discount_amount' => 0,
     ];
 
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        // Valider qu'une commande ne peut pas être créée sans items
+        static::creating(function ($order) {
+            // Pour les nouvelles commandes, on vérifie qu'il y a bien un total > 0
+            // Une commande valide doit avoir un montant total supérieur à 0
+            if ($order->total_amount <= 0) {
+                throw new \Exception('Impossible de créer une commande avec un montant de 0€. Le panier doit contenir au moins un produit.');
+            }
+        });
+
+        // Valider après la sauvegarde que la commande a bien des items
+        static::created(function ($order) {
+            // Vérifier que la commande a au moins un item
+            if ($order->items()->count() === 0) {
+                // Supprimer la commande si elle n'a pas d'items
+                $order->delete();
+                throw new \Exception('Une commande doit contenir au moins un produit.');
+            }
+        });
+    }
+
     // Relations
     public function user()
     {
