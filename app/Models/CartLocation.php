@@ -79,8 +79,9 @@ class CartLocation extends Model
         // Vérifier la disponibilité du produit pour cette période
         $this->checkProductAvailability($product, $quantity, $startDate, $endDate);
 
-        // Calculer la durée
-        $durationDays = $startDate->diffInDays($endDate) + 1; // +1 pour inclure le jour de fin
+        // Calculer la durée en excluant les dimanches (jours de fermeture)
+        // Utilise la méthode du produit qui compte uniquement les jours ouvrés
+        $durationDays = $product->calculateRentalDuration($startDate, $endDate);
 
         // Créer l'élément de panier
         $cartItem = $this->items()->create([

@@ -720,11 +720,11 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
             
-            // Valider que la date de fin est après la date de début
-            if (new Date(this.endDate) <= new Date(this.startDate)) {
+            // Valider que la date de fin n'est pas avant la date de début (permet location d'un jour)
+            if (new Date(this.endDate) < new Date(this.startDate)) {
                 this.calculation.show = false;
                 this.calculation.loading = false;
-                this.calculationError = 'La date de fin doit être après la date de début';
+                this.calculationError = 'La date de fin doit être après ou égale à la date de début';
                 return;
             }
             

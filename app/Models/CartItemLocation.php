@@ -48,7 +48,7 @@ class CartItemLocation extends Model
     ];
 
     // Taux de TVA par défaut
-    const TVA_RATE = 0.20; // 20%
+    const TVA_RATE = 0.21; // 21% (Belgique)
 
     // Relations
     public function cartLocation(): BelongsTo
@@ -78,21 +78,24 @@ class CartItemLocation extends Model
     // Méthodes de calcul
 
     /**
-     * Calculer tous les montants de la ligne
+     * Calcule les montants de la ligne du panier
+     * NOTE: unit_price_per_day vient de Product.rental_price_per_day qui est DÉJÀ EN TTC
      */
     public function calculateAmounts(): void
     {
-        // Calcul du sous-total HT (prix par jour * quantité * durée)
-        $this->subtotal_amount = $this->unit_price_per_day * $this->quantity * $this->duration_days;
+        // Le prix par jour est déjà TTC (vient du catalogue produit)
+        $priceTTC = $this->unit_price_per_day;
         
-        // Calcul du sous-total caution (caution unitaire * quantité)
+        // Calcul du total TTC (prix TTC par jour * quantité * durée)
+        $this->total_amount = $priceTTC * $this->quantity * $this->duration_days;
+        
+        // Décomposition pour affichage : calcul du HT et TVA à partir du TTC
+        // Formule inverse : HT = TTC / (1 + taux TVA)
+        $this->subtotal_amount = $this->total_amount / (1 + self::TVA_RATE);
+        $this->tva_amount = $this->total_amount - $this->subtotal_amount;
+        
+        // Calcul du sous-total caution (caution unitaire * quantité, pas de TVA sur caution)
         $this->subtotal_deposit = $this->unit_deposit * $this->quantity;
-        
-        // Calcul de la TVA (sur le montant de location seulement)
-        $this->tva_amount = $this->subtotal_amount * self::TVA_RATE;
-        
-        // Calcul du total TTC (sous-total + TVA)
-        $this->total_amount = $this->subtotal_amount + $this->tva_amount;
     }
 
     /**
@@ -120,7 +123,9 @@ class CartItemLocation extends Model
             throw new \Exception('La date de début ne peut pas être dans le passé');
         }
 
-        $durationDays = $startDate->diffInDays($endDate) + 1;
+        // Calculer la durée en excluant les dimanches (jours de fermeture)
+        // Utilise la méthode du produit qui compte uniquement les jours ouvrés
+        $durationDays = $this->product->calculateRentalDuration($startDate, $endDate);
 
         $this->update([
             'start_date' => $startDate,

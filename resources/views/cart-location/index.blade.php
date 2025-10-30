@@ -158,10 +158,13 @@
                                         <!-- Pricing -->
                                         <div class="text-right space-y-1">
                                             <div class="text-sm text-gray-600">
-                                                <span x-text="formatCurrency(item.unit_price_per_day)"></span>{{ __('app.cart_location.per_day') }} × <span x-text="item.quantity"></span> × <span x-text="item.duration_days"></span> {{ __('app.cart_location.days') }}
+                                                <span x-text="formatCurrency(item.unit_price_per_day)"></span> TTC{{ __('app.cart_location.per_day') }} × <span x-text="item.quantity"></span> × <span x-text="item.duration_days"></span> {{ __('app.cart_location.days') }}
                                             </div>
                                             <div class="text-lg font-semibold text-gray-900">
-                                                <span x-text="formatCurrency(item.total_amount)"></span>
+                                                <span x-text="formatCurrency(item.total_amount)"></span> TTC
+                                            </div>
+                                            <div class="text-xs text-gray-500">
+                                                (dont TVA 21% : <span x-text="formatCurrency(item.tva_amount)"></span>)
                                             </div>
                                             <div class="text-sm text-orange-600">
                                                 {{ __('app.cart_location.deposit_label') }}: <span x-text="formatCurrency(item.subtotal_deposit)"></span>
@@ -194,17 +197,19 @@
                     
                     <!-- Summary Details -->
                     <div class="space-y-3 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">{{ __('app.cart_location.subtotal_ht') }}:</span>
-                            <span x-text="formatCurrency(cartSummary.total_amount || 0)"></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">{{ __('app.cart_location.vat') }} (21%):</span>
-                            <span x-text="formatCurrency(cartSummary.total_tva || 0)"></span>
-                        </div>
-                        <div class="flex justify-between border-t pt-3">
+                        <div class="flex justify-between border-b pb-3">
                             <span class="font-semibold text-gray-900">{{ __('app.cart_location.total_ttc') }}:</span>
-                            <span class="font-semibold text-lg" x-text="formatCurrency(cartSummary.total_with_tax || 0)"></span>
+                            <span class="font-semibold text-lg" x-text="formatCurrency(cartSummary.total_amount || 0)"></span>
+                        </div>
+                        <div class="text-xs text-gray-500 space-y-1">
+                            <div class="flex justify-between">
+                                <span>{{ __('app.cart_location.subtotal_ht') }}:</span>
+                                <span x-text="formatCurrency((cartSummary.total_amount || 0) / 1.21)"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>{{ __('app.cart_location.vat') }} (21%):</span>
+                                <span x-text="formatCurrency(cartSummary.total_tva || 0)"></span>
+                            </div>
                         </div>
                         <div class="flex justify-between border-t pt-3">
                             <span class="font-semibold text-orange-600">{{ __('app.cart_location.total_deposit') }}:</span>
