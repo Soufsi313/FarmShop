@@ -293,11 +293,17 @@ class OrderLocation extends Model
     public function calculateLateDays()
     {
         if (!$this->actual_return_date) {
-            // Si pas encore retourné, calculer depuis maintenant
-            return max(0, now()->diffInDays($this->end_date, false) * -1);
+            // Si pas encore retourné, calculer depuis maintenant (jours complets uniquement)
+            $days = now()->startOfDay()->diffInDays($this->end_date->copy()->startOfDay(), false);
+            return max(0, $days * -1);
         }
         
-        return max(0, $this->actual_return_date->diffInDays($this->end_date, false) * -1);
+        // Calculer les jours complets de retard (sans fractions d'heures/minutes)
+        // Standard dans la location: un retour le 30/10 à 9h pour une fin le 25/10 = 5 jours complets
+        // diffInDays(endDate, false) donne un nombre négatif si actual_return_date > end_date
+        $days = $this->actual_return_date->copy()->startOfDay()
+            ->diffInDays($this->end_date->copy()->startOfDay(), false);
+        return max(0, $days * -1);
     }
 
     /**
@@ -389,7 +395,10 @@ class OrderLocation extends Model
 
         $actualReturnDate = $returnDate ? Carbon::parse($returnDate) : now();
         
-        // Calculer les retards
+        // Définir temporairement actual_return_date pour le calcul correct
+        $this->actual_return_date = $actualReturnDate;
+        
+        // Calculer les retards avec la date de retour correcte
         $lateDays = $this->calculateLateDays();
         $lateFees = $this->calculateLateFees();
         
