@@ -90,9 +90,9 @@
                                         @elseif($order->status === 'inspecting') 🔍 {{ __('app.rental_status.inspecting') }}
                                         @elseif($order->status === 'finished')
                                             @if($order->inspection_completed_at)
-                                                ✅ Inspection terminée
+                                                ✅ {{ __('app.rental_status.inspection_completed') }}
                                             @else
-                                                🔔 Location terminée - À inspecter
+                                                🔔 {{ __('app.rental_status.awaiting_inspection') }}
                                             @endif
                                         @elseif($order->status === 'cancelled') ❌ {{ __('app.rental_status.cancelled') }}
                                         @else 🔘 {{ $order->status_label }}

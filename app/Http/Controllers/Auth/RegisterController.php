@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\AccountCreatedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -29,7 +30,7 @@ class RegisterController extends Controller
             'username' => 'required|string|max:255|unique:users',
             'name' => 'nullable|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:6|confirmed',
             'terms' => 'required|accepted',
         ], [
             'username.required' => 'Le nom d\'utilisateur est obligatoire.',
@@ -39,7 +40,7 @@ class RegisterController extends Controller
             'email.email' => 'L\'adresse email doit être valide.',
             'email.unique' => 'Cette adresse email est déjà utilisée.',
             'password.required' => 'Le mot de passe est obligatoire.',
-            'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
+            'password.min' => 'Le mot de passe doit contenir au moins 6 caractères.',
             'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
             'terms.required' => 'Vous devez accepter les conditions d\'utilisation.',
             'terms.accepted' => 'Vous devez accepter les conditions d\'utilisation.',
@@ -61,12 +62,31 @@ class RegisterController extends Controller
             'newsletter_subscribed' => $request->has('newsletter'),
         ]);
 
+        // Envoyer l'email de bienvenue (confirmation de création de compte)
+        $user->notify(new AccountCreatedNotification());
+
         // Envoyer l'email de vérification (synchrone pour éviter les problèmes de queue)
         $user->sendEmailVerificationNotification();
 
         // Marquer qu'un changement d'authentification pourrait avoir lieu pour la synchronisation des cookies
         session()->put('auth_status_changed', true);
 
-        return redirect('/login')->with('success', 'Votre compte a été créé avec succès ! Veuillez vérifier votre email pour activer votre compte.');
+        // Stocker l'email de l'utilisateur en session pour l'afficher sur la page de confirmation
+        session()->flash('user_email', $user->email);
+
+        return redirect()->route('register.success');
+    }
+
+    /**
+     * Afficher la page de confirmation de création de compte
+     */
+    public function success()
+    {
+        // Vérifier que la session contient bien les données (éviter accès direct)
+        if (!session()->has('user_email')) {
+            return redirect()->route('login');
+        }
+
+        return view('auth.register-success');
     }
 }

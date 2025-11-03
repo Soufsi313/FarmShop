@@ -222,9 +222,21 @@
                                     </div>
 
                                     <!-- Stock indicator -->
-                                    @if($product->quantity <= $product->critical_threshold)
+                                    @if($product->is_out_of_stock)
                                         <div class="absolute top-2 right-2">
-                                            <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                                            <span class="bg-red-600 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg">
+                                                🚫 {{ __('products.out_of_stock') }}
+                                            </span>
+                                        </div>
+                                    @elseif($product->is_critical_stock)
+                                        <div class="absolute top-2 right-2">
+                                            <span class="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium shadow-lg">
+                                                ⚠️ {{ __('products.critical_stock') }}
+                                            </span>
+                                        </div>
+                                    @elseif($product->is_low_stock)
+                                        <div class="absolute top-2 right-2">
+                                            <span class="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium">
                                                 {{ __('products.low_stock') }}
                                             </span>
                                         </div>

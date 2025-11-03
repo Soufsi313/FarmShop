@@ -67,6 +67,7 @@ return [
         'this_week' => 'Deze week',
         'this_month' => 'Deze maand',
         'today' => 'Vandaag',
+        'last_update' => 'Laatste update',
     ],
 
     // Additional labels
@@ -149,6 +150,7 @@ return [
     'estimated_total_cost' => 'Geschatte Totale Kosten',
     'urgent_priority' => 'Urgente Prioriteit',
     'total_quantity' => 'Totale Hoeveelheid',
+    'average_stock' => 'Gemiddelde Voorraad',
     
     // Restock suggestions
     'restock_suggestions' => '💡 Bijvullingssuggesties',
@@ -252,4 +254,15 @@ return [
     'export_error' => 'Export fout',
     'report_error' => 'Fout bij het genereren van rapport',
     'schedule_development' => 'Planningsfunctie in ontwikkeling',
+    
+    // Time references for restock page
+    'today' => 'Vandaag',
+    'last_update' => 'Laatste update',
+    'total_value' => 'Totale Waarde',
+    
+    // Restock page section
+    'restock' => [
+        'title' => 'Bijvulling',
+        'page_title' => 'Bijvulling - Voorraadbeheer',
+    ],
 ];

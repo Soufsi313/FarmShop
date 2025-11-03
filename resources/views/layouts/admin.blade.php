@@ -35,7 +35,6 @@
     
     <!-- Chart.js pour les graphiques -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</body>
     
     <!-- Alpine.js pour l'interactivité -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -44,15 +43,77 @@
         html {
             font-family: 'Inter', ui-sans-serif, system-ui;
         }
+        
+        /* Optimisations responsive pour écrans moyens */
+        @media (max-width: 1600px) {
+            .admin-sidebar {
+                width: 16rem !important; /* 256px instead of 288px */
+            }
+        }
+        
+        @media (max-width: 1366px) {
+            .admin-sidebar {
+                width: 14rem !important; /* 224px pour écrans laptop */
+            }
+        }
+        
+        /* Forcer le bon comportement du scrolling */
+        .admin-container {
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .admin-main {
+            height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+        
+        /* Stylisation de la scrollbar pour le menu de navigation - TOUJOURS VISIBLE */
+        .admin-nav-scroll::-webkit-scrollbar {
+            width: 16px; /* Largeur augmentée pour meilleure visibilité */
+        }
+        
+        .admin-nav-scroll::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.8); /* slate-800 foncé et visible */
+            border-radius: 6px;
+            margin: 4px 0;
+            border: 1px solid rgba(51, 65, 85, 0.4);
+        }
+        
+        .admin-nav-scroll::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, rgba(52, 211, 153, 1) 0%, rgba(34, 197, 94, 1) 100%); /* emerald gradient */
+            border-radius: 6px;
+            border: 2px solid rgba(30, 41, 59, 0.8);
+            box-shadow: 0 0 6px rgba(52, 211, 153, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .admin-nav-scroll::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, rgba(52, 211, 153, 1) 0%, rgba(52, 211, 153, 1) 100%);
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.8);
+            transform: scaleX(1.1);
+            cursor: grab;
+        }
+        
+        .admin-nav-scroll::-webkit-scrollbar-thumb:active {
+            cursor: grabbing;
+            background: rgba(34, 197, 94, 1);
+        }
+        
+        /* Pour Firefox */
+        .admin-nav-scroll {
+            scrollbar-width: auto; /* auto au lieu de thin pour meilleure visibilité */
+            scrollbar-color: rgba(52, 211, 153, 1) rgba(30, 41, 59, 0.8);
+        }
     </style>
 
     @stack('styles')
 </head>
 <body class="h-full bg-gray-100" x-data="{ sidebarOpen: false }">
-    <div class="flex h-full">
+    <div class="flex h-full admin-container">
         <!-- Sidebar Moderne -->
-        <div class="hidden md:flex md:w-72 md:flex-col">
-            <div class="flex flex-col flex-grow bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl">
+        <div class="hidden md:flex md:w-64 lg:w-72 md:flex-col admin-sidebar">
+            <div class="flex flex-col h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl">
                 <!-- Logo Section -->
                 <div class="flex items-center flex-shrink-0 px-6 py-6 border-b border-slate-700/50">
                     <div class="flex items-center space-x-3">
@@ -69,7 +130,7 @@
                 </div>
                 
                 <!-- Navigation -->
-                <nav class="flex-1 px-4 py-6 overflow-y-auto">
+                <nav class="flex-1 px-4 py-6 overflow-y-scroll admin-nav-scroll" style="min-height: 0;">
                     <div class="space-y-2">
                         <!-- Dashboard principal -->
                         <a href="{{ route('admin.dashboard') }}" 
@@ -492,7 +553,7 @@
             </header>
 
             <!-- Page content -->
-            <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
+            <main class="flex-1 overflow-y-auto p-4 lg:p-6 bg-gray-50 min-h-0 admin-main">
                 @yield('content')
             </main>
         </div>

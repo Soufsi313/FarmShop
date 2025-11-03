@@ -1,0 +1,201 @@
+/* Styles responsifs personnalisés pour le dashboard admin */
+
+/* Optimisation pour écrans 16 pouces et plus petits (1920px et moins) */
+@media (max-width: 1920px) {
+    /* Réduction de la largeur de la sidebar sur les écrans moyens */
+    .admin-sidebar {
+        width: 16rem; /* 256px au lieu de 288px */
+    }
+    
+    /* Ajustement des cartes de statistiques */
+    .stats-card {
+        min-height: 120px;
+    }
+    
+    /* Réduction des paddings dans les sections */
+    .dashboard-section {
+        padding: 1.25rem;
+    }
+}
+
+/* Optimisation pour écrans de 15-16 pouces (1366px à 1600px) */
+@media (max-width: 1600px) {
+    /* Sidebar plus compacte */
+    .admin-sidebar {
+        width: 14rem; /* 224px */
+    }
+    
+    /* Navigation plus compacte */
+    .nav-item {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    
+    /* Cartes de statistiques plus compactes */
+    .stats-grid {
+        gap: 1rem;
+    }
+    
+    .stats-card {
+        padding: 1rem;
+        min-height: 100px;
+    }
+    
+    /* Réduction de la taille des titres */
+    .dashboard-title {
+        font-size: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.125rem;
+    }
+}
+
+/* Optimisation pour écrans de 13-14 pouces (1366px et moins) */
+@media (max-width: 1366px) {
+    /* Sidebar encore plus compacte */
+    .admin-sidebar {
+        width: 12rem; /* 192px */
+    }
+    
+    /* Navigation très compacte */
+    .nav-item {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.8125rem;
+    }
+    
+    .nav-icon {
+        width: 1rem;
+        height: 1rem;
+    }
+    
+    /* Grilles adaptatives */
+    .stats-grid-responsive {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
+    /* Cartes encore plus compactes */
+    .stats-card {
+        padding: 0.75rem;
+        min-height: 90px;
+    }
+    
+    /* Réduction des espaces entre sections */
+    .dashboard-gap {
+        gap: 0.75rem;
+    }
+}
+
+/* Classes utilitaires pour la responsivité */
+.compact-text {
+    font-size: 0.875rem;
+    line-height: 1.25;
+}
+
+.compact-padding {
+    padding: 0.5rem;
+}
+
+.responsive-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+/* Grille adaptative pour écrans moyens */
+@media (min-width: 768px) and (max-width: 1366px) {
+    .responsive-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
+
+/* Grille adaptative pour grands écrans */
+@media (min-width: 1367px) {
+    .responsive-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+}
+
+/* Améliorations pour les cartes de statistiques */
+.stat-card-compact {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 80px;
+    padding: 0.75rem;
+}
+
+.stat-number-compact {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-label-compact {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+/* Optimisation de la section gestion de stock */
+.stock-section-compact {
+    padding: 1rem;
+}
+
+.stock-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+}
+
+/* Optimisation des graphiques */
+.chart-container-compact {
+    height: 200px;
+    margin: 0.5rem 0;
+}
+
+/* Tables responsives */
+.table-responsive-compact {
+    font-size: 0.875rem;
+}
+
+.table-responsive-compact th,
+.table-responsive-compact td {
+    padding: 0.5rem 0.75rem;
+}
+
+/* Boutons compacts */
+.btn-compact {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* Améliorations pour la section newsletter */
+.newsletter-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+@media (max-width: 1366px) {
+    .newsletter-metrics {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Scrollbar personnalisée pour la sidebar */
+.admin-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}

@@ -3,32 +3,71 @@
 @section('title', 'Détails de la newsletter - Dashboard Admin')
 @section('page-title', 'Détails de la newsletter')
 
+@push('styles')
+<style>
+    /* Amélioration de la lisibilité sur petits écrans */
+    @media (max-width: 1024px) {
+        .container {
+            max-width: 100%;
+        }
+    }
+    
+    /* Éviter les débordements de texte */
+    .line-clamp-1 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Améliorer les boutons sur mobile */
+    @media (max-width: 640px) {
+        button, a.inline-flex {
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
     <!-- En-tête -->
     <div class="mb-8">
-        <div class="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-6 text-white shadow-lg">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold flex items-center">
-                        <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-4 md:p-6 text-white shadow-lg">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div class="flex-1">
+                    <h1 class="text-xl md:text-2xl lg:text-3xl font-bold flex items-center">
+                        <svg class="w-6 h-6 md:w-8 md:h-8 mr-2 md:mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        {{ $newsletter->title }}
+                        <span class="line-clamp-2">{{ $newsletter->title }}</span>
                     </h1>
-                    <p class="mt-2 text-purple-100">
+                    <p class="mt-2 text-purple-100 text-sm md:text-base line-clamp-1">
                         {{ $newsletter->subject }}
                     </p>
                 </div>
-                <div class="text-right">
+                <div class="flex flex-wrap gap-2 lg:flex-shrink-0">
                     <a href="{{ route('admin.newsletters.index') }}" 
-                       class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors mr-2">
-                        ← Retour à la liste
+                       class="inline-flex items-center justify-center bg-white/20 hover:bg-white/30 text-white px-3 md:px-4 py-2 rounded-lg transition-colors text-sm whitespace-nowrap">
+                        ← Retour
+                    </a>
+                    <a href="{{ route('admin.newsletters.preview', $newsletter) }}" 
+                       target="_blank"
+                       class="inline-flex items-center justify-center bg-blue-500/90 hover:bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg transition-colors text-sm whitespace-nowrap">
+                        👁️ Aperçu
                     </a>
                     @if($newsletter->status != 'sent')
                     <a href="{{ route('admin.newsletters.edit', $newsletter) }}" 
-                       class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors">
-                        Modifier
+                       class="inline-flex items-center justify-center bg-white/20 hover:bg-white/30 text-white px-3 md:px-4 py-2 rounded-lg transition-colors text-sm whitespace-nowrap">
+                        ✏️ Modifier
                     </a>
                     @endif
                 </div>
@@ -164,15 +203,15 @@
                 {!! $newsletter->content !!}
             </div>
             
-            <div class="mt-4 flex gap-2">
+            <div class="mt-4 flex flex-wrap gap-2">
                 <button onclick="previewNewsletter()" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
-                    Aperçu complet
+                        class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-2 rounded-lg text-sm transition-colors whitespace-nowrap">
+                    👁️ Aperçu complet
                 </button>
                 
                 @if($newsletter->status != 'sent')
                 <button onclick="sendTestEmail()" 
-                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                        class="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-2 rounded-lg text-sm transition-colors whitespace-nowrap">
                     Envoyer un test
                 </button>
                 @endif
@@ -245,12 +284,12 @@
     @endif
 
     <!-- Actions -->
-    <div class="mt-8 flex justify-between items-center">
-        <div class="flex gap-3">
+    <div class="mt-8 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
+        <div class="flex flex-wrap gap-2 md:gap-3">
             @if($newsletter->status != 'sent')
                 <a href="{{ route('admin.newsletters.edit', $newsletter) }}" 
-                   class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors">
-                    Modifier
+                   class="inline-flex items-center justify-center bg-purple-600 hover:bg-purple-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg transition-colors text-sm md:text-base whitespace-nowrap">
+                    ✏️ Modifier
                 </a>
                 
                 @if($newsletter->status == 'draft')
@@ -259,31 +298,50 @@
                     @method('PUT')
                     <input type="hidden" name="action" value="send_now">
                     <button type="submit" 
-                            class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors"
+                            class="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg transition-colors text-sm md:text-base whitespace-nowrap"
                             onclick="return confirm('Êtes-vous sûr de vouloir envoyer cette newsletter à TOUS les abonnés ?')">
-                        Envoyer maintenant
+                        🚀 Envoyer maintenant
                     </button>
                 </form>
                 
                 <form method="POST" action="{{ route('admin.newsletters.send-to-me', $newsletter) }}" class="inline">
                     @csrf
                     <button type="submit" 
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
+                            class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg transition-colors text-sm md:text-base whitespace-nowrap"
                             onclick="return confirm('Envoyer cette newsletter uniquement à votre adresse ?')">
-                        📧 Envoyer à moi
+                        📧 Test
+                    </button>
+                </form>
+                @elseif($newsletter->status == 'scheduled')
+                <form method="POST" action="{{ route('admin.newsletters.send', $newsletter) }}" class="inline">
+                    @csrf
+                    <button type="submit" 
+                            class="inline-flex items-center justify-center bg-orange-600 hover:bg-orange-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg transition-colors text-sm md:text-base whitespace-nowrap"
+                            onclick="return confirm('Forcer l\'envoi immédiat de cette newsletter programmée ?')">
+                        ⚡ Forcer l'envoi
                     </button>
                 </form>
                 @endif
+            @else
+                <!-- Newsletter déjà envoyée - Option de renvoi -->
+                <form method="POST" action="{{ route('admin.newsletters.resend', $newsletter) }}" class="inline">
+                    @csrf
+                    <button type="submit" 
+                            class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg transition-colors text-sm md:text-base whitespace-nowrap"
+                            onclick="return confirm('⚠️ Renvoyer cette newsletter à TOUS les abonnés actuels ?\n\nCela créera de nouveaux envois pour tous les abonnés actifs.')">
+                        🔄 Renvoyer
+                    </button>
+                </form>
             @endif
         </div>
         
-        <form method="POST" action="{{ route('admin.newsletters.destroy', $newsletter) }}" class="inline">
+        <form method="POST" action="{{ route('admin.newsletters.destroy', $newsletter) }}" class="inline w-full lg:w-auto">
             @csrf
             @method('DELETE')
             <button type="submit" 
-                    class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors"
+                    class="inline-flex items-center justify-center w-full lg:w-auto bg-red-600 hover:bg-red-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg transition-colors text-sm md:text-base whitespace-nowrap"
                     onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette newsletter ? Cette action est irréversible.')">
-                Supprimer
+                🗑️ Supprimer
             </button>
         </form>
     </div>

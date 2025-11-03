@@ -204,22 +204,22 @@
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.rental_orders.summary') }}</h2>
                     
                     <!-- Total -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __('app.rental_orders.rental_subtotal') }}</span>
-                            <span>{{ number_format($orderLocation->subtotal, 2) }}€</span>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center gap-4 text-sm">
+                            <span class="text-gray-600 flex-shrink-0">{{ __('app.rental_orders.rental_subtotal') }}</span>
+                            <span class="font-medium text-right whitespace-nowrap min-w-[120px]">{{ number_format($orderLocation->subtotal, 2) }}€</span>
                         </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __('app.rental_orders.total_deposit') }}</span>
-                            <span>{{ number_format($orderLocation->deposit_amount, 2) }}€</span>
+                        <div class="flex justify-between items-center gap-4 text-sm">
+                            <span class="text-gray-600 flex-shrink-0">{{ __('app.rental_orders.total_deposit') }}</span>
+                            <span class="font-medium text-right whitespace-nowrap min-w-[120px]">{{ number_format($orderLocation->deposit_amount, 2) }}€</span>
                         </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __('app.rental_orders.tax') }} ({{ $orderLocation->tax_rate }}%)</span>
-                            <span>{{ number_format($orderLocation->tax_amount, 2) }}€</span>
+                        <div class="flex justify-between items-center gap-4 text-sm">
+                            <span class="text-gray-600 flex-shrink-0">{{ __('app.rental_orders.tax') }} ({{ $orderLocation->tax_rate }}%)</span>
+                            <span class="font-medium text-right whitespace-nowrap min-w-[120px]">{{ number_format($orderLocation->tax_amount, 2) }}€</span>
                         </div>
-                        <div class="flex justify-between text-lg font-semibold pt-2 border-t border-gray-200">
-                            <span>{{ __('app.rental_orders.total_paid') }}</span>
-                            <span>{{ number_format($orderLocation->total_amount, 2) }}€</span>
+                        <div class="flex justify-between items-center gap-4 text-lg font-semibold pt-2 mt-2 border-t border-gray-200">
+                            <span class="flex-shrink-0">{{ __('app.rental_orders.total_paid') }}</span>
+                            <span class="text-right whitespace-nowrap min-w-[130px]">{{ number_format($orderLocation->total_amount, 2) }}€</span>
                         </div>
                     </div>
                     

@@ -227,6 +227,14 @@ class NewsletterController extends Controller
     }
 
     /**
+     * Forcer l'envoi immédiat d'une newsletter (même si programmée ou brouillon)
+     */
+    public function send(Newsletter $newsletter)
+    {
+        return $this->sendNow($newsletter);
+    }
+
+    /**
      * Envoyer immédiatement une newsletter
      */
     public function sendNow(Newsletter $newsletter)

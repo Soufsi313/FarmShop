@@ -259,6 +259,20 @@
                                         </button>
                                     </form>
                                 @elseif($newsletter->status == 'scheduled')
+                                    <!-- {{ __('newsletters.sections.force_send_button') }} -->
+                                    <form method="POST" action="{{ route('admin.newsletters.send', $newsletter) }}" class="inline">
+                                        @csrf
+                                        <button type="submit" 
+                                                class="inline-flex items-center px-3 py-2 text-sm bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg transition-colors group"
+                                                title="Forcer l'envoi immédiat"
+                                                onclick="return confirm('Forcer l\'envoi immédiat de cette newsletter programmée ?')">
+                                            <svg class="w-4 h-4 mr-1.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                            </svg>
+                                            Forcer l'envoi
+                                        </button>
+                                    </form>
+                                    
                                     <!-- {{ __('newsletters.sections.cancel_scheduling_button') }} -->
                                     <form method="POST" action="{{ route('admin.newsletters.update', $newsletter) }}" class="inline">
                                         @csrf

@@ -16,8 +16,9 @@ class ProductController extends Controller
         // Calculer les statistiques globales avant la pagination
         $stats = [
             'total' => Product::count(),
-            'available' => Product::where('is_active', true)->count(),
-            'low_stock' => Product::whereColumn('quantity', '<=', 'low_stock_threshold')->count(),
+            'active' => Product::where('is_active', true)->count(),
+            'out_of_stock' => Product::where('quantity', 0)->count(), // Rupture de stock = quantity à 0
+            'low_stock' => Product::whereRaw('quantity > 0 AND quantity <= low_stock_threshold AND quantity > critical_threshold')->count(), // Stock faible = entre critical et low_stock
             'categories' => Category::count(),
         ];
         

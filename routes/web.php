@@ -58,6 +58,10 @@ Route::get('/test-tailwind', function () {
     return view('test-tailwind');
 })->name('test.tailwind');
 
+Route::get('/test-translation', function () {
+    return view('test-translation');
+})->name('test.translation');
+
 // Pages légales
 Route::get('/privacy', function () {
     return view('legal.privacy');
@@ -476,6 +480,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
+Route::get('/register/success', [RegisterController::class, 'success'])->name('register.success');
 
 // Routes de vérification d'email
 Route::get('/email/verify', [EmailVerificationController::class, 'show'])
@@ -655,6 +660,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // Gestion des newsletters
     Route::resource('newsletters', AdminNewsletterController::class);
+    Route::get('/newsletters/{newsletter}/preview', [AdminNewsletterController::class, 'preview'])->name('newsletters.preview');
     Route::post('/newsletters/{newsletter}/send', [AdminNewsletterController::class, 'send'])->name('newsletters.send');
     Route::post('/newsletters/{newsletter}/resend', [AdminNewsletterController::class, 'resend'])->name('newsletters.resend');
     Route::post('/newsletters/{newsletter}/send-to-me', [AdminNewsletterController::class, 'sendToMe'])->name('newsletters.send-to-me');

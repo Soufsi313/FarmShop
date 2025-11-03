@@ -674,19 +674,22 @@ class OrderLocation extends Model
         // Déterminer le type de facture selon l'état de l'inspection
         $invoiceType = $this->inspection_completed_at ? 'final' : 'initial';
         
+        // Charger les items avec les produits ET leurs catégories pour la traduction
+        $items = $this->items()->with(['product.category'])->get();
+        
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.rental-invoice', [
             'orderLocation' => $this,
-            'items' => $this->items()->with('product')->get(),
+            'items' => $items,
             'user' => $this->user,
             'invoiceType' => $invoiceType, // Nouveau paramètre
             'company' => [
                 'name' => config('app.name', 'FarmShop'),
-                'address' => 'Rue de la Ferme, 123',
+                'address' => 'Avenue de la ferme 123',
                 'postal_code' => '1000',
                 'city' => 'Bruxelles',
                 'country' => 'Belgique',
                 'phone' => '+32 2 123 45 67',
-                'email' => 'contact@farmshop.be',
+                'email' => 's.mef2703@gmail.com',
                 'vat_number' => 'BE0123456789'
             ]
         ]);

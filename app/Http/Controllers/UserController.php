@@ -131,12 +131,26 @@ class UserController extends Controller
             abort(403, 'Accès refusé.');
         }
 
+                // Nettoyer les valeurs "null" (string) en vrai null
+        $data = $request->all();
+        $nullableFields = ['phone', 'address', 'address_line_2', 'city', 'postal_code', 'country', 'name'];
+        
+        foreach ($nullableFields as $field) {
+            if (isset($data[$field]) && ($data[$field] === 'null' || $data[$field] === '')) {
+                $data[$field] = null;
+            }
+        }
+        
+        // Remplacer les données de la requête
+        $request->merge($data);
+
+        // Validation des données
         $validated = $request->validate([
-            'username' => ['sometimes', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'name' => 'sometimes|nullable|string|max:255',
-            'email' => ['sometimes', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'password' => 'sometimes|string|min:8|confirmed',
-            'role' => ['sometimes', Rule::in(['Admin', 'User'])],
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'name' => 'nullable|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed',
+            'role' => 'sometimes|in:Admin,User',
             'newsletter_subscribed' => 'sometimes|boolean',
             'phone' => 'sometimes|nullable|string|max:255',
             'address' => 'sometimes|nullable|string|max:255',
@@ -145,6 +159,25 @@ class UserController extends Controller
             'postal_code' => 'sometimes|nullable|string|max:20',
             'country' => 'sometimes|nullable|string|max:2',
         ]);
+
+        // Seuls les admins peuvent modifier les rôles
+        if (isset($validated['role']) && !Auth::user()?->isAdmin()) {
+            unset($validated['role']);
+        }
+
+        // Hacher le mot de passe si fourni
+        if (isset($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
+        }
+
+        // Nettoyer encore les valeurs null dans validated pour être sûr
+        foreach ($nullableFields as $field) {
+            if (isset($validated[$field]) && ($validated[$field] === 'null' || $validated[$field] === '')) {
+                $validated[$field] = null;
+            }
+        }
+
+        $user->update($validated);
 
         // Seuls les admins peuvent modifier les rôles
         if (isset($validated['role']) && !Auth::user()?->isAdmin()) {

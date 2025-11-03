@@ -135,6 +135,7 @@ return array (
     'categories' => 'Catégories',
     'subtotal' => 'Sous-total',
     'tax' => 'TVA',
+    'shipping' => 'Livraison',
     'payment' => 'Paiement',
     'orders' => 'Commandes Achat',
     'order_locations' => 'Commandes Location',
@@ -309,6 +310,8 @@ return array (
     'closed' => 'Clôturée',
     'inspecting' => 'Inspection en cours',
     'finished' => 'Inspection terminée',
+    'inspection_completed' => 'Inspection terminée',
+    'awaiting_inspection' => 'Location terminée - À inspecter',
   ),
   'payment_status' => 
   array (
@@ -1494,6 +1497,7 @@ return array (
     'cancelled' => 'Annulée',
     'return_requested' => 'Retour demandé',
     'returned' => 'Retournée',
+    'refunded' => 'Remboursée',
   ),
   'buttons' => 
   array (

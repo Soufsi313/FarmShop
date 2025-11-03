@@ -129,6 +129,13 @@ class StockController extends Controller
         // Générer les suggestions de réapprovisionnement
         $suggestions = $this->generateRestockSuggestions();
         
+        // Calcul de la valeur totale des produits à réapprovisionner
+        $totalValue = collect($suggestions)->sum('estimated_cost');
+        
+        // Calcul du stock moyen des produits critiques
+        $averageStock = Product::whereColumn('quantity', '<=', 'critical_threshold')
+                              ->avg('quantity') ?? 0;
+        
         // Historique des réapprovisionnements récents
         $recentRestocks = Message::where('type', 'system')
                                 ->where('subject', 'like', '%réapprovisionnement%')
@@ -138,6 +145,8 @@ class StockController extends Controller
 
         return view('admin.stock.restock', compact(
             'suggestions',
+            'totalValue',
+            'averageStock',
             'recentRestocks'
         ));
     }

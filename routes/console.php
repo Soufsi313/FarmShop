@@ -32,7 +32,8 @@ Artisan::command('rentals:auto-update', function () {
 // Planification des tâches
 Schedule::command('special-offers:clean-expired')->dailyAt('00:00');
 Schedule::command('orders:update-status')->hourly();
-Schedule::command('rentals:auto-update')->everyFiveMinutes();
+// DÉSACTIVÉ TEMPORAIREMENT POUR PRÉSENTATION ACHAT
+// Schedule::command('rentals:auto-update')->everyFiveMinutes();
 
 // ⏰ PROGRAMMATION AUTOMATIQUE
 // Note: La mise à jour des statuts de commande est maintenant gérée par des jobs individuels

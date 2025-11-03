@@ -6,7 +6,7 @@
 @section('content')
 <div class="space-y-6">
     <!-- Statistiques principales -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-6">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
         <!-- Utilisateurs -->
         <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="p-5">
@@ -291,7 +291,7 @@
             </div>
 
             <!-- Statistiques de Stock -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <!-- Rupture de Stock -->
                 <div class="@if(($stats['stock']['out_of_stock'] ?? 0) > 0) bg-red-50 border-red-300 shadow-lg shadow-red-200 card-alert-critical stock-critical @else bg-red-50 @endif border border-red-200 rounded-lg p-4 transition-all-smooth">
                     <div class="flex items-center">
@@ -500,7 +500,7 @@
     </div>
 
     <!-- Section Statistiques Avancées -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Fréquentation du site -->
         <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-6 border border-blue-200">
             <div class="flex items-center justify-between mb-4">
@@ -699,7 +699,7 @@
             </div>
 
             <!-- Mini graphiques -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Graphique visiteurs -->
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
                     <h4 class="text-sm font-medium text-gray-700 mb-3">{{ __('app.pages.dashboard.performance.visitor_evolution') }}</h4>
@@ -781,7 +781,7 @@
             </div>
 
             <!-- Résumé de performance -->
-            <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="text-center p-4 bg-gray-50 rounded-lg">
                     <div class="text-2xl font-bold text-blue-600">{{ number_format($stats['analytics']['visitors'] ?? 1247) }}</div>
                     <div class="text-sm text-gray-600">{{ __('app.pages.dashboard.analytics.visitors_total') }}</div>
@@ -915,7 +915,7 @@
     <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">{{ __('app.pages.dashboard.quick_actions') }}</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
                 <a href="{{ route('admin.blog.index') }}" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     <div class="flex-shrink-0">
                         <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">

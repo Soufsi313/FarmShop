@@ -69,11 +69,11 @@
                                 @break
                             @case('returned')
                                 🟢 {{ __('app.status.returned') }}
-                                @if($order->refund_processed)
-                                    <span class="text-xs block text-green-600">✅ {{ __('app.orders.refund_processed') }}</span>
-                                @else
-                                    <span class="text-xs block text-orange-600">⏳ {{ __('app.orders.refund_processing') }}</span>
-                                @endif
+                                <span class="text-xs block text-orange-600">⏳ {{ __('app.orders.refund_processing') }}</span>
+                                @break
+                            @case('refunded')
+                                💚 {{ __('app.status.refunded') }}
+                                <span class="text-xs block text-green-600">✅ {{ __('app.orders.refund_processed') }}</span>
                                 @break
                             @default
                                 ⚪ {{ ucfirst($order->status) }}
@@ -193,36 +193,36 @@
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('app.orders.order_summary') }}</h2>
                     
                     <div class="space-y-3">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __("app.ecommerce.subtotal") }}</span>
-                            <span>{{ number_format($order->subtotal, 2) }} €</span>
+                        <div class="flex justify-between items-center gap-4 text-sm">
+                            <span class="text-gray-600 flex-shrink-0">{{ __("app.ecommerce.subtotal") }}</span>
+                            <span class="font-medium text-right whitespace-nowrap min-w-[120px]">{{ number_format($order->subtotal, 2) }} €</span>
                         </div>
                         
                         @if($order->tax_amount > 0)
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __("app.ecommerce.tax") }}<//span>
-                            <span>{{ number_format($order->tax_amount, 2) }} €</span>
+                        <div class="flex justify-between items-center gap-4 text-sm">
+                            <span class="text-gray-600 flex-shrink-0">{{ __("app.ecommerce.tax") }}</span>
+                            <span class="font-medium text-right whitespace-nowrap min-w-[120px]">{{ number_format($order->tax_amount, 2) }} €</span>
                         </div>
                         @endif
                         
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __('app.orders.shipping_cost') }}</span>
-                            <span class="{{ $order->shipping_cost == 0 ? 'text-green-600' : '' }}">
+                        <div class="flex justify-between items-center gap-4 text-sm">
+                            <span class="text-gray-600 flex-shrink-0">{{ __('app.orders.shipping_cost') }}</span>
+                            <span class="font-medium text-right whitespace-nowrap min-w-[120px] {{ $order->shipping_cost == 0 ? 'text-green-600' : '' }}">
                                 {{ $order->shipping_cost == 0 ? __('app.orders.free_shipping') : number_format($order->shipping_cost, 2) . ' €' }}
                             </span>
                         </div>
                         
                         @if($order->discount_amount > 0)
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __("app.ecommerce.discount") }}<//span>
-                            <span class="text-green-600">-{{ number_format($order->discount_amount, 2) }} €</span>
+                        <div class="flex justify-between items-center gap-4 text-sm">
+                            <span class="text-gray-600 flex-shrink-0">{{ __("app.ecommerce.discount") }}</span>
+                            <span class="text-green-600 font-medium text-right whitespace-nowrap min-w-[120px]">-{{ number_format($order->discount_amount, 2) }} €</span>
                         </div>
                         @endif
                         
-                        <div class="border-t pt-3">
-                            <div class="flex justify-between text-lg font-semibold">
-                                <span>{{ __("app.ecommerce.total") }}<//span>
-                                <span>{{ number_format($order->total_amount, 2) }} €</span>
+                        <div class="border-t pt-3 mt-4">
+                            <div class="flex justify-between items-center gap-4 text-lg font-semibold">
+                                <span class="flex-shrink-0">{{ __("app.ecommerce.total") }}</span>
+                                <span class="text-right whitespace-nowrap min-w-[130px]">{{ number_format($order->total_amount, 2) }} €</span>
                             </div>
                         </div>
                     </div>
@@ -233,9 +233,9 @@
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __("app.ecommerce.payment") }}</h2>
                     
                     <div class="space-y-3">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __('app.orders.payment_method') }}</span>
-                            <span class="capitalize">
+                        <div class="flex justify-between items-center gap-4 text-sm">
+                            <span class="text-gray-600 flex-shrink-0">{{ __('app.orders.payment_method') }}</span>
+                            <span class="capitalize font-medium text-right whitespace-nowrap">
                                 @switch($order->payment_method)
                                     @case('card')
                                         {{ __('app.orders.payment_methods.card') }}
@@ -252,9 +252,9 @@
                             </span>
                         </div>
                         
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __('app.orders.payment_status') }}</span>
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                        <div class="flex justify-between items-center gap-4 text-sm">
+                            <span class="text-gray-600 flex-shrink-0">{{ __('app.orders.payment_status') }}</span>
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap
                                 {{ $order->payment_status == 'paid' ? 'bg-green-100 text-green-800' : '' }}
                                 {{ $order->payment_status == 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
                                 {{ $order->payment_status == 'failed' ? 'bg-red-100 text-red-800' : '' }}">
@@ -275,9 +275,9 @@
                         </div>
                         
                         @if($order->paid_at)
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ __('app.orders.paid_on') }}</span>
-                            <span>{{ $order->paid_at->format('d/m/Y') }}</span>
+                        <div class="flex justify-between items-center gap-4 text-sm">
+                            <span class="text-gray-600 flex-shrink-0">{{ __('app.orders.paid_on') }}</span>
+                            <span class="font-medium text-right whitespace-nowrap">{{ $order->paid_at->format('d/m/Y') }}</span>
                         </div>
                         @endif
                     </div>
@@ -414,7 +414,8 @@ function getStatusText(status) {
         'delivered': '📍 Livrée',
         'cancelled': '❌ Annulée',
         'return_requested': '<span class="inline-flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Retour demandé</span>',
-        'returned': '<span class="inline-flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>Retournée</span>'
+        'returned': '<span class="inline-flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>Retournée</span>',
+        'refunded': '<span class="inline-flex items-center gap-1">💚 Remboursée</span>'
     };
     return statusTexts[status] || status;
 }
@@ -429,7 +430,8 @@ function getStatusClasses(status) {
         'delivered': 'bg-green-100 text-green-800',
         'cancelled': 'bg-red-100 text-red-800',
         'return_requested': 'bg-orange-100 text-orange-800',
-        'returned': 'bg-gray-100 text-gray-800'
+        'returned': 'bg-gray-100 text-gray-800',
+        'refunded': 'bg-green-100 text-green-800'
     };
     return baseClasses + (statusClasses[status] || '');
 }

@@ -134,6 +134,7 @@ return array (
     'categories' => 'Categories',
     'subtotal' => 'Subtotal',
     'tax' => 'Tax',
+    'shipping' => 'Shipping',
     'payment' => 'Payment',
     'orders' => 'Purchase Orders',
     'order_locations' => 'Rental Orders',
@@ -375,6 +376,8 @@ return array (
     'closed' => 'Closed',
     'inspecting' => 'Inspection in progress',
     'finished' => 'Inspection completed',
+    'inspection_completed' => 'Inspection completed',
+    'awaiting_inspection' => 'Rental completed - Awaiting inspection',
   ),
   'payment_status' => 
   array (
@@ -1764,6 +1767,31 @@ return array (
     'accept_terms_alert' => 'Please accept the terms and conditions',
     'payment_error' => 'Payment error',
     'processing_error' => 'Error processing payment',
+  ),
+
+  'status' => array(
+    'pending' => 'Pending',
+    'confirmed' => 'Confirmed',
+    'preparing' => 'Preparing',
+    'shipped' => 'Shipped',
+    'delivered' => 'Delivered',
+    'cancelled' => 'Cancelled',
+    'return_requested' => 'Return requested',
+    'returned' => 'Returned',
+    'refunded' => 'Refunded',
+  ),
+
+  'payment_methods' => array(
+    'card' => '💳 Credit card',
+    'paypal' => '💰 PayPal',
+    'bank_transfer' => '🏦 Bank transfer',
+    'stripe' => '💳 Credit card',
+  ),
+
+  'payment_statuses' => array(
+    'paid' => '✅ Paid',
+    'pending' => '⏳ Pending',
+    'failed' => '❌ Failed',
   ),
 
   'orders' => array(

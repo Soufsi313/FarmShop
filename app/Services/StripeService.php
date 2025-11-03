@@ -532,6 +532,14 @@ class StripeService
     public function handleWebhook(string $payload, string $signature): bool
     {
         try {
+            // Log détaillé pour debug
+            Log::info('🔍 DEBUG Webhook', [
+                'webhook_secret_from_config' => config('services.stripe.webhook.secret'),
+                'webhook_secret_from_env' => env('STRIPE_WEBHOOK_SECRET'),
+                'signature_header' => $signature,
+                'payload_preview' => substr($payload, 0, 100)
+            ]);
+
             $event = Webhook::constructEvent(
                 $payload,
                 $signature,
@@ -572,6 +580,12 @@ class StripeService
 
             return true;
         } catch (\Exception $e) {
+            Log::error('💥 ERREUR WEBHOOK DÉTAILLÉE', [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
             error_log("💥 ERREUR WEBHOOK: " . $e->getMessage());
             return false;
         }

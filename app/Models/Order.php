@@ -106,7 +106,10 @@ class Order extends Model
             }
         });
 
-        // Valider après la sauvegarde que la commande a bien des items
+        // ❌ BUG DÉSACTIVÉ : Cette validation est TROP TÔT
+        // L'event "created" se déclenche AVANT que les items ne soient ajoutés
+        // La validation "creating" ci-dessus (total > 0) suffit
+        /*
         static::created(function ($order) {
             // Vérifier que la commande a au moins un item
             if ($order->items()->count() === 0) {
@@ -115,6 +118,7 @@ class Order extends Model
                 throw new \Exception('Une commande doit contenir au moins un produit.');
             }
         });
+        */
     }
 
     // Relations
@@ -200,29 +204,17 @@ class Order extends Model
     // Accesseurs
     public function getStatusLabelAttribute()
     {
-        $statuses = [
-            'pending' => 'En attente',
-            'confirmed' => 'Confirmée',
-            'preparing' => 'En préparation',
-            'shipped' => 'Expédiée',
-            'delivered' => 'Livrée',
-            'cancelled' => 'Annulée',
-            'returned' => 'Retournée'
-        ];
-
-        return $statuses[$this->status] ?? 'Inconnu';
+        return __('app.status.' . $this->status, [], app()->getLocale());
     }
 
     public function getPaymentStatusLabelAttribute()
     {
-        $statuses = [
-            'pending' => 'En attente',
-            'paid' => 'Payée',
-            'failed' => 'Échec',
-            'refunded' => 'Remboursée'
-        ];
-
-        return $statuses[$this->payment_status] ?? 'Inconnu';
+        return __('app.payment_statuses.' . $this->payment_status, [], app()->getLocale());
+    }
+    
+    public function getPaymentMethodLabelAttribute()
+    {
+        return __('app.payment_methods.' . $this->payment_method, [], app()->getLocale());
     }
 
     public function getFormattedTotalAttribute()

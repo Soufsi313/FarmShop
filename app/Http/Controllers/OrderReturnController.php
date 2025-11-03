@@ -8,7 +8,9 @@ use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
+use App\Mail\OrderReturnRequested;
 
 class OrderReturnController extends Controller
 {
@@ -152,6 +154,25 @@ class OrderReturnController extends Controller
             'refund_amount' => $refundAmount,
             'status' => 'pending'
         ]);
+
+        // Envoyer l'email de confirmation au client
+        try {
+            $userEmail = Auth::user()->email;
+            \Log::info('Tentative d\'envoi d\'email de retour', [
+                'return_number' => $return->return_number,
+                'user_email' => $userEmail
+            ]);
+            
+            Mail::to($userEmail)->send(new OrderReturnRequested($return->fresh()->load(['order', 'orderItem.product', 'user'])));
+            
+            \Log::info('Email de retour envoyé avec succès', [
+                'return_number' => $return->return_number
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de l\'envoi de l\'email de confirmation de demande de retour: ' . $e->getMessage(), [
+                'exception' => $e->getTraceAsString()
+            ]);
+        }
 
         return response()->json([
             'status' => 'success',

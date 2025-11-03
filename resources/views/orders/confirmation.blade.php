@@ -45,8 +45,8 @@
                     @forelse($order->items as $item)
                         <div class="bg-white rounded-lg shadow-sm p-4 flex items-center justify-between">
                             <div class="flex items-center space-x-4">
-                                @if($item->product && $item->product->image)
-                                    <img src="{{ asset('storage/' . $item->product->image) }}" 
+                                @if($item->product && $item->product->main_image)
+                                    <img src="{{ $item->product->image_url }}" 
                                          alt="{{ $item->product_name }}" 
                                          class="w-16 h-16 object-cover rounded-lg">
                                 @else

@@ -10,7 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Mail\OrderReturnConfirmed;
+use App\Mail\OrderRefundProcessed;
 
 class OrderController extends Controller
 {
@@ -588,8 +591,9 @@ class OrderController extends Controller
             ], 422);
         }
 
-        $order->load(['items.product', 'user']);
+        $order->load(['items.product.category', 'user']);
 
+        // La locale est déjà définie par le middleware SetLocale
         // Générer le PDF
         $pdf = Pdf::loadView('invoices.order', compact('order'));
         
@@ -998,6 +1002,33 @@ class OrderController extends Controller
                     'user_id' => $order->user_id,
                     'reason' => $request->reason
                 ]);
+
+                // Envoyer l'email de confirmation du retour
+                try {
+                    Mail::to($order->user->email)->send(new OrderReturnConfirmed($order->fresh()));
+                    Log::info('Email de retour confirmé envoyé', [
+                        'order_number' => $order->order_number,
+                        'user_email' => $order->user->email
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Erreur lors de l\'envoi de l\'email de confirmation de retour: ' . $e->getMessage());
+                }
+
+                // Mettre à jour le statut vers "refunded" (mode pédagogique - remboursement immédiat)
+                $order->update([
+                    'status' => 'refunded',
+                ]);
+
+                // Envoyer immédiatement l'email de confirmation de remboursement (mode pédagogique)
+                try {
+                    Mail::to($order->user->email)->send(new OrderRefundProcessed($order->fresh()));
+                    Log::info('Email de remboursement effectué envoyé', [
+                        'order_number' => $order->order_number,
+                        'user_email' => $order->user->email
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Erreur lors de l\'envoi de l\'email de remboursement: ' . $e->getMessage());
+                }
 
                 DB::commit();
 

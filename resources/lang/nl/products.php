@@ -36,6 +36,7 @@ return [
     // Stock and availability
     'in_stock' => 'Op voorraad',
     'out_of_stock' => 'Uitverkocht',
+    'critical_stock' => 'Kritieke voorraad',
     'limited_stock' => 'Beperkte voorraad',
     'low_stock' => 'Lage voorraad',
     'quantity' => 'Hoeveelheid',

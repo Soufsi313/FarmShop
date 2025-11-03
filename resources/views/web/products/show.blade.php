@@ -290,18 +290,24 @@
                             </label>
                             <div class="flex items-center space-x-3">
                                 <button type="button" 
-                                        onclick="decreaseQuantity()"
+                                        onclick="decreaseQuantity(); return false;"
                                         class="px-3 py-2 border border-gray-300 rounded-l-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500">
                                     -
                                 </button>
-                                <input type="number" 
+                                <input type="text" 
                                        id="quantity" 
-                                       x-model="quantity"
-                                       min="1" 
-                                       max="{{ $product->quantity }}"
+                                       value="1"
+                                       inputmode="numeric"
+                                       pattern="[0-9]*"
+                                       onclick="event.stopPropagation(); event.preventDefault();"
+                                       onfocus="event.stopPropagation(); this.select();"
+                                       onmousedown="event.stopPropagation();"
+                                       onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateQuantityDisplay(this.value);"
+                                       onblur="validateQuantity(this)"
                                        class="w-20 px-3 py-2 border-t border-b border-gray-300 text-center focus:outline-none focus:ring-2 focus:ring-green-500">
                                 <button type="button" 
-                                        onclick="increaseQuantity()"
+                                        onclick="increaseQuantity(); return false;"
                                         class="px-3 py-2 border border-gray-300 rounded-r-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500">
                                     +
                                 </button>
@@ -589,26 +595,45 @@ function changeMainImage(src) {
 // Gestion des quantités
 function increaseQuantity() {
     const input = document.getElementById('quantity');
-    const currentValue = parseInt(input.value);
-    const maxValue = parseInt(input.getAttribute('max'));
+    const currentValue = parseInt(input.value) || 1;
+    const maxValue = {{ $product->quantity }};
     
     if (currentValue < maxValue) {
         const newValue = currentValue + 1;
         input.value = newValue;
-        // Mettre à jour Alpine.js via un événement personnalisé
-        input.dispatchEvent(new Event('input'));
+        updateQuantityDisplay(newValue);
     }
 }
 
 function decreaseQuantity() {
     const input = document.getElementById('quantity');
-    const currentValue = parseInt(input.value);
+    const currentValue = parseInt(input.value) || 1;
     
     if (currentValue > 1) {
         const newValue = currentValue - 1;
         input.value = newValue;
-        // Mettre à jour Alpine.js via un événement personnalisé
-        input.dispatchEvent(new Event('input'));
+        updateQuantityDisplay(newValue);
+    }
+}
+
+function validateQuantity(input) {
+    const value = parseInt(input.value) || 1;
+    const max = {{ $product->quantity }};
+    
+    if (value < 1) {
+        input.value = 1;
+    } else if (value > max) {
+        input.value = max;
+    }
+    
+    updateQuantityDisplay(input.value);
+}
+
+function updateQuantityDisplay(value) {
+    // Mettre à jour Alpine.js manuellement pour le calcul du prix
+    const alpineData = Alpine.$data(document.querySelector('[x-data="productPricing"]'));
+    if (alpineData) {
+        alpineData.quantity = parseInt(value) || 1;
     }
 }
 

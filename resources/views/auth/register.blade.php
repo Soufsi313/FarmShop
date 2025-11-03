@@ -89,25 +89,72 @@
                 </div>
 
                 <!-- Mot de passe -->
-                <div>
+                <div x-data="passwordStrength()">
                     <label for="password" class="block text-sm font-medium text-farm-green-700">
                         {{ __('app.auth.password') }}
                     </label>
-                    <div class="mt-1">
+                    <div class="mt-1 relative">
                         <input id="password" 
                                name="password" 
                                type="password" 
                                autocomplete="new-password" 
                                required
+                               x-model="password"
+                               @input="checkStrength()"
                                placeholder="{{ __('app.auth.password_placeholder') }}"
                                class="appearance-none block w-full px-3 py-2 border border-farm-green-300 rounded-md placeholder-farm-green-400 focus:outline-none focus:ring-farm-green-500 focus:border-farm-green-500 sm:text-sm bg-white/80 @error('password') border-red-500 @enderror">
+                        
+                        <!-- Bouton pour afficher/masquer le mot de passe -->
+                        <button type="button" 
+                                @click="showPassword = !showPassword; $el.previousElementSibling.type = showPassword ? 'text' : 'password'"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                            <svg x-show="!showPassword" class="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                            <svg x-show="showPassword" class="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                            </svg>
+                        </button>
+                        
                         @error('password')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
-                    <p class="mt-1 text-xs text-farm-green-500">
-                        {{ __('app.auth.password_help') }}
-                    </p>
+                    
+                    <!-- Barre de progression et indicateur de force -->
+                    <div x-show="password.length > 0" class="mt-2">
+                        <!-- Barre de progression -->
+                        <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                            <div class="h-full transition-all duration-300 ease-out rounded-full"
+                                 :class="{
+                                     'bg-red-500': strength === 'weak',
+                                     'bg-yellow-500': strength === 'medium',
+                                     'bg-green-500': strength === 'strong'
+                                 }"
+                                 :style="'width: ' + strengthPercentage + '%'">
+                            </div>
+                        </div>
+                        
+                        <!-- Texte indicateur -->
+                        <div class="flex items-center justify-between mt-1">
+                            <p class="text-xs font-medium"
+                               :class="{
+                                   'text-red-600': strength === 'weak',
+                                   'text-yellow-600': strength === 'medium',
+                                   'text-green-600': strength === 'strong'
+                               }">
+                                <span x-show="strength === 'weak'">🔴 Mot de passe faible (<span x-text="password.length"></span> caractères)</span>
+                                <span x-show="strength === 'medium'">🟡 Mot de passe moyen (<span x-text="password.length"></span> caractères)</span>
+                                <span x-show="strength === 'strong'">🟢 Mot de passe élevé (<span x-text="password.length"></span> caractères)</span>
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                <span x-show="strength === 'weak'">Minimum 6 caractères</span>
+                                <span x-show="strength === 'medium'">Recommandé 8+ caractères</span>
+                                <span x-show="strength === 'strong'">Excellent ✓</span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Confirmation mot de passe -->
@@ -209,4 +256,40 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function passwordStrength() {
+        return {
+            password: '',
+            showPassword: false,
+            strength: 'weak',
+            strengthPercentage: 0,
+            
+            checkStrength() {
+                const length = this.password.length;
+                
+                if (length === 0) {
+                    this.strength = 'weak';
+                    this.strengthPercentage = 0;
+                } else if (length < 6) {
+                    // Faible : moins de 6 caractères
+                    this.strength = 'weak';
+                    this.strengthPercentage = (length / 6) * 33; // Max 33% pour faible
+                } else if (length < 8) {
+                    // Moyen : entre 6 et 7 caractères
+                    this.strength = 'medium';
+                    this.strengthPercentage = 33 + ((length - 6) / 2) * 33; // 33% à 66%
+                } else {
+                    // Élevé : 8 caractères ou plus
+                    this.strength = 'strong';
+                    // Progression jusqu'à 100% pour les mots de passe longs
+                    this.strengthPercentage = Math.min(100, 66 + ((length - 8) / 8) * 34);
+                }
+            }
+        }
+    }
+</script>
+@endpush
+
 @endsection

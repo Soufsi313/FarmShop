@@ -67,6 +67,7 @@ return [
         'this_week' => 'Cette semaine',
         'this_month' => 'Ce mois',
         'today' => 'Aujourd\'hui',
+        'last_update' => 'Dernière mise à jour',
     ],
 
     // Additional labels
@@ -149,6 +150,7 @@ return [
     'estimated_total_cost' => 'Coût Total Estimé',
     'urgent_priority' => 'Priorité Urgente',
     'total_quantity' => 'Quantité Totale',
+    'average_stock' => 'Stock Moyen',
     
     // Restock suggestions
     'restock_suggestions' => '💡 Suggestions de Réapprovisionnement',
@@ -252,4 +254,15 @@ return [
     'export_error' => 'Erreur lors de l\'export',
     'report_error' => 'Erreur lors de la génération du rapport',
     'schedule_development' => 'Fonctionnalité de planification en développement',
+    
+    // Time references for restock page
+    'today' => 'Aujourd\'hui',
+    'last_update' => 'Dernière mise à jour',
+    'total_value' => 'Valeur Totale',
+    
+    // Restock page section
+    'restock' => [
+        'title' => 'Réapprovisionnement',
+        'page_title' => 'Réapprovisionnement - Gestion de Stock',
+    ],
 ];

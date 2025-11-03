@@ -67,6 +67,7 @@ return [
         'this_week' => 'This week',
         'this_month' => 'This month',
         'today' => 'Today',
+        'last_update' => 'Last update',
     ],
 
     // Additional labels
@@ -149,6 +150,7 @@ return [
     'estimated_total_cost' => 'Estimated Total Cost',
     'urgent_priority' => 'Urgent Priority',
     'total_quantity' => 'Total Quantity',
+    'average_stock' => 'Average Stock',
     
     // Restock suggestions
     'restock_suggestions' => '💡 Restocking Suggestions',
@@ -252,4 +254,15 @@ return [
     'export_error' => 'Export error',
     'report_error' => 'Error generating report',
     'schedule_development' => 'Scheduling feature in development',
+    
+    // Time references for restock page
+    'today' => 'Today',
+    'last_update' => 'Last update',
+    'total_value' => 'Total Value',
+    
+    // Restock page section
+    'restock' => [
+        'title' => 'Restocking',
+        'page_title' => 'Restocking - Stock Management',
+    ],
 ];

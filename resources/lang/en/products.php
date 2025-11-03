@@ -36,6 +36,7 @@ return [
     // Stock and availability
     'in_stock' => 'In stock',
     'out_of_stock' => 'Out of stock',
+    'critical_stock' => 'Critical stock',
     'limited_stock' => 'Limited stock',
     'low_stock' => 'Low stock',
     'quantity' => 'Quantity',

@@ -198,6 +198,7 @@ return array (
     'categories' => 'Categorieën',
     'subtotal' => 'Subtotaal',
     'tax' => 'BTW',
+    'shipping' => 'Verzending',
     'payment' => 'Betaling',
     'orders' => 'Aankoop Bestellingen',
     'order_locations' => 'Verhuur Bestellingen',
@@ -442,6 +443,8 @@ return array (
     'closed' => 'Gesloten',
     'inspecting' => 'Inspectie bezig',
     'finished' => 'Inspectie voltooid',
+    'inspection_completed' => 'Inspectie voltooid',
+    'awaiting_inspection' => 'Verhuur voltooid - In afwachting van inspectie',
   ),
   'payment_status' => 
   array (
@@ -1815,6 +1818,31 @@ return array (
     'accept_terms_alert' => 'Accepteer a.u.b. de voorwaarden',
     'payment_error' => 'Betalingsfout',
     'processing_error' => 'Fout bij verwerken betaling',
+  ),
+
+  'status' => array(
+    'pending' => 'In afwachting',
+    'confirmed' => 'Bevestigd',
+    'preparing' => 'In voorbereiding',
+    'shipped' => 'Verzonden',
+    'delivered' => 'Afgeleverd',
+    'cancelled' => 'Geannuleerd',
+    'return_requested' => 'Retour aangevraagd',
+    'returned' => 'Geretourneerd',
+    'refunded' => 'Terugbetaald',
+  ),
+
+  'payment_methods' => array(
+    'card' => '💳 Creditcard',
+    'paypal' => '💰 PayPal',
+    'bank_transfer' => '🏦 Bankoverschrijving',
+    'stripe' => '💳 Creditcard',
+  ),
+
+  'payment_statuses' => array(
+    'paid' => '✅ Betaald',
+    'pending' => '⏳ In afwachting',
+    'failed' => '❌ Mislukt',
   ),
 
   'orders' => array(

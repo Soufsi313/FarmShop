@@ -95,12 +95,18 @@
             border: 1px solid #ddd;
             padding: 10px;
             text-align: left;
+            white-space: nowrap;
         }
         
         .items-table th {
             background-color: #28a745;
             color: white;
             font-weight: bold;
+        }
+        
+        .items-table td:first-child {
+            white-space: normal;
+            min-width: 200px;
         }
         
         .items-table tbody tr:nth-child(even) {
@@ -169,22 +175,21 @@
     <div class="header">
         <div class="company-info">
             <div class="company-name">FarmShop</div>
-            <div>E-commerce de produits agricoles</div>
-            <div>123 Avenue des Champs</div>
-            <div>75001 Paris, France</div>
-            <div>Tél: +33 1 23 45 67 89</div>
-            <div>Email: contact@farmshop.fr</div>
-            <div>SIRET: 12345678901234</div>
-            <div>TVA: FR12345678901</div>
+            <div>Matériel agricole - Achat et location</div>
+            <div>{{ __('app.footer.address_line1') }}</div>
+            <div>{{ __('app.footer.address_line2') }}</div>
+            <div>{{ __('app.footer.tel') }}</div>
+            <div>{{ __('app.footer.email') }}</div>
+            <div>N° TVA: BE0123456789</div>
         </div>
         
         <div class="invoice-info">
-            <div class="invoice-title">FACTURE</div>
+            <div class="invoice-title">{{ __('invoices.invoice') }}</div>
             <div class="invoice-details">
-                <div><strong>N° Facture:</strong> {{ $order->invoice_number }}</div>
-                <div><strong>N° Commande:</strong> {{ $order->order_number }}</div>
-                <div><strong>Date facture:</strong> {{ $order->created_at->format('d/m/Y') }}</div>
-                <div><strong>Date échéance:</strong> {{ $order->created_at->addDays(30)->format('d/m/Y') }}</div>
+                <div><strong>{{ __('invoices.invoice_number') }}:</strong> {{ $order->invoice_number }}</div>
+                <div><strong>{{ __('invoices.order_number') }}:</strong> {{ $order->order_number }}</div>
+                <div><strong>{{ __('invoices.invoice_date') }}:</strong> {{ $order->created_at->format('d/m/Y') }}</div>
+                <div><strong>{{ __('invoices.due_date') }}:</strong> {{ $order->created_at->addDays(30)->format('d/m/Y') }}</div>
                 <div class="status-badge status-{{ $order->payment_status }}">
                     {{ ucfirst($order->payment_status_label) }}
                 </div>
@@ -195,7 +200,7 @@
     <!-- Adresses -->
     <div class="addresses">
         <div class="address-box">
-            <div class="address-title">ADRESSE DE FACTURATION</div>
+            <div class="address-title">{{ __('invoices.billing_address') }}</div>
             <div>{{ $order->billing_address['name'] }}</div>
             <div>{{ $order->billing_address['address'] }}</div>
             <div>{{ $order->billing_address['postal_code'] }} {{ $order->billing_address['city'] }}</div>
@@ -203,7 +208,7 @@
         </div>
         
         <div class="address-box">
-            <div class="address-title">ADRESSE DE LIVRAISON</div>
+            <div class="address-title">{{ __('invoices.shipping_address') }}</div>
             <div>{{ $order->shipping_address['name'] }}</div>
             <div>{{ $order->shipping_address['address'] }}</div>
             <div>{{ $order->shipping_address['postal_code'] }} {{ $order->shipping_address['city'] }}</div>
@@ -213,47 +218,47 @@
     
     <!-- Informations client -->
     <div class="order-summary">
-        <h3 style="margin-top: 0; color: #28a745;">Informations client</h3>
+        <h3 style="margin-top: 0; color: #28a745;">{{ __('invoices.customer_info') }}</h3>
         <div class="summary-row">
-            <span><strong>Client:</strong></span>
+            <span><strong>{{ __('invoices.client') }}:</strong></span>
             <span>{{ $order->user->name }}</span>
         </div>
         <div class="summary-row">
-            <span><strong>Email:</strong></span>
+            <span><strong>{{ __('invoices.email') }}:</strong></span>
             <span>{{ $order->user->email }}</span>
         </div>
         <div class="summary-row">
-            <span><strong>Téléphone:</strong></span>
-            <span>{{ $order->user->phone ?? 'Non renseigné' }}</span>
+            <span><strong>{{ __('invoices.phone') }}:</strong></span>
+            <span>{{ $order->user->phone ?? __('invoices.not_provided') }}</span>
         </div>
     </div>
     
     <!-- Informations de commande -->
     <div class="order-summary">
-        <h3 style="margin-top: 0; color: #28a745;">Détails de la commande</h3>
+        <h3 style="margin-top: 0; color: #28a745;">{{ __('invoices.order_details') }}</h3>
         <div class="summary-row">
-            <span><strong>Statut:</strong></span>
+            <span><strong>{{ __('invoices.status') }}:</strong></span>
             <span>{{ $order->status_label }}</span>
         </div>
         <div class="summary-row">
-            <span><strong>Mode de paiement:</strong></span>
+            <span><strong>{{ __('invoices.payment_method') }}:</strong></span>
             <span>{{ $order->payment_method_label }}</span>
         </div>
         @if($order->tracking_number)
         <div class="summary-row">
-            <span><strong>N° de suivi:</strong></span>
+            <span><strong>{{ __('invoices.tracking_number') }}:</strong></span>
             <span>{{ $order->tracking_number }}</span>
         </div>
         @endif
         @if($order->shipped_at)
         <div class="summary-row">
-            <span><strong>Date d'expédition:</strong></span>
+            <span><strong>{{ __('invoices.shipping_date') }}:</strong></span>
             <span>{{ $order->shipped_at->format('d/m/Y H:i') }}</span>
         </div>
         @endif
         @if($order->delivered_at)
         <div class="summary-row">
-            <span><strong>Date de livraison:</strong></span>
+            <span><strong>{{ __('invoices.delivery_date') }}:</strong></span>
             <span>{{ $order->delivered_at->format('d/m/Y H:i') }}</span>
         </div>
         @endif
@@ -263,22 +268,22 @@
     <table class="items-table">
         <thead>
             <tr>
-                <th style="width: 50%;">{{ __("app.ecommerce.product") }}</th>
-                <th style="width: 15%;" class="text-center">{{ __("app.ecommerce.quantity") }}</th>
-                <th style="width: 15%;" class="text-right">Prix unitaire</th>
-                <th style="width: 20%;" class="text-right">{{ __("app.ecommerce.total") }}</th>
+                <th style="width: 50%;">{{ __("invoices.product") }}</th>
+                <th style="width: 15%;" class="text-center">{{ __("invoices.quantity") }}</th>
+                <th style="width: 15%;" class="text-right">{{ __("invoices.unit_price") }}</th>
+                <th style="width: 20%;" class="text-right">{{ __("invoices.total") }}</th>
             </tr>
         </thead>
         <tbody>
             @foreach($order->items as $item)
             <tr>
                 <td>
-                    <strong>{{ $item->product->name }}</strong>
+                    <strong>{{ trans_product($item->product, 'name') }}</strong>
                     @if($item->product->category)
-                    <br><small style="color: #666;">{{ $item->product->category->name }}</small>
+                    <br><small style="color: #666;">{{ trans_category($item->product->category, 'name') }}</small>
                     @endif
                     @if($item->product->sku)
-                    <br><small style="color: #666;">Réf: {{ $item->product->sku }}</small>
+                    <br><small style="color: #666;">{{ __('invoices.ref_label') }}: {{ $item->product->sku }}</small>
                     @endif
                 </td>
                 <td class="text-center">{{ $item->quantity }}</td>
@@ -289,7 +294,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="3" class="text-right"><strong>Sous-total HT:</strong></td>
+                <td colspan="3" class="text-right"><strong>{{ __('invoices.subtotal_ht') }}:</strong></td>
                 <td class="text-right"><strong>{{ number_format($order->subtotal, 2, ',', ' ') }} €</strong></td>
             </tr>
             @if($order->tax_amount > 0)
@@ -314,7 +319,7 @@
                 {{-- Affichage détaillé si plusieurs taux TVA --}}
                 @foreach($taxDetails as $taxDetail)
                 <tr>
-                    <td colspan="3" class="text-right"><strong>TVA ({{ number_format($taxDetail['rate'], 0) }}%) sur {{ number_format($taxDetail['subtotal_ht'], 2, ',', ' ') }} €:</strong></td>
+                    <td colspan="3" class="text-right"><strong>{{ __('invoices.vat') }} ({{ number_format($taxDetail['rate'], 0) }}%) {{ __('app.orders.on') }} {{ number_format($taxDetail['subtotal_ht'], 2, ',', ' ') }} €:</strong></td>
                     <td class="text-right"><strong>{{ number_format($taxDetail['tax_amount'], 2, ',', ' ') }} €</strong></td>
                 </tr>
                 @endforeach
@@ -322,25 +327,25 @@
                 {{-- Affichage simple si un seul taux TVA --}}
                 @php $singleTaxDetail = reset($taxDetails); @endphp
                 <tr>
-                    <td colspan="3" class="text-right"><strong>TVA ({{ number_format($singleTaxDetail['rate'], 0) }}%):</strong></td>
+                    <td colspan="3" class="text-right"><strong>{{ __('invoices.vat') }} ({{ number_format($singleTaxDetail['rate'], 0) }}%):</strong></td>
                     <td class="text-right"><strong>{{ number_format($order->tax_amount, 2, ',', ' ') }} €</strong></td>
                 </tr>
             @endif
             @endif
             @if($order->shipping_cost > 0)
             <tr>
-                <td colspan="3" class="text-right"><strong>Frais de livraison:</strong></td>
+                <td colspan="3" class="text-right"><strong>{{ __('invoices.shipping_cost') }}:</strong></td>
                 <td class="text-right"><strong>{{ number_format($order->shipping_cost, 2, ',', ' ') }} €</strong></td>
             </tr>
             @endif
             @if($order->discount_amount > 0)
             <tr>
-                <td colspan="3" class="text-right"><strong>Remise:</strong></td>
+                <td colspan="3" class="text-right"><strong>{{ __('invoices.discount') }}:</strong></td>
                 <td class="text-right"><strong>-{{ number_format($order->discount_amount, 2, ',', ' ') }} €</strong></td>
             </tr>
             @endif
             <tr class="total-row">
-                <td colspan="3" class="text-right"><strong>TOTAL TTC:</strong></td>
+                <td colspan="3" class="text-right"><strong>{{ __('invoices.total_ttc') }}:</strong></td>
                 <td class="text-right"><strong>{{ number_format($order->total_amount, 2, ',', ' ') }} €</strong></td>
             </tr>
         </tfoot>
@@ -349,36 +354,40 @@
     <!-- Informations de paiement -->
     @if($order->payment_status === 'paid')
     <div class="payment-info">
-        <h3 style="margin-top: 0; color: #28a745;">Paiement effectué</h3>
-        <p>Le paiement de cette facture a été effectué le {{ $order->updated_at->format('d/m/Y à H:i') }} 
-        par {{ $order->payment_method_label }}.</p>
+        <h3 style="margin-top: 0; color: #28a745;">{{ __('invoices.payment_completed') }}</h3>
+        <p>{{ __('invoices.payment_completed_message', [
+            'date' => $order->updated_at->format('d/m/Y à H:i'),
+            'name' => $order->user->name,
+            'method' => match($order->payment_method) {
+                'stripe', 'card' => __('invoices.payment_card'),
+                'paypal' => 'PayPal',
+                'bank_transfer' => __('invoices.payment_transfer'),
+                default => ucfirst($order->payment_method)
+            }
+        ]) }}</p>
     </div>
     @else
     <div class="payment-info">
-        <h3 style="margin-top: 0; color: #856404;">Paiement en attente</h3>
-        <p>Cette facture est en attente de paiement. Merci de procéder au règlement dans les meilleurs délais.</p>
+        <h3 style="margin-top: 0; color: #856404;">{{ __('invoices.payment_pending') }}</h3>
+        <p>{{ __('invoices.payment_pending_message') }}</p>
     </div>
     @endif
     
     <!-- Pied de page -->
     <div class="footer">
         <div style="text-align: center;">
-            <p><strong>Conditions de vente:</strong></p>
-            <p>
-                Les produits alimentaires ne sont pas échangeables ni remboursables pour des raisons d'hygiène et de sécurité alimentaire.
-                Les produits non alimentaires peuvent être retournés dans un délai de 14 jours après livraison, dans leur emballage d'origine et en parfait état.
-                Les frais de retour sont à la charge du client sauf en cas de défaut du produit.
-            </p>
+            <p><strong>{{ __('invoices.sale_conditions') }}:</strong></p>
+            <p>{{ __('invoices.sale_conditions_text') }}</p>
         </div>
         
         <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
-            <p><strong>FarmShop - E-commerce de produits agricoles</strong></p>
-            <p>123 Avenue des Champs, 75001 Paris, France | Tél: +33 1 23 45 67 89 | Email: contact@farmshop.fr</p>
-            <p>SIRET: 12345678901234 | TVA: FR12345678901</p>
+            <p><strong>FarmShop - {{ __('invoices.company_title') }}</strong></p>
+            <p>{{ __('app.footer.address_line1') }}, {{ __('app.footer.address_line2') }} | {{ __('app.footer.tel') }} | {{ __('app.footer.email') }}</p>
+            <p>{{ __('invoices.vat_number') }}: BE0123456789</p>
         </div>
         
         <div style="text-align: center; margin-top: 10px; color: #999; font-size: 10px;">
-            <p>Facture générée automatiquement le {{ now()->format('d/m/Y à H:i') }}</p>
+            <p>{{ __('invoices.invoice_generated') }} {{ now()->format('d/m/Y à H:i') }}</p>
         </div>
     </div>
 </body>
