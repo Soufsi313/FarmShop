@@ -90,7 +90,8 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::where('is_active', true)->orderBy('name')->get();
-        return view('admin.products.create', compact('categories'));
+        $rentalCategories = \App\Models\RentalCategory::where('is_active', true)->orderBy('name')->get();
+        return view('admin.products.create', compact('categories', 'rentalCategories'));
     }
 
     public function store(Request $request)
@@ -99,13 +100,13 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'short_description' => 'nullable|string|max:500',
-            'price' => 'required|numeric|min:0',
+            'price' => 'nullable|numeric|min:0',
             'rental_price_per_day' => 'nullable|numeric|min:0',
             'deposit_amount' => 'nullable|numeric|min:0',
             'min_rental_days' => 'nullable|integer|min:1',
             'max_rental_days' => 'nullable|integer|min:1', // NULL autorisé = pas de limite
             'type' => 'required|in:sale,rental,both',
-            'quantity' => 'required|integer|min:0',
+            'quantity' => 'nullable|integer|min:0',
             'rental_stock' => 'nullable|integer|min:0',
             'critical_threshold' => 'required|integer|min:0',
             'low_stock_threshold' => 'nullable|integer|min:0',
@@ -117,7 +118,8 @@ class ProductController extends Controller
             'image_alt' => 'nullable|string|max:255',
             'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'nullable|exists:categories,id',
+            'rental_category_id' => 'nullable|exists:rental_categories,id',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
             'meta_title' => 'nullable|string|max:255',
@@ -185,7 +187,8 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::where('is_active', true)->orderBy('name')->get();
-        return view('admin.products.edit', compact('product', 'categories'));
+        $rentalCategories = \App\Models\RentalCategory::where('is_active', true)->orderBy('name')->get();
+        return view('admin.products.edit', compact('product', 'categories', 'rentalCategories'));
     }
 
     public function update(Request $request, Product $product)
@@ -215,7 +218,8 @@ class ProductController extends Controller
             'remove_gallery_images.*' => 'nullable|string',
             'remove_images' => 'nullable|array',
             'remove_images.*' => 'nullable|string',
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'nullable|exists:categories,id',
+            'rental_category_id' => 'nullable|exists:rental_categories,id',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
             'meta_title' => 'nullable|string|max:255',

@@ -17,3 +17,12 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Dossiers de schémas et diagrammes
+/diagrammes
+/database_schemas
+/database_schemas_small
+
+# Fichiers de documentation temporaires
+/CHANGELOG.md
+/GUIDE_TEST_COOKIE_FIX.md
