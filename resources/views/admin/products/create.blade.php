@@ -232,14 +232,13 @@
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Gestion du stock</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
+                        <div x-show="formData.type === 'sale' || formData.type === 'both'">
                             <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantité en stock (vente) *</label>
                             <input type="number" 
                                    id="quantity" 
                                    name="quantity" 
                                    value="{{ old('quantity', 0) }}"
                                    min="0"
-                                   required
                                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 @error('quantity') border-red-500 @enderror">
                             @error('quantity')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
