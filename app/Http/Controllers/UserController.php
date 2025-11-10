@@ -240,8 +240,16 @@ class UserController extends Controller
         $user = User::withTrashed()->findOrFail($id);
         $user->restore();
 
+        // Envoyer l'email de notification de restauration
+        try {
+            \Mail::to($user->email)->send(new \App\Mail\AccountRestoredNotification($user));
+        } catch (\Exception $e) {
+            // Log l'erreur mais ne bloque pas la restauration
+            \Log::error('Erreur envoi email restauration compte : ' . $e->getMessage());
+        }
+
         return redirect()->route('admin.users.index')
-            ->with('success', "Utilisateur '{$user->name}' restauré avec succès !");
+            ->with('success', "Utilisateur '{$user->name}' restauré avec succès ! Un email de confirmation lui a été envoyé.");
     }
 
     /**
@@ -422,7 +430,7 @@ class UserController extends Controller
     }
 
     /**
-     * Demander la suppression du compte utilisateur (étape 1)
+     * Supprimer le compte utilisateur immédiatement
      */
     public function requestSelfDelete()
     {
@@ -434,54 +442,36 @@ class UserController extends Controller
         }
 
         try {
-            // Envoyer l'email de confirmation
-            $user->notify(new ConfirmAccountDeletionNotification());
-            
-            return view('auth.account-deletion-requested');
-            
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Erreur lors de l\'envoi de l\'email de confirmation : ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Confirmer la suppression du compte utilisateur (étape 2)
-     */
-    public function confirmSelfDelete(Request $request, $userId)
-    {
-        // Vérifier la signature de l'URL
-        if (!$request->hasValidSignature()) {
-            abort(403, 'Lien de confirmation invalide ou expiré');
-        }
-
-        $user = User::findOrFail($userId);
-
-        // Vérifier que c'est bien l'utilisateur connecté
-        if (Auth::id() !== $user->id) {
-            abort(403, 'Accès non autorisé');
-        }
-
-        // Un admin ne peut pas se supprimer lui-même
-        if ($user->isAdmin()) {
-            abort(403, 'Un administrateur ne peut pas supprimer son propre compte');
-        }
-
-        try {
-            // Générer le téléchargement GDPR avant suppression
+            // Générer le ZIP GDPR avant suppression
             $zipPath = $this->generateGdprZip($user);
             $zipFileName = basename($zipPath);
             
-            // Supprimer le compte (soft delete)
+            // Copier le ZIP dans storage/app/public pour accès public
+            $publicPath = storage_path('app/public/gdpr/' . $zipFileName);
+            $publicDir = dirname($publicPath);
+            if (!is_dir($publicDir)) {
+                mkdir($publicDir, 0755, true);
+            }
+            copy($zipPath, $publicPath);
+            
+            // Supprimer le compte (soft delete - préservé !)
             $user->delete();
+
+            // Envoyer l'email de notification de suppression
+            \Mail::to($user->email)->send(new \App\Mail\AccountDeletionNotification($user));
 
             // Déconnecter l'utilisateur
             Auth::logout();
+
+            // Invalider la session
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
 
             // Retourner la page de confirmation avec téléchargement automatique
             return view('auth.account-deleted-success')->with('zipFileName', $zipFileName);
             
         } catch (\Exception $e) {
-            return redirect()->route('home')->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
 
@@ -572,7 +562,7 @@ class UserController extends Controller
      */
     private function generateRentalsPdf($user)
     {
-        $rentals = $user->orderLocations()->with('product', 'inspections')->get();
+        $rentals = $user->orderLocations()->with('orderItemLocations.product')->get();
         $html = view('pdfs.user-rentals', compact('user', 'rentals'))->render();
         $pdf = Pdf::loadHTML($html);
         

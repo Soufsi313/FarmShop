@@ -86,16 +86,6 @@
                     Retour à l'accueil
                 </a>
             </div>
-
-            <!-- Auto-déconnexion -->
-            <div class="text-center bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                <p class="text-xs text-yellow-800">
-                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Déconnexion automatique dans <span id="countdown">5</span> secondes...
-                </p>
-            </div>
         </div>
     </div>
 </div>
@@ -104,46 +94,22 @@
 <script>
 // Déclencher le téléchargement automatique du ZIP
 document.addEventListener('DOMContentLoaded', function() {
-    const link = document.createElement('a');
-    link.href = '{{ asset('storage/gdpr/') }}/' + '{{ $zipFileName }}';
-    link.download = '{{ $zipFileName }}';
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    setTimeout(function() {
+        const link = document.createElement('a');
+        link.href = '{{ url('storage/gdpr') }}/' + '{{ $zipFileName }}';
+        link.download = '{{ $zipFileName }}';
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        console.log('Téléchargement du ZIP initié : {{ $zipFileName }}');
+    }, 1000); // Attendre 1 seconde avant de déclencher le téléchargement
 });
 </script>
 @endif
 
 <script>
-// Countdown et auto-déconnexion après 5 secondes
-let countdown = 5;
-const countdownElement = document.getElementById('countdown');
-
-const timer = setInterval(function() {
-    countdown--;
-    if (countdownElement) {
-        countdownElement.textContent = countdown;
-    }
-    
-    if (countdown <= 0) {
-        clearInterval(timer);
-        // Créer un formulaire POST pour la déconnexion
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = "{{ route('logout') }}";
-        
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = "{{ csrf_token() }}";
-        
-        form.appendChild(csrfToken);
-        document.body.appendChild(form);
-        form.submit();
-    }
-}, 1000);
-
 // Animation d'entrée
 document.addEventListener('DOMContentLoaded', function() {
     const elements = document.querySelectorAll('.max-w-lg > *');

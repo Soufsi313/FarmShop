@@ -78,7 +78,7 @@
             </div>
             <div class="order-info">
                 <div class="order-label">Total :</div>
-                <div>{{ number_format($order->total, 2) }}€</div>
+                <div>{{ number_format($order->total_amount, 2) }} €</div>
             </div>
 
             @if($order->items->count() > 0)
@@ -96,8 +96,8 @@
                             <tr>
                                 <td>{{ $item->product->name ?? 'Produit supprimé' }}</td>
                                 <td>{{ $item->quantity }}</td>
-                                <td>{{ number_format($item->price, 2) }}€</td>
-                                <td>{{ number_format($item->price * $item->quantity, 2) }}€</td>
+                                <td>{{ number_format($item->unit_price, 2) }} €</td>
+                                <td>{{ number_format($item->total_price, 2) }} €</td>
                             </tr>
                         @endforeach
                     </tbody>

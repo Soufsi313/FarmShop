@@ -61,8 +61,17 @@
             </div>
             
             <div class="rental-info">
-                <div class="rental-label">Produit :</div>
-                <div>{{ $rental->product->name ?? 'Produit supprimé' }}</div>
+                <div class="rental-label">Produit(s) :</div>
+                <div>
+                    @if($rental->orderItemLocations && $rental->orderItemLocations->count() > 0)
+                        @foreach($rental->orderItemLocations as $item)
+                            {{ $item->product_name ?? 'Produit supprimé' }}
+                            @if(!$loop->last), @endif
+                        @endforeach
+                    @else
+                        Aucun produit
+                    @endif
+                </div>
             </div>
             <div class="rental-info">
                 <div class="rental-label">Date de début :</div>
@@ -77,23 +86,18 @@
                 <div>{{ $rental->status }}</div>
             </div>
             <div class="rental-info">
-                <div class="rental-label">Prix :</div>
-                <div>{{ number_format($rental->total_price, 2) }}€</div>
+                <div class="rental-label">Prix total :</div>
+                <div>{{ number_format($rental->total_amount, 2) }} €</div>
+            </div>
+            <div class="rental-info">
+                <div class="rental-label">Caution :</div>
+                <div>{{ number_format($rental->deposit_amount, 2) }} €</div>
             </div>
 
-            @if($rental->inspections && $rental->inspections->count() > 0)
-                <div class="inspections">
-                    <h4>Inspections :</h4>
-                    @foreach($rental->inspections as $inspection)
-                        <div class="inspection">
-                            <strong>{{ ucfirst($inspection->type) }}</strong> - 
-                            {{ $inspection->created_at->format('d/m/Y à H:i') }}<br>
-                            Statut : {{ $inspection->status }}<br>
-                            @if($inspection->notes)
-                                Notes : {{ $inspection->notes }}
-                            @endif
-                        </div>
-                    @endforeach
+            @if($rental->inspection_notes)
+                <div class="rental-info">
+                    <div class="rental-label">Notes d'inspection :</div>
+                    <div>{{ $rental->inspection_notes }}</div>
                 </div>
             @endif
         </div>

@@ -532,11 +532,8 @@ Route::middleware(['auth'])->group(function () {
     // Export données RGPD
     Route::get('/profile/download-data', [UserController::class, 'downloadData'])->name('users.download-data');
     
-    // Suppression de compte en 2 étapes
+    // Suppression de compte (immédiate)
     Route::post('/profile/request-delete', [UserController::class, 'requestSelfDelete'])->name('users.request-delete');
-    Route::get('/profile/confirm-delete/{user}', [UserController::class, 'confirmSelfDelete'])->name('account.confirm-deletion')->middleware('signed');
-    
-    // Ancien endpoint (pour compatibilité)
     Route::delete('/profile/self-delete', [UserController::class, 'requestSelfDelete'])->name('users.self-delete');
 });
 

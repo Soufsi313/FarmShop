@@ -64,7 +64,7 @@
         </div>
         <div class="info-row">
             <div class="info-label">Email vérifié :</div>
-            <div class="info-value">{{ $email_verified_at ? 'Oui, le ' . $email_verified_at->format('d/m/Y à H:i:s') : {{ __("app.common.no") }} }}</div>
+            <div class="info-value">{{ $email_verified_at ? 'Oui, le ' . $email_verified_at->format('d/m/Y à H:i:s') : 'Non' }}</div>
         </div>
     </div>
 

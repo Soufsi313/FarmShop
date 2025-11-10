@@ -325,15 +325,15 @@
                                             <!-- Bouton Restaurer pour les comptes supprimés -->
                                             <form method="POST" 
                                                   action="{{ route('admin.users.restore', $user->id) }}" 
-                                                  class="inline" onsubmit="return confirm('{{ __('users.actions.restore_confirm') }}')">
+                                                  class="inline" onsubmit="return confirm('Voulez-vous vraiment restaurer cet utilisateur ?')">
                                                 @csrf
                                                 <button type="submit" 
                                                         class="text-green-600 hover:text-green-900 transition-colors bg-green-50 hover:bg-green-100 px-3 py-2 rounded-lg border border-green-200" 
-                                                        title="{{ __('users.actions.restore') }}">
+                                                        title="Restaurer l'utilisateur">
                                                     <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0V9a8 8 0 1115.356 2M15 13l-3-3-3 3m3-3v9"/>
                                                     </svg>
-                                                    {{ __('users.actions.restore') }}
+                                                    Restaurer
                                                 </button>
                                             </form>
                                         @else
