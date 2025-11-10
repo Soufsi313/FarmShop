@@ -427,24 +427,24 @@ class OrderLocation extends Model
             'has_damages' => 'boolean',
             'damage_notes' => 'nullable|string|max:2000',
             'damage_photos' => 'nullable|array',
-            'inspection_notes' => 'required|string|max:2000'
+            'inspection_notes' => 'required|string|max:2000',
+            'manual_damage_cost' => 'nullable|numeric'
         ])->validate();
         
-        // Calculer automatiquement les coûts de dommages
-        $damageCost = 0;
-        $hasDamages = $validated['has_damages'] ?? false;
-        
-        if ($hasDamages && $this->auto_calculate_damages) {
-            // Dommages = caution complète + frais de retard
-            $damageCost = $this->deposit_amount + $this->late_fees;
+        // Si les montants ont déjà été définis manuellement, on les garde
+        // Sinon on utilise les valeurs par défaut
+        if (!isset($this->damage_cost) || $this->damage_cost === null) {
+            $damageCost = $validated['manual_damage_cost'] ?? 0;
+            $hasDamages = $validated['has_damages'] ?? false;
+            $totalPenalties = $this->late_fees + $damageCost;
+            $depositRefund = $hasDamages ? max(0, $this->deposit_amount - $totalPenalties) : $this->deposit_amount;
+        } else {
+            // Les valeurs ont déjà été définies dans le contrôleur
+            $damageCost = $this->damage_cost;
+            $totalPenalties = $this->total_penalties;
+            $depositRefund = $this->deposit_refund;
+            $hasDamages = $validated['has_damages'] ?? false;
         }
-        
-        // Calculer le total des pénalités
-        $totalPenalties = $this->late_fees + $damageCost;
-        
-        // Important: Avec le système de pré-autorisation, il n'y a pas de "remboursement"
-        // La caution est soit libérée (si pas de dommages) soit capturée (si dommages)
-        $depositRefund = $hasDamages ? 0 : $this->deposit_amount;
         
         $this->update([
             'status' => 'finished',

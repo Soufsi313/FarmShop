@@ -1753,18 +1753,7 @@ return array (
     'tracking_number' => 'Numéro de suivi',
     'refund_processed' => 'Remboursement traité',
     'refund_processing' => 'Remboursement en cours',
-    // Méthodes de paiement
-    'payment_methods' => array(
-      'card' => '💳 Carte bancaire',
-      'paypal' => '💰 PayPal',
-      'bank_transfer' => '🏦 Virement bancaire',
-    ),
-    // Statuts de paiement
-    'payment_statuses' => array(
-      'paid' => '✅ Payé',
-      'pending' => '⏳ En attente',
-      'failed' => '❌ Échec',
-    ),
+    // Méthodes de paiement (obsolète - voir niveau racine)
     
     // Actions et boutons
     'reorder_confirm' => 'Voulez-vous vraiment ajouter tous les produits de cette commande à votre panier ?',
@@ -1782,6 +1771,24 @@ return array (
     // Messages JavaScript
     'update_error' => 'Erreur lors de la mise à jour du statut:',
     'status_updated' => 'Statut mis à jour:',
+  ),
+
+  // Méthodes de paiement (niveau racine)
+  'payment_methods' => array(
+    'stripe' => 'Carte bancaire',
+    'card' => 'Carte bancaire',
+    'cash' => 'Espèces',
+    'bank_transfer' => 'Virement bancaire',
+    'paypal' => 'PayPal',
+  ),
+
+  // Statuts de paiement (niveau racine)
+  'payment_statuses' => array(
+    'paid' => 'Payé',
+    'pending' => 'En attente',
+    'failed' => 'Échec',
+    'refunded' => 'Remboursé',
+    'deposit_paid' => 'Acompte payé',
   ),
 
   'admin' => array(

@@ -258,7 +258,18 @@
                 
                 @if($orderLocation->status === 'inspecting')
                 <!-- Formulaire d'inspection -->
-                <form action="{{ route('admin.rental-returns.finish-inspection', $orderLocation) }}" method="POST" id="inspectionForm" enctype="multipart/form-data">
+                @if ($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <strong class="font-bold">Erreurs de validation :</strong>
+                    <ul class="list-disc list-inside mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
+                
+                <form action="{{ route('admin.rental-returns.finish-inspection', $orderLocation) }}" method="POST" id="inspectionForm" enctype="multipart/form-data" onsubmit="console.log('Form submitted!'); return true;">
                     @csrf
                     @method('PATCH')
                     
@@ -333,7 +344,7 @@
                         <!-- Section Frais généraux -->
                         <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
                             <h4 class="font-medium text-gray-900 mb-4">💰 {{ __('rental_returns.fees_and_penalties') }}</h4>
-                            <div class="grid grid-cols-1 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">
                                         {{ __('rental_returns.late_fees') }}
@@ -351,20 +362,44 @@
                                            class="w-full border border-gray-300 rounded px-3 py-2"
                                            placeholder="0.00"
                                            oninput="updatePenaltiesDisplay()"
-                                           onchange="updatePenaltiesDisplay()">>
+                                           onchange="updatePenaltiesDisplay()">
                                     <small class="text-gray-500">{{ __('rental_returns.late_fees_note') }}</small>
                                 </div>
                                 
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        💥 Frais de dégâts
+                                        <small class="text-gray-500">(Montant personnalisé)</small>
+                                    </label>
+                                    <input type="number" 
+                                           id="damage_cost_input"
+                                           name="damage_cost" 
+                                           value="{{ $orderLocation->damage_cost ?? 0 }}"
+                                           step="0.01" 
+                                           min="0" 
+                                           max="999999.99"
+                                           class="w-full border border-gray-300 rounded px-3 py-2"
+                                           placeholder="0.00"
+                                           oninput="updatePenaltiesDisplay()"
+                                           onchange="updatePenaltiesDisplay()">
+                                    <small class="text-gray-500">Saisissez le montant exact des dégâts constatés</small>
+                                </div>
 
                             </div>
                         </div>
                         
                         <div class="border-t pt-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('rental_returns.general_inspection_notes') }}</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ __('rental_returns.general_inspection_notes') }}
+                                <span class="text-red-600">*</span>
+                                <span class="text-xs text-gray-500 font-normal">(obligatoire)</span>
+                            </label>
                             <textarea name="general_notes" 
                                       rows="4" 
+                                      required
                                       class="w-full border border-gray-300 rounded px-3 py-2"
                                       placeholder="{{ __('rental_returns.general_inspection_notes') }}...">{{ $orderLocation->inspection_notes }}</textarea>
+                            <p class="text-xs text-gray-500 mt-1">⚠️ Ce champ est obligatoire pour finaliser l'inspection</p>
                         </div>
                         
                         <!-- Section Photos de dommages -->
@@ -537,15 +572,15 @@ function updatePenaltiesDisplay() {
     // Récupérer les frais de retard
     const lateFees = parseFloat(document.getElementById('late_fees_input')?.value || 0);
     
-    // Calculer la somme des coûts de dégâts par produit
-    let itemDamageCosts = 0;
-    const itemDamageInputs = document.querySelectorAll('.item-damage-cost');
-    itemDamageInputs.forEach(input => {
-        itemDamageCosts += parseFloat(input.value || 0);
-    });
+    // Récupérer les frais de dégâts manuels
+    const damageCost = parseFloat(document.getElementById('damage_cost_input')?.value || 0);
     
     // Total des pénalités
-    const totalPenalties = lateFees + itemDamageCosts;
+    const totalPenalties = lateFees + damageCost;
+    
+    // Calculer le remboursement de caution
+    const depositAmount = {{ $orderLocation->deposit_amount ?? 0 }};
+    const refundAmount = Math.max(0, depositAmount - totalPenalties);
     
     // Mettre à jour l'affichage
     const lateFeesDisplay = document.getElementById('late_fees_display');
@@ -555,12 +590,17 @@ function updatePenaltiesDisplay() {
     
     const damageDisplay = document.getElementById('damage_costs_display');
     if (damageDisplay) {
-        damageDisplay.textContent = itemDamageCosts.toFixed(2) + '€';
+        damageDisplay.textContent = damageCost.toFixed(2) + '€';
     }
     
     const totalDisplay = document.getElementById('total_penalties_display');
     if (totalDisplay) {
         totalDisplay.textContent = totalPenalties.toFixed(2) + '€';
+    }
+    
+    const refundDisplay = document.getElementById('refund_amount_display');
+    if (refundDisplay) {
+        refundDisplay.textContent = refundAmount.toFixed(2) + '€';
     }
 }
 

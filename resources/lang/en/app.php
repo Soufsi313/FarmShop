@@ -1781,17 +1781,22 @@ return array (
     'refunded' => 'Refunded',
   ),
 
+  // Payment methods
   'payment_methods' => array(
-    'card' => '💳 Credit card',
-    'paypal' => '💰 PayPal',
-    'bank_transfer' => '🏦 Bank transfer',
-    'stripe' => '💳 Credit card',
+    'stripe' => 'Credit card',
+    'card' => 'Credit card',
+    'cash' => 'Cash',
+    'bank_transfer' => 'Bank transfer',
+    'paypal' => 'PayPal',
   ),
 
+  // Payment statuses
   'payment_statuses' => array(
-    'paid' => '✅ Paid',
-    'pending' => '⏳ Pending',
-    'failed' => '❌ Failed',
+    'paid' => 'Paid',
+    'pending' => 'Pending',
+    'failed' => 'Failed',
+    'refunded' => 'Refunded',
+    'deposit_paid' => 'Deposit paid',
   ),
 
   'orders' => array(

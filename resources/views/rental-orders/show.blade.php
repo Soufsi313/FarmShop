@@ -55,6 +55,9 @@
                                 'confirmed' => 'bg-blue-100 text-blue-800',
                                 'active' => 'bg-purple-100 text-purple-800',
                                 'completed' => 'bg-green-100 text-green-800',
+                                'closed' => 'bg-blue-100 text-blue-800',
+                                'inspecting' => 'bg-purple-100 text-purple-800',
+                                'finished' => 'bg-green-100 text-green-800',
                                 'cancelled' => 'bg-red-100 text-red-800'
                             ];
                             
@@ -63,6 +66,9 @@
                                 'confirmed' => __("app.rental_status.confirmed"),
                                 'active' => __("app.rental_status.active"),
                                 'completed' => __("app.rental_status.completed"),
+                                'closed' => __("app.rental_status.closed"),
+                                'inspecting' => __("app.rental_status.inspecting"),
+                                'finished' => __("app.rental_status.finished"),
                                 'cancelled' => __("app.rental_status.cancelled")
                             ];
                         @endphp

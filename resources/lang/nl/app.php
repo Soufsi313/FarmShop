@@ -1832,17 +1832,22 @@ return array (
     'refunded' => 'Terugbetaald',
   ),
 
+  // Betaalmethoden
   'payment_methods' => array(
-    'card' => '💳 Creditcard',
-    'paypal' => '💰 PayPal',
-    'bank_transfer' => '🏦 Bankoverschrijving',
-    'stripe' => '💳 Creditcard',
+    'stripe' => 'Creditcard',
+    'card' => 'Creditcard',
+    'cash' => 'Contant',
+    'bank_transfer' => 'Bankoverschrijving',
+    'paypal' => 'PayPal',
   ),
 
+  // Betalingsstatussen
   'payment_statuses' => array(
-    'paid' => '✅ Betaald',
-    'pending' => '⏳ In afwachting',
-    'failed' => '❌ Mislukt',
+    'paid' => 'Betaald',
+    'pending' => 'In afwachting',
+    'failed' => 'Mislukt',
+    'refunded' => 'Terugbetaald',
+    'deposit_paid' => 'Aanbetaling betaald',
   ),
 
   'orders' => array(

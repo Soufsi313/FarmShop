@@ -410,10 +410,10 @@
                     <span><strong>{{ number_format($orderLocation->damage_cost, 2) }}€</strong></span>
                 </div>
                 @endif
-                @if((($orderLocation->late_fees ?? 0) > 0 && $orderLocation->late_days > 0) || ($orderLocation->damage_cost ?? 0) > 0)
+                @if($orderLocation->total_penalties && $orderLocation->total_penalties > 0)
                 <div class="financial-row total" style="color: #dc3545;">
                     <span>Total des pénalités :</span>
-                    <span><strong>{{ number_format((($orderLocation->late_fees ?? 0) * ($orderLocation->late_days > 0 ? 1 : 0)) + ($orderLocation->damage_cost ?? 0), 2) }}€</strong></span>
+                    <span><strong>{{ number_format($orderLocation->total_penalties, 2) }}€</strong></span>
                 </div>
                 @endif
                 <div class="financial-row total">

@@ -135,6 +135,7 @@ class RentalReturnsController extends Controller
             'items.*.has_damages' => 'required|boolean',
             'damage_photos.*' => 'nullable|image|mimes:jpeg,jpg,png|max:5120', // 5MB max
             'late_fees' => 'nullable|numeric|min:0|max:999999.99',
+            'damage_cost' => 'nullable|numeric|min:0|max:999999.99',
             'general_notes' => 'nullable|string|max:2000'
         ]);
 
@@ -172,6 +173,11 @@ class RentalReturnsController extends Controller
 
             // Récupérer les frais saisis dans le formulaire
             $lateFees = floatval($request->late_fees ?? 0);
+            $damageCost = floatval($request->damage_cost ?? 0);
+            
+            // Calculer le total des pénalités
+            $totalPenalties = $lateFees + $damageCost;
+            $depositRefund = max(0, $orderLocation->deposit_amount - $totalPenalties);
             
             // Préparer les données pour l'inspection
             $inspectionData = [
@@ -179,11 +185,18 @@ class RentalReturnsController extends Controller
                 'has_damages' => $hasGlobalDamages,
                 'damage_notes' => $request->general_notes,
                 'damage_photos' => $damagePhotoPaths,
-                'inspection_notes' => $request->general_notes
+                'inspection_notes' => $request->general_notes,
+                'manual_damage_cost' => $damageCost // Passer le coût manuel
             ];
 
-            // Mettre à jour les frais de retard avant l'inspection finale
-            $orderLocation->update(['late_fees' => $lateFees]);
+            // Mettre à jour les frais avant l'inspection finale
+            $orderLocation->update([
+                'late_fees' => $lateFees,
+                'damage_cost' => $damageCost,
+                'total_penalties' => $totalPenalties,
+                'deposit_refund' => $depositRefund,
+                'auto_calculate_damages' => false // Désactiver le calcul auto
+            ]);
 
             // Utiliser la méthode du modèle pour terminer l'inspection
             $orderLocation->completeInspection($inspectionData);
@@ -192,8 +205,6 @@ class RentalReturnsController extends Controller
 
             // Récupérer les valeurs calculées après l'inspection
             $orderLocation->refresh();
-            $totalPenalties = $orderLocation->total_penalties;
-            $depositRefund = $orderLocation->deposit_refund;
 
             // 🤖 Envoyer message Mr Clank et email d'inspection
             $this->sendMrClankMessage($orderLocation, $totalPenalties, $depositRefund);
