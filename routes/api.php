@@ -513,7 +513,7 @@ Route::post('/newsletter/track/click/{token}', [NewsletterSubscriptionController
 Route::get('/newsletter/unsubscribe/{token}', [NewsletterSubscriptionController::class, 'unsubscribeByToken'])->name('api.newsletter.unsubscribe-token');
 
 // Routes commentaires de blog pour utilisateurs connectés
-Route::prefix('blog')->name('api.blog.')->group(function () {
+Route::middleware(['web', 'auth'])->prefix('blog')->name('api.blog.')->group(function () {
     Route::post('/posts/{blogPost}/comments', [App\Http\Controllers\BlogCommentController::class, 'store'])->name('comments.store');
     Route::put('/comments/{blogComment}', [App\Http\Controllers\BlogCommentController::class, 'update'])->name('comments.update');
     Route::delete('/comments/{blogComment}', [App\Http\Controllers\BlogCommentController::class, 'destroy'])->name('comments.destroy');

@@ -81,7 +81,7 @@
                                         <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                                             <path fill-rule="evenodd" d="M4.848 2.771A49.144 49.144 0 0112 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 01-3.476.383.39.39 0 00-.297.17l-2.755 4.133a.75.75 0 01-1.248 0l-2.755-4.133a.39.39 0 00-.297-.17 48.9 48.9 0 01-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.678 3.348-3.97z"/>
                                         </svg>
-                                        {{ $post->comments_count }} commentaires
+                                        {{ $visibleCommentsCount }} commentaires
                                     </span>
                                 </div>
 
@@ -137,7 +137,7 @@
                 <!-- Section commentaires -->
                 <div class="mt-8 bg-white rounded-lg shadow-sm p-8">
                     <h2 class="text-2xl font-bold text-gray-900 mb-6">
-                        Commentaires ({{ $comments->total() }})
+                        Commentaires ({{ $visibleCommentsCount }})
                     </h2>
 
                     @auth
@@ -276,7 +276,7 @@ document.getElementById('comment-form')?.addEventListener('submit', async functi
     submitButton.disabled = true;
     
     try {
-        const response = await fetch('/api/blog/comments', {
+        const response = await fetch('/api/blog/posts/{{ $post->id }}/comments', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -287,13 +287,13 @@ document.getElementById('comment-form')?.addEventListener('submit', async functi
         
         const data = await response.json();
         
-        if (data.success) {
+        if (data.status === 'success') {
             // Réinitialiser le formulaire
             this.reset();
             // Afficher un message de succès
-            showNotification('Commentaire publié avec succès !', 'success');
-            // Recharger la page pour afficher le nouveau commentaire
-            setTimeout(() => window.location.reload(), 1000);
+            showNotification(data.message || 'Commentaire publié avec succès !', 'success');
+            // Recharger la page immédiatement pour afficher le nouveau commentaire
+            setTimeout(() => window.location.reload(), 500);
         } else {
             showNotification(data.message || 'Erreur lors de la publication', 'error');
         }

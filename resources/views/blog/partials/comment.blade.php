@@ -6,14 +6,14 @@
     <div class="flex space-x-3">
         <!-- Avatar -->
         <div class="flex-shrink-0">
-            @if($comment->user->avatar)
+            @if($comment->user && $comment->user->avatar)
                 <img src="{{ Storage::url($comment->user->avatar) }}" 
                      alt="{{ $comment->user->name }}"
                      class="w-10 h-10 rounded-full object-cover">
             @else
                 <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
                     <span class="text-gray-600 font-medium text-sm">
-                        {{ strtoupper(substr($comment->user->name, 0, 1)) }}
+                        {{ strtoupper(substr($comment->user ? $comment->user->name : ($comment->guest_name ?? 'I'), 0, 1)) }}
                     </span>
                 </div>
             @endif
@@ -23,7 +23,7 @@
             <!-- Header du commentaire -->
             <div class="flex items-center space-x-2 mb-2">
                 <h4 class="text-sm font-medium text-gray-900">
-                    {{ $comment->user->name }}
+                    {{ $comment->user ? $comment->user->name : ($comment->guest_name ?? 'Invité') }}
                 </h4>
                 <time class="text-xs text-gray-500" datetime="{{ $comment->created_at->format('Y-m-d\TH:i:s') }}">
                     {{ $comment->created_at->diffForHumans() }}
@@ -177,8 +177,11 @@ async function submitReply(event, parentId) {
     submitButton.textContent = 'Envoi...';
     submitButton.disabled = true;
     
+    // Récupérer l'ID du blog post depuis le formulaire
+    const blogPostId = formData.get('blog_post_id');
+    
     try {
-        const response = await fetch('/api/blog/comments', {
+        const response = await fetch(`/api/blog/posts/${blogPostId}/comments`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -189,9 +192,9 @@ async function submitReply(event, parentId) {
         
         const data = await response.json();
         
-        if (data.success) {
-            showNotification('Réponse publiée avec succès !', 'success');
-            setTimeout(() => window.location.reload(), 1000);
+        if (data.status === 'success') {
+            showNotification(data.message || 'Réponse publiée avec succès !', 'success');
+            setTimeout(() => window.location.reload(), 500);
         } else {
             showNotification(data.message || 'Erreur lors de la publication', 'error');
         }

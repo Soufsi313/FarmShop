@@ -11,7 +11,8 @@ class BlogCommentReportController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum');
+        // Utiliser uniquement l'authentification web (session) pour les signalements
+        $this->middleware('auth');
         $this->middleware('admin')->except(['store']);
     }
 

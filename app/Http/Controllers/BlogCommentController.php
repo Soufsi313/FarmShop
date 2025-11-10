@@ -11,7 +11,8 @@ class BlogCommentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum');
+        // Utiliser uniquement l'authentification web (session) pour les commentaires
+        $this->middleware('auth');
         $this->middleware('admin')->only(['index', 'moderate', 'statistics']);
     }
 
@@ -280,13 +281,11 @@ class BlogCommentController extends Controller
 
         $validated['blog_post_id'] = $blogPost->id;
 
-        // Si l'utilisateur est connecté
+        // Tous les commentaires d'utilisateurs connectés sont approuvés automatiquement
+        // La modération n'intervient que si le commentaire est signalé
         if (Auth::check()) {
             $validated['user_id'] = Auth::id();
-            // Les admins voient leurs commentaires approuvés automatiquement
-            if (in_array(Auth::user()->role, ['admin', 'Admin'])) {
-                $validated['status'] = 'approved';
-            }
+            $validated['status'] = 'approved';
         } else {
             // Commentaire d'invité - validation supplémentaire
             if (!$validated['guest_name'] || !$validated['guest_email']) {
@@ -295,10 +294,12 @@ class BlogCommentController extends Controller
                     'message' => 'Le nom et l\'email sont requis pour les invités'
                 ], 422);
             }
+            // Les invités aussi sont approuvés automatiquement
+            $validated['status'] = 'approved';
         }
 
         // Vérifier si le parent existe et appartient au même article
-        if ($validated['parent_id']) {
+        if (isset($validated['parent_id']) && $validated['parent_id']) {
             $parent = BlogComment::find($validated['parent_id']);
             if (!$parent || $parent->blog_post_id !== $blogPost->id) {
                 return response()->json([

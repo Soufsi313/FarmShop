@@ -305,15 +305,24 @@ class BlogPostController extends Controller
         // Incrémenter le compteur de vues
         $post->increment('views_count');
 
-        // Charger les commentaires approuvés
+        // Charger les commentaires approuvés (exclure ceux des utilisateurs supprimés)
         $comments = $post->comments()
             ->where('status', 'approved')
             ->whereNull('parent_id')
+            ->whereHas('user') // Exclut les commentaires dont l'utilisateur est soft deleted
             ->with(['user', 'replies' => function($query) {
-                $query->where('status', 'approved')->with('user');
+                $query->where('status', 'approved')
+                    ->whereHas('user') // Exclut les réponses dont l'utilisateur est soft deleted
+                    ->with('user');
             }])
             ->latest()
             ->paginate(10);
+
+        // Compter uniquement les commentaires visibles (avec utilisateur actif)
+        $visibleCommentsCount = $post->comments()
+            ->where('status', 'approved')
+            ->whereHas('user')
+            ->count();
 
         // Articles similaires
         $relatedPosts = BlogPost::where('status', 'published')
@@ -323,7 +332,7 @@ class BlogPostController extends Controller
             ->take(4)
             ->get();
 
-        return view('blog.show', compact('post', 'comments', 'relatedPosts'));
+        return view('blog.show', compact('post', 'comments', 'relatedPosts', 'visibleCommentsCount'));
     }
 
     /**
